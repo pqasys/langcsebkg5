@@ -1,0 +1,150 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "API Load Test"
+  
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+  
+  variables:
+    adminEmail: 'test.admin@example.com'
+    adminPassword: 'testpassword123'
+
+scenarios:
+  - name: "Public API Endpoints"
+    weight: 30
+    flow:
+      - get:
+          url: "/"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/categories"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/institutions"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/courses"
+          expect:
+            - statusCode: 200
+
+  - name: "Admin API Endpoints"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/auth/signin"
+          json:
+            email: "{{ adminEmail }}"
+            password: "{{ adminPassword }}"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/admin/dashboard"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/admin/users"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/admin/courses"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/admin/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Student API Endpoints"
+    weight: 25
+    flow:
+      - post:
+          url: "/api/auth/signin"
+          json:
+            email: "test.student@example.com"
+            password: "testpassword123"
+          capture:
+            - json: "$.token"
+              as: "studentToken"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/student/dashboard"
+          headers:
+            Authorization: "Bearer {{ studentToken }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/student/courses"
+          headers:
+            Authorization: "Bearer {{ studentToken }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/student/progress"
+          headers:
+            Authorization: "Bearer {{ studentToken }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Search and Filter Endpoints"
+    weight: 15
+    flow:
+      - get:
+          url: "/api/search?query=language&category=beginner"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/courses?level=BEGINNER&framework=CEFR"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/institutions?country=Test Country"
+          expect:
+            - statusCode: 200
+
+  - name: "Database Intensive Operations"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/admin/courses?include=enrollments,completions,tags"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      
+      - get:
+          url: "/api/student/dashboard/stats"
+          headers:
+            Authorization: "Bearer {{ studentToken }}"
+          expect:
+            - statusCode: 200 

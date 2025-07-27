@@ -1,0 +1,280 @@
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { assignTagsToCourse } from '@/lib/tag-utils';
+import { v4 as uuidv4 } from 'uuid';
+
+export async function GET(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const institutionId = searchParams.get('institutionId');
+    const search = searchParams.get('search');
+    const categoryId = searchParams.get('categoryId');
+    const status = searchParams.get('status');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const skip = (page - 1) * limit;
+
+    console.log('API: Received params:', { 
+      institutionId, 
+      search, 
+      categoryId, 
+      status,
+      page, 
+      limit, 
+      skip 
+    });
+
+    // Build where clause
+    const where: any = {};
+    
+    if (institutionId) {
+      // Verify institution exists
+      const institution = await prisma.institution.findUnique({
+        where: { id: institutionId }
+      });
+      
+      if (!institution) {
+        console.error('Institution not found:', institutionId);
+        return NextResponse.json(
+          { message: 'Institution not found' },
+          { status: 404 }
+        );
+      }
+      
+      where.institutionId = institutionId;
+      console.log('Filtering by institution:', institution.name);
+    }
+    
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+    
+    if (status) {
+      where.status = status.toUpperCase();
+    }
+    
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    // Get total count for pagination
+    const total = await prisma.course.count({ where });
+    console.log('Total courses found:', total);
+
+    // Single optimized query with pagination
+    const courses = await prisma.course.findMany({
+      where,
+      include: {
+        courseTags: {
+          select: {
+            id: true,
+            tag: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+                icon: true,
+              },
+            },
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        }
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip,
+      take: limit,
+    });
+
+    // Get institution data for all courses
+    const institutionIds = [...new Set(courses.map(course => course.institutionId))];
+    const institutions = await prisma.institution.findMany({
+      where: {
+        id: { in: institutionIds }
+      },
+      select: {
+        id: true,
+        name: true,
+      }
+    });
+
+    // Create a map for quick lookup
+    const institutionMap = new Map(institutions.map(inst => [inst.id, inst]));
+
+    // Filter by institution name if search term matches institution
+    let filteredCourses = courses;
+    if (search) {
+      filteredCourses = courses.filter(course => {
+        const institution = institutionMap.get(course.institutionId);
+        return course.title.toLowerCase().includes(search.toLowerCase()) ||
+          course.description?.toLowerCase().includes(search.toLowerCase()) ||
+          institution?.name.toLowerCase().includes(search.toLowerCase());
+      });
+    }
+
+    // Get counts separately for each course
+    const coursesWithCounts = await Promise.all(
+      filteredCourses.map(async (course) => {
+        const [enrollments, completions, courseTags, weeklyPrices, pricingRules] = await Promise.all([
+          prisma.studentCourseEnrollment.count({ where: { courseId: course.id } }),
+          prisma.studentCourseCompletion.count({ where: { courseId: course.id } }),
+          prisma.courseTag.count({ where: { courseId: course.id } }),
+          prisma.courseWeeklyPrice.count({ where: { courseId: course.id } }),
+          prisma.coursePricingRule.count({ where: { courseId: course.id } })
+        ]);
+
+        return {
+          ...course,
+          institution: institutionMap.get(course.institutionId),
+          _count: {
+            enrollments,
+            completions,
+            courseTags,
+            weeklyPrices,
+            pricingRules,
+          },
+        };
+      })
+    );
+
+    console.log('API: Successfully fetched courses:', {
+      count: coursesWithCounts.length,
+      total,
+      page,
+      limit,
+      institutionId,
+      institutionName: coursesWithCounts[0]?.institution?.name
+    });
+    
+    return NextResponse.json({
+      courses: coursesWithCounts,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error('API Error fetching courses:', error);
+    return NextResponse.json(
+      { message: 'Error fetching courses' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const {
+      title,
+      description,
+      base_price,
+      pricingPeriod,
+      institutionId,
+      categoryId,
+      framework,
+      level,
+      tags,
+      weeklyPrices,
+      monthlyPrices,
+      duration,
+      status,
+      startDate,
+      endDate,
+      maxStudents
+    } = body;
+
+    // Validate required fields
+    if (!title || !institutionId || !categoryId) {
+      console.log('Missing required fields:', { title, institutionId, categoryId });
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate base_price is a number (can be 0)
+    if (base_price === undefined || base_price === null || isNaN(Number(base_price))) {
+      console.log('Invalid base_price:', base_price);
+      return NextResponse.json(
+        { error: 'Base price must be a valid number' },
+        { status: 400 }
+      );
+    }
+
+    console.log('Creating course with data:', {
+      title,
+      base_price,
+      pricingPeriod,
+      institutionId,
+      categoryId,
+      tags: tags?.length,
+      weeklyPrices: weeklyPrices?.length,
+      monthlyPrices: monthlyPrices?.length
+    });
+
+    // Create the course
+    const course = await prisma.course.create({
+      data: {
+        id: uuidv4(),
+        title,
+        description,
+        base_price: parseFloat(base_price),
+        pricingPeriod: pricingPeriod || 'WEEKLY',
+        institutionId,
+        categoryId,
+        framework: framework || 'GENERAL',
+        level: level || 'BEGINNER',
+        duration: parseInt(duration) || 0,
+        status: status || 'draft',
+        startDate: startDate ? new Date(startDate) : new Date(),
+        endDate: endDate ? new Date(endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        maxStudents: parseInt(maxStudents) || 30,
+        courseTags: {
+          create: tags?.map((tag: { id: string }) => ({
+            tagId: tag.id
+          }))
+        }
+      },
+      include: {
+        courseTags: {
+          include: {
+            tag: true
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(course);
+  } catch (error) {
+    console.error('Error creating course:', error);
+    return NextResponse.json(
+      { error: 'Failed to create course' },
+      { status: 500 }
+    );
+  }
+} 

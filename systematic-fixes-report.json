@@ -1,0 +1,4445 @@
+{
+  "timestamp": "2025-07-18T23:34:22.546Z",
+  "totalFixes": 2451,
+  "totalFiles": 509,
+  "results": [
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 46,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 45,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 45,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\profile\\institution-profile.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 36,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\notification.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 33,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 6 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\server-connectivity.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 28,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\mobile-performance-report.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 27,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\enrollments\\calculate-price\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 27,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\global-setup.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 25,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\InstitutionCourseForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 25,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 7 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\profile\\facilities\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 25,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\prisma\\seed.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 24,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 23,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 5 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\CourseForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 23,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 7 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 22,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 5 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\websocket.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 21,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-student-profile-fix.js",
+      "pattern": "Multiple patterns",
+      "fixes": 20,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\auth-debug.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 20,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\subscription-commission-service.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 19,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\background-sync.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 19,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 9 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 19,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 18,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\audit-logger.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 17,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 16 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\cleanup\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 17,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\enroll\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 17,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\global-teardown.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 16,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 11 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\QuizInterface.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 16,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\offline-storage.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 15,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 14 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\enhanced-database-optimizer.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 15,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 12 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\tags\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 15,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\register\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 15,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 1 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 14,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\cron\\trial-expiration\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 14,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 14,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 3 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\performance\\performance-monitor.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 13,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\components\\EnrollmentModal.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 13,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\users\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 13,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\users\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 13,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\components\\CourseForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 13,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\components\\CourseForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 13,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 13,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 2 fixes",
+        "Generic 500 Errors: 4 fixes",
+        "Missing Request Validation: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\global-setup.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 12,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\performance-integration.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 12,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\encryption.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 12,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 8 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-progress-tracking.js",
+      "pattern": "Multiple patterns",
+      "fixes": 11,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\mobile-device-testing.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 11,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\email.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 11,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 6 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\payments\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 11,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\payments\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 11,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 11,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-courses-page.js",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\MonthlyPricingTable.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\debug-homepage.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\_admin_backup\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 5 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\_admin_backup\\CourseForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\test-session-establishment\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\tags\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\tags\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 4 fixes",
+        "Missing Request Validation: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 10,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\redis-cache.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\notification-integration.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\content-preloader.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\password-test.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\enrollment\\state-manager.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\redirect-after-signin\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\[contentId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\start\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\new\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\new\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 9,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\revenue-tracking-service.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\rate-limiter.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Any Type Usage: 8 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\payment-service.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\automated-commission-service.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\auth.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\subscriptions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\subscriptions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-banks\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 5 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\progress-visualization\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Any Type Usage: 7 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-banks\\[id]\\share\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\subscription-plans\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 8,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-admin-form.js",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\search.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Any Type Usage: 7 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\react-optimizer.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 5 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\database-optimizer.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Any Type Usage: 7 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\hooks\\useOfflineData.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Any Type Usage: 7 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\Navbar.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\test-simple-page.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\quick-homepage.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\debug-signin.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\courses\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\test-session\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\subscription\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\debug-cookies\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\error-scanning\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\courses\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\courses\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 7,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 3 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-course-issues.js",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\push-notifications.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\performance-monitor.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 5 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\api-optimizer.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\CoursesPageClient.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\profile\\00institution-profile.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\categories\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\search\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\test-session-establishment\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\force-session\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\commission-tiers\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\commission-tiers\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\pricing\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\subscriptions\\[id]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\subscriptions\\[id]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\courses\\[id]\\modules\\[moduleId]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic 500 Errors: 5 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\notifications\\templates\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 3 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\new\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\[contentId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 3 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 6,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\advanced-caching.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\hooks\\useServiceWorker.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\MainNav.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\simple-connection-test.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\institution\\InstitutionForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\utils.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\settings\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-templates\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-banks\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\content-management\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\profile\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\custom-signin\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\subscription-plans\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\subscription-plans\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\[id]\\upload\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\quiz\\[quizId]\\adaptive\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Any Type Usage: 4 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\weekly-prices\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\monthly-prices\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 3 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 5,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-dashboard.js",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\subscription-payment-service.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\enhanced-cache.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\cdn-optimizer.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\hooks\\useSessionSync.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\StructuredData.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\debug-accessibility.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\payment\\service.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\ExerciseInterface.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\AdvancedQuizInterface.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\AdaptiveQuizInterface.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\admin\\Sidebar.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\invoice-templates.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\utils\\test-helpers.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\profile\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\shared-questions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\dashboard\\DashboardClient.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\notifications\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 2 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institution-monetization\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institution-monetization\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\courses\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\user\\settings\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\notifications\\send\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 2 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\notifications\\preferences\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\subscription\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic 500 Errors: 4 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\test-login\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\custom-signout\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\check-session\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\test-session\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\monthly-pricing\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\users\\[userId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\run-all-maintenance-scripts\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\notifications\\templates\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\permissions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\notifications\\templates\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\permissions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\payments\\process\\[paymentId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\import\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 2 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\enrollments\\[id]\\invoice\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Any Type Usage: 2 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\dates\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\subscription-plans\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\settings\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\enrollments\\[id]\\dates\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic 500 Errors: 3 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\exercises\\[exerciseId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic 500 Errors: 3 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\new\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 4,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\utils.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\logger.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\HomePageClient.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\DiscountSettingsForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\CourseTagManager.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\CourseSearch.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\AdvertisingBanner.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\test-public-pages.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\global-teardown.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\validation\\booking-payment-validator.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\NotificationPreferences.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\providers\\InstitutionProvider.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\institution\\InstitutionSidebar.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\admin\\QuestionPreview.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\subscription-signup\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\payment-service.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\migrations\\commission-setup.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\quizzes\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\payments\\PaymentsClient.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\payments\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\student\\NotificationPreferences.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\auth\\login\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\bookings\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-disabled\\dashboard\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\question-templates\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\question-templates\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\dashboard\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\MonthlyPricingTable.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\tags\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\upload\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\subscriptions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-templates\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\profile\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\payments\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\password-reset\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\debug\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\analytics\\performance\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\tags\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\revenue\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\process-fallbacks\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\payments\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\achievements\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-templates\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\tags\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\pricing-rules\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\enroll\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\subscriptions\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\payment-approval\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\email\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\commission-tiers\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\settings\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\categories\\[categoryId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\edit\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\new\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\questions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\enrollments\\[id]\\dates\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 2 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\notifications\\templates\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 2 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\permissions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\courses\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\commission-rate\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 2 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\enrollments\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\questions\\[questionId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\questions\\bulk\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\users\\[userId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\exercises\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 2 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 3,
+      "details": [
+        "Generic 500 Errors: 3 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\comprehensive-bug-detection.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\upload.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\SubscriptionManagementCard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\ServiceWorkerProvider.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\OfflineDataManager.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\ChunkErrorBoundary.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\AdvancedSearch.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\performance\\load-test-processor.js",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\integration\\setup.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\payment\\manual-payment.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\_admin_backup\\course-categories.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\invoice-handlers.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\hooks\\useCurrency.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\LocationSelect.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\InstitutionForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\settings\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\components\\PayCourseButton.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Any Type Usage: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\students\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\courses\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\search\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\route_new.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\question-banks\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\categories\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\question-banks\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\categories\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\students\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\analytics\\quiz-analytics\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\webhooks\\stripe\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\tags\\analytics\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\notifications\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\notifications\\subscribe\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\settings\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\payouts\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\commission-rate\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\categories\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\check-password-reset\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\analytics\\leads\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\cleanup-sample-data\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\categories\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\advertising\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\payment-approval\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\payment-approval\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\courses\\[id]\\payment\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\[id]\\approve\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\settings\\discount\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\bulk-update\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Any Type Usage: 1 fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\profile\\main-image\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\priority\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\commissions\\calculate\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\enrollments\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\enrollments\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\exercises\\[exerciseId]\\submit\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 1 fixes",
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\questions\\[id]\\copy-to-course\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\questions\\[id]\\copy\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\copy\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\enrollments\\[id]\\reminder\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\payments\\approve\\[paymentId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\users\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\logo\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\facilities\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\questions\\share\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Console Log in Production: applied function-based fixes",
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\content\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 2,
+      "details": [
+        "Generic 500 Errors: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-commission-rate.js",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\seo-config.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\s3.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\prisma.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\notification-scheduler.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\load-balancer.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\cache-utils.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\api-optimizer-new.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\TagSelector.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\TagFilter.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\SubscriptionPaymentForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\SubscriptionOverviewCard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\StudentSubscriptionCard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\SearchPageClient.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\PromotionalSidebar.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\PerformanceMonitor.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\PaymentForm.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\MobileOptimizer.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\LeadTracking.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\signin-test.spec.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\payment\\types.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\payment\\notification.interface.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\payment\\gateway.interface.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\constants\\payment-config.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\StudentSubscriptionCard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\StudentSidebar.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\QuizCard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\institution\\InstitutionSubscriptionCard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\course\\ModuleProgressCard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\page_backup.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\settings\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\hooks\\useInstitution.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\NotificationDashboard.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\checkout\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\awaiting-approval\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\test-adaptive-quiz\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\progress\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institutions\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\setup\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\collaboration\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\analytics\\InstitutionAnalyticsClient.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\student\\ProgressVisualization.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\student\\PersonalizedRecommendations.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\student\\LearningPath.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\student\\EnrollmentModal.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\institution\\MarkPaymentDialog.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\bookings\\success\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\auth\\signup\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\auth\\signin\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\auth\\register\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\test-db\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\socket\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\revalidate\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\locations\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution-registration\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\revenue\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\revenue\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Console Log in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\WeeklyPricingTable.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\TimeBasedPricingRules.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\subscriptions\\create\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\recommendations\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\progress\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\learning-path\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\enrollments\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\notifications\\unsubscribe\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\students\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\shared-questions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\setup\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\quizzes\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\info\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\current\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\categories\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\images\\[...path]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\cron\\reminders\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\cron\\payment-reminders\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\by-country\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\bookings\\update\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\validate-session\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\user\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\users\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\subscriptions\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-templates\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-banks\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\performance\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institution-monetization\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\fix-missing-students\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\question-banks\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\question-banks\\[id]\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Any Type Usage: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\enrollments\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Throwing: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\subscription\\upgrade\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\subscription\\payment\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\subscription\\billing-history\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\profile\\password\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\payments\\initiate\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\recent-modules\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\quiz-stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\courses\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\[id]\\status\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\[id]\\approval\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\subscription\\upgrade\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\subscription\\payment\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\subscription\\billing-history\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\subscriptions\\cancel\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\students\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\settings\\payment-approval\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\import\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\bulk-export\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\bulk-delete\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\update-weekly-prices\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\collaboration\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\analytics\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\analytics\\quiz\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\register\\institution\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\subscriptions\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\seed-tags\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\seed-categories\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-templates\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-banks\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Missing Request Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\performance\\metrics\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\performance\\health\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\payments\\pending-count\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\create-simple\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institution-monetization\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\update-weekly-prices\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\users\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\users\\page.tsx",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\payment\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\questions\\[id]\\rate\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-templates\\[id]\\copy\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\export\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\payments\\[paymentId]\\reject\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\payments\\[paymentId]\\approve\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\enrollments\\[id]\\mark-paid\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\enrollments\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\users\\[userId]\\status\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\subscriptions\\[id]\\plan\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\notifications\\stats\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\notifications\\send\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\notifications\\seed-templates\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\email\\test\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\commission-tiers\\[id]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\payments\\disapprove\\[paymentId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\status\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\main-image\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\modules\\[moduleId]\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\questions\\bulk-delete\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\submit\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\attempts\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\analytics\\route.ts",
+      "pattern": "Multiple patterns",
+      "fixes": 1,
+      "details": [
+        "Generic 500 Errors: 1 fixes"
+      ]
+    }
+  ],
+  "summary": {
+    "byPattern": {
+      "Multiple patterns": 2451
+    }
+  }
+}

@@ -1,0 +1,264 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - link "FluentShip Badge - Boat with three people on wavy water FluentShip":
+    - /url: /
+    - img "FluentShip Badge - Boat with three people on wavy water"
+    - text: FluentShip
+  - button
+- main:
+  - heading "Master Languages with FluentShip" [level=1]
+  - paragraph: "\"Your journey to fluency begins here.\""
+  - paragraph: Embark on your language learning voyage with certified native speakers and fellow learners from around the world. Learn languages through interactive video lessons, quizzes, live conversations, study groups, personalized learning paths, and in-person classes at our partner institutions.
+  - link "Start Learning":
+    - /url: /students-public
+    - button "Start Learning"
+  - link "For Partners":
+    - /url: /institutions-public
+    - button "For Partners"
+  - img
+  - heading "Interactive Learning" [level=3]
+  - paragraph: Real-time practice with native speakers
+  - img
+  - heading "Certified Programs" [level=3]
+  - paragraph: Internationally recognized certificates
+  - img
+  - heading "Global Community" [level=3]
+  - paragraph: Join study groups and language exchanges
+  - text: 3+ Active Students 2+ Partner Institutions 9+ Available Courses 1+ Languages Taught
+  - heading "Popular Languages" [level=2]
+  - paragraph: Choose from a wide variety of languages taught by native speakers from around the world.
+  - text: 🇬🇧
+  - heading "United Kingdom" [level=3]
+  - paragraph: 5 courses
+  - text: 🇺🇸
+  - heading "United States" [level=3]
+  - paragraph: 4 courses
+  - heading "Why Choose FluentShip?" [level=2]
+  - paragraph: Experience language learning like never before with our innovative platform designed for the modern learner.
+  - paragraph: "\"FluentShip — Where fluency meets friendship.\""
+  - img
+  - heading "Native Speakers" [level=3]
+  - paragraph: Learn from certified native speakers who provide authentic pronunciation and cultural insights.
+  - img
+  - heading "Interactive Lessons" [level=3]
+  - paragraph: Engage with high-quality video content and interactive exercises designed for optimal retention.
+  - img
+  - heading "AI-Powered Learning" [level=3]
+  - paragraph: Personalized learning paths adapted to your progress and learning style using advanced AI.
+  - img
+  - heading "Live Conversations" [level=3]
+  - paragraph: Practice speaking with native speakers in real-time conversations and group sessions.
+  - img
+  - heading "Community Learning" [level=3]
+  - paragraph: Join study groups, language exchange partners, and global communities of learners.
+  - img
+  - heading "Mobile Learning" [level=3]
+  - paragraph: Learn anywhere, anytime with our mobile-optimized platform and offline capabilities.
+  - img
+  - heading "Secure & Reliable" [level=3]
+  - paragraph: Your data is protected with enterprise-grade security and 99.9% uptime guarantee.
+  - img
+  - heading "In-Person Learning" [level=3]
+  - paragraph: Attend physical classes at our partner institutions for traditional classroom learning with native speakers.
+  - paragraph: "\"Best of both worlds\""
+  - heading "How It Works" [level=2]
+  - paragraph: Get started with FluentShip in just a few simple steps
+  - paragraph: "\"FluentShip — Set sail for your next language.\""
+  - text: "1"
+  - heading "Choose Your Language" [level=3]
+  - paragraph: Select from our wide range of languages and find the perfect course for your learning goals.
+  - text: "2"
+  - heading "Connect & Collaborate" [level=3]
+  - paragraph: Join live sessions with native speakers, connect with fellow learners in study groups, or attend in-person classes at partner institutions.
+  - paragraph: "\"You're never learning alone\""
+  - text: "3"
+  - heading "Practice & Improve" [level=3]
+  - paragraph: Complete interactive exercises, take quizzes, and track your progress with detailed analytics.
+  - text: "4"
+  - heading "Get Certified" [level=3]
+  - paragraph: Earn certificates upon completion and showcase your language skills to the world.
+  - heading "Success Stories" [level=2]
+  - paragraph: Hear from real students and institutions who have achieved their language learning goals with FluentShip.
+  - paragraph: "\"On FluentShip, you're never learning alone.\""
+  - img
+  - img
+  - img
+  - img
+  - img
+  - paragraph: "\"FluentShip helped me achieve fluency in English in just 6 months. The native speakers and interactive lessons made all the difference.\""
+  - text: Maria Santos English • Brazil B2 to C1 in 6 months
+  - img
+  - img
+  - img
+  - img
+  - img
+  - paragraph: "\"Partnering with FluentShip has transformed our reach. We now have students from 30+ countries and our revenue has increased by 150%.\""
+  - text: Dr. Maria Rodriguez Director, Spanish Language Institute Madrid Language Academy
+  - img
+  - img
+  - img
+  - img
+  - img
+  - paragraph: "\"The live conversation practice sessions and study groups are incredible. I found amazing language exchange partners and can now confidently speak German in professional settings.\""
+  - text: Ahmed Hassan German • Egypt A2 to B2 in 8 months
+  - img
+  - img
+  - img
+  - img
+  - img
+  - paragraph: "\"The community aspect is what makes FluentShip special. I joined a Spanish study group and made friends from 5 different countries. Learning together is so much more fun!\""
+  - text: Emma Thompson Spanish • Canada Beginner to B1 in 5 months
+  - heading "Choose Your Plan" [level=2]
+  - paragraph: Start your language learning journey with flexible plans designed for every learner.
+  - heading "Free" [level=3]
+  - text: $0
+  - paragraph: Perfect for getting started
+  - list:
+    - listitem:
+      - img
+      - text: Access to basic courses
+    - listitem:
+      - img
+      - text: Limited practice sessions
+    - listitem:
+      - img
+      - text: Basic community access
+  - link "Get Started Free":
+    - /url: /students-public
+    - button "Get Started Free"
+  - text: Most Popular
+  - heading "Premium" [level=3]
+  - text: $19.99/month
+  - paragraph: For serious learners
+  - list:
+    - listitem:
+      - img
+      - text: All courses and languages
+    - listitem:
+      - img
+      - text: Unlimited practice sessions
+    - listitem:
+      - img
+      - text: Live conversation classes
+    - listitem:
+      - img
+      - text: Study groups & language exchanges
+    - listitem:
+      - img
+      - text: AI-powered learning paths
+    - listitem:
+      - img
+      - text: In-person classes at partner institutions
+    - listitem:
+      - img
+      - text: Progress certificates
+  - link "Start Premium Trial":
+    - /url: /students-public
+    - button "Start Premium Trial"
+  - heading "Enterprise" [level=3]
+  - text: Custom
+  - paragraph: For institutions and teams
+  - list:
+    - listitem:
+      - img
+      - text: Custom course creation
+    - listitem:
+      - img
+      - text: Advanced analytics
+    - listitem:
+      - img
+      - text: Dedicated support
+    - listitem:
+      - img
+      - text: In-person & hybrid learning programs
+    - listitem:
+      - img
+      - text: API integration
+  - link "Contact Sales":
+    - /url: /institutions-public
+    - button "Contact Sales"
+  - heading "Frequently Asked Questions" [level=2]
+  - paragraph: Find answers to common questions about FluentShip language learning platform.
+  - paragraph: "\"Fluent learning starts with human connection.\""
+  - heading "How does Fluentish work?" [level=3]
+  - paragraph: FluentShip connects you with certified native speakers through interactive video lessons, live conversations, personalized learning paths, and in-person classes at our partner institutions. Our AI-powered platform adapts to your learning style and progress, whether you prefer online or on-site learning.
+  - heading "What languages are available?" [level=3]
+  - paragraph: We offer courses in 25+ languages including English, Spanish, French, German, Italian, Portuguese, Chinese, Japanese, Korean, and many more. New languages are added regularly.
+  - heading "Can I learn at my own pace?" [level=3]
+  - paragraph: Absolutely! Fluentish is designed for flexible learning. You can access courses anytime, anywhere, and our AI adapts the content to your learning speed and preferences.
+  - heading "Do you offer certificates?" [level=3]
+  - paragraph: Yes! Upon completing courses and reaching proficiency milestones, you'll receive certificates that are recognized by educational institutions and employers worldwide.
+  - heading "Can I practice with other learners?" [level=3]
+  - paragraph: Absolutely! FluentShip offers study groups, language exchange partnerships, and community forums where you can practice with fellow learners. You can also join topic-specific discussion groups and participate in group challenges.
+  - heading "How do I get started?" [level=3]
+  - paragraph: Getting started is easy! Simply sign up for a free account, choose your target language, and begin with our assessment to determine your current level. Our platform will guide you through the rest.
+  - heading "Ready to Start Your Language Journey?" [level=2]
+  - paragraph: Join thousands of learners who have already transformed their language skills with FluentShip.
+  - paragraph: "\"Learn together. Speak with confidence.\""
+  - link "Start Learning Today":
+    - /url: /students-public
+    - button "Start Learning Today"
+  - link "Partner With Us":
+    - /url: /institutions-public
+    - button "Partner With Us"
+- contentinfo:
+  - link "FluentShip Badge - Boat with three people on wavy water FluentShip":
+    - /url: /
+    - img "FluentShip Badge - Boat with three people on wavy water"
+    - text: FluentShip
+  - paragraph: Learn together. Speak with confidence. Join FluentShip's community-powered language learning journey.
+  - heading "Quick Links" [level=3]
+  - list:
+    - listitem:
+      - link "Browse Courses":
+        - /url: /courses
+    - listitem:
+      - link "Learn":
+        - /url: /students-public
+    - listitem:
+      - link "Partner":
+        - /url: /institutions-public
+    - listitem:
+      - link "Browse Institutions":
+        - /url: /institutions
+  - heading "Support" [level=3]
+  - list:
+    - listitem:
+      - link "FAQ":
+        - /url: /faq
+    - listitem:
+      - link "Contact Us":
+        - /url: /contact
+    - listitem:
+      - link "Privacy Policy":
+        - /url: /privacy
+  - heading "Connect With Us" [level=3]
+  - link "Facebook":
+    - /url: "#"
+    - text: Facebook
+    - img
+  - link "Twitter":
+    - /url: "#"
+    - text: Twitter
+    - img
+  - link "LinkedIn":
+    - /url: "#"
+    - text: LinkedIn
+    - img
+  - paragraph: Subscribe to our newsletter for updates and insights.
+  - textbox "Enter your email"
+  - button "Subscribe"
+  - paragraph: © 2024 FluentShip. All rights reserved.
+  - link "Terms of Service":
+    - /url: /terms
+  - link "Privacy Policy":
+    - /url: /privacy
+  - link "Cookie Policy":
+    - /url: /cookies
+- region "Notifications (F8)":
+  - list
+- region "Notifications alt+T"
+- alert
+```

@@ -1,0 +1,31 @@
+# Database
+DATABASE_URL="mysql://root:@localhost:3306/langcsebkg4"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="l+CcCr1EVzgIZwbep9tsqiEfpvruSVCUOokpTLeSSl0="
+
+# Stripe
+STRIPE_SECRET_KEY="your-stripe-secret-key-here"
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="your-stripe-publishable-key-here"
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+NEXT_PUBLIC_APP_URL=your_app_url
+
+#Set up a Stripe webhook endpoint in your Stripe dashboard pointing to:
+https://your-domain.com/api/webhooks/stripe
+
+# Inoice notification resend
+RESEND_API_KEY=your_api_key_here
+
+# Cron to send out automated payment reminders
+CRON_SECRET=your-secure-secret-here
+
+# Actual cron to be implemented
+# 0 0 * * * curl -X GET -H "Authorization: Bearer your-secure-secret-here" https://your-domain.com/api/cron/reminders
+
+# Commission Rate (as decimal)
+COMMISSION_RATE="0.30"
+
+#Alternative admin login credentials
+#ADMIN_EMAIL="admin@example.com"
+#ADMIN_PASSWORD="admin123"

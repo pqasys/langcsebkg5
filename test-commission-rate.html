@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Commission Rate Update</title>
+</head>
+<body>
+    <h1>Test Commission Rate Update</h1>
+    <button id="updateButton">Update Commission Rate</button>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('updateButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/institutions/0fc20433-04a8-492a-980f-2f36272d3952/commission-rate', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        newRate: 15,
+                        reason: 'Updated commission rate',
+                    }),
+                });
+
+                const data = await response.json();
+                document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('response').innerText = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html> 

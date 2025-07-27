@@ -1,0 +1,74 @@
+I'll outline the complete workflow of the tagging system based on the codebase:
+Tag Management Interface (/admin/tags):
+Admin users can access the tag management page through the admin sidebar
+The page displays a list of all tags with their usage counts
+
+Features:
+Create new tags
+Edit existing tags
+Delete tags
+View how many courses are using each tag
+
+Tag Creation:
+Admin clicks "Add Tag" button
+Modal opens with a form containing:
+Tag name (required)
+Tag description (optional)
+On submit:
+Validates the input
+Makes POST request to /api/tags
+Creates new tag in database
+Updates the UI with the new tag
+Tag Editing:
+Admin clicks edit button on a tag
+Modal opens with pre-filled form
+Can modify:
+Tag name
+Tag description
+On submit:
+Makes PUT request to /api/tags/[id]
+Updates tag in database
+Updates the UI
+Tag Deletion:
+Admin clicks delete button on a tag
+Confirmation dialog appears
+On confirm:
+Makes DELETE request to /api/tags/[id]
+Removes tag from database
+Updates the UI
+
+Tag Usage in Courses:
+Tags can be associated with courses
+Each tag shows a count of how many courses are using it
+The count is displayed in the tag list
+Tags cannot be deleted if they are in use by courses
+
+API Endpoints:
+GET /api/tags: List all tags with usage counts
+POST /api/tags: Create a new tag
+GET /api/tags/[id]: Get a specific tag
+PUT /api/tags/[id]: Update a tag
+DELETE /api/tags/[id]: Delete a tag
+
+Database Schema:
+Apply
+
+Security:
+All tag management operations require admin authentication
+API routes check for admin role before allowing modifications
+Frontend routes are protected by the admin layout
+Error Handling:
+Validates required fields
+Handles duplicate tag names
+Prevents deletion of tags in use
+Shows error messages for failed operations
+Provides feedback for successful operations
+
+UI Components:
+Tag list with search and filtering
+Add/Edit tag modal
+Delete confirmation dialog
+Loading states
+Error messages
+Success notifications
+Would you like me to explain any specific part of the workflow in more detail?

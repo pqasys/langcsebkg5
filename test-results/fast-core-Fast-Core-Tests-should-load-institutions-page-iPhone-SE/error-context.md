@@ -1,0 +1,82 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - link "FluentShip Badge - Boat with three people on wavy water FluentShip":
+    - /url: /
+    - img "FluentShip Badge - Boat with three people on wavy water"
+    - text: FluentShip
+  - link "Home":
+    - /url: /
+  - link "Learn":
+    - /url: /students-public
+  - link "Partner":
+    - /url: /institutions-public
+  - link "Browse Institutions":
+    - /url: /institutions
+  - link "Live Conversations":
+    - /url: /features/live-conversations
+  - link "Community":
+    - /url: /features/community-learning
+  - link "Search":
+    - /url: /search
+  - button
+- main
+- contentinfo:
+  - link "FluentShip Badge - Boat with three people on wavy water FluentShip":
+    - /url: /
+    - img "FluentShip Badge - Boat with three people on wavy water"
+    - text: FluentShip
+  - paragraph: Learn together. Speak with confidence. Join FluentShip's community-powered language learning journey.
+  - heading "Quick Links" [level=3]
+  - list:
+    - listitem:
+      - link "Browse Courses":
+        - /url: /courses
+    - listitem:
+      - link "Learn":
+        - /url: /students-public
+    - listitem:
+      - link "Partner":
+        - /url: /institutions-public
+    - listitem:
+      - link "Browse Institutions":
+        - /url: /institutions
+  - heading "Support" [level=3]
+  - list:
+    - listitem:
+      - link "FAQ":
+        - /url: /faq
+    - listitem:
+      - link "Contact Us":
+        - /url: /contact
+    - listitem:
+      - link "Privacy Policy":
+        - /url: /privacy
+  - heading "Connect With Us" [level=3]
+  - link "Facebook":
+    - /url: "#"
+    - text: Facebook
+    - img
+  - link "Twitter":
+    - /url: "#"
+    - text: Twitter
+    - img
+  - link "LinkedIn":
+    - /url: "#"
+    - text: LinkedIn
+    - img
+  - paragraph: Subscribe to our newsletter for updates and insights.
+  - textbox "Enter your email"
+  - button "Subscribe"
+  - paragraph: © 2024 FluentShip. All rights reserved.
+  - link "Terms of Service":
+    - /url: /terms
+  - link "Privacy Policy":
+    - /url: /privacy
+  - link "Cookie Policy":
+    - /url: /cookies
+- region "Notifications (F8)":
+  - list
+- region "Notifications alt+T"
+```

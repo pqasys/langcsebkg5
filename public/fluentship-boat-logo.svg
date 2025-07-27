@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hull of the boat -->
+  <path d="M50 140 Q100 170 150 170 Q200 170 250 140 L50 140 Z" fill="#2C3E50"/>
+
+  <!-- Mast -->
+  <rect x="145" y="60" width="10" height="80" fill="#34495E"/>
+
+  <!-- Sail shaped like a speech bubble -->
+  <path d="M150 60 L150 120 Q180 110 190 90 Q180 80 165 70 L150 60 Z" fill="#3498DB"/>
+
+  <!-- Three figures (circles for heads, rectangles for bodies) -->
+  <circle cx="90" cy="135" r="7" fill="#ECF0F1"/>
+  <rect x="86" y="135" width="8" height="12" fill="#ECF0F1"/>
+
+  <circle cx="130" cy="135" r="7" fill="#ECF0F1"/>
+  <rect x="126" y="135" width="8" height="12" fill="#ECF0F1"/>
+
+  <circle cx="170" cy="135" r="7" fill="#ECF0F1"/>
+  <rect x="166" y="135" width="8" height="12" fill="#ECF0F1"/>
+</svg> 

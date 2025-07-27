@@ -1,0 +1,21 @@
+https://github.com/prisma/prisma/discussions/25982
+ 
+
+To fix the drift between your Prisma schema and the production database without resetting the database and incurring data loss, you can follow these steps:
+
+Baselining: This is the recommended method to sync your migration history with your current database schema without resetting the database. The process is described in the Prisma documentation on baselining.
+
+Create an initial migration: You can create an initial migration that represents your current database state without applying it. Here's how you can do this:
+
+mkdir -p prisma/migrations/init
+npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/init/migration.sql
+npx prisma migrate resolve --applied init
+After this, run npx prisma migrate dev. It should indicate that everything is in sync Github Issue Comment.
+
+Use prisma migrate diff: This tool can help you compare your migration history and revert changes made to your database schema. You can use it to generate SQL that either reverts changes made in the database schema or moves your database schema forward to apply missing changes from the Prisma schema and /migrations Prisma Docs.
+Remember, it's important to avoid manually editing or deleting migrations that have already been applied, as this can lead to discrepancies between development and production environments Prisma Docs.
+
+For future development, it's recommended to use prisma migrate dev consistently for creating and applying migrations, rather than mixing db push and migrate dev, as this can lead to the kind of drift you're experiencing Github Discussion.
+
+I found a similar open issue discussing the use of prisma migrate dev without losing data, which might provide additional insights: Use Prisma migrate dev without losing data [5].
+ 

@@ -1,0 +1,42 @@
+'use client';
+
+import { useEffect, useState, ReactNode } from 'react';
+import { toast } from 'sonner';
+
+interface ClientOnlyServiceWorkerProviderProps {
+  children: ReactNode;
+}
+
+export function ClientOnlyServiceWorkerProvider({ children }: ClientOnlyServiceWorkerProviderProps) {
+  const [ServiceWorkerProvider, setServiceWorkerProvider] = useState<any>(null);
+  const [OfflineIndicator, setOfflineIndicator] = useState<any>(null);
+  const [SyncStatusIndicator, setSyncStatusIndicator] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    
+    // Dynamically import the ServiceWorkerProvider only on the client side
+    import('./ServiceWorkerProvider').then((module) => {
+      setServiceWorkerProvider(() => module.ServiceWorkerProvider);
+      setOfflineIndicator(() => module.OfflineIndicator);
+      setSyncStatusIndicator(() => module.SyncStatusIndicator);
+    }).catch((error) => {
+      toast.error('Failed to load ServiceWorkerProvider:');
+    });
+  }, []);
+
+  // Show children without ServiceWorkerProvider during SSR
+  if (!isClient || !ServiceWorkerProvider) {
+    return <>{children}</>;
+  }
+
+  // Render with ServiceWorkerProvider on client side
+  return (
+    <ServiceWorkerProvider>
+      {children}
+      {OfflineIndicator && <OfflineIndicator />}
+      {SyncStatusIndicator && <SyncStatusIndicator />}
+    </ServiceWorkerProvider>
+  );
+} 

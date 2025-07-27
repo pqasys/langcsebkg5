@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor">
+  <!-- Globe outline -->
+  <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  
+  <!-- Meridian lines -->
+  <path d="M8 1 A7 7 0 0 1 8 15" stroke="currentColor" stroke-width="0.5" fill="none"/>
+  <path d="M1 8 A7 7 0 0 1 15 8" stroke="currentColor" stroke-width="0.5" fill="none"/>
+  
+  <!-- Language symbols -->
+  <text x="8" y="6" text-anchor="middle" fill="currentColor" font-family="Arial, sans-serif" font-size="3" font-weight="bold">F</text>
+  <text x="8" y="11" text-anchor="middle" fill="currentColor" font-family="Arial, sans-serif" font-size="3" font-weight="bold">L</text>
+</svg> 

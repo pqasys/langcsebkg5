@@ -1,0 +1,411 @@
+{
+  "timestamp": "2025-07-11T02:06:18.148Z",
+  "summary": {
+    "totalTests": 0,
+    "passed": 0,
+    "failed": 0,
+    "errors": [
+      "Command failed: npx playwright test tests/comprehensive-bug-detection.spec.ts --reporter=json"
+    ]
+  },
+  "issues": [
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\admin\\courses\\page.tsx"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\admin\\scripts\\booking-payment-consistency\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\admin\\scripts\\seed\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (4 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\auth\\register\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\bookings\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\bookings\\update\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\courses\\public\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\courses\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\courses\\route_new.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\institutions\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\api\\revalidate\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Code Quality",
+      "severity": "low",
+      "description": "TODO/FIXME comments found (1 occurrences)",
+      "suggestion": "Address pending issues and remove TODO comments",
+      "location": "app\\api\\student\\courses\\[id]\\payment\\route.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\bookings\\success\\page.tsx"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\courses\\[id]\\page.tsx"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "app\\institutions\\[id]\\page.tsx"
+    },
+    {
+      "pattern": {},
+      "category": "Code Quality",
+      "severity": "low",
+      "description": "TODO/FIXME comments found (1 occurrences)",
+      "suggestion": "Address pending issues and remove TODO comments",
+      "location": "app\\lib\\payment-service.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Code Quality",
+      "severity": "low",
+      "description": "TODO/FIXME comments found (1 occurrences)",
+      "suggestion": "Address pending issues and remove TODO comments",
+      "location": "app\\student\\payments\\process\\[paymentId]\\page.tsx"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "components\\HomePageClient.tsx"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\advanced-caching.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\audit-logger.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\automated-commission-service.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (5 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\background-sync.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\constants\\payment-config.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\content-access.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (7 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\content-preloader.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\email.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (4 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\encryption.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\logger.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (8 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\notification.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Code Quality",
+      "severity": "low",
+      "description": "TODO/FIXME comments found (2 occurrences)",
+      "suggestion": "Address pending issues and remove TODO comments",
+      "location": "lib\\notification.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (8 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\offline-analytics.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\offline-storage.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\payment\\manual-payment.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\payment\\reminder-scheduler.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\payment-service.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Code Quality",
+      "severity": "low",
+      "description": "TODO/FIXME comments found (1 occurrences)",
+      "suggestion": "Address pending issues and remove TODO comments",
+      "location": "lib\\payment-service.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (6 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\permissions.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\prisma.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (14 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\push-notifications.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (3 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\rate-limiter.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\react-optimizer.tsx"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\s3.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (19 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\subscription-commission-service.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (5 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\subscription-payment-service.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (2 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\upload.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (1 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\validation\\booking-payment-validator.ts"
+    },
+    {
+      "pattern": {},
+      "category": "Error Handling",
+      "severity": "medium",
+      "description": "Console.error statements in production code (3 occurrences)",
+      "suggestion": "Replace with proper error handling and user feedback",
+      "location": "lib\\websocket.ts"
+    },
+    {
+      "category": "Dependencies",
+      "severity": "medium",
+      "description": "@radix-ui/react-toast version ^1.2.14 - Known webpack module loading issues",
+      "suggestion": "Consider updating to latest version or applying known workarounds"
+    },
+    {
+      "category": "Dependencies",
+      "severity": "medium",
+      "description": "next version ^14.1.0 - Fast Refresh issues in some configurations",
+      "suggestion": "Consider updating to latest version or applying known workarounds"
+    },
+    {
+      "category": "TypeScript",
+      "severity": "high",
+      "description": "TypeScript compilation errors found",
+      "suggestion": "Fix TypeScript errors to prevent runtime issues"
+    }
+  ],
+  "performance": {
+    "loadTimes": [],
+    "memoryUsage": []
+  }
+}

@@ -1,0 +1,72 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 1
+      name: "Warm-up"
+    
+    # Ramp-up phase
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 20
+      name: "Ramp-up"
+    
+    # Sustained load phase
+    - duration: 300
+      arrivalRate: 20
+      name: "Sustained load"
+    
+    # Peak load phase
+    - duration: 120
+      arrivalRate: 20
+      rampTo: 50
+      name: "Peak load"
+    
+    # Cool-down phase
+    - duration: 60
+      arrivalRate: 50
+      rampTo: 1
+      name: "Cool-down"
+
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+      User-Agent: 'Artillery Performance Test'
+
+  processor: './load-test-processor.js'
+
+  # Environment variables
+  environment:
+    development:
+      target: 'http://localhost:3000'
+    staging:
+      target: 'https://staging.yourapp.com'
+    production:
+      target: 'https://yourapp.com'
+
+  # HTTP settings
+  http:
+    timeout: 30
+    pool: 10
+    maxSockets: 50
+
+  # Plugin settings
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+    expect: {}
+    publish-metrics:
+      - type: 'influxdb'
+        config:
+          url: 'http://localhost:8086'
+          database: 'artillery'
+          username: 'artillery'
+          password: 'artillery'
+
+  # Test data
+  variables:
+    adminEmail: 'test.admin@example.com'
+    adminPassword: 'testpassword123'
+    studentEmail: 'test.student@example.com'
+    studentPassword: 'testpassword123' 

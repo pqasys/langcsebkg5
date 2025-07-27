@@ -1,0 +1,63 @@
+model InstitutionPayout {
+  id            String   @id @default(cuid())
+  institutionId String
+  enrollmentId  String
+  amount        Float
+  status        String   // PENDING, PAID, CANCELLED
+  metadata      Json?    // Store payment method, reference numbers, notes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  institution   Institution            @relation(fields: [institutionId], references: [id])
+  enrollment    StudentCourseEnrollment @relation(fields: [enrollmentId], references: [id])
+  commission    InstitutionCommission @relation(fields: [institutionId], references: [institutionId])
+
+  @@index([institutionId])
+  @@index([enrollmentId])
+}
+
+// New models for commission and payout tracking
+model InstitutionCommission {
+  id            String   @id @default(cuid())
+  institutionId String
+  rate          Float    @default(0) // Commission rate as a percentage
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  payouts       InstitutionPayout[]
+
+  @@index([institutionId])
+}
+
+// Update Institution model to include new relations
+model Institution {
+  id            String   @id @default(cuid())
+  name          String
+  commissions   InstitutionCommission[]
+  payouts       InstitutionPayout[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([name])
+}
+
+// Update Payment model to include commission metadata
+model Payment {
+  id            String   @id @default(cuid())
+  amount        Float
+  status        String   // PENDING, PAID, FAILED
+  paidAt        DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  metadata      Json?    // Add commissionAmount, commissionRate, institutionAmount, payoutId
+
+  institution   Institution            @relation(fields: [institutionId], references: [id])
+  enrollment    StudentCourseEnrollment @relation(fields: [enrollmentId], references: [id])
+
+  @@index([institutionId])
+  @@index([enrollmentId])
+  @@index([status])
+} 

@@ -1,0 +1,2063 @@
+{
+  "timestamp": "2025-07-18T23:36:16.143Z",
+  "totalFixes": 1356,
+  "totalFiles": 287,
+  "results": [
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\page.tsx",
+      "fixes": 42,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\profile\\institution-profile.tsx",
+      "fixes": 34,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\page.tsx",
+      "fixes": 32,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\page.tsx",
+      "fixes": 32,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\server-connectivity.spec.ts",
+      "fixes": 27,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\mobile-performance-report.spec.ts",
+      "fixes": 27,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\enrollments\\calculate-price\\route.ts",
+      "fixes": 25,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\prisma\\seed.ts",
+      "fixes": 24,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\notification.ts",
+      "fixes": 24,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\profile\\facilities\\route.ts",
+      "fixes": 23,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\global-setup.ts",
+      "fixes": 22,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-student-profile-fix.js",
+      "fixes": 20,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\auth-debug.spec.ts",
+      "fixes": 20,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\InstitutionCourseForm.tsx",
+      "fixes": 20,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\CourseForm.tsx",
+      "fixes": 18,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\websocket.ts",
+      "fixes": 17,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\QuizInterface.tsx",
+      "fixes": 16,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\components\\EnrollmentModal.tsx",
+      "fixes": 16,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\cleanup\\route.ts",
+      "fixes": 16,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\page.tsx",
+      "fixes": 15,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\page.tsx",
+      "fixes": 15,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\route.ts",
+      "fixes": 15,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\enroll\\route.ts",
+      "fixes": 15,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\performance\\performance-monitor.ts",
+      "fixes": 13,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\cron\\trial-expiration\\route.ts",
+      "fixes": 13,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\register\\route.ts",
+      "fixes": 13,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\performance-integration.ts",
+      "fixes": 12,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\tags\\route.ts",
+      "fixes": 12,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\edit\\page.tsx",
+      "fixes": 12,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-progress-tracking.js",
+      "fixes": 11,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\users\\page.tsx",
+      "fixes": 11,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\users\\page.tsx",
+      "fixes": 11,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\route.ts",
+      "fixes": 11,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-courses-page.js",
+      "fixes": 10,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\debug-homepage.spec.ts",
+      "fixes": 10,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-banks\\page.tsx",
+      "fixes": 10,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\components\\CourseForm.tsx",
+      "fixes": 10,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\components\\CourseForm.tsx",
+      "fixes": 10,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\route.ts",
+      "fixes": 10,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\test-session-establishment\\route.ts",
+      "fixes": 9,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\redirect-after-signin\\route.ts",
+      "fixes": 9,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\global-setup.ts",
+      "fixes": 8,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\content-preloader.ts",
+      "fixes": 8,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\password-test.spec.ts",
+      "fixes": 8,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\start\\route.ts",
+      "fixes": 8,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-admin-form.js",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\subscription-commission-service.ts",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\background-sync.ts",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\Navbar.tsx",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\test-simple-page.spec.ts",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\quick-homepage.spec.ts",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\debug-signin.spec.ts",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\auth.spec.ts",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\institution\\InstitutionForm.tsx",
+      "fixes": 7,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\_admin_backup\\CourseForm.tsx",
+      "fixes": 7,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\profile\\00institution-profile.tsx",
+      "fixes": 7,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\payments\\page.tsx",
+      "fixes": 7,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\payments\\page.tsx",
+      "fixes": 7,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\route.ts",
+      "fixes": 7,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-course-issues.js",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\redis-cache.ts",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\test-session\\route.ts",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\tags\\page.tsx",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\page.tsx",
+      "fixes": 6,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\tags\\page.tsx",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\page.tsx",
+      "fixes": 6,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\debug-cookies\\route.ts",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\stats\\route.ts",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\commission-tiers\\page.tsx",
+      "fixes": 6,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\commission-tiers\\page.tsx",
+      "fixes": 6,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\route.ts",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\[contentId]\\route.ts",
+      "fixes": 6,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\mobile-device-testing.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\global-teardown.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\email.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\advanced-caching.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\MonthlyPricingTable.tsx",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\MainNav.tsx",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\simple-connection-test.spec.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\utils.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-banks\\[id]\\page.tsx",
+      "fixes": 5,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\test-session-establishment\\route.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\force-session\\route.ts",
+      "fixes": 5,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\route.ts",
+      "fixes": 5,
+      "details": [
+        "Missing API Validation: 2 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\[contentId]\\edit\\page.tsx",
+      "fixes": 5,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-dashboard.js",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\cdn-optimizer.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\hooks\\useSessionSync.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\debug-accessibility.spec.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\courses\\page.tsx",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\categories\\route.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\search\\route.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\custom-signin\\route.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\route.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\page.tsx",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\page.tsx",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\subscription-plans\\route.ts",
+      "fixes": 4,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\courses\\page.tsx",
+      "fixes": 4,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\courses\\page.tsx",
+      "fixes": 4,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\page.tsx",
+      "fixes": 4,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\edit\\page.tsx",
+      "fixes": 4,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\enhanced-database-optimizer.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\HomePageClient.tsx",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\CourseTagManager.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\CoursesPageClient.tsx",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\CourseSearch.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\test-public-pages.spec.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\global-teardown.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\admin\\Sidebar.tsx",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\_admin_backup\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\migrations\\commission-setup.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-templates\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\auth\\login\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\question-templates\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\question-banks\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\question-templates\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\question-banks\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\subscription\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\profile\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\test-login\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\custom-signout\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\check-session\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\test-session\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\pricing\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\run-all-maintenance-scripts\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\notifications\\templates\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\notifications\\templates\\page.tsx",
+      "fixes": 3,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\payments\\process\\[paymentId]\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\dates\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\settings\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\enrollments\\[id]\\dates\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\notifications\\templates\\[id]\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\route.ts",
+      "fixes": 3,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\comprehensive-bug-detection.spec.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\utils.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\payment-service.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\logger.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\api-optimizer.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\ChunkErrorBoundary.tsx",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\performance\\load-test-processor.js",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\integration\\setup.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\AdvancedQuizInterface.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\_admin_backup\\course-categories.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\reset-password\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\lib\\invoice-handlers.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\utils\\test-helpers.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\profile\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\shared-questions\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\payments\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\dashboard\\DashboardClient.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\content-management\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\student\\EnrollmentModal.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\subscriptions\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\subscriptions\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\students\\[id]\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\[id]\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\payments\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\auth\\debug\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\process-fallbacks\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\payments\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\question-banks\\[id]\\share\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\error-scanning\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\settings\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\subscriptions\\[id]\\edit\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\users\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\subscriptions\\[id]\\edit\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\users\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\enrollments\\[id]\\dates\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Missing API Validation: 1 fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\weekly-prices\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\monthly-prices\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\subscription-plans\\[id]\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\new\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\new\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\route.ts",
+      "fixes": 2,
+      "details": [
+        "Missing API Validation: 2 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\new\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes",
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\edit\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\[questionId]\\edit\\page.tsx",
+      "fixes": 2,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\test-commission-rate.js",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\react-optimizer.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\push-notifications.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\performance-monitor.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\encryption.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\audit-logger.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\lib\\api-optimizer-new.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\PerformanceMonitor.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\LeadTracking.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\DiscountSettingsForm.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\tests\\e2e\\signin-test.spec.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\ui\\icon-picker.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\ui\\color-picker.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\institution\\InstitutionSubscriptionCard.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\institution\\InstitutionSidebar.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\StudentSubscriptionCard.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\StudentSidebar.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\QuizCard.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\student\\NotificationPreferences.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\settings\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution-registration\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\hooks\\useCurrency.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\forgot-password\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\admin\\categories\\EditCategoryDialog.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\components\\admin\\categories\\AddCategoryDialog.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\settings\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\settings\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\courses\\[id]\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\student\\NotificationPreferences.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\institution\\PayoutDialog.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\institution\\MarkPaymentDialog.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\components\\institution\\EnrollmentStatusCard.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\auth\\signin\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\bookings\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-temp\\revenue\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institution-monetization\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\revenue\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institution-monetization\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\student\\courses\\[id]\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\WeeklyPricingTable.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\components\\TimeBasedPricingRules.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\add\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\user\\settings\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\tags\\analytics\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\courses\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\subscriptions\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-templates\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-templates\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-banks\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\revenue\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\settings\\payment-approval\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\create\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\settings\\payment-approval\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\create\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\stats\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\dashboard\\achievements\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institutions\\[id]\\upload\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\profile\\main-image\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\monthly-pricing\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\courses\\[id]\\enroll\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\subscriptions\\[id]\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-templates\\[id]\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\question-banks\\[id]\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\permissions\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\institutions\\[id]\\edit\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\permissions\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\institutions\\[id]\\edit\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\new\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\student\\exercises\\[exerciseId]\\submit\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\questions\\[id]\\copy-to-course\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\questions\\[id]\\copy\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\import\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\copy\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\enrollments\\[id]\\reminder\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\settings\\notifications\\templates\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\payments\\approve\\[paymentId]\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\permissions\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\logo\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\facilities\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\institutions\\[id]\\courses\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\edit\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\question-banks\\[id]\\questions\\share\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\exercises\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\content\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Console Statements in Production: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\edit\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\api\\institution\\courses\\[id]\\modules\\[moduleId]\\exercises\\[exerciseId]\\route.ts",
+      "fixes": 1,
+      "details": [
+        "Missing API Validation: 1 fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin-backup-restored\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\edit\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\admin\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\edit\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    },
+    {
+      "file": "C:\\wamp64\\www\\myCursorProj\\langcsebkg4a\\app\\institution\\courses\\[id]\\modules\\[moduleId]\\quizzes\\[quizId]\\questions\\new\\page.tsx",
+      "fixes": 1,
+      "details": [
+        "Generic Error Messages: applied function-based fixes"
+      ]
+    }
+  ],
+  "summary": {
+    "byFixType": {
+      "Console Statements in Production": 1196,
+      "Generic Error Messages": 491,
+      "Missing API Validation": 63
+    }
+  }
+}

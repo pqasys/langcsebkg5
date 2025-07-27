@@ -1,0 +1,131 @@
+# Page snapshot
+
+```yaml
+- navigation:
+  - link "FluentShip Badge - Boat with three people on wavy water FluentShip":
+    - /url: /
+    - img "FluentShip Badge - Boat with three people on wavy water"
+    - text: FluentShip
+  - button
+- main:
+  - heading "About Fluentish" [level=1]
+  - paragraph: We're on a mission to make language learning accessible, effective, and enjoyable for everyone. Our platform combines cutting-edge technology with proven educational methods to help learners achieve their language goals faster and more efficiently.
+  - heading "Our Mission" [level=3]
+  - paragraph: To break down language barriers and connect people across cultures through innovative, accessible, and effective language learning solutions. We believe that language is the key to understanding, empathy, and global collaboration.
+  - heading "Our Vision" [level=3]
+  - paragraph: To become the world's leading platform for language learning, empowering millions of people to communicate confidently in any language, anywhere in the world.
+  - heading "Our Impact" [level=2]
+  - paragraph: See how we're making a difference in language learning worldwide.
+  - text: 50,000+
+  - paragraph: Active Learners
+  - text: 25+
+  - paragraph: Languages
+  - text: 500+
+  - paragraph: Expert Instructors
+  - text: 95%
+  - paragraph: Success Rate
+  - heading "Our Values" [level=2]
+  - paragraph: The principles that guide everything we do.
+  - heading "Excellence" [level=3]
+  - paragraph: We strive for excellence in everything we do, from course quality to user experience.
+  - heading "Innovation" [level=3]
+  - paragraph: We continuously innovate to provide the most effective language learning solutions.
+  - heading "Accessibility" [level=3]
+  - paragraph: We believe language learning should be accessible to everyone, everywhere.
+  - heading "Trust" [level=3]
+  - paragraph: We build trust through transparency, security, and reliable service.
+  - heading "Meet Our Team" [level=2]
+  - paragraph: The passionate individuals behind our mission to revolutionize language learning.
+  - heading "Dr. Sarah Johnson" [level=3]
+  - text: CEO & Founder
+  - paragraph: Former linguistics professor with 15+ years of experience in language education technology.
+  - heading "Michael Chen" [level=3]
+  - text: CTO
+  - paragraph: Tech leader with expertise in AI, machine learning, and educational technology platforms.
+  - heading "Dr. Elena Rodriguez" [level=3]
+  - text: Head of Education
+  - paragraph: Curriculum specialist with a PhD in Applied Linguistics and 20+ years in language teaching.
+  - heading "David Kim" [level=3]
+  - text: Head of Product
+  - paragraph: Product strategist focused on creating intuitive and effective learning experiences.
+  - heading "Our Journey" [level=2]
+  - paragraph: Key milestones in our mission to transform language learning.
+  - text: "2020"
+  - heading "Platform Launch" [level=3]
+  - paragraph: Launched our first version with 5 languages and 100 courses.
+  - text: "2021"
+  - heading "Mobile App Release" [level=3]
+  - paragraph: Introduced our mobile app, making learning accessible on-the-go.
+  - text: "2022"
+  - heading "AI Integration" [level=3]
+  - paragraph: Implemented AI-powered personalized learning paths and recommendations.
+  - text: "2023"
+  - heading "Global Expansion" [level=3]
+  - paragraph: Expanded to 25+ languages and reached 50,000+ active learners worldwide.
+  - text: "2024"
+  - heading "Institution Partnerships" [level=3]
+  - paragraph: Launched partnerships with educational institutions and corporate clients.
+  - heading "Join Our Mission" [level=2]
+  - paragraph: Be part of the global community of language learners and help us break down barriers one conversation at a time.
+  - link "Start Learning Today":
+    - /url: /auth/register
+  - link "Get in Touch":
+    - /url: /contact
+- contentinfo:
+  - link "FluentShip Badge - Boat with three people on wavy water FluentShip":
+    - /url: /
+    - img "FluentShip Badge - Boat with three people on wavy water"
+    - text: FluentShip
+  - paragraph: Learn together. Speak with confidence. Join FluentShip's community-powered language learning journey.
+  - heading "Quick Links" [level=3]
+  - list:
+    - listitem:
+      - link "Browse Courses":
+        - /url: /courses
+    - listitem:
+      - link "Learn":
+        - /url: /students-public
+    - listitem:
+      - link "Partner":
+        - /url: /institutions-public
+    - listitem:
+      - link "Browse Institutions":
+        - /url: /institutions
+  - heading "Support" [level=3]
+  - list:
+    - listitem:
+      - link "FAQ":
+        - /url: /faq
+    - listitem:
+      - link "Contact Us":
+        - /url: /contact
+    - listitem:
+      - link "Privacy Policy":
+        - /url: /privacy
+  - heading "Connect With Us" [level=3]
+  - link "Facebook":
+    - /url: "#"
+    - text: Facebook
+    - img
+  - link "Twitter":
+    - /url: "#"
+    - text: Twitter
+    - img
+  - link "LinkedIn":
+    - /url: "#"
+    - text: LinkedIn
+    - img
+  - paragraph: Subscribe to our newsletter for updates and insights.
+  - textbox "Enter your email"
+  - button "Subscribe"
+  - paragraph: © 2024 FluentShip. All rights reserved.
+  - link "Terms of Service":
+    - /url: /terms
+  - link "Privacy Policy":
+    - /url: /privacy
+  - link "Cookie Policy":
+    - /url: /cookies
+- region "Notifications (F8)":
+  - list
+- region "Notifications alt+T"
+```

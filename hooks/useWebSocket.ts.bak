@@ -1,0 +1,306 @@
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
+import { WebSocketMessage } from '@/lib/websocket';
+
+interface UseWebSocketOptions {
+  autoConnect?: boolean;
+  onNotification?: (message: WebSocketMessage) => void;
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+  onError?: (error: any) => void;
+}
+
+interface UseWebSocketReturn {
+  socket: any | null;
+  isConnected: boolean;
+  isConnecting: boolean;
+  connect: () => void;
+  disconnect: () => void;
+  joinRoom: (room: string) => void;
+  leaveRoom: (room: string) => void;
+  sendMessage: (event: string, data: any) => void;
+  lastNotification: WebSocketMessage | null;
+  connectionError: string | null;
+}
+
+// Global socket instance to prevent multiple connections
+let globalSocket: any = null;
+let globalConnectionPromise: Promise<void> | null = null;
+
+export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketReturn {
+  const { data: session } = useSession();
+  const socketRef = useRef<any | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [lastNotification, setLastNotification] = useState<WebSocketMessage | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
+
+  const {
+    autoConnect = true,
+    onNotification,
+    onConnect,
+    onDisconnect,
+    onError
+  } = options;
+
+  // Initialize WebSocket server if not already done
+  const initializeWebSocketServer = useCallback(async () => {
+    try {
+      await fetch('/api/socket');
+    } catch (error) {
+      console.error('Failed to initialize WebSocket server:', error);
+    }
+  }, []);
+
+  // Connect to WebSocket with connection pooling
+  const connect = useCallback(async () => {
+    if (socketRef.current?.connected || isConnecting) {
+      return;
+    }
+
+    if (!session?.user?.id) {
+      console.warn('Cannot connect to WebSocket: No user session');
+      return;
+    }
+
+    // If there's already a global connection, use it
+    if (globalSocket?.connected) {
+      socketRef.current = globalSocket;
+      setIsConnected(true);
+      setIsConnecting(false);
+      onConnect?.();
+      return;
+    }
+
+    // If there's a connection in progress, wait for it
+    if (globalConnectionPromise) {
+      setIsConnecting(true);
+      try {
+        await globalConnectionPromise;
+        if (globalSocket?.connected) {
+          socketRef.current = globalSocket;
+          setIsConnected(true);
+          setIsConnecting(false);
+          onConnect?.();
+        }
+      } catch (error) {
+        console.error('Failed to wait for existing connection:', error);
+      }
+      return;
+    }
+
+    try {
+      setIsConnecting(true);
+      setConnectionError(null);
+
+      // Create a new connection promise
+      globalConnectionPromise = (async () => {
+        // Initialize server if needed
+        await initializeWebSocketServer();
+
+        // Dynamically import socket.io-client to avoid SSR issues
+        let io: any;
+        try {
+          const socketIOClient = await import('socket.io-client');
+          io = socketIOClient.io;
+        } catch (error) {
+          console.error('Failed to load socket.io-client:', error);
+          throw new Error('Socket.io client not available');
+        }
+
+        // Create socket connection
+        const socket = io(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000', {
+          transports: ['websocket', 'polling'],
+          autoConnect: false,
+          withCredentials: true,
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionAttempts: 5
+        });
+
+        // Set up event listeners
+        socket.on('connect', () => {
+          console.log('🔌 WebSocket connected');
+          setIsConnected(true);
+          setIsConnecting(false);
+          onConnect?.();
+
+          // Authenticate with user ID
+          socket.emit('authenticate', { userId: session.user.id });
+        });
+
+        socket.on('disconnect', (reason: string) => {
+          console.log('🔌 WebSocket disconnected:', reason);
+          setIsConnected(false);
+          setIsConnecting(false);
+          onDisconnect?.();
+        });
+
+        socket.on('notification', (message: WebSocketMessage) => {
+          console.log('📨 Received notification:', message);
+          setLastNotification(message);
+          onNotification?.(message);
+        });
+
+        socket.on('error', (error: any) => {
+          console.error('🔌 WebSocket error:', error);
+          setConnectionError(error.message || 'Connection error');
+          onError?.(error);
+        });
+
+        socket.on('connect_error', (error: any) => {
+          console.error('🔌 WebSocket connection error:', error);
+          setConnectionError(error.message || 'Connection failed');
+          setIsConnecting(false);
+          onError?.(error);
+        });
+
+        // Connect
+        socket.connect();
+        globalSocket = socket;
+        socketRef.current = socket;
+      })();
+
+      await globalConnectionPromise;
+    } catch (error) {
+      console.error('Failed to connect to WebSocket:', error);
+      setConnectionError('Failed to connect');
+      setIsConnecting(false);
+      onError?.(error);
+      globalConnectionPromise = null;
+    }
+  }, [session?.user?.id, isConnecting, onConnect, onDisconnect, onError, onNotification, initializeWebSocketServer]);
+
+  // Disconnect from WebSocket
+  const disconnect = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
+    }
+    setIsConnected(false);
+    setIsConnecting(false);
+  }, []);
+
+  // Join a room
+  const joinRoom = useCallback((room: string) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('join_room', { room });
+      console.log(`🏠 Joined room: ${room}`);
+    }
+  }, []);
+
+  // Leave a room
+  const leaveRoom = useCallback((room: string) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('leave_room', { room });
+      console.log(`🚪 Left room: ${room}`);
+    }
+  }, []);
+
+  // Send a message
+  const sendMessage = useCallback((event: string, data: any) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit(event, data);
+    } else {
+      console.warn('Cannot send message: WebSocket not connected');
+    }
+  }, []);
+
+  // Auto-connect when session is available
+  useEffect(() => {
+    if (autoConnect && session?.user?.id && !isConnected && !isConnecting) {
+      connect();
+    }
+  }, [autoConnect, session?.user?.id, isConnected, isConnecting, connect]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  return {
+    socket: socketRef.current,
+    isConnected,
+    isConnecting,
+    connect,
+    disconnect,
+    joinRoom,
+    leaveRoom,
+    sendMessage,
+    lastNotification,
+    connectionError
+  };
+}
+
+// Hook for course-specific notifications
+export function useCourseNotifications(courseId?: string) {
+  const [notifications, setNotifications] = useState<WebSocketMessage[]>([]);
+  
+  const handleNotification = useCallback((message: WebSocketMessage) => {
+    if (message.type === 'course_update' && message.data.courseId === courseId) {
+      setNotifications(prev => [message, ...prev.slice(0, 9)]); // Keep last 10 notifications
+    }
+  }, [courseId]);
+
+  const { isConnected, joinRoom, leaveRoom } = useWebSocket({
+    onNotification: handleNotification
+  });
+
+  // Join/leave course room
+  useEffect(() => {
+    if (courseId && isConnected) {
+      joinRoom(`course:${courseId}`);
+      return () => leaveRoom(`course:${courseId}`);
+    }
+  }, [courseId, isConnected, joinRoom, leaveRoom]);
+
+  return {
+    notifications,
+    isConnected,
+    clearNotifications: () => setNotifications([])
+  };
+}
+
+// Hook for payment notifications
+export function usePaymentNotifications() {
+  const [notifications, setNotifications] = useState<WebSocketMessage[]>([]);
+  
+  const handleNotification = useCallback((message: WebSocketMessage) => {
+    if (message.type === 'payment_update') {
+      setNotifications(prev => [message, ...prev.slice(0, 9)]); // Keep last 10 notifications
+    }
+  }, []);
+
+  useWebSocket({
+    onNotification: handleNotification
+  });
+
+  return {
+    notifications,
+    clearNotifications: () => setNotifications([])
+  };
+}
+
+// Hook for system alerts
+export function useSystemAlerts() {
+  const [alerts, setAlerts] = useState<WebSocketMessage[]>([]);
+  
+  const handleNotification = useCallback((message: WebSocketMessage) => {
+    if (message.type === 'system_alert') {
+      setAlerts(prev => [message, ...prev.slice(0, 4)]); // Keep last 5 alerts
+    }
+  }, []);
+
+  useWebSocket({
+    onNotification: handleNotification
+  });
+
+  return {
+    alerts,
+    clearAlerts: () => setAlerts([])
+  };
+} 

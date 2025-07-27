@@ -1,0 +1,243 @@
+LanguageCourse.net
+LinguaTrip.com
+LanguageInternational.com
+CourseFinders.com
+
+Next Steps / Options:
+Add support for multimedia file uploads (audio/video/image) instead of just URLs.
+Implement a quiz/exercise builder UI for richer authoring.
+Create a student view for consuming module content and submitting exercises.
+Add analytics for student progress within modules.
+
+
+-Next steps:
+Implement the quiz builder
+Implement the exercise builder
+Add file size limits
+Add more file type validations
+Add progress indicators for large files
+Add file compression for images
+Add video transcoding
+Add audio processing
+
+
+Based on the codebase analysis, here's the implementation of proficiency levels in the system:
+Framework Support:
+The system supports multiple language proficiency frameworks:
+CEFR (Common European Framework of Reference)
+ACTFL (American Council on the Teaching of Foreign Languages)
+JLPT (Japanese Language Proficiency Test)
+HSK (Hanyu Shuiping Kaoshi - Chinese)
+TOPIK (Test of Proficiency in Korean)
+Level Structure:
+Each framework has its own set of levels:
+CEFR:
+A1 (Beginner)
+A2 (Elementary)
+B1 (Intermediate)
+B2 (Upper Intermediate)
+C1 (Advanced)
+C2 (Mastery)
+ACTFL:
+Novice Low
+Novice Mid
+Novice High
+Intermediate Low
+Intermediate Mid
+Intermediate High
+Advanced Low
+Advanced Mid
+Advanced High
+Superior
+JLPT:
+N5 (Basic)
+N4 (Elementary)
+N3 (Intermediate)
+N2 (Pre-Advanced)
+N1 (Advanced)
+HSK:
+HSK 1 (Basic)
+HSK 2 (Elementary)
+HSK 3 (Intermediate)
+HSK 4 (Upper Intermediate)
+HSK 5 (Advanced)
+HSK 6 (Mastery)
+TOPIK:
+TOPIK 1 (Beginner)
+TOPIK 2 (Elementary)
+TOPIK 3 (Intermediate)
+TOPIK 4 (Upper Intermediate)
+TOPIK 5 (Advanced)
+TOPIK 6 (Mastery)
+Implementation Details:
+The framework and level are stored in both the course and modules tables
+Each course has a framework setting that determines which level system to use
+Modules within a course must use the same framework as the course
+The system includes level equivalency mappings between different frameworks
+The UI provides a framework selector and corresponding level selector based on the chosen framework
+Database Structure:
+Apply
+UI Implementation:
+Framework selection is available when creating/editing courses
+Level selection is available for both courses and modules
+The level selector dynamically updates based on the selected framework
+The UI shows the framework and level in a formatted way (e.g., "CEFR A1" or "JLPT N5")
+Level Equivalency:
+The system includes mappings between equivalent levels across different frameworks. For example:
+JLPT N5 ≈ CEFR A1 ≈ ACTFL Novice Low/Mid ≈ HSK 1 ≈ TOPIK 1
+JLPT N1 ≈ CEFR C1/C2 ≈ ACTFL Advanced High/Superior ≈ HSK 5/6 ≈ TOPIK 5/6
+This implementation allows for:
+Flexible course creation with different proficiency frameworks
+Consistent level tracking across the platform
+Easy comparison between different language proficiency standards
+Clear progression paths for students
+Framework-specific content organization
+Would you like me to provide more details about any specific aspect of this implementation?
+
+I've made the following fixes:
+In the module edit page:
+Added frameworkMappings to the imports
+Replaced the hardcoded framework options with dynamic options from frameworkMappings
+In the new course page:
+Added frameworkMappings to the imports
+Fixed the framework selection to use frameworkMappings instead of getFrameworkInfo
+These changes ensure that:
+All pages use the same source of truth for framework options
+The framework selection is consistent across the application
+Any updates to the framework mappings will be reflected everywhere
+The type safety is maintained throughout the application
+The error you were seeing (TypeError: Cannot read properties of undefined (reading 'map')) was likely occurring because:
+The framework value in the form data wasn't properly typed as Framework
+The framework selection wasn't using the proper source of truth (frameworkMappings)
+Now all pages use the same pattern:
+Import frameworkMappings from framework-utils
+Use Object.entries(frameworkMappings) to generate the framework options
+Use getFrameworkLevels to get the levels for the selected framework
+Use getFrameworkInfo to get the framework description
+Would you like me to make any additional changes or explain any part of the fix in more detail?
+
+I understand. Yes, that's a good point for future enhancement. Currently, the discount logic is hardcoded with:
+Starting discount rate: 5%
+Discount increment: 2.5%
+Increment period: Every 4 weeks
+Maximum discount cap: 50%
+In the future, we could make this configurable by:
+Adding new fields to the institution or course model in the Prisma schema:
+Apply
+Creating an institution settings page where administrators can configure these values
+Modifying the WeeklyPricingTable component to use these configurable values instead of hardcoded ones
+For now, we'll keep the current implementation as is, and this can be added to the roadmap for future development. Would you like to proceed with testing the current weekly pricing implementation?
+
+course_weekly_prices table:
+Stores the actual weekly prices for each course
+Contains: courseId, weekNumber, year, price
+Used for the progressive discount pricing model we just implemented
+This is what we're currently using and saving to
+course_pricing_rules table:
+Designed for time-based pricing rules (e.g., seasonal pricing, special offers)
+Contains: courseId, startDate, endDate, price
+Could be used for things like:
+Summer course discounts
+Early bird pricing
+Holiday specials
+Peak/off-peak pricing
+The course_pricing_rules table is currently empty because we haven't implemented the time-based pricing feature yet. This could be a future enhancement where institutions can set special pricing for specific date ranges.
+Would you like to:
+Continue testing the weekly pricing functionality?
+Implement the time-based pricing rules feature?
+Or focus on something else?
+
+The changes I've made ensure that:
+"Reset to Calculated Prices":
+Uses calculateWeeklyPrice to apply progressive discounts
+Updates both price and baseTotal correctly
+Maintains the discount percentage display
+"Generate Prices":
+Regenerates prices for next 12 weeks from today
+Uses the same progressive discount formula
+Updates all date fields
+"Reset to Default Prices":
+Sets prices to basePrice * weekNumber (no discounts)
+Sets discount to 0%
+Maintains correct baseTotal calculation
+"Edit All":
+Toggles the isTableEditable state
+Enables/disables the Final Price input fields
+Doesn't affect other columns
+The price calculation formula is now consistent across all functions:
+Base Total = basePrice * weekNumber
+Discount = min(5 + (weekNumber-1)/4 * 2.5, 50)%
+Final Price = Base Total * (1 - discount/100)
+Each button should now work as intended:
+"Reset to Calculated Prices" - applies progressive discounts
+"Generate Prices" - refreshes dates and prices
+"Reset to Default Prices" - removes all discounts
+"Edit All" - enables manual price editing
+
+Add infinite scrolling, lazy loading of images, optimise asset sizes, show skeletons and implement progressive loading. Implement for courses first and if successfull then we may consider implementing the optimasation throughout the project
+
+Based on the code, here's what records are available to students through their dashboard:
+Enrollment Details (CourseAccessStatus component):
+Course title and institution name
+Enrollment status (ACTIVE, PENDING_PAYMENT, etc.)
+Payment status (PENDING, PAID)
+Start and end dates
+Payment amount and invoice number
+Option to complete payment if pending
+Payment History (StudentPaymentsPage):
+Institution name
+Payment amount and currency
+Payment method used
+Payment date
+Reference number (if available)
+Payment status
+Course Progress (from StudentCourseEnrollment model):
+Progress percentage
+Course status
+Start and end dates
+Payment status and date
+Payment Details (from Payment model):
+Amount paid
+Payment status
+Payment method
+Payment date
+Reference number
+Any additional metadata (like invoice number)
+The student dashboard provides a comprehensive view of:
+Their current enrollments and their status
+Payment history and details
+Course progress and access status
+Payment requirements and options
+All of this information is presented in a user-friendly interface with:
+Status badges for quick visual reference
+Clear payment requirements and options
+Detailed payment history
+Course access status and progress tracking
+The data is fetched securely using the student's session ID to ensure they only see their own records.
+
+
+Add the payment button to a specific page in your dashboard?
+Implement a specific payment gateway integration?
+Add any additional features to the payment system?
+
+Add any additional features to the PaymentStatus component?
+Add more payment status types?
+Enhance the styling of the payment status display?
+
+Update the Prisma schema to include a Payment model
+Add the relationship between Student and Payment models
+Then we can add the payments UI back to the dashboard
+Would you like me to:
+Create the Payment model in the Prisma schema?
+Add the relationship between Student and Payment models?
+Add the payments UI back to the dashboard once the schema is updated
+
+Would you like me to:
+Add more details to the enrollment modal?
+Implement the terms and conditions page?
+Add any additional features to the enrollment flow?
+
+Would you like me to:
+Add more payment methods?
+Add payment method-specific fields (e.g., card details for credit card)?
+Improve the payment method selection UI further?

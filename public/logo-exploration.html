@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Exploration - FluentShip</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .logo-concept {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-concept:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+        
+        .logo-concept.featured {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .logo-concept.featured h3,
+        .logo-concept.featured p {
+            color: white;
+        }
+        
+        .logo-svg {
+            width: 200px;
+            height: 150px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+        
+        .logo-concept h3 {
+            color: #333;
+            margin: 0 0 15px 0;
+            font-size: 1.3rem;
+        }
+        
+        .logo-concept p {
+            color: #666;
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .concept-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h3 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+        }
+        
+        .feature p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .color-palette {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .logo-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .logo-concept {
+                padding: 20px;
+            }
+            
+            .logo-svg {
+                width: 150px;
+                height: 120px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">FluentShip</div>
+            <h1>Logo Design Exploration</h1>
+            <p>Explore various design directions for the FluentShip brand identity. Each concept represents a different approach to communicating our mission of global language learning and cultural exchange.</p>
+        </div>
+        
+        <div class="logo-grid">
+            <!-- Featured Boat Logo -->
+            <div class="logo-concept featured">
+                <div class="concept-tag">NEW</div>
+                <svg class="logo-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Hull of the boat -->
+                    <path d="M50 140 Q100 170 150 170 Q200 170 250 140 L50 140 Z" fill="#ECF0F1"/>
+                    
+                    <!-- Mast -->
+                    <rect x="145" y="60" width="10" height="80" fill="#ECF0F1"/>
+                    
+                    <!-- Sail shaped like a speech bubble -->
+                    <path d="M150 60 L150 120 Q180 110 190 90 Q180 80 165 70 L150 60 Z" fill="#ECF0F1"/>
+                    
+                    <!-- Three figures (circles for heads, rectangles for bodies) -->
+                    <circle cx="90" cy="135" r="7" fill="#667eea"/>
+                    <rect x="86" y="135" width="8" height="12" fill="#667eea"/>
+                    
+                    <circle cx="130" cy="135" r="7" fill="#667eea"/>
+                    <rect x="126" y="135" width="8" height="12" fill="#667eea"/>
+                    
+                    <circle cx="170" cy="135" r="7" fill="#667eea"/>
+                    <rect x="166" y="135" width="8" height="12" fill="#667eea"/>
+                </svg>
+                <h3>Communication Boat</h3>
+                <p>A boat with a speech bubble sail and three figures representing global communication and collaborative learning. Symbolizes journey, connection, and dialogue.</p>
+                <div class="color-palette">
+                    <div class="color-swatch" style="background: #667eea;"></div>
+                    <div class="color-swatch" style="background: #764ba2;"></div>
+                    <div class="color-swatch" style="background: #ECF0F1;"></div>
+                </div>
+            </div>
+            
+            <!-- Typography Concept -->
+            <div class="logo-concept">
+                <div class="concept-tag">Typography</div>
+                <div class="logo-svg" style="display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    FS
+                </div>
+                <h3>Modern Typography</h3>
+                <p>Clean, minimalist approach using custom typography. The "FS" monogram represents FluentShip with elegant, modern letterforms.</p>
+                <div class="color-palette">
+                    <div class="color-swatch" style="background: #667eea;"></div>
+                    <div class="color-swatch" style="background: #764ba2;"></div>
+                    <div class="color-swatch" style="background: #2C3E50;"></div>
+                </div>
+            </div>
+            
+            <!-- Globe Concept -->
+            <div class="logo-concept">
+                <div class="concept-tag">Icon</div>
+                <svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="100" r="80" fill="none" stroke="#667eea" stroke-width="3"/>
+                    <path d="M20 100 Q100 20 180 100 Q100 180 20 100" fill="none" stroke="#764ba2" stroke-width="2"/>
+                    <path d="M100 20 Q180 100 100 180 Q20 100 100 20" fill="none" stroke="#764ba2" stroke-width="2"/>
+                    <circle cx="100" cy="100" r="15" fill="#667eea"/>
+                </svg>
+                <h3>Global Connection</h3>
+                <p>World globe with intersecting lines representing global connections and language networks. Emphasizes the worldwide reach of language learning.</p>
+                <div class="color-palette">
+                    <div class="color-swatch" style="background: #667eea;"></div>
+                    <div class="color-swatch" style="background: #764ba2;"></div>
+                    <div class="color-swatch" style="background: #3498DB;"></div>
+                </div>
+            </div>
+            
+            <!-- Abstract Waves -->
+            <div class="logo-concept">
+                <div class="concept-tag">Abstract</div>
+                <svg class="logo-svg" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 75 Q50 45 80 75 Q110 105 140 75 Q170 45 200 75" fill="none" stroke="#667eea" stroke-width="4"/>
+                    <path d="M20 85 Q50 55 80 85 Q110 115 140 85 Q170 55 200 85" fill="none" stroke="#764ba2" stroke-width="3"/>
+                    <path d="M20 95 Q50 65 80 95 Q110 125 140 95 Q170 65 200 95" fill="none" stroke="#3498DB" stroke-width="2"/>
+                </svg>
+                <h3>Fluid Communication</h3>
+                <p>Abstract wave patterns representing fluid communication and the flow of language learning. Dynamic and modern approach to brand identity.</p>
+                <div class="color-palette">
+                    <div class="color-swatch" style="background: #667eea;"></div>
+                    <div class="color-swatch" style="background: #764ba2;"></div>
+                    <div class="color-swatch" style="background: #3498DB;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 40px 0;">
+            <a href="/" class="btn">Back to Home</a>
+            <a href="/features" class="btn btn-secondary">View Features</a>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>Typography</h3>
+                <p>Clean, modern type-based designs that emphasize readability and professionalism</p>
+            </div>
+            <div class="feature">
+                <h3>Icon-Based</h3>
+                <p>Symbolic representations that communicate core values through visual metaphors</p>
+            </div>
+            <div class="feature">
+                <h3>Abstract</h3>
+                <p>Creative geometric and fluid designs that convey movement and innovation</p>
+            </div>
+            <div class="feature">
+                <h3>Communication</h3>
+                <p>Designs that emphasize dialogue, connection, and global understanding</p>
+            </div>
+        </div>
+        
+        <p style="margin-top: 30px; font-size: 0.9rem; color: #999; text-align: center;">
+            All logo concepts are designed to be scalable, memorable, and representative of FluentShip's mission to connect learners worldwide.
+        </p>
+    </div>
+</body>
+</html> 

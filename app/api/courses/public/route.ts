@@ -1,0 +1,145 @@
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { logger, logError } from '../../../../lib/logger';
+
+export async function GET() {
+  try {
+    // Get all approved courses with enhanced prioritization
+    const courses = await prisma.course.findMany({
+      where: {
+        startDate: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0) - 30 * 24 * 60 * 60 * 1000) // Show courses starting from 30 days ago
+        },
+        status: 'PUBLISHED', // Only show published courses
+        institution: {
+          isApproved: true,
+          status: 'ACTIVE'
+        }
+      },
+      include: {
+        institution: {
+          select: {
+            id: true,
+            name: true,
+            country: true,
+            city: true,
+            commissionRate: true,
+            isApproved: true,
+            status: true,
+            subscriptionPlan: true, // Legacy field for backward compatibility
+            isFeatured: true, // For featured institution status
+            subscription: {
+              include: {
+                commissionTier: true
+              }
+            }
+          }
+        },
+        category: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        courseTags: {
+          include: {
+            tag: true
+          }
+        }
+      },
+      orderBy: [
+        // Primary: Featured institutions first
+        { institution: { isFeatured: 'desc' } },
+        // Secondary: Higher commission rates
+        { institution: { commissionRate: 'desc' } },
+        // Tertiary: Sooner start dates
+        { startDate: 'asc' },
+        // Quaternary: Newer courses
+        { createdAt: 'desc' }
+      ]
+    })
+
+    // Calculate priority scores for advanced sorting
+    const coursesWithPriority = courses.map(course => {
+      let priorityScore = 0;
+      
+      // Featured institution bonus (highest priority)
+      if (course.institution.isFeatured) {
+        priorityScore += 1000;
+      }
+      
+      // Commission rate bonus (0-50 points based on rate)
+      priorityScore += (course.institution.commissionRate || 0) * 10;
+      
+      // Subscription plan bonus - use new unified architecture when available
+      let subscriptionPlan = 'BASIC'; // Default fallback
+      
+      if (course.institution.subscription?.status === 'ACTIVE' && course.institution.subscription.commissionTier) {
+        // Use new unified architecture
+        subscriptionPlan = course.institution.subscription.commissionTier.planType;
+      } else if (course.institution.subscriptionPlan) {
+        // Fallback to legacy field for backward compatibility
+        subscriptionPlan = course.institution.subscriptionPlan;
+      }
+      
+      const planBonus = {
+        'STARTER': 25,
+        'BASIC': 0,
+        'PROFESSIONAL': 50,
+        'ENTERPRISE': 100
+      };
+      priorityScore += planBonus[subscriptionPlan as keyof typeof planBonus] || 0;
+      
+      // Recency bonus (newer courses get slight boost)
+      const daysSinceCreation = Math.floor((Date.now() - new Date(course.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+      priorityScore += Math.max(0, 30 - daysSinceCreation); // Up to 30 points for very new courses
+      
+      // Start date proximity bonus (sooner courses get boost)
+      const daysUntilStart = Math.floor((new Date(course.startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      priorityScore += Math.max(0, 30 - daysUntilStart); // Up to 30 points for courses starting soon
+      
+      // Commission rate band categorization
+      const commissionRate = course.institution.commissionRate || 0;
+      const commissionBand = commissionRate >= 25 ? 'VERY_HIGH' : 
+                            commissionRate >= 20 ? 'HIGH' : 
+                            commissionRate >= 15 ? 'MEDIUM' : 'LOW';
+      
+      return {
+        ...course,
+        // Keep priorityScore for internal sorting but don't expose it publicly
+        priorityScore,
+        // Add advertising eligibility flags
+        isPremiumPlacement: subscriptionPlan === 'ENTERPRISE',
+        isFeaturedPlacement: course.institution.isFeatured,
+        isHighCommission: commissionRate >= 20,
+        isVeryHighCommission: commissionRate >= 25,
+        commissionBand,
+        effectiveSubscriptionPlan: subscriptionPlan,
+        // Add commission rate band for better categorization (but don't expose the actual rate)
+        commissionRateBand: {
+          band: commissionBand,
+          description: commissionBand === 'VERY_HIGH' ? 'Very High Commission' :
+                      commissionBand === 'HIGH' ? 'High Commission' :
+                      commissionBand === 'MEDIUM' ? 'Medium Commission' : 'Standard Commission'
+        }
+      };
+    });
+
+    // Sort by calculated priority score
+    coursesWithPriority.sort((a, b) => b.priorityScore - a.priorityScore);
+
+    // Remove sensitive data from public response
+    const publicCourses = coursesWithPriority.map(course => {
+      const { priorityScore, ...publicCourse } = course;
+      return publicCourse;
+    });
+
+    return NextResponse.json(publicCourses)
+  } catch (error) {
+    console.error('Error fetching public courses:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch courses' },
+      { status: 500 }
+    )
+  }
+}

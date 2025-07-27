@@ -1,0 +1,26 @@
+{
+  "timestamp": "2025-07-11T09:36:29.404Z",
+  "summary": {
+    "totalFixes": 4,
+    "totalErrors": 0,
+    "filesProcessed": 2
+  },
+  "results": [
+    {
+      "file": "scripts\\fix-server-console-errors.ts",
+      "fixes": [
+        "Removed unused logError import",
+        "Fixed unused imports and parameters"
+      ],
+      "errors": []
+    },
+    {
+      "file": "scripts\\fix-unused-imports.ts",
+      "fixes": [
+        "Removed unused logError import",
+        "Fixed unused imports and parameters"
+      ],
+      "errors": []
+    }
+  ]
+}

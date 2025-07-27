@@ -1,0 +1,94 @@
+{
+  "slides": [
+    {
+      "id": "slide1",
+      "voice": "en-US-Wavenet-D",
+      "script": "Hello and welcome...\nToday\u2019s topic is Describing Data and Trends \u2014 a key academic skill.",
+      "title": "Describing Data & Trends",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide2",
+      "voice": "en-US-Wavenet-D",
+      "script": "You\u2019ll often use this when writing reports or giving presentations.",
+      "title": "Interpreting Academic Visuals",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide3",
+      "voice": "en-US-Wavenet-D",
+      "script": "Let\u2019s start with some essential vocabulary...\nincrease, decrease, fluctuate, peak, plateau.",
+      "title": "Essential Vocabulary",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide4",
+      "voice": "en-US-Wavenet-D",
+      "script": "For example: \u201cThe number of applicants increased sharply in 2022.\u201d",
+      "title": "Vocabulary in Context",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide5",
+      "voice": "en-US-Wavenet-D",
+      "script": "Now let\u2019s talk about grammar for trend descriptions.\nPast Simple vs. Present Perfect.",
+      "title": "Grammar Focus",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide6",
+      "voice": "en-US-Wavenet-D",
+      "script": "Use comparative phrases like: \u201cmore than,\u201d \u201cless than,\u201d \u201cas much as.\u201d",
+      "title": "Making Comparisons",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide7",
+      "voice": "en-US-Wavenet-D",
+      "script": "Academic English values accuracy and objectivity.\nDescribe only what the data shows.",
+      "title": "Academic Objectivity",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide8",
+      "voice": "en-US-Wavenet-D",
+      "script": "Instead of saying \u201cThe drop was probably due to poor marketing,\u201d say:\n\u201cThere was a 20% drop in sales between March and June.\u201d",
+      "title": "Correct vs. Incorrect",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide9",
+      "voice": "en-US-Wavenet-D",
+      "script": "Here\u2019s a quick challenge: describe this sample chart in 2\u20133 sentences.",
+      "title": "Practice Prompt",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    },
+    {
+      "id": "slide10",
+      "voice": "en-US-Wavenet-D",
+      "script": "To sum up: good data descriptions are clear, concise, and based on evidence.\nUp next: an interactive quiz to test your skills!",
+      "title": "Conclusion & Quiz Teaser",
+      "background": "default",
+      "avatar": "anna",
+      "layout": "default"
+    }
+  ]
+}
