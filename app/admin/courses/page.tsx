@@ -703,29 +703,6 @@ function AdminCoursesContent() {
     }
   }, []);
 
-  // Show loading while checking authentication
-  if (status === 'loading') {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if not authenticated
-  if (!session || session.user?.role !== 'ADMIN') {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-sm text-muted-foreground">Access denied. Please log in as an admin.</p>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (inView && hasMore && !isLoadingMore) {
       loadMoreCourses();
@@ -783,6 +760,29 @@ function AdminCoursesContent() {
 
     loadInitialData();
   }, [institutionId]);
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if not authenticated
+  if (!session || session.user?.role !== 'ADMIN') {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm text-muted-foreground">Access denied. Please log in as an admin.</p>
+        </div>
+      </div>
+    );
+  }
 
   const loadMoreCourses = async () => {
     try {

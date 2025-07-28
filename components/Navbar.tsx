@@ -36,11 +36,7 @@ const Navbar = () => {
     }
   }, [session, status]);
 
-  // Hide navbar on admin pages to prevent duplicate navigation
-  const isAdminPage = pathname?.startsWith('/admin')
-  if (isAdminPage) {
-    return null
-  }
+  // Note: Admin pages will show navbar but without duplicate links (handled by conditional logic below)
 
   const getDashboardLink = () => {
     if (!session?.user) return null;
@@ -79,7 +75,7 @@ const Navbar = () => {
       case 'INSTITUTION':
         return { href: '/institution/courses', label: 'Courses' };
       case 'ADMIN':
-        return { href: '/admin/courses', label: 'Courses' };
+        return null; // Don't show Courses link for admin users since it's in the sidebar
       default:
         return null;
     }
@@ -229,8 +225,8 @@ const Navbar = () => {
             )}
             {status === 'authenticated' && session ? (
               <div className="flex items-center space-x-4">
-                {/* Notifications for authenticated users */}
-                <SimpleNotifications />
+                {/* Notifications for authenticated users (except admin) */}
+                {session.user.role !== 'ADMIN' && <SimpleNotifications />}
                 
                 {session.user.role === 'INSTITUTION' ? (
                   (session.user.institutionApproved || institution?.isApproved) ? (
@@ -353,10 +349,12 @@ const Navbar = () => {
             <div className="pt-4 pb-3 border-t border-gray-200">
               {status === 'authenticated' && session ? (
                 <div className="space-y-2">
-                  {/* Real-time notifications for authenticated users */}
-                  <div className="px-3 py-2">
-                    <SimpleNotifications />
-                  </div>
+                  {/* Real-time notifications for authenticated users (except admin) */}
+                  {session.user.role !== 'ADMIN' && (
+                    <div className="px-3 py-2">
+                      <SimpleNotifications />
+                    </div>
+                  )}
                   
                   {session.user.role === 'INSTITUTION' ? (
                     (session.user.institutionApproved || institution?.isApproved) ? (

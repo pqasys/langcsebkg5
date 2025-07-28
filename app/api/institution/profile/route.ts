@@ -109,8 +109,8 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (session.user.role !== 'INSTITUTION') {
-      console.log('Institution profile PUT - User role is not INSTITUTION:', session.user.role);
+    if (session.user.role !== 'INSTITUTION' && session.user.role !== 'ADMIN') {
+      console.log('Institution profile PUT - User role is not INSTITUTION or ADMIN:', session.user.role);
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
