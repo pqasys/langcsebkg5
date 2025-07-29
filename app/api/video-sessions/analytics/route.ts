@@ -1,11 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getSafeServerSession, isBuildTime } from '@/lib/auth-utils';
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    // Check if we're in a build context
+    if (isBuildTime(request)) {
+      // During static generation, return empty data instead of error
+      return NextResponse.json({
+        totalSessions: 0,
+        activeSessions: 0,
+        completedSessions: 0,
+        totalParticipants: 0,
+        totalRevenue: 0,
+        averageSessionDuration: 0,
+        topLanguages: [],
+        topInstructors: [],
+        revenueByDay: [],
+        participantGrowth: []
+      });
+    }
+
+    const session = await getSafeServerSession(request);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

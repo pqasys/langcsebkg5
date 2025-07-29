@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { DashboardClient } from './DashboardClient';
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic'
+
 export default async function InstitutionDashboardPage() {
   const session = await getServerSession(authOptions);
 

@@ -20,6 +20,9 @@ import {
 import { format } from 'date-fns'
 import Link from 'next/link'
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic'
+
 interface VideoSession {
   id: string
   title: string

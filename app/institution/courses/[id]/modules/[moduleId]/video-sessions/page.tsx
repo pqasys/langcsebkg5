@@ -26,6 +26,9 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic'
+
 interface VideoSession {
   id: string
   title: string

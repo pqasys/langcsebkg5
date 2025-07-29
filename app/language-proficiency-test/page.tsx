@@ -55,70 +55,70 @@ const AVAILABLE_LANGUAGES: Language[] = [
     name: 'English',
     flag: '🇺🇸',
     status: 'available',
-    description: 'Comprehensive English proficiency test with 80 questions covering all CEFR levels'
+    description: 'Proficiency Test'
   },
   {
     code: 'es',
     name: 'Spanish',
     flag: '🇪🇸',
     status: 'coming-soon',
-    description: 'Spanish language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'fr',
     name: 'French',
     flag: '🇫🇷',
     status: 'coming-soon',
-    description: 'French language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'de',
     name: 'German',
     flag: '🇩🇪',
     status: 'coming-soon',
-    description: 'German language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'it',
     name: 'Italian',
     flag: '🇮🇹',
     status: 'coming-soon',
-    description: 'Italian language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'pt',
     name: 'Portuguese',
     flag: '🇵🇹',
     status: 'coming-soon',
-    description: 'Portuguese language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'ru',
     name: 'Russian',
     flag: '🇷🇺',
     status: 'coming-soon',
-    description: 'Russian language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'zh',
     name: 'Chinese',
     flag: '🇨🇳',
     status: 'coming-soon',
-    description: 'Chinese language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'ja',
     name: 'Japanese',
     flag: '🇯🇵',
     status: 'coming-soon',
-    description: 'Japanese language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   },
   {
     code: 'ko',
     name: 'Korean',
     flag: '🇰🇷',
     status: 'coming-soon',
-    description: 'Korean language proficiency assessment (Coming Soon)'
+    description: 'Proficiency Test'
   }
 ];
 
@@ -225,15 +225,15 @@ export default function LanguageProficiencyTestPage() {
                 <SelectContent>
                   {AVAILABLE_LANGUAGES.map((language) => (
                     <SelectItem key={language.code} value={language.code}>
-                      <div className="flex items-center space-x-3">
-                        <span className="text-2xl">{language.flag}</span>
-                        <div className="flex-1">
-                          <div className="font-medium">{language.name}</div>
-                          <div className="text-xs text-gray-500">{language.description}</div>
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2 flex-1">
+                          <span className="flex-shrink-0">{language.flag}</span>
+                          <span className="font-medium w-20 text-left">{language.name}</span>
+                          <span className="text-xs text-gray-500">- {language.description}</span>
                         </div>
                         <Badge 
                           variant={language.status === 'available' ? 'default' : 'secondary'}
-                          className="text-xs"
+                          className="text-xs flex-shrink-0"
                         >
                           {language.status === 'available' ? 'Available' : 'Coming Soon'}
                         </Badge>
@@ -274,7 +274,7 @@ export default function LanguageProficiencyTestPage() {
                     <Button 
                       variant="outline" 
                       size="lg"
-                      className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold"
+                      className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold bg-transparent"
                     >
                       <UserPlus className="h-5 w-5 mr-2" />
                       Create Account
@@ -326,9 +326,6 @@ export default function LanguageProficiencyTestPage() {
                       <h3 className="text-xl font-semibold text-gray-900">
                         {language.name}
                       </h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {language.description}
-                      </p>
                       <div className="mt-3">
                         <Badge 
                           variant={language.status === 'available' ? 'default' : 'secondary'}
@@ -399,9 +396,6 @@ export default function LanguageProficiencyTestPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 {selectedLang.name} Test Details
               </h2>
-              <p className="text-lg text-gray-600">
-                {selectedLang.description}
-              </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
