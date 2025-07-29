@@ -14,14 +14,13 @@ import {
   Phone, 
   PhoneOff, 
   Share, 
-  ShareOff,
+  Monitor,
   MessageSquare,
   Users,
   Settings,
-  Monitor,
   MonitorOff,
-  Record,
-  RecordOff,
+  Play,
+  Square,
   Send,
   MoreVertical,
   Maximize,
@@ -503,7 +502,7 @@ export function VideoSessionInterface({ sessionId, onLeave }: VideoSessionInterf
                 onClick={toggleScreenShare}
                 className={`rounded-full ${isScreenSharing ? 'bg-blue-500 text-white' : 'text-white border-gray-600'}`}
               >
-                {isScreenSharing ? <ShareOff className="w-4 h-4" /> : <Share className="w-4 h-4" />}
+                {isScreenSharing ? <MonitorOff className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
               </Button>
               
               <Button
@@ -512,7 +511,7 @@ export function VideoSessionInterface({ sessionId, onLeave }: VideoSessionInterf
                 onClick={toggleRecording}
                 className={`rounded-full ${isRecording ? 'bg-red-500 text-white' : 'text-white border-gray-600'}`}
               >
-                {isRecording ? <RecordOff className="w-4 h-4" /> : <Record className="w-4 h-4" />}
+                {isRecording ? <Square className="w-4 h-4" /> : <Play className="w-4 h-4" />}
               </Button>
               
               <Button

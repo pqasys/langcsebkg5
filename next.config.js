@@ -10,17 +10,11 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   
-  // Enable Turbopack for faster builds and better chunk loading
+  // Re-enable Turbopack with conservative settings
   experimental: {
-    // Enable Turbopack with optimizations
+    // Enable Turbopack with minimal configuration
     turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-      // Enable Turbopack optimizations
+      // Disable font optimization to prevent loading issues
       resolveAlias: {
         '@': './',
       },

@@ -451,6 +451,19 @@ export default function HomePageClient() {
                   </Button>
                 </Link>
               </div>
+              {/* Small CTA for Language Proficiency Test */}
+              <div className="mt-4 flex justify-center lg:justify-start">
+                <Link href="/language-proficiency-test">
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="text-blue-100 hover:text-white hover:bg-white/10 transition-all duration-200 px-4 py-2 text-sm font-medium border border-white/20 hover:border-white/40"
+                  >
+                    <FaAward className="w-4 h-4 mr-2" />
+                    Take Free Language Test
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             <div className="relative">

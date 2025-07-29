@@ -20,7 +20,7 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
   display: "swap",
-  preload: true,
+  preload: false, // Disable preloading to avoid Turbopack issues
   fallback: ["system-ui", "arial"],
   variable: "--font-poppins",
 });

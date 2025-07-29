@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 29, 2025 at 08:55 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Jul 29, 2025 at 07:29 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -1214,12 +1214,12 @@ CREATE TABLE IF NOT EXISTS `learning_sessions` (
 
 DROP TABLE IF EXISTS `live_conversations`;
 CREATE TABLE IF NOT EXISTS `live_conversations` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `conversationType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `language` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `level` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `conversationType` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `startTime` datetime(3) NOT NULL,
   `endTime` datetime(3) NOT NULL,
   `duration` int NOT NULL,
@@ -1228,14 +1228,14 @@ CREATE TABLE IF NOT EXISTS `live_conversations` (
   `price` double NOT NULL DEFAULT '0',
   `isPublic` tinyint(1) NOT NULL DEFAULT '1',
   `isFree` tinyint(1) NOT NULL DEFAULT '0',
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SCHEDULED',
-  `meetingUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `meetingId` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `meetingPassword` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `instructorId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `hostId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `topic` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `culturalNotes` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SCHEDULED',
+  `meetingUrl` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meetingId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meetingPassword` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instructorId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `hostId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `topic` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `culturalNotes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `vocabularyList` json DEFAULT NULL,
   `grammarPoints` json DEFAULT NULL,
   `conversationPrompts` json DEFAULT NULL,
@@ -1270,18 +1270,18 @@ INSERT INTO `live_conversations` (`id`, `title`, `description`, `conversationTyp
 
 DROP TABLE IF EXISTS `live_conversation_bookings`;
 CREATE TABLE IF NOT EXISTS `live_conversation_bookings` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `conversationId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CONFIRMED',
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conversationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CONFIRMED',
   `bookedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `cancelledAt` datetime(3) DEFAULT NULL,
-  `paymentStatus` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PAID',
+  `paymentStatus` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PAID',
   `amount` double NOT NULL DEFAULT '0',
-  `currency` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USD',
-  `paymentMethod` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `transactionId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `refundReason` text COLLATE utf8mb4_unicode_ci,
+  `currency` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USD',
+  `paymentMethod` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `transactionId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `refundReason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `live_conversation_bookings_conversationId_userId_key` (`conversationId`,`userId`),
@@ -1307,15 +1307,15 @@ INSERT INTO `live_conversation_bookings` (`id`, `conversationId`, `userId`, `sta
 
 DROP TABLE IF EXISTS `live_conversation_messages`;
 CREATE TABLE IF NOT EXISTS `live_conversation_messages` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `conversationId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `senderId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `recipientId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `messageType` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'TEXT',
-  `language` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conversationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `senderId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recipientId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `messageType` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'TEXT',
+  `language` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `isTranslation` tinyint(1) NOT NULL DEFAULT '0',
-  `originalMessage` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `originalMessage` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `timestamp` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `isRead` tinyint(1) NOT NULL DEFAULT '0',
   `metadata` json DEFAULT NULL,
@@ -1335,15 +1335,15 @@ CREATE TABLE IF NOT EXISTS `live_conversation_messages` (
 
 DROP TABLE IF EXISTS `live_conversation_participants`;
 CREATE TABLE IF NOT EXISTS `live_conversation_participants` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `conversationId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conversationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `joinedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `leftAt` datetime(3) DEFAULT NULL,
   `duration` int NOT NULL DEFAULT '0',
   `isInstructor` tinyint(1) NOT NULL DEFAULT '0',
   `isHost` tinyint(1) NOT NULL DEFAULT '0',
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'JOINED',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'JOINED',
   `speakingTime` int NOT NULL DEFAULT '0',
   `messageCount` int NOT NULL DEFAULT '0',
   `feedback` json DEFAULT NULL,
@@ -3064,24 +3064,24 @@ INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`,
 
 DROP TABLE IF EXISTS `video_sessions`;
 CREATE TABLE IF NOT EXISTS `video_sessions` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `sessionType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `language` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `level` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `sessionType` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `maxParticipants` int NOT NULL DEFAULT '10',
   `startTime` datetime(3) NOT NULL,
   `endTime` datetime(3) NOT NULL,
   `duration` int NOT NULL,
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SCHEDULED',
-  `meetingUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `meetingId` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `recordingUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `instructorId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `institutionId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `courseId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `moduleId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SCHEDULED',
+  `meetingUrl` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meetingId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recordingUrl` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instructorId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `institutionId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `courseId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `moduleId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `price` double NOT NULL DEFAULT '0',
   `isPublic` tinyint(1) NOT NULL DEFAULT '0',
   `isRecorded` tinyint(1) NOT NULL DEFAULT '0',
@@ -3110,14 +3110,14 @@ CREATE TABLE IF NOT EXISTS `video_sessions` (
 
 DROP TABLE IF EXISTS `video_session_messages`;
 CREATE TABLE IF NOT EXISTS `video_session_messages` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `messageType` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `messageType` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `timestamp` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `isPrivate` tinyint(1) NOT NULL DEFAULT '0',
-  `recipientId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recipientId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `video_session_messages_sessionId_idx` (`sessionId`),
@@ -3134,16 +3134,16 @@ CREATE TABLE IF NOT EXISTS `video_session_messages` (
 
 DROP TABLE IF EXISTS `video_session_participants`;
 CREATE TABLE IF NOT EXISTS `video_session_participants` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PARTICIPANT',
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PARTICIPANT',
   `joinedAt` datetime(3) DEFAULT NULL,
   `leftAt` datetime(3) DEFAULT NULL,
   `duration` int NOT NULL DEFAULT '0',
   `isActive` tinyint(1) NOT NULL DEFAULT '0',
   `deviceInfo` json DEFAULT NULL,
-  `connectionQuality` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `connectionQuality` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lastSeen` datetime(3) DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -3163,15 +3163,15 @@ CREATE TABLE IF NOT EXISTS `video_session_participants` (
 
 DROP TABLE IF EXISTS `video_session_recordings`;
 CREATE TABLE IF NOT EXISTS `video_session_recordings` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `recordingUrl` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recordingUrl` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `duration` int NOT NULL,
   `fileSize` int NOT NULL,
-  `quality` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PROCESSING',
-  `thumbnailUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `transcript` text COLLATE utf8mb4_unicode_ci,
+  `quality` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PROCESSING',
+  `thumbnailUrl` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `transcript` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,

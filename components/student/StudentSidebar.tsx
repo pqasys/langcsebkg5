@@ -69,7 +69,12 @@ const menuItems = [
     icon: History,
     description: 'View your payment records'
   },
-
+  {
+    title: 'Language Test',
+    href: '/language-proficiency-test',
+    icon: Award,
+    description: 'Take the free language proficiency test'
+  },
   {
     title: 'Settings',
     href: '/student/settings',

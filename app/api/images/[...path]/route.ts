@@ -24,8 +24,11 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error serving image:');
-    return new NextResponse('Error serving image', { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' });
+    console.error('Error serving image:', error);
+    return new NextResponse('Error serving image', { 
+      status: 500, 
+      statusText: 'Internal Server Error' 
+    });
   }
 }
 

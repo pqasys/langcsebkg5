@@ -39,6 +39,11 @@ const mobileNavItems = [
     icon: CreditCard
   },
   {
+    title: 'Language Test',
+    href: '/language-proficiency-test',
+    icon: Award
+  },
+  {
     title: 'Profile',
     href: '/student/profile',
     icon: User
