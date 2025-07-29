@@ -81,6 +81,19 @@ const Navbar = () => {
     }
   }
 
+  const getVideoSessionsLink = () => {
+    if (!session?.user) return null;
+    
+    switch (session.user.role) {
+      case 'INSTITUTION':
+        return { href: '/video-sessions/create', label: 'Create Session' };
+      case 'ADMIN':
+        return { href: '/video-sessions/create', label: 'Create Session' };
+      default:
+        return null;
+    }
+  }
+
   const getStudentsLink = () => {
     if (!session?.user) return null;
     
@@ -198,6 +211,12 @@ const Navbar = () => {
                 Live Conversations
               </Link>
               <Link
+                href="/features/video-conferencing"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+              >
+                Video Conferencing
+              </Link>
+              <Link
                 href="/features/community-learning"
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
               >
@@ -221,6 +240,14 @@ const Navbar = () => {
                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium mr-4"
               >
                 {getCoursesLink()!.label}
+              </Link>
+            )}
+            {getVideoSessionsLink() && (
+              <Link
+                href={getVideoSessionsLink()!.href}
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium mr-4"
+              >
+                {getVideoSessionsLink()!.label}
               </Link>
             )}
             {status === 'authenticated' && session ? (
@@ -335,6 +362,13 @@ const Navbar = () => {
               <Search className="h-4 w-4 mr-2 inline" />
               Search
             </Link>
+            <Link
+              href="/features/video-conferencing"
+              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md no-hover-underline"
+              onClick={closeMobileMenu}
+            >
+              Video Conferencing
+            </Link>
             {getCoursesLink() && (
               <Link
                 href={getCoursesLink()!.href}
@@ -342,6 +376,15 @@ const Navbar = () => {
                 onClick={closeMobileMenu}
               >
                 {getCoursesLink()!.label}
+              </Link>
+            )}
+            {getVideoSessionsLink() && (
+              <Link
+                href={getVideoSessionsLink()!.href}
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                onClick={closeMobileMenu}
+              >
+                {getVideoSessionsLink()!.label}
               </Link>
             )}
 

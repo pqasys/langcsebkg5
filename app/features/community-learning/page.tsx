@@ -23,6 +23,7 @@ import {
   FaBookOpen,
   FaVideo
 } from 'react-icons/fa'
+import { getAllStudentTiers } from '@/lib/subscription-pricing'
 
 export default function CommunityLearningFeaturePage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -114,8 +115,12 @@ export default function CommunityLearningFeaturePage() {
     }
   ]
 
-  const pricingPlans = [
-    {
+  // Generate pricing plans from single source of truth
+  const generatePricingPlans = () => {
+    const studentTiers = getAllStudentTiers();
+    
+    // Create a free community plan
+    const freeCommunityPlan = {
       name: 'Free Community',
       price: '$0',
       period: 'forever',
@@ -127,23 +132,25 @@ export default function CommunityLearningFeaturePage() {
       ],
       cta: 'Join Free',
       popular: false
-    },
-    {
-      name: 'Premium Community',
-      price: '$9.99',
+    };
+    
+    // Convert student tiers to pricing plans
+    const tierPlans = studentTiers.map(tier => ({
+      name: `${tier.name.replace(' Plan', '')} Community`,
+      price: `$${tier.price}`,
       period: '/month',
-      features: [
-        'All community features',
-        'Exclusive study groups',
-        'Advanced resource library',
-        'Priority group creation',
-        'Community challenges',
-        'Progress tracking'
-      ],
-      cta: 'Start Premium',
-      popular: true
-    },
-    {
+      features: tier.features.filter(feature => 
+        feature.toLowerCase().includes('community') || 
+        feature.toLowerCase().includes('group') ||
+        feature.toLowerCase().includes('social') ||
+        feature.toLowerCase().includes('study')
+      ),
+      cta: `Start ${tier.name.replace(' Plan', '')}`,
+      popular: tier.popular || false
+    }));
+    
+    // Add enterprise plan
+    const enterprisePlan = {
       name: 'Enterprise',
       price: 'Custom',
       period: '',
@@ -157,8 +164,12 @@ export default function CommunityLearningFeaturePage() {
       ],
       cta: 'Contact Sales',
       popular: false
-    }
-  ]
+    };
+    
+    return [freeCommunityPlan, ...tierPlans, enterprisePlan];
+  };
+
+  const pricingPlans = generatePricingPlans();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/30 to-purple-50/30">

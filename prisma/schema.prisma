@@ -51,6 +51,7 @@ model Institution {
   subscription InstitutionSubscription?
   leadEvents LeadEvent[]
   templateUsageRecords QuestionTemplateUsage[] @relation("InstitutionTemplateUsage")
+  videoSessions VideoSession[]
 
   @@map("institution")
 }
@@ -84,6 +85,7 @@ model Course {
   bookings    booking[]
   modules     modules[]
   courseTags  CourseTag[]
+  videoSessions VideoSession[]
 
   @@unique([title, institutionId], map: "Course_title_institutionId_key")
   @@index([categoryId], map: "Course_categoryId_fkey")
@@ -282,6 +284,20 @@ model user {
   templateUsageRecords         QuestionTemplateUsage[] @relation("TemplateUsageUser")
   templateSuggestionsReviewed  QuestionTemplateSuggestion[] @relation("TemplateSuggestionReviewer")
 
+  // Video session relations
+  videoSessionsInstructed VideoSession[] @relation("VideoSessionInstructor")
+  videoSessionParticipants VideoSessionParticipant[]
+  videoSessionMessages     VideoSessionMessage[]
+  receivedMessages         VideoSessionMessage[] @relation("MessageRecipient")
+  
+  // Live conversation relations
+  liveConversationsInstructed LiveConversation[] @relation("LiveConversationInstructor")
+  liveConversationsHosted     LiveConversation[] @relation("LiveConversationHost")
+  liveConversationParticipants LiveConversationParticipant[]
+  liveConversationMessages    LiveConversationMessage[]
+  receivedConversationMessages LiveConversationMessage[] @relation("ConversationMessageRecipient")
+  liveConversationBookings    LiveConversationBooking[]
+
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
 }
@@ -394,6 +410,7 @@ model modules {
   quizzes      quizzes[]
   contentItems content_items[]
   exercises    exercises[]
+  videoSessions VideoSession[]
 
   @@index([course_id], map: "idx_modules_course_id")
   @@index([order_index], map: "idx_modules_order_index")
@@ -1444,4 +1461,226 @@ model LeadEvent {
   @@index([eventType])
   @@index([timestamp])
   @@map("lead_events")
+}
+
+model VideoSession {
+  id                String   @id @default(uuid()) @db.VarChar(36)
+  title             String   @db.VarChar(255)
+  description       String?  @db.Text
+  sessionType       String   @db.VarChar(50) // GROUP, PRIVATE, WORKSHOP
+  language          String   @db.VarChar(50)
+  level             String   @db.VarChar(20)
+  startTime         DateTime
+  endTime           DateTime
+  duration          Int      // in minutes
+  maxParticipants   Int      @default(10)
+  currentParticipants Int    @default(0)
+  price             Float    @default(0)
+  isPublic          Boolean  @default(true)
+  isRecorded        Boolean  @default(false)
+  recordingUrl      String?  @db.VarChar(500)
+  status            String   @default("SCHEDULED") @db.VarChar(20) // SCHEDULED, ACTIVE, COMPLETED, CANCELLED
+  meetingUrl        String?  @db.VarChar(500)
+  meetingId         String?  @db.VarChar(100)
+  meetingPassword   String?  @db.VarChar(100)
+  instructorId      String   @db.VarChar(36)
+  courseId          String?  @db.VarChar(36)
+  moduleId          String?  @db.VarChar(36)
+  institutionId     String   @db.VarChar(36)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  metadata          Json?
+
+  // Relations
+  instructor user @relation("VideoSessionInstructor", fields: [instructorId], references: [id])
+  course Course? @relation(fields: [courseId], references: [id])
+  module modules? @relation(fields: [moduleId], references: [id])
+  institution Institution @relation(fields: [institutionId], references: [id])
+  participants VideoSessionParticipant[]
+  messages VideoSessionMessage[]
+
+  @@index([instructorId])
+  @@index([courseId])
+  @@index([moduleId])
+  @@index([institutionId])
+  @@index([startTime])
+  @@index([status])
+  @@index([language])
+  @@index([level])
+  @@map("video_sessions")
+}
+
+model VideoSessionParticipant {
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  sessionId     String   @db.VarChar(36)
+  userId        String   @db.VarChar(36)
+  joinedAt      DateTime @default(now())
+  leftAt        DateTime?
+  duration      Int      @default(0) // in seconds
+  isInstructor  Boolean  @default(false)
+  isHost        Boolean  @default(false)
+  status        String   @default("JOINED") @db.VarChar(20) // JOINED, LEFT, KICKED, BANNED
+  metadata      Json?
+
+  // Relations
+  session VideoSession @relation(fields: [sessionId], references: [id])
+  user user @relation(fields: [userId], references: [id])
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([status])
+  @@map("video_session_participants")
+}
+
+model VideoSessionMessage {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  sessionId String   @db.VarChar(36)
+  senderId  String   @db.VarChar(36)
+  recipientId String? @db.VarChar(36) // null for broadcast messages
+  content   String   @db.Text
+  messageType String @default("TEXT") @db.VarChar(20) // TEXT, SYSTEM, PRIVATE
+  timestamp DateTime @default(now())
+  isRead    Boolean  @default(false)
+  metadata  Json?
+
+  // Relations
+  session VideoSession @relation(fields: [sessionId], references: [id])
+  sender user @relation(fields: [senderId], references: [id])
+  recipient user? @relation("MessageRecipient", fields: [recipientId], references: [id])
+
+  @@index([sessionId])
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([timestamp])
+  @@map("video_session_messages")
+}
+
+// Live Conversation Models
+model LiveConversation {
+  id                String   @id @default(uuid()) @db.VarChar(36)
+  title             String   @db.VarChar(255)
+  description       String?  @db.Text
+  conversationType  String   @db.VarChar(50) // GROUP, PRIVATE, PRACTICE, CULTURAL
+  language          String   @db.VarChar(50)
+  level             String   @db.VarChar(20)
+  startTime         DateTime
+  endTime           DateTime
+  duration          Int      // in minutes
+  maxParticipants   Int      @default(8)
+  currentParticipants Int    @default(0)
+  price             Float    @default(0)
+  isPublic          Boolean  @default(true)
+  isFree            Boolean  @default(false)
+  status            String   @default("SCHEDULED") @db.VarChar(20) // SCHEDULED, ACTIVE, COMPLETED, CANCELLED
+  meetingUrl        String?  @db.VarChar(500)
+  meetingId         String?  @db.VarChar(100)
+  meetingPassword   String?  @db.VarChar(100)
+  instructorId      String?  @db.VarChar(36) // null for peer-to-peer conversations
+  hostId            String   @db.VarChar(36)
+  topic             String?  @db.VarChar(255)
+  culturalNotes     String?  @db.Text
+  vocabularyList    Json?    // Array of vocabulary words
+  grammarPoints     Json?    // Array of grammar points
+  conversationPrompts Json?  // Array of conversation prompts
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  metadata          Json?
+
+  // Relations
+  instructor user? @relation("LiveConversationInstructor", fields: [instructorId], references: [id])
+  host user @relation("LiveConversationHost", fields: [hostId], references: [id])
+  participants LiveConversationParticipant[]
+  messages LiveConversationMessage[]
+  bookings LiveConversationBooking[]
+
+  @@index([instructorId])
+  @@index([hostId])
+  @@index([startTime])
+  @@index([status])
+  @@index([language])
+  @@index([level])
+  @@index([conversationType])
+  @@index([isFree])
+  @@map("live_conversations")
+}
+
+model LiveConversationParticipant {
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  conversationId String  @db.VarChar(36)
+  userId        String   @db.VarChar(36)
+  joinedAt      DateTime @default(now())
+  leftAt        DateTime?
+  duration      Int      @default(0) // in seconds
+  isInstructor  Boolean  @default(false)
+  isHost        Boolean  @default(false)
+  status        String   @default("JOINED") @db.VarChar(20) // JOINED, LEFT, KICKED, BANNED
+  speakingTime  Int      @default(0) // in seconds
+  messageCount  Int      @default(0)
+  feedback      Json?    // Participant feedback
+  metadata      Json?
+
+  // Relations
+  conversation LiveConversation @relation(fields: [conversationId], references: [id])
+  user user @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@index([status])
+  @@map("live_conversation_participants")
+}
+
+model LiveConversationMessage {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  conversationId  String   @db.VarChar(36)
+  senderId        String   @db.VarChar(36)
+  recipientId     String?  @db.VarChar(36) // null for broadcast messages
+  content         String   @db.Text
+  messageType     String   @default("TEXT") @db.VarChar(20) // TEXT, SYSTEM, PRIVATE, CORRECTION, TRANSLATION
+  language        String   @db.VarChar(50)
+  isTranslation   Boolean  @default(false)
+  originalMessage String?  @db.VarChar(36) // ID of original message if this is a translation
+  timestamp       DateTime @default(now())
+  isRead          Boolean  @default(false)
+  metadata        Json?
+
+  // Relations
+  conversation LiveConversation @relation(fields: [conversationId], references: [id])
+  sender user @relation(fields: [senderId], references: [id])
+  recipient user? @relation("ConversationMessageRecipient", fields: [recipientId], references: [id])
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([timestamp])
+  @@index([messageType])
+  @@map("live_conversation_messages")
+}
+
+model LiveConversationBooking {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  conversationId  String   @db.VarChar(36)
+  userId          String   @db.VarChar(36)
+  status          String   @default("CONFIRMED") @db.VarChar(20) // CONFIRMED, CANCELLED, NO_SHOW, COMPLETED
+  bookedAt        DateTime @default(now())
+  cancelledAt     DateTime?
+  paymentStatus   String   @default("PAID") @db.VarChar(20) // PAID, PENDING, REFUNDED
+  amount          Float    @default(0)
+  currency        String   @default("USD") @db.VarChar(3)
+  paymentMethod   String?  @db.VarChar(50)
+  transactionId   String?  @db.VarChar(255)
+  refundReason    String?  @db.Text
+  metadata        Json?
+
+  // Relations
+  conversation LiveConversation @relation(fields: [conversationId], references: [id])
+  user user @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@map("live_conversation_bookings")
 }

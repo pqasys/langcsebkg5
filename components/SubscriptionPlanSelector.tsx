@@ -27,6 +27,7 @@ import {
   User,
   Video
 } from 'lucide-react';
+import { getAllStudentTiers, getAllInstitutionTiers } from '@/lib/subscription-pricing';
 
 interface Plan {
   id: string;
@@ -52,169 +53,44 @@ interface SubscriptionPlanSelectorProps {
   isLoading?: boolean;
 }
 
-const studentPlans: Plan[] = [
-  {
-    id: 'BASIC',
-    name: 'Basic',
-    price: 12.99,
-    annualPrice: 129.99,
+// Generate student plans from single source of truth
+const generateStudentPlans = (): Plan[] => {
+  const studentTiers = getAllStudentTiers();
+  return studentTiers.map(tier => ({
+    id: tier.planType,
+    name: tier.name.replace(' Plan', ''),
+    price: tier.price,
+    annualPrice: tier.annualPrice,
     period: 'month',
-    description: 'Perfect for beginners starting their language journey',
-    features: [
-      'Access to 5 languages',
-      'Basic video lessons',
-      'Progress tracking',
-      'Mobile app access',
-      'Email support',
-      'Basic certificates'
-    ],
-    notIncluded: [
-      'Live conversation practice',
-      'AI-powered recommendations',
-      'Advanced analytics',
-      'Priority support',
-      'Offline downloads',
-      'Premium content'
-    ],
-    popular: false,
-    trialDays: 7
-  },
-  {
-    id: 'PREMIUM',
-    name: 'Premium',
-    price: 24.99,
-    annualPrice: 249.99,
-    period: 'month',
-    description: 'Most popular choice for serious language learners',
-    features: [
-      'Access to all 15+ languages',
-      'HD video lessons',
-      'Live conversation practice',
-      'AI-powered adaptive learning',
-      'Advanced progress analytics',
-      'Priority support',
-      'Offline downloads',
-      'Premium certificates',
-      'Cultural content',
-      'Study reminders'
-    ],
-    notIncluded: [
-      'One-on-one tutoring',
-      'Custom learning paths',
-      'Group study sessions'
-    ],
-    popular: true,
-    trialDays: 7
-  },
-  {
-    id: 'PRO',
-    name: 'Pro',
-    price: 49.99,
-    annualPrice: 499.99,
-    period: 'month',
-    description: 'Complete language learning experience with personal tutoring',
-    features: [
-      'Everything in Premium',
-      'One-on-one tutoring sessions',
-      'Custom learning paths',
-      'Group study sessions',
-      'Personal learning coach',
-      'Advanced assessment tools',
-      'Portfolio building',
-      'Career guidance',
-      '24/7 support',
-      'Exclusive content'
-    ],
-    notIncluded: [],
-    popular: false,
-    trialDays: 7
-  }
-];
+    description: tier.description,
+    features: tier.features,
+    notIncluded: [], // Will be populated based on tier comparison
+    popular: tier.popular || false,
+    trialDays: tier.trialDays
+  }));
+};
 
-const institutionPlans: Plan[] = [
-  {
-    id: 'STARTER',
-    name: 'Starter',
-    price: 99,
-    annualPrice: 990,
+const studentPlans = generateStudentPlans();
+
+// Generate institution plans from single source of truth
+const generateInstitutionPlans = (): Plan[] => {
+  const institutionTiers = getAllInstitutionTiers();
+  return institutionTiers.map(tier => ({
+    id: tier.planType,
+    name: tier.name.replace(' Plan', ''),
+    price: tier.price,
+    annualPrice: tier.annualPrice,
     period: 'month',
-    description: 'Perfect for small language schools getting started online',
-    features: [
-      'Up to 100 students',
-      'Basic course management',
-      'Student progress tracking',
-      'Payment processing',
-      'Email support',
-      'Basic analytics',
-      'Mobile app access',
-      'Certificate generation'
-    ],
-    notIncluded: [
-      'Advanced analytics',
-      'Marketing tools',
-      'Priority support',
-      'Custom branding',
-      'API access',
-      'White-label options'
-    ],
-    popular: false,
-    commissionRate: 25,
-    trialDays: 14
-  },
-  {
-    id: 'PROFESSIONAL',
-    name: 'Professional',
-    price: 299,
-    annualPrice: 2990,
-    period: 'month',
-    description: 'Ideal for growing institutions with multiple courses',
-    features: [
-      'Up to 500 students',
-      'Advanced course management',
-      'Comprehensive analytics',
-      'Marketing tools',
-      'Priority support',
-      'Custom branding',
-      'Multi-language support',
-      'Advanced certificates',
-      'Student management tools',
-      'Revenue tracking'
-    ],
-    notIncluded: [
-      'Unlimited students',
-      'API access',
-      'White-label platform',
-      'Dedicated account manager'
-    ],
-    popular: true,
-    commissionRate: 15,
-    trialDays: 14
-  },
-  {
-    id: 'ENTERPRISE',
-    name: 'Enterprise',
-    price: 999,
-    annualPrice: 9990,
-    period: 'month',
-    description: 'For large institutions with unlimited growth potential',
-    features: [
-      'Unlimited students',
-      'Full platform customization',
-      'API access',
-      'White-label platform',
-      'Dedicated account manager',
-      'Custom integrations',
-      'Advanced security',
-      'Multi-location support',
-      'Custom reporting',
-      '24/7 priority support'
-    ],
-    notIncluded: [],
-    popular: false,
-    commissionRate: 10,
-    trialDays: 14
-  }
-];
+    description: tier.description,
+    features: tier.features,
+    notIncluded: [], // Will be populated based on tier comparison
+    popular: tier.popular || false,
+    commissionRate: tier.commissionRate,
+    trialDays: tier.trialDays
+  }));
+};
+
+const institutionPlans = generateInstitutionPlans();
 
 export default function SubscriptionPlanSelector({
   userType,

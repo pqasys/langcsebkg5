@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Check, Star, Users, BookOpen, Globe, Zap, Shield, Headphones } from 'lucide-react';
 import Link from 'next/link';
+import { getAllStudentTiers, getAllInstitutionTiers, getPopularStudentTier, getPopularInstitutionTier } from '@/lib/subscription-pricing';
 
 interface PricingPlan {
   id: string;
@@ -31,68 +32,30 @@ export default function PricingPageClient() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const plans: PricingPlan[] = [
-    {
-      id: 'basic',
-      name: 'Basic',
-      description: 'Perfect for individual learners getting started',
-      price: {
-        monthly: 9.99,
-        yearly: 99.99
-      },
-      features: [
-        'Access to 100+ basic courses',
-        'Mobile app access',
-        'Basic progress tracking',
-        'Email support',
-        'Certificate of completion'
-      ],
-      icon: <BookOpen className="h-6 w-6" />,
-      color: 'bg-blue-500'
+  // Get pricing from single source of truth
+  const studentTiers = getAllStudentTiers();
+  const institutionTiers = getAllInstitutionTiers();
+  const popularStudentTier = getPopularStudentTier();
+  const popularInstitutionTier = getPopularInstitutionTier();
+
+  // Convert student tiers to pricing plans
+  const plans: PricingPlan[] = studentTiers.map(tier => ({
+    id: tier.planType.toLowerCase(),
+    name: tier.name.replace(' Plan', ''),
+    description: tier.description,
+    price: {
+      monthly: tier.price,
+      yearly: tier.annualPrice
     },
-    {
-      id: 'premium',
-      name: 'Premium',
-      description: 'Best value for serious language learners',
-      price: {
-        monthly: 19.99,
-        yearly: 199.99
-      },
-      features: [
-        'Everything in Basic',
-        'Access to 500+ premium courses',
-        'Live tutoring sessions (2/month)',
-        'Advanced progress analytics',
-        'Priority email support',
-        'Offline course downloads',
-        'Personalized learning path'
-      ],
-      popular: true,
-      icon: <Star className="h-6 w-6" />,
-      color: 'bg-purple-500'
-    },
-    {
-      id: 'pro',
-      name: 'Professional',
-      description: 'For institutions and advanced learners',
-      price: {
-        monthly: 49.99,
-        yearly: 499.99
-      },
-      features: [
-        'Everything in Premium',
-        'Unlimited course access',
-        'Unlimited live tutoring',
-        'Custom learning plans',
-        'API access for integrations',
-        'Dedicated account manager',
-        'White-label solutions',
-        'Advanced reporting'
-      ],
-      icon: <Zap className="h-6 w-6" />,
-      color: 'bg-orange-500'
-    }
-  ];
+    features: tier.features,
+    popular: tier.popular || false,
+    icon: tier.planType === 'BASIC' ? <BookOpen className="h-6 w-6" /> :
+          tier.planType === 'PREMIUM' ? <Star className="h-6 w-6" /> :
+          <Zap className="h-6 w-6" />,
+    color: tier.planType === 'BASIC' ? 'bg-blue-500' :
+           tier.planType === 'PREMIUM' ? 'bg-purple-500' :
+           'bg-orange-500'
+  }));
 
   const features = [
     {

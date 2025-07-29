@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowLeft, GripVertical, Trash2, Edit, Eye, Target, FileVideo, FileAudio, Image, FileText } from 'lucide-react';
+import { Plus, ArrowLeft, GripVertical, Trash2, Edit, Eye, Target, FileVideo, FileAudio, Image, FileText, Video } from 'lucide-react';
 import { toast } from 'sonner';
 import { FaSpinner } from 'react-icons/fa';
 import {
@@ -25,6 +25,14 @@ interface ContentItem {
   content: string;
   order_index: number;
   module_id: string;
+}
+
+interface Exercise {
+  id: string;
+  question: string;
+  type: string;
+  answer: string;
+  order_index: number;
 }
 
 interface Quiz {
@@ -332,6 +340,13 @@ export default function ModuleContentPage({ params }: { params: { id: string; mo
               <Target className="w-4 h-4 mr-2" />
               Manage Quizzes
             </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => router.push(`/institution/courses/${params.id}/modules/${params.moduleId}/video-sessions`)}
+            >
+              <Video className="w-4 h-4 mr-2" />
+              Video Sessions
+            </Button>
             <Button onClick={handleCreateContent}>
               <Plus className="w-4 h-4 mr-2" />
               Add Content
@@ -475,6 +490,41 @@ export default function ModuleContentPage({ params }: { params: { id: string; mo
                   </Button>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Video Sessions Overview */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Video Sessions</CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => router.push(`/institution/courses/${params.id}/modules/${params.moduleId}/video-sessions`)}
+              >
+                <Video className="w-4 h-4 mr-2" />
+                Manage Sessions
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8 text-muted-foreground">
+              <Video className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Live Video Sessions
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Create interactive video sessions for real-time language learning and practice.
+              </p>
+              <Button 
+                onClick={() => router.push(`/institution/courses/${params.id}/modules/${params.moduleId}/video-sessions`)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Video className="w-4 h-4 mr-2" />
+                Create Video Session
+              </Button>
             </div>
           </CardContent>
         </Card>

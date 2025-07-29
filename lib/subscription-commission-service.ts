@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { getAllStudentTiers, getAllInstitutionTiers } from '@/lib/subscription-pricing';
 
 export interface CommissionTier {
   planType: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
@@ -896,95 +897,26 @@ export class SubscriptionCommissionService {
    * Get all available subscription plans
    */
   static getSubscriptionPlans(): SubscriptionPlan[] {
-    return [
-      {
-        planType: 'STARTER',
-        monthlyPrice: 129,
-        annualPrice: 129 * 12 * 0.8, // 20% discount for annual
-        features: {
-          maxStudents: 100,
-          maxCourses: 10,
-          commissionRate: 25,
-          analytics: 'basic',
-          support: 'email'
-        }
-      },
-      {
-        planType: 'PROFESSIONAL',
-        monthlyPrice: 399,
-        annualPrice: 399 * 12 * 0.8,
-        features: {
-          maxStudents: 500,
-          maxCourses: 50,
-          commissionRate: 15,
-          analytics: 'advanced',
-          support: 'priority',
-          customBranding: true
-        }
-      },
-      {
-        planType: 'ENTERPRISE',
-        monthlyPrice: 2000,
-        annualPrice: 2000 * 12 * 0.8,
-        features: {
-          maxStudents: -1, // Unlimited
-          maxCourses: -1, // Unlimited
-          commissionRate: 10,
-          analytics: 'enterprise',
-          support: 'dedicated',
-          customBranding: true,
-          apiAccess: true,
-          whiteLabel: true
-        }
-      }
-    ];
+    const institutionTiers = getAllInstitutionTiers();
+    return institutionTiers.map(tier => ({
+      planType: tier.planType,
+      monthlyPrice: tier.price,
+      annualPrice: tier.annualPrice,
+      features: tier.features
+    }));
   }
 
   /**
    * Get all available student subscription plans
    */
   static getStudentSubscriptionPlans(): StudentSubscriptionPlan[] {
-    return [
-      {
-        planType: 'BASIC',
-        monthlyPrice: 12.99,
-        annualPrice: 12.99 * 12 * 0.8, // 20% discount for annual
-        features: {
-          maxCourses: 5,
-          practiceTests: 10,
-          progressTracking: true,
-          support: 'email'
-        }
-      },
-      {
-        planType: 'PREMIUM',
-        monthlyPrice: 24.99,
-        annualPrice: 24.99 * 12 * 0.8,
-        features: {
-          maxCourses: 20,
-          practiceTests: 50,
-          progressTracking: true,
-          support: 'priority',
-          offlineAccess: true,
-          certificateDownload: true
-        }
-      },
-      {
-        planType: 'PRO',
-        monthlyPrice: 49.99,
-        annualPrice: 49.99 * 12 * 0.8,
-        features: {
-          maxCourses: -1, // Unlimited
-          practiceTests: -1, // Unlimited
-          progressTracking: true,
-          support: 'dedicated',
-          offlineAccess: true,
-          certificateDownload: true,
-          personalizedLearning: true,
-          oneOnOneTutoring: true
-        }
-      }
-    ];
+    const studentTiers = getAllStudentTiers();
+    return studentTiers.map(tier => ({
+      planType: tier.planType,
+      monthlyPrice: tier.price,
+      annualPrice: tier.annualPrice,
+      features: tier.features
+    }));
   }
 
   /**

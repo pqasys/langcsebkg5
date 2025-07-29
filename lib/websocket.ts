@@ -4,16 +4,18 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
 
 export interface WebSocketMessage {
-  type: 'notification' | 'course_update' | 'payment_update' | 'system_alert';
+  type: 'notification' | 'course_update' | 'payment_update' | 'system_alert' | 'video_session_update' | 'video_participant_joined' | 'video_participant_left' | 'video_message' | 'video_screen_share' | 'video_recording_started' | 'video_recording_stopped';
   data: unknown;
   timestamp: Date;
   userId?: string;
+  sessionId?: string;
 }
 
 class WebSocketService {
   private static instance: WebSocketService;
   private io: SocketIOServer | null = null;
   private userSockets: Map<string, string[]> = new Map(); // userId -> socketIds[]
+  private sessionParticipants: Map<string, Set<string>> = new Map(); // sessionId -> Set<userId>
 
   private constructor() {}
 
@@ -42,7 +44,7 @@ class WebSocketService {
     if (!this.io) return;
 
     this.io.on('connection', (socket) => {
-      console.log(`� Client connected: ${socket.id}`);
+      console.log(` Client connected: ${socket.id}`);
 
       // Handle user authentication
       socket.on('authenticate', async (data: { userId: string }) => {
@@ -57,12 +59,12 @@ class WebSocketService {
           socket.data.userId = userId;
           socket.join(`user:${userId}`);
           
-          console.log(`� User ${userId} authenticated on socket ${socket.id}`);
+          console.log(` User ${userId} authenticated on socket ${socket.id}`);
           
           // Send any pending notifications
           await this.sendPendingNotifications(userId);
         } catch (error) {
-          logger.error('Authentication error:');
+          console.error('Authentication error:', error);
           socket.emit('error', { message: 'Authentication failed' });
         }
       });
@@ -70,13 +72,138 @@ class WebSocketService {
       // Handle user joining specific rooms (courses, institutions, etc.)
       socket.on('join_room', (data: { room: string }) => {
         socket.join(data.room);
-        console.log(`� Socket ${socket.id} joined room: ${data.room}`);
+        console.log(` Socket ${socket.id} joined room: ${data.room}`);
       });
 
       // Handle user leaving rooms
       socket.on('leave_room', (data: { room: string }) => {
         socket.leave(data.room);
-        console.log(`� Socket ${socket.id} left room: ${data.room}`);
+        console.log(` Socket ${socket.id} left room: ${data.room}`);
+      });
+
+      // Video session specific handlers
+      socket.on('join_video_session', async (data: { sessionId: string, userId: string }) => {
+        try {
+          const { sessionId, userId } = data;
+          
+          // Join video session room
+          socket.join(`video_session:${sessionId}`);
+          
+          // Track participant
+          if (!this.sessionParticipants.has(sessionId)) {
+            this.sessionParticipants.set(sessionId, new Set());
+          }
+          this.sessionParticipants.get(sessionId)!.add(userId);
+          
+          // Notify other participants
+          socket.to(`video_session:${sessionId}`).emit('video_participant_joined', {
+            sessionId,
+            userId,
+            timestamp: new Date()
+          });
+          
+          console.log(` User ${userId} joined video session ${sessionId}`);
+        } catch (error) {
+          console.error('Error joining video session:', error);
+          socket.emit('error', { message: 'Failed to join video session' });
+        }
+      });
+
+      socket.on('leave_video_session', async (data: { sessionId: string, userId: string }) => {
+        try {
+          const { sessionId, userId } = data;
+          
+          // Leave video session room
+          socket.leave(`video_session:${sessionId}`);
+          
+          // Remove from participants
+          const participants = this.sessionParticipants.get(sessionId);
+          if (participants) {
+            participants.delete(userId);
+            if (participants.size === 0) {
+              this.sessionParticipants.delete(sessionId);
+            }
+          }
+          
+          // Notify other participants
+          socket.to(`video_session:${sessionId}`).emit('video_participant_left', {
+            sessionId,
+            userId,
+            timestamp: new Date()
+          });
+          
+          console.log(` User ${userId} left video session ${sessionId}`);
+        } catch (error) {
+          console.error('Error leaving video session:', error);
+          socket.emit('error', { message: 'Failed to leave video session' });
+        }
+      });
+
+      socket.on('video_message', async (data: { sessionId: string, userId: string, content: string, messageType?: string, recipientId?: string }) => {
+        try {
+          const { sessionId, userId, content, messageType, recipientId } = data;
+          
+          const message = {
+            sessionId,
+            userId,
+            content,
+            messageType: messageType || 'TEXT',
+            recipientId,
+            timestamp: new Date()
+          };
+          
+          // Broadcast to session participants
+          if (recipientId) {
+            // Private message
+            socket.to(`user:${recipientId}`).emit('video_private_message', message);
+            socket.emit('video_private_message', message);
+          } else {
+            // Public message
+            socket.to(`video_session:${sessionId}`).emit('video_message', message);
+            socket.emit('video_message', message);
+          }
+          
+          console.log(` Video message sent in session ${sessionId}`);
+        } catch (error) {
+          console.error('Error sending video message:', error);
+          socket.emit('error', { message: 'Failed to send video message' });
+        }
+      });
+
+      socket.on('video_screen_share', (data: { sessionId: string, userId: string, isSharing: boolean }) => {
+        try {
+          const { sessionId, userId, isSharing } = data;
+          
+          socket.to(`video_session:${sessionId}`).emit('video_screen_share', {
+            sessionId,
+            userId,
+            isSharing,
+            timestamp: new Date()
+          });
+          
+          console.log(` Screen share ${isSharing ? 'started' : 'stopped'} by user ${userId} in session ${sessionId}`);
+        } catch (error) {
+          console.error('Error handling screen share:', error);
+          socket.emit('error', { message: 'Failed to handle screen share' });
+        }
+      });
+
+      socket.on('video_recording', (data: { sessionId: string, userId: string, isRecording: boolean }) => {
+        try {
+          const { sessionId, userId, isRecording } = data;
+          
+          socket.to(`video_session:${sessionId}`).emit('video_recording', {
+            sessionId,
+            userId,
+            isRecording,
+            timestamp: new Date()
+          });
+          
+          console.log(` Recording ${isRecording ? 'started' : 'stopped'} by user ${userId} in session ${sessionId}`);
+        } catch (error) {
+          console.error('Error handling recording:', error);
+          socket.emit('error', { message: 'Failed to handle recording' });
+        }
       });
 
       // Handle disconnection
@@ -94,7 +221,7 @@ class WebSocketService {
             }
           }
         }
-        console.log(`� Client disconnected: ${socket.id}`);
+        console.log(` Client disconnected: ${socket.id}`);
       });
 
       // Handle ping/pong for connection health
@@ -155,6 +282,23 @@ class WebSocketService {
     console.log(`📨 Sent notification to role ${role}:`, message.type);
   }
 
+  // Send video session specific notifications
+  public sendToVideoSession(sessionId: string, message: WebSocketMessage) {
+    if (!this.io) {
+      console.warn('WebSocket server not initialized');
+      return;
+    }
+
+    this.io.to(`video_session:${sessionId}`).emit('video_session_update', message);
+    console.log(`📨 Sent video session update to session ${sessionId}:`, message.type);
+  }
+
+  // Get active participants for a video session
+  public getVideoSessionParticipants(sessionId: string): string[] {
+    const participants = this.sessionParticipants.get(sessionId);
+    return participants ? Array.from(participants) : [];
+  }
+
   // Store pending notification for offline users
   private async storePendingNotification(userId: string, message: WebSocketMessage) {
     try {
@@ -166,14 +310,10 @@ class WebSocketService {
           type: message.type,
           data: message.data,
           timestamp: message.timestamp,
-          metadata: {
-            attempts: 0,
-            lastAttempt: null
-          }
         }
       });
     } catch (error) {
-      logger.error('Failed to store pending notification:');
+      console.error('Failed to store pending notification:', error);
     }
   }
 
@@ -211,10 +351,10 @@ class WebSocketService {
       }
 
       if (pendingNotifications.length > 0) {
-        console.log(`� Sent ${pendingNotifications.length} pending notifications to user ${userId}`);
+        console.log(` Sent ${pendingNotifications.length} pending notifications to user ${userId}`);
       }
     } catch (error) {
-      logger.error('Failed to send pending notifications:');
+      console.error('Failed to send pending notifications:', error);
     }
   }
 
@@ -225,7 +365,9 @@ class WebSocketService {
     return {
       connectedClients: this.io.engine.clientsCount,
       activeUsers: this.userSockets.size,
-      totalUserSockets: Array.from(this.userSockets.values()).reduce((sum, sockets) => sum + sockets.length, 0)
+      totalUserSockets: Array.from(this.userSockets.values()).reduce((sum, sockets) => sum + sockets.length, 0),
+      activeVideoSessions: this.sessionParticipants.size,
+      totalVideoParticipants: Array.from(this.sessionParticipants.values()).reduce((sum, participants) => sum + participants.size, 0)
     };
   }
 
@@ -237,7 +379,7 @@ class WebSocketService {
         this.io?.sockets.sockets.get(socketId)?.disconnect();
       });
       this.userSockets.delete(userId);
-      console.log(`� Force disconnected user ${userId}`);
+      console.log(` Force disconnected user ${userId}`);
     }
   }
 }

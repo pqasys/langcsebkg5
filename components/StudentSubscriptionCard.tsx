@@ -2,35 +2,45 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-// import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  User, 
-  Crown, 
-  Zap, 
   Star, 
-  Calendar, 
-  DollarSign, 
-  CheckCircle,
-  AlertTriangle,
-  ArrowRight,
-  Headphones,
-  Globe,
-  Shield,
-  BookOpen,
-  Languages,
+  Zap, 
+  Crown, 
+  Languages, 
+  BookOpen, 
+  Award, 
+  MessageCircle, 
+  Globe, 
+  Users, 
+  Sparkles, 
+  Headphones, 
+  User, 
+  Settings, 
   Video,
-  MessageCircle,
-  Award,
-  Sparkles,
+  Calendar,
+  CreditCard,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
   Clock,
-  Users,
-  Settings,
-  CreditCard
+  TrendingUp,
+  TrendingDown,
+  RefreshCw,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
+  ArrowRight,
+  AlertTriangle
 } from 'lucide-react';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { getAllStudentTiers, getStudentTier } from '@/lib/subscription-pricing';
 import { FaSpinner } from 'react-icons/fa';
 
 interface StudentSubscription {
@@ -103,77 +113,44 @@ interface PlanDetails {
   popular?: boolean;
 }
 
-const planDetails: Record<string, PlanDetails> = {
-  BASIC: {
-    planType: 'BASIC',
-    name: 'Basic',
-    icon: <Star className="w-5 h-5" />,
-    color: 'text-blue-600',
-    monthlyPrice: 12.99,
-    annualPrice: 124.99,
-    features: [
-      { name: '5 Languages', included: true, icon: <Languages className="w-4 h-4" />, description: 'Access to 5 core languages' },
-      { name: 'Basic Course Access', included: true, icon: <BookOpen className="w-4 h-4" />, description: 'Standard course materials' },
-      { name: 'Progress Tracking', included: true, icon: <Award className="w-4 h-4" />, description: 'Basic progress monitoring' },
-      { name: 'Email Support', included: true, icon: <MessageCircle className="w-4 h-4" />, description: 'Email-based customer support' },
-      { name: 'Mobile Access', included: true, icon: <Globe className="w-4 h-4" />, description: 'Learn on mobile devices' },
-      { name: '15+ Languages', included: false, icon: <Languages className="w-4 h-4" />, description: 'Access to all languages' },
-      { name: 'Live Conversations', included: false, icon: <Users className="w-4 h-4" />, description: 'Practice with native speakers' },
-      { name: 'AI Learning Assistant', included: false, icon: <Sparkles className="w-4 h-4" />, description: 'Personalized AI guidance' },
-      { name: 'Priority Support', included: false, icon: <Headphones className="w-4 h-4" />, description: '24/7 priority support' },
-      { name: 'Personal Tutoring', included: false, icon: <User className="w-4 h-4" />, description: 'One-on-one tutoring sessions' },
-      { name: 'Certification Prep', included: false, icon: <Award className="w-4 h-4" />, description: 'Exam preparation materials' },
-      { name: 'Advanced Analytics', included: false, icon: <Settings className="w-4 h-4" />, description: 'Detailed learning insights' },
-    ]
-  },
-  PREMIUM: {
-    planType: 'PREMIUM',
-    name: 'Premium',
-    icon: <Zap className="w-5 h-5" />,
-    color: 'text-purple-600',
-    monthlyPrice: 24.99,
-    annualPrice: 239.99,
-    popular: true,
-    features: [
-      { name: '15+ Languages', included: true, icon: <Languages className="w-4 h-4" />, description: 'Access to all available languages' },
-      { name: 'Basic Course Access', included: true, icon: <BookOpen className="w-4 h-4" />, description: 'Standard course materials' },
-      { name: 'Progress Tracking', included: true, icon: <Award className="w-4 h-4" />, description: 'Advanced progress monitoring' },
-      { name: 'Live Conversations', included: true, icon: <Users className="w-4 h-4" />, description: 'Practice with native speakers' },
-      { name: 'AI Learning Assistant', included: true, icon: <Sparkles className="w-4 h-4" />, description: 'Personalized AI guidance' },
-      { name: 'Mobile Access', included: true, icon: <Globe className="w-4 h-4" />, description: 'Learn on mobile devices' },
-      { name: 'Video Lessons', included: true, icon: <Video className="w-4 h-4" />, description: 'High-quality video content' },
-      { name: 'Priority Support', included: true, icon: <Headphones className="w-4 h-4" />, description: '24/7 priority support' },
-      { name: 'Personal Tutoring', included: false, icon: <User className="w-4 h-4" />, description: 'One-on-one tutoring sessions' },
-      { name: 'Certification Prep', included: false, icon: <Award className="w-4 h-4" />, description: 'Exam preparation materials' },
-      { name: 'Advanced Analytics', included: false, icon: <Settings className="w-4 h-4" />, description: 'Detailed learning insights' },
-      { name: 'Custom Learning Paths', included: false, icon: <Sparkles className="w-4 h-4" />, description: 'Personalized learning journeys' },
-    ]
-  },
-  PRO: {
-    planType: 'PRO',
-    name: 'Pro',
-    icon: <Crown className="w-5 h-5" />,
-    color: 'text-yellow-600',
-    monthlyPrice: 49.99,
-    annualPrice: 479.99,
-    features: [
-      { name: '15+ Languages', included: true, icon: <Languages className="w-4 h-4" />, description: 'Access to all available languages' },
-      { name: 'Basic Course Access', included: true, icon: <BookOpen className="w-4 h-4" />, description: 'Standard course materials' },
-      { name: 'Progress Tracking', included: true, icon: <Award className="w-4 h-4" />, description: 'Advanced progress monitoring' },
-      { name: 'Live Conversations', included: true, icon: <Users className="w-4 h-4" />, description: 'Practice with native speakers' },
-      { name: 'AI Learning Assistant', included: true, icon: <Sparkles className="w-4 h-4" />, description: 'Personalized AI guidance' },
-      { name: 'Mobile Access', included: true, icon: <Globe className="w-4 h-4" />, description: 'Learn on mobile devices' },
-      { name: 'Video Lessons', included: true, icon: <Video className="w-4 h-4" />, description: 'High-quality video content' },
-      { name: 'Priority Support', included: true, icon: <Headphones className="w-4 h-4" />, description: '24/7 priority support' },
-      { name: 'Personal Tutoring', included: true, icon: <User className="w-4 h-4" />, description: 'One-on-one tutoring sessions' },
-      { name: 'Certification Prep', included: true, icon: <Award className="w-4 h-4" />, description: 'Exam preparation materials' },
-      { name: 'Advanced Analytics', included: true, icon: <Settings className="w-4 h-4" />, description: 'Detailed learning insights' },
-      { name: 'Custom Learning Paths', included: true, icon: <Sparkles className="w-4 h-4" />, description: 'Personalized learning journeys' },
-      { name: 'Dedicated Success Manager', included: true, icon: <User className="w-4 h-4" />, description: 'Personal success manager' },
-      { name: 'Exclusive Content', included: true, icon: <Crown className="w-4 h-4" />, description: 'Premium exclusive materials' },
-    ]
-  }
+// Generate planDetails from single source of truth
+const generatePlanDetails = () => {
+  const studentTiers = getAllStudentTiers();
+  const planDetails: Record<string, PlanDetails> = {};
+  
+  studentTiers.forEach(tier => {
+    const icon = tier.planType === 'BASIC' ? <Star className="w-5 h-5" /> :
+                 tier.planType === 'PREMIUM' ? <Zap className="w-5 h-5" /> :
+                 <Crown className="w-5 h-5" />;
+    
+    const color = tier.planType === 'BASIC' ? 'text-blue-600' :
+                  tier.planType === 'PREMIUM' ? 'text-purple-600' :
+                  'text-yellow-600';
+    
+    // Convert features to the expected format
+    const features = tier.features.map(feature => ({
+      name: feature,
+      included: true,
+      icon: <CheckCircle className="w-4 h-4" />,
+      description: feature
+    }));
+    
+    planDetails[tier.planType] = {
+      planType: tier.planType,
+      name: tier.name.replace(' Plan', ''),
+      icon,
+      color,
+      monthlyPrice: tier.price,
+      annualPrice: tier.annualPrice,
+      popular: tier.popular || false,
+      features
+    };
+  });
+  
+  return planDetails;
 };
+
+const planDetails = generatePlanDetails();
 
 export function StudentSubscriptionCard() {
   const { data: session } = useSession();

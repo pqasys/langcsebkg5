@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 27, 2025 at 11:42 PM
+-- Generation Time: Jul 29, 2025 at 08:55 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `langcsebkg4`
+-- Database: `langcsebkg5`
 --
 
 -- --------------------------------------------------------
@@ -229,9 +229,9 @@ CREATE TABLE IF NOT EXISTS `commission_tiers` (
 --
 
 INSERT INTO `commission_tiers` (`id`, `planType`, `commissionRate`, `features`, `isActive`, `createdAt`, `updatedAt`, `name`, `description`, `price`, `currency`, `billingCycle`, `maxStudents`, `maxCourses`, `maxTeachers`) VALUES
-('cmcjo5f2b0000man3v5b54dxt', 'STARTER', 25, '{\"apiAccess\": false, \"maxCourses\": 5, \"whiteLabel\": false, \"maxStudents\": 50, \"maxTeachers\": 2, \"emailSupport\": true, \"basicAnalytics\": true, \"customBranding\": false, \"marketingTools\": false, \"prioritySupport\": false, \"advancedAnalytics\": false, \"dedicatedAccountManager\": false}', 1, '2025-06-30 22:26:59.075', '2025-07-05 02:50:02.000', 'Starter Plan', 'Perfect for small language schools and individual tutors', 99, 'USD', 'MONTHLY', 50, 5, 2),
-('cmcjo5f2n0001man32g2nxct8', 'PROFESSIONAL', 15, '{\"apiAccess\": false, \"maxCourses\": 15, \"whiteLabel\": false, \"maxStudents\": 200, \"maxTeachers\": 5, \"emailSupport\": true, \"basicAnalytics\": true, \"customBranding\": true, \"marketingTools\": true, \"prioritySupport\": true, \"advancedAnalytics\": true, \"dedicatedAccountManager\": false}', 1, '2025-06-30 22:26:59.087', '2025-07-05 02:50:02.000', 'Professional Plan', 'Ideal for growing language institutions', 299, 'USD', 'MONTHLY', 200, 15, 5),
-('cmcjo5f2s0002man3kimifkjj', 'ENTERPRISE', 10, '{\"apiAccess\": true, \"maxCourses\": 50, \"whiteLabel\": true, \"maxStudents\": 1000, \"maxTeachers\": 20, \"emailSupport\": true, \"basicAnalytics\": true, \"customBranding\": true, \"marketingTools\": true, \"prioritySupport\": true, \"advancedAnalytics\": true, \"dedicatedAccountManager\": true}', 1, '2025-06-30 22:26:59.092', '2025-07-05 02:50:02.000', 'Enterprise Plan', 'Complete solution for large language organizations', 799, 'USD', 'MONTHLY', 1000, 50, 20);
+('cmcjo5f2b0000man3v5b54dxt', 'STARTER', 25, '{\"apiAccess\": false, \"maxCourses\": 5, \"whiteLabel\": false, \"maxStudents\": 50, \"maxTeachers\": 2, \"emailSupport\": true, \"mobileAccess\": true, \"basicAnalytics\": true, \"customBranding\": false, \"marketingTools\": false, \"prioritySupport\": false, \"studentProgress\": true, \"courseManagement\": true, \"advancedAnalytics\": false, \"paymentProcessing\": true, \"videoConferencing\": false, \"certificateGeneration\": true}', 1, '2025-06-30 22:26:59.075', '2025-07-28 19:53:13.667', 'Starter Plan', 'Perfect for small language schools getting started online', 99, 'USD', 'MONTHLY', 50, 5, 2),
+('cmcjo5f2n0001man32g2nxct8', 'PROFESSIONAL', 15, '{\"apiAccess\": false, \"maxCourses\": 15, \"whiteLabel\": false, \"maxStudents\": 200, \"maxTeachers\": 5, \"emailSupport\": true, \"mobileAccess\": true, \"basicAnalytics\": true, \"customBranding\": true, \"marketingTools\": true, \"prioritySupport\": true, \"revenueTracking\": true, \"studentProgress\": true, \"courseManagement\": true, \"advancedAnalytics\": true, \"paymentProcessing\": true, \"studentManagement\": true, \"videoConferencing\": \"limited\", \"advancedCertificates\": true, \"multiLanguageSupport\": true, \"certificateGeneration\": true}', 1, '2025-06-30 22:26:59.087', '2025-07-28 19:53:13.669', 'Professional Plan', 'Ideal for growing institutions with multiple courses', 299, 'USD', 'MONTHLY', 200, 15, 5),
+('cmcjo5f2s0002man3kimifkjj', 'ENTERPRISE', 10, '{\"apiAccess\": true, \"maxCourses\": 50, \"whiteLabel\": true, \"maxStudents\": 1000, \"maxTeachers\": 20, \"emailSupport\": true, \"mobileAccess\": true, \"basicAnalytics\": true, \"customBranding\": true, \"marketingTools\": true, \"customReporting\": true, \"prioritySupport\": true, \"revenueTracking\": true, \"studentProgress\": true, \"advancedSecurity\": true, \"courseManagement\": true, \"advancedAnalytics\": true, \"paymentProcessing\": true, \"studentManagement\": true, \"videoConferencing\": \"unlimited\", \"customIntegrations\": true, \"advancedCertificates\": true, \"multiLanguageSupport\": true, \"multiLocationSupport\": true, \"certificateGeneration\": true, \"dedicatedAccountManager\": true}', 1, '2025-06-30 22:26:59.092', '2025-07-28 19:53:13.670', 'Enterprise Plan', 'Complete solution for large language organizations', 799, 'USD', 'MONTHLY', 1000, 50, 20);
 
 -- --------------------------------------------------------
 
@@ -1204,6 +1204,155 @@ CREATE TABLE IF NOT EXISTS `learning_sessions` (
   PRIMARY KEY (`id`),
   KEY `learning_sessions_moduleProgressId_idx` (`moduleProgressId`),
   KEY `learning_sessions_startedAt_idx` (`startedAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `live_conversations`
+--
+
+DROP TABLE IF EXISTS `live_conversations`;
+CREATE TABLE IF NOT EXISTS `live_conversations` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `conversationType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `startTime` datetime(3) NOT NULL,
+  `endTime` datetime(3) NOT NULL,
+  `duration` int NOT NULL,
+  `maxParticipants` int NOT NULL DEFAULT '8',
+  `currentParticipants` int NOT NULL DEFAULT '0',
+  `price` double NOT NULL DEFAULT '0',
+  `isPublic` tinyint(1) NOT NULL DEFAULT '1',
+  `isFree` tinyint(1) NOT NULL DEFAULT '0',
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SCHEDULED',
+  `meetingUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meetingId` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meetingPassword` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instructorId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `hostId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `topic` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `culturalNotes` text COLLATE utf8mb4_unicode_ci,
+  `vocabularyList` json DEFAULT NULL,
+  `grammarPoints` json DEFAULT NULL,
+  `conversationPrompts` json DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `metadata` json DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `live_conversations_instructorId_idx` (`instructorId`),
+  KEY `live_conversations_hostId_idx` (`hostId`),
+  KEY `live_conversations_startTime_idx` (`startTime`),
+  KEY `live_conversations_status_idx` (`status`),
+  KEY `live_conversations_language_idx` (`language`),
+  KEY `live_conversations_level_idx` (`level`),
+  KEY `live_conversations_conversationType_idx` (`conversationType`),
+  KEY `live_conversations_isFree_idx` (`isFree`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `live_conversations`
+--
+
+INSERT INTO `live_conversations` (`id`, `title`, `description`, `conversationType`, `language`, `level`, `startTime`, `endTime`, `duration`, `maxParticipants`, `currentParticipants`, `price`, `isPublic`, `isFree`, `status`, `meetingUrl`, `meetingId`, `meetingPassword`, `instructorId`, `hostId`, `topic`, `culturalNotes`, `vocabularyList`, `grammarPoints`, `conversationPrompts`, `createdAt`, `updatedAt`, `metadata`) VALUES
+('conv-001', 'Beginner Spanish Conversation', 'Practice basic Spanish conversation skills with fellow beginners. We\'ll cover greetings, introductions, and everyday topics.', 'GROUP', 'es', 'CEFR_A1', '2025-07-29 01:38:20.000', '2025-07-29 02:38:20.000', 60, 8, 3, 0, 1, 1, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Basic Introductions', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-07-28 23:38:20.264', NULL),
+('conv-002', 'Business English Practice', 'Improve your business English skills through role-playing exercises and professional discussions.', 'PRACTICE', 'en', 'CEFR_B2', '2025-07-29 03:38:20.000', '2025-07-29 04:38:20.000', 60, 6, 2, 15.99, 1, 0, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Business Meetings', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-07-28 23:38:20.264', NULL),
+('conv-003', 'French Cultural Exchange', 'Learn about French culture while practicing your French language skills. We\'ll discuss traditions, food, and daily life.', 'CULTURAL', 'fr', 'CEFR_B1', '2025-07-29 23:38:20.000', '2025-07-30 00:38:20.000', 60, 10, 1, 0, 1, 1, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'French Culture', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-07-28 23:38:20.264', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `live_conversation_bookings`
+--
+
+DROP TABLE IF EXISTS `live_conversation_bookings`;
+CREATE TABLE IF NOT EXISTS `live_conversation_bookings` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conversationId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'CONFIRMED',
+  `bookedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `cancelledAt` datetime(3) DEFAULT NULL,
+  `paymentStatus` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PAID',
+  `amount` double NOT NULL DEFAULT '0',
+  `currency` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USD',
+  `paymentMethod` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `transactionId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `refundReason` text COLLATE utf8mb4_unicode_ci,
+  `metadata` json DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `live_conversation_bookings_conversationId_userId_key` (`conversationId`,`userId`),
+  KEY `live_conversation_bookings_conversationId_idx` (`conversationId`),
+  KEY `live_conversation_bookings_userId_idx` (`userId`),
+  KEY `live_conversation_bookings_status_idx` (`status`),
+  KEY `live_conversation_bookings_paymentStatus_idx` (`paymentStatus`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `live_conversation_bookings`
+--
+
+INSERT INTO `live_conversation_bookings` (`id`, `conversationId`, `userId`, `status`, `bookedAt`, `cancelledAt`, `paymentStatus`, `amount`, `currency`, `paymentMethod`, `transactionId`, `refundReason`, `metadata`) VALUES
+('booking-001', 'conv-001', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'CONFIRMED', '2025-07-28 23:38:20.267', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL),
+('booking-002', 'conv-002', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'CONFIRMED', '2025-07-28 23:38:20.267', NULL, 'PAID', 15.99, 'USD', NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `live_conversation_messages`
+--
+
+DROP TABLE IF EXISTS `live_conversation_messages`;
+CREATE TABLE IF NOT EXISTS `live_conversation_messages` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conversationId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `senderId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recipientId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `messageType` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'TEXT',
+  `language` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `isTranslation` tinyint(1) NOT NULL DEFAULT '0',
+  `originalMessage` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `timestamp` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `isRead` tinyint(1) NOT NULL DEFAULT '0',
+  `metadata` json DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `live_conversation_messages_conversationId_idx` (`conversationId`),
+  KEY `live_conversation_messages_senderId_idx` (`senderId`),
+  KEY `live_conversation_messages_recipientId_idx` (`recipientId`),
+  KEY `live_conversation_messages_timestamp_idx` (`timestamp`),
+  KEY `live_conversation_messages_messageType_idx` (`messageType`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `live_conversation_participants`
+--
+
+DROP TABLE IF EXISTS `live_conversation_participants`;
+CREATE TABLE IF NOT EXISTS `live_conversation_participants` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conversationId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `joinedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `leftAt` datetime(3) DEFAULT NULL,
+  `duration` int NOT NULL DEFAULT '0',
+  `isInstructor` tinyint(1) NOT NULL DEFAULT '0',
+  `isHost` tinyint(1) NOT NULL DEFAULT '0',
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'JOINED',
+  `speakingTime` int NOT NULL DEFAULT '0',
+  `messageCount` int NOT NULL DEFAULT '0',
+  `feedback` json DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `live_conversation_participants_conversationId_userId_key` (`conversationId`,`userId`),
+  KEY `live_conversation_participants_conversationId_idx` (`conversationId`),
+  KEY `live_conversation_participants_userId_idx` (`userId`),
+  KEY `live_conversation_participants_status_idx` (`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -2721,9 +2870,9 @@ CREATE TABLE IF NOT EXISTS `student_tiers` (
 --
 
 INSERT INTO `student_tiers` (`id`, `planType`, `name`, `description`, `price`, `currency`, `billingCycle`, `features`, `maxCourses`, `maxLanguages`, `isActive`, `createdAt`, `updatedAt`) VALUES
-('basic-tier', 'BASIC', 'Basic Plan', 'Perfect for beginners starting their language journey', 12.99, 'USD', 'MONTHLY', '{\"maxCourses\": 5, \"aiAssistant\": false, \"basicLessons\": true, \"certificates\": false, \"emailSupport\": true, \"maxLanguages\": 5, \"mobileAccess\": true, \"offlineAccess\": false, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": false, \"customLearningPaths\": false}', 5, 5, 1, '2025-07-05 02:45:40.000', '2025-07-05 02:50:02.000'),
-('premium-tier', 'PREMIUM', 'Premium Plan', 'Most popular choice for serious language learners', 24.99, 'USD', 'MONTHLY', '{\"maxCourses\": 20, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"culturalContent\": true, \"prioritySupport\": true, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": true, \"customLearningPaths\": false}', 20, -1, 1, '2025-07-05 02:45:40.000', '2025-07-05 02:50:02.000'),
-('pro-tier', 'PRO', 'Pro Plan', 'Complete language learning experience with personal tutoring', 49.99, 'USD', 'MONTHLY', '{\"maxCourses\": -1, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"culturalContent\": true, \"prioritySupport\": true, \"dedicatedSupport\": true, \"personalTutoring\": true, \"progressTracking\": true, \"advancedAnalytics\": true, \"certificationPrep\": true, \"liveConversations\": true, \"groupStudySessions\": true, \"customLearningPaths\": true}', -1, -1, 1, '2025-07-05 02:45:40.000', '2025-07-05 02:50:02.000');
+('basic-tier', 'BASIC', 'Basic Plan', 'Perfect for beginners starting their language journey', 12.99, 'USD', 'MONTHLY', '{\"maxCourses\": 5, \"aiAssistant\": false, \"basicLessons\": true, \"certificates\": false, \"emailSupport\": true, \"maxLanguages\": 5, \"mobileAccess\": true, \"offlineAccess\": false, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": false, \"videoConferencing\": false, \"customLearningPaths\": false}', 5, 5, 1, '2025-07-05 02:45:40.000', '2025-07-28 19:53:13.525'),
+('premium-tier', 'PREMIUM', 'Premium Plan', 'Most popular choice for serious language learners', 24.99, 'USD', 'MONTHLY', '{\"maxCourses\": 20, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"culturalContent\": true, \"prioritySupport\": true, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": true, \"videoConferencing\": \"limited\", \"customLearningPaths\": false}', 20, -1, 1, '2025-07-05 02:45:40.000', '2025-07-28 19:53:13.664'),
+('pro-tier', 'PRO', 'Pro Plan', 'Complete language learning experience with personal tutoring', 49.99, 'USD', 'MONTHLY', '{\"maxCourses\": -1, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"careerGuidance\": true, \"culturalContent\": true, \"dedicatedSupport\": true, \"exclusiveContent\": true, \"personalTutoring\": true, \"progressTracking\": true, \"liveConversations\": true, \"portfolioBuilding\": true, \"videoConferencing\": \"unlimited\", \"advancedAssessment\": true, \"groupStudySessions\": true, \"customLearningPaths\": true}', -1, -1, 1, '2025-07-05 02:45:40.000', '2025-07-28 19:53:13.665');
 
 -- --------------------------------------------------------
 
@@ -2906,6 +3055,130 @@ INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`,
 ('c98a0b89-011b-482f-843e-a5522de40b1e', 'Nisha Test', 'nisha@sterlingcollegelondon.com', NULL, NULL, '$2b$10$270rbxzD7QcM.Csbl71mROab8x4i3hJmAPYyoLBo3Fq.GIn9VAsQq', 'STUDENT', NULL, '2025-07-12 21:39:11.400', '2025-07-12 21:39:11.400', 'ACTIVE', 0),
 ('ccb77175-fa66-4d1f-bbb9-0701df84384d', 'Student4', 'rodrigo@amitycollege.co.uk', NULL, NULL, '$2b$10$Y1xb73MSRSoxH/8Iyk5ch.CN3SK8YrAFX4ZmVsWuSPxl4dHT69tjG', 'STUDENT', NULL, '2025-07-12 21:13:08.978', '2025-07-12 21:13:08.978', 'ACTIVE', 0),
 ('5c39be61-c09b-4fb0-b6da-fad403dd2470', 'Admin User', 'admin@example.com', NULL, NULL, '$2b$10$FoPDZ6moKaZnRFy.e95wXeHjtzZB1svOepg0ms4a9K7pNDKfCfkRK', 'ADMIN', NULL, '2025-07-14 11:19:57.030', '2025-07-14 11:19:57.030', 'ACTIVE', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `video_sessions`
+--
+
+DROP TABLE IF EXISTS `video_sessions`;
+CREATE TABLE IF NOT EXISTS `video_sessions` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `sessionType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `maxParticipants` int NOT NULL DEFAULT '10',
+  `startTime` datetime(3) NOT NULL,
+  `endTime` datetime(3) NOT NULL,
+  `duration` int NOT NULL,
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SCHEDULED',
+  `meetingUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meetingId` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recordingUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instructorId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `institutionId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `courseId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `moduleId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `price` double NOT NULL DEFAULT '0',
+  `isPublic` tinyint(1) NOT NULL DEFAULT '0',
+  `isRecorded` tinyint(1) NOT NULL DEFAULT '0',
+  `allowChat` tinyint(1) NOT NULL DEFAULT '1',
+  `allowScreenShare` tinyint(1) NOT NULL DEFAULT '1',
+  `allowRecording` tinyint(1) NOT NULL DEFAULT '0',
+  `metadata` json DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `video_sessions_instructorId_idx` (`instructorId`),
+  KEY `video_sessions_institutionId_idx` (`institutionId`),
+  KEY `video_sessions_courseId_idx` (`courseId`),
+  KEY `video_sessions_startTime_idx` (`startTime`),
+  KEY `video_sessions_status_idx` (`status`),
+  KEY `video_sessions_language_idx` (`language`),
+  KEY `video_sessions_level_idx` (`level`),
+  KEY `video_sessions_moduleId_fkey` (`moduleId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `video_session_messages`
+--
+
+DROP TABLE IF EXISTS `video_session_messages`;
+CREATE TABLE IF NOT EXISTS `video_session_messages` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `messageType` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `timestamp` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `isPrivate` tinyint(1) NOT NULL DEFAULT '0',
+  `recipientId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `video_session_messages_sessionId_idx` (`sessionId`),
+  KEY `video_session_messages_userId_idx` (`userId`),
+  KEY `video_session_messages_timestamp_idx` (`timestamp`),
+  KEY `video_session_messages_recipientId_fkey` (`recipientId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `video_session_participants`
+--
+
+DROP TABLE IF EXISTS `video_session_participants`;
+CREATE TABLE IF NOT EXISTS `video_session_participants` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PARTICIPANT',
+  `joinedAt` datetime(3) DEFAULT NULL,
+  `leftAt` datetime(3) DEFAULT NULL,
+  `duration` int NOT NULL DEFAULT '0',
+  `isActive` tinyint(1) NOT NULL DEFAULT '0',
+  `deviceInfo` json DEFAULT NULL,
+  `connectionQuality` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lastSeen` datetime(3) DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `video_session_participants_sessionId_userId_key` (`sessionId`,`userId`),
+  KEY `video_session_participants_sessionId_idx` (`sessionId`),
+  KEY `video_session_participants_userId_idx` (`userId`),
+  KEY `video_session_participants_isActive_idx` (`isActive`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `video_session_recordings`
+--
+
+DROP TABLE IF EXISTS `video_session_recordings`;
+CREATE TABLE IF NOT EXISTS `video_session_recordings` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `recordingUrl` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duration` int NOT NULL,
+  `fileSize` int NOT NULL,
+  `quality` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PROCESSING',
+  `thumbnailUrl` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `transcript` text COLLATE utf8mb4_unicode_ci,
+  `metadata` json DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `video_session_recordings_sessionId_idx` (`sessionId`),
+  KEY `video_session_recordings_status_idx` (`status`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
