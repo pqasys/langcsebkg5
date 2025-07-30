@@ -14,14 +14,14 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sessionId = params.id;
+    const conversationId = params.id;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');
     const before = searchParams.get('before'); // For pagination
 
-    // Get the video session
-    const videoSession = await prisma.videoSession.findUnique({
-      where: { id: sessionId },
+    // Get the conversation
+    const conversation = await prisma.liveConversation.findUnique({
+      where: { id: conversationId },
       include: {
         participants: {
           where: {
@@ -31,21 +31,21 @@ export async function GET(
       }
     });
 
-    if (!videoSession) {
-      return NextResponse.json({ error: 'Video session not found' }, { status: 404 });
+    if (!conversation) {
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
     }
 
     // Check if user has access to view messages
-    const hasAccess = await checkUserAccess(session.user.id, videoSession);
+    const hasAccess = await checkUserAccess(session.user.id, conversation);
     if (!hasAccess) {
       return NextResponse.json({ 
-        error: 'You do not have access to view this video session' 
+        error: 'You do not have access to view this conversation' 
       }, { status: 403 });
     }
 
     // Build where clause for messages
     const whereClause: any = {
-      sessionId
+      conversationId
     };
 
     if (before) {
@@ -55,7 +55,7 @@ export async function GET(
     }
 
     // Get messages
-    const messages = await prisma.videoSessionMessage.findMany({
+    const messages = await prisma.liveConversationMessage.findMany({
       where: whereClause,
       include: {
         sender: {
@@ -80,9 +80,9 @@ export async function GET(
     });
 
     // Mark messages as read for the current user
-    await prisma.videoSessionMessage.updateMany({
+    await prisma.liveConversationMessage.updateMany({
       where: {
-        sessionId,
+        conversationId,
         recipientId: session.user.id,
         isRead: false
       },
@@ -98,9 +98,9 @@ export async function GET(
     });
 
   } catch (error) {
-    logger.error('Failed to get video session messages:', error);
+    logger.error('Failed to get conversation messages:', error);
     return NextResponse.json(
-      { error: 'Failed to get video session messages' },
+      { error: 'Failed to get conversation messages' },
       { status: 500 }
     );
   }
@@ -116,7 +116,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sessionId = params.id;
+    const conversationId = params.id;
     const body = await request.json();
     const { content, messageType, recipientId, language, isTranslation, originalMessageId } = body;
 
@@ -124,9 +124,9 @@ export async function POST(
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
     }
 
-    // Get the video session
-    const videoSession = await prisma.videoSession.findUnique({
-      where: { id: sessionId },
+    // Get the conversation
+    const conversation = await prisma.liveConversation.findUnique({
+      where: { id: conversationId },
       include: {
         participants: {
           where: {
@@ -136,20 +136,20 @@ export async function POST(
       }
     });
 
-    if (!videoSession) {
-      return NextResponse.json({ error: 'Video session not found' }, { status: 404 });
+    if (!conversation) {
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
     }
 
     // Check if user is a participant
-    if (videoSession.participants.length === 0) {
+    if (conversation.participants.length === 0) {
       return NextResponse.json({ 
         error: 'You must be a participant to send messages' 
       }, { status: 403 });
     }
 
-    // Check if session is active
-    if (videoSession.status !== 'ACTIVE') {
-      return NextResponse.json({ error: 'Session is not active' }, { status: 400 });
+    // Check if conversation is active
+    if (conversation.status !== 'ACTIVE') {
+      return NextResponse.json({ error: 'Conversation is not active' }, { status: 400 });
     }
 
     // Validate message type
@@ -160,23 +160,23 @@ export async function POST(
 
     // For private messages, validate recipient
     if (messageType === 'PRIVATE' && recipientId) {
-      const recipientParticipant = await prisma.videoSessionParticipant.findFirst({
+      const recipientParticipant = await prisma.liveConversationParticipant.findFirst({
         where: {
-          sessionId,
+          conversationId,
           userId: recipientId,
           status: 'JOINED'
         }
       });
 
       if (!recipientParticipant) {
-        return NextResponse.json({ error: 'Recipient is not a participant in this session' }, { status: 400 });
+        return NextResponse.json({ error: 'Recipient is not a participant in this conversation' }, { status: 400 });
       }
     }
 
     // Create message
-    const message = await prisma.videoSessionMessage.create({
+    const message = await prisma.liveConversationMessage.create({
       data: {
-        sessionId,
+        conversationId,
         senderId: session.user.id,
         recipientId: messageType === 'PRIVATE' ? recipientId : null,
         content: content.trim(),
@@ -206,9 +206,9 @@ export async function POST(
     });
 
     // Update participant message count
-    await prisma.videoSessionParticipant.updateMany({
+    await prisma.liveConversationParticipant.updateMany({
       where: {
-        sessionId,
+        conversationId,
         userId: session.user.id
       },
       data: {
@@ -218,7 +218,7 @@ export async function POST(
       }
     });
 
-    logger.info(`User ${session.user.id} sent message in video session ${sessionId}`);
+    logger.info(`User ${session.user.id} sent message in conversation ${conversationId}`);
 
     return NextResponse.json({
       success: true,
@@ -235,15 +235,15 @@ export async function POST(
   }
 }
 
-async function checkUserAccess(userId: string, videoSession: any): Promise<boolean> {
+async function checkUserAccess(userId: string, conversation: any): Promise<boolean> {
   try {
     // Host and instructor can always access messages
-    if (videoSession.hostId === userId || videoSession.instructorId === userId) {
+    if (conversation.hostId === userId || conversation.instructorId === userId) {
       return true;
     }
 
     // Check if user is a participant
-    const isParticipant = videoSession.participants.some(p => p.userId === userId);
+    const isParticipant = conversation.participants.some(p => p.userId === userId);
     if (isParticipant) {
       return true;
     }
@@ -278,6 +278,19 @@ async function checkUserAccess(userId: string, videoSession: any): Promise<boole
     });
 
     if (user?.role === 'INSTITUTION') {
+      return true;
+    }
+
+    // Check if user has a booking for this conversation
+    const booking = await prisma.liveConversationBooking.findFirst({
+      where: {
+        conversationId: conversation.id,
+        studentId: userId,
+        status: { not: 'CANCELLED' }
+      }
+    });
+
+    if (booking) {
       return true;
     }
 

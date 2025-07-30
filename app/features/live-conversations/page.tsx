@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useSubscription } from '@/hooks/useSubscription'
+import { useSession } from 'next-auth/react'
 import { 
   FaComments, 
   FaVideo, 
@@ -20,11 +22,25 @@ import {
   FaRocket,
   FaGraduationCap,
   FaHeart,
-  FaShieldAlt
+  FaShieldAlt,
+  FaCrown,
+  FaUsersCog
 } from 'react-icons/fa'
 import { getAllStudentTiers } from '@/lib/subscription-pricing'
 
 export default function LiveConversationsFeaturePage() {
+  const { data: session } = useSession()
+  const { 
+    userType,
+    canAccessLiveClasses,
+    canAccessPlatformContent,
+    canAccessInstitutionContent,
+    canAccessPremiumFeatures,
+    hasActiveSubscription,
+    currentPlan,
+    institutionEnrollment,
+    loading: subscriptionLoading 
+  } = useSubscription()
   const [selectedLanguage, setSelectedLanguage] = useState('all')
 
   const languages = [
@@ -211,15 +227,145 @@ export default function LiveConversationsFeaturePage() {
         </div>
       </section>
 
+      {/* Access Status Banner */}
+      {session?.user && !subscriptionLoading && (
+        <section className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            {userType === 'FREE' ? (
+              <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaStar className="w-5 h-5 text-yellow-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-yellow-800">
+                      Upgrade Required
+                    </h3>
+                    <p className="text-sm text-yellow-600">
+                      Subscribe or enroll with an institution to access live conversations
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link href="/subscription-signup">
+                    <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                      Subscribe
+                    </Button>
+                  </Link>
+                  <Link href="/institutions">
+                    <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                      Find Institution
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : userType === 'SUBSCRIBER' ? (
+              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaCheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-green-800">
+                      Platform Subscription - {currentPlan} Plan
+                    </h3>
+                    <p className="text-sm text-green-600">
+                      You have access to platform-wide live conversations and premium features
+                    </p>
+                  </div>
+                </div>
+                <Link href="/student/settings">
+                  <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100">
+                    Manage Subscription
+                  </Button>
+                </Link>
+              </div>
+            ) : userType === 'INSTITUTION_STUDENT' ? (
+              <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaGraduationCap className="w-5 h-5 text-blue-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-blue-800">
+                      Institution Student - {institutionEnrollment?.institutionName || 'Your Institution'}
+                    </h3>
+                    <p className="text-sm text-blue-600">
+                      You have access to your institution's live conversations and content
+                    </p>
+                  </div>
+                </div>
+                <Link href="/student/dashboard">
+                  <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                    View Institution Content
+                  </Button>
+                </Link>
+              </div>
+            ) : userType === 'HYBRID' ? (
+              <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaCrown className="w-5 h-5 text-purple-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-purple-800">
+                      Premium Access - {currentPlan} Plan + Institution
+                    </h3>
+                    <p className="text-sm text-purple-600">
+                      You have access to both platform and institution live conversations
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link href="/student/settings">
+                    <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-100">
+                      Manage Subscription
+                    </Button>
+                  </Link>
+                  <Link href="/student/dashboard">
+                    <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-100">
+                      Institution Content
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : userType === 'INSTITUTION_STAFF' ? (
+              <div className="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaUsersCog className="w-5 h-5 text-indigo-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-indigo-800">
+                      Institution Staff
+                    </h3>
+                    <p className="text-sm text-indigo-600">
+                      You can create and host live conversations for your institution
+                    </p>
+                  </div>
+                </div>
+                <Link href="/institution/dashboard">
+                  <Button variant="outline" size="sm" className="border-indigo-300 text-indigo-700 hover:bg-indigo-100">
+                    Manage Conversations
+                  </Button>
+                </Link>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      )}
+
       {/* Demo Sessions */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Experience Live Conversations
+              {canAccessLiveClasses 
+                ? userType === 'INSTITUTION_STAFF' 
+                  ? 'Manage Your Institution\'s Live Conversations'
+                  : 'Your Live Conversations Dashboard'
+                : 'Experience Live Conversations'
+              }
             </h2>
             <p className="text-xl text-gray-600">
-              Join upcoming sessions and see the magic of real-time language practice
+              {userType === 'INSTITUTION_STAFF' 
+                ? 'Create and manage live conversations for your institution\'s students'
+                : canAccessLiveClasses 
+                  ? userType === 'INSTITUTION_STUDENT'
+                    ? 'Access your institution\'s scheduled conversations and practice sessions'
+                    : 'Access your scheduled conversations and discover new practice opportunities'
+                  : 'Join upcoming sessions and see the magic of real-time language practice'
+              }
             </p>
           </div>
           
@@ -261,13 +407,37 @@ export default function LiveConversationsFeaturePage() {
                   </div>
                   
                   <div className="flex gap-2 mb-4">
-                    <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
-                      <FaPlay className="w-4 h-4 mr-2" />
-                      Join Demo
-                    </Button>
-                    <Button variant="outline" className="px-3">
-                      <FaHeart className="w-4 h-4" />
-                    </Button>
+                    {userType === 'INSTITUTION_STAFF' ? (
+                      <>
+                        <Button className="flex-1 bg-indigo-600 hover:bg-indigo-700">
+                          <FaVideo className="w-4 h-4 mr-2" />
+                          Host Session
+                        </Button>
+                        <Button variant="outline" className="px-3">
+                          <FaUsersCog className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : canAccessLiveClasses ? (
+                      <>
+                        <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                          <FaPlay className="w-4 h-4 mr-2" />
+                          {userType === 'INSTITUTION_STUDENT' ? 'Join Institution Session' : 'Join Session'}
+                        </Button>
+                        <Button variant="outline" className="px-3">
+                          <FaCalendarAlt className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+                          <FaPlay className="w-4 h-4 mr-2" />
+                          Preview Session
+                        </Button>
+                        <Button variant="outline" className="px-3">
+                          <FaHeart className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -429,20 +599,60 @@ export default function LiveConversationsFeaturePage() {
       <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Start Speaking?
+            {userType === 'INSTITUTION_STAFF' 
+              ? 'Ready to Create Amazing Conversation Experiences?'
+              : canAccessLiveClasses 
+                ? 'Ready to Continue Your Speaking Journey?'
+                : 'Ready to Start Speaking?'
+            }
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of learners who have improved their speaking skills through live conversations
+            {userType === 'INSTITUTION_STAFF'
+              ? 'Empower your students with engaging live conversations and comprehensive speaking tools'
+              : canAccessLiveClasses 
+                ? 'Keep building your speaking skills with our comprehensive live conversation platform'
+                : 'Join thousands of learners who have improved their speaking skills through live conversations'
+            }
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
-              Start Your Free Trial
-            </Button>
-            <Link href="/">
-              <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
-                Back to Home
-              </Button>
-            </Link>
+            {userType === 'INSTITUTION_STAFF' ? (
+              <>
+                <Button size="lg" className="bg-indigo-500 hover:bg-indigo-600 text-white">
+                  <FaVideo className="w-5 h-5 mr-2" />
+                  Create New Session
+                </Button>
+                <Link href="/institution/dashboard">
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
+                    <FaArrowRight className="w-5 h-5 mr-2" />
+                    Institution Dashboard
+                  </Button>
+                </Link>
+              </>
+            ) : canAccessLiveClasses ? (
+              <>
+                <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white">
+                  <FaRocket className="w-5 h-5 mr-2" />
+                  {userType === 'INSTITUTION_STUDENT' ? 'Browse Institution Sessions' : 'Browse All Sessions'}
+                </Button>
+                <Link href="/student/dashboard">
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
+                    <FaArrowRight className="w-5 h-5 mr-2" />
+                    {userType === 'INSTITUTION_STUDENT' ? 'Institution Dashboard' : 'Go to Dashboard'}
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
+                  Start Your Free Trial
+                </Button>
+                <Link href="/">
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
+                    Back to Home
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>

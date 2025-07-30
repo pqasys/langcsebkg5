@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { useSubscription } from '@/hooks/useSubscription'
+import { useSession } from 'next-auth/react'
 import { 
   FaUsers, 
   FaGlobe, 
@@ -21,11 +23,25 @@ import {
   FaCheckCircle,
   FaShieldAlt,
   FaBookOpen,
-  FaVideo
+  FaVideo,
+  FaCrown,
+  FaUsersCog
 } from 'react-icons/fa'
 import { getAllStudentTiers } from '@/lib/subscription-pricing'
 
 export default function CommunityLearningFeaturePage() {
+  const { data: session } = useSession()
+  const { 
+    userType,
+    canAccessLiveClasses,
+    canAccessPlatformContent,
+    canAccessInstitutionContent,
+    canAccessPremiumFeatures,
+    hasActiveSubscription,
+    currentPlan,
+    institutionEnrollment,
+    loading: subscriptionLoading 
+  } = useSubscription()
   const [selectedCategory, setSelectedCategory] = useState('all')
 
   const categories = [
@@ -202,15 +218,143 @@ export default function CommunityLearningFeaturePage() {
         </div>
       </section>
 
+      {/* Access Status Banner */}
+      {session?.user && !subscriptionLoading && (
+        <section className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            {userType === 'FREE' ? (
+              <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaStar className="w-5 h-5 text-yellow-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-yellow-800">
+                      Limited Access
+                    </h3>
+                    <p className="text-sm text-yellow-600">
+                      Subscribe or enroll with an institution to access premium community features
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link href="/subscription-signup">
+                    <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                      Subscribe
+                    </Button>
+                  </Link>
+                  <Link href="/institutions">
+                    <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                      Find Institution
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : userType === 'SUBSCRIBER' ? (
+              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaCheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-green-800">
+                      Platform Subscription - {currentPlan} Plan
+                    </h3>
+                    <p className="text-sm text-green-600">
+                      You have access to platform-wide community features and study groups
+                    </p>
+                  </div>
+                </div>
+                <Link href="/student/settings">
+                  <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100">
+                    Manage Subscription
+                  </Button>
+                </Link>
+              </div>
+            ) : userType === 'INSTITUTION_STUDENT' ? (
+              <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaGraduationCap className="w-5 h-5 text-blue-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-blue-800">
+                      Institution Student - {institutionEnrollment?.institutionName || 'Your Institution'}
+                    </h3>
+                    <p className="text-sm text-blue-600">
+                      You have access to your institution's community features and study groups
+                    </p>
+                  </div>
+                </div>
+                <Link href="/student/dashboard">
+                  <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                    View Institution Content
+                  </Button>
+                </Link>
+              </div>
+            ) : userType === 'HYBRID' ? (
+              <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaCrown className="w-5 h-5 text-purple-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-purple-800">
+                      Premium Access - {currentPlan} Plan + Institution
+                    </h3>
+                    <p className="text-sm text-purple-600">
+                      You have access to both platform and institution community features
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link href="/student/settings">
+                    <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-100">
+                      Manage Subscription
+                    </Button>
+                  </Link>
+                  <Link href="/student/dashboard">
+                    <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-100">
+                      Institution Content
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : userType === 'INSTITUTION_STAFF' ? (
+              <div className="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <FaUsersCog className="w-5 h-5 text-indigo-600 mr-3" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-indigo-800">
+                      Institution Staff
+                    </h3>
+                    <p className="text-sm text-indigo-600">
+                      You can create and manage community features for your institution
+                    </p>
+                  </div>
+                </div>
+                <Link href="/institution/dashboard">
+                  <Button variant="outline" size="sm" className="border-indigo-300 text-indigo-700 hover:bg-indigo-100">
+                    Manage Communities
+                  </Button>
+                </Link>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      )}
+
       {/* Featured Communities */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Featured Communities
+              {userType === 'INSTITUTION_STAFF' 
+                ? 'Manage Your Institution\'s Communities'
+                : userType === 'INSTITUTION_STUDENT'
+                  ? 'Your Institution\'s Communities'
+                  : 'Featured Communities'
+              }
             </h2>
             <p className="text-xl text-gray-600">
-              Join active communities and start learning with fellow language enthusiasts
+              {userType === 'INSTITUTION_STAFF'
+                ? 'Create and manage study groups and communities for your institution\'s students'
+                : userType === 'INSTITUTION_STUDENT'
+                  ? 'Join your institution\'s study groups and connect with fellow students'
+                  : 'Join active communities and start learning with fellow language enthusiasts'
+              }
             </p>
           </div>
           
@@ -264,12 +408,36 @@ export default function CommunityLearningFeaturePage() {
                   </div>
                   
                   <div className="flex gap-2">
-                    <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
-                      Join Community
-                    </Button>
-                    <Button variant="outline" className="px-3">
-                      <FaHeart className="w-4 h-4" />
-                    </Button>
+                    {userType === 'INSTITUTION_STAFF' ? (
+                      <>
+                        <Button className="flex-1 bg-indigo-600 hover:bg-indigo-700">
+                          <FaUsersCog className="w-4 h-4 mr-2" />
+                          Manage Community
+                        </Button>
+                        <Button variant="outline" className="px-3">
+                          <FaUsers className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : userType === 'INSTITUTION_STUDENT' ? (
+                      <>
+                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+                          <FaUsers className="w-4 h-4 mr-2" />
+                          Join Institution Community
+                        </Button>
+                        <Button variant="outline" className="px-3">
+                          <FaHeart className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+                          Join Community
+                        </Button>
+                        <Button variant="outline" className="px-3">
+                          <FaHeart className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -455,20 +623,60 @@ export default function CommunityLearningFeaturePage() {
       <section className="py-16 bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-800 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Join the Community?
+            {userType === 'INSTITUTION_STAFF' 
+              ? 'Ready to Create Amazing Community Experiences?'
+              : userType === 'INSTITUTION_STUDENT'
+                ? 'Ready to Join Your Institution\'s Community?'
+                : 'Ready to Join the Community?'
+            }
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Start your language learning journey with friends from around the world
+            {userType === 'INSTITUTION_STAFF'
+              ? 'Empower your students with engaging community features and collaborative learning tools'
+              : userType === 'INSTITUTION_STUDENT'
+                ? 'Connect with your institution\'s study groups and fellow students'
+                : 'Start your language learning journey with friends from around the world'
+            }
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
-              Join Free Community
-            </Button>
-            <Link href="/">
-              <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
-                Back to Home
-              </Button>
-            </Link>
+            {userType === 'INSTITUTION_STAFF' ? (
+              <>
+                <Button size="lg" className="bg-indigo-500 hover:bg-indigo-600 text-white">
+                  <FaUsersCog className="w-5 h-5 mr-2" />
+                  Create New Community
+                </Button>
+                <Link href="/institution/dashboard">
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
+                    <FaArrowRight className="w-5 h-5 mr-2" />
+                    Institution Dashboard
+                  </Button>
+                </Link>
+              </>
+            ) : userType === 'INSTITUTION_STUDENT' ? (
+              <>
+                <Button size="lg" className="bg-blue-500 hover:bg-blue-600 text-white">
+                  <FaUsers className="w-5 h-5 mr-2" />
+                  Browse Institution Communities
+                </Button>
+                <Link href="/student/dashboard">
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
+                    <FaArrowRight className="w-5 h-5 mr-2" />
+                    Institution Dashboard
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
+                  Join Free Community
+                </Button>
+                <Link href="/">
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
+                    Back to Home
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>

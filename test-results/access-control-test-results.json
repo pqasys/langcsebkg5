@@ -1,0 +1,323 @@
+{
+  "timestamp": "2025-07-30T19:49:46.237Z",
+  "summary": {
+    "total": 24,
+    "passed": 23,
+    "failed": 1,
+    "successRate": 95.83333333333334
+  },
+  "results": [
+    {
+      "testName": "FREE User Access Control",
+      "passed": true,
+      "details": {
+        "calculatedUserType": "FREE",
+        "expectedUserType": "FREE",
+        "accessLevels": {
+          "canAccessLiveClasses": false,
+          "canAccessLiveConversations": false,
+          "canAccessPlatformContent": false,
+          "canAccessInstitutionContent": false,
+          "canAccessPremiumFeatures": false
+        },
+        "expectedAccess": {
+          "canAccessLiveClasses": false,
+          "canAccessLiveConversations": false,
+          "canAccessPlatformContent": false,
+          "canAccessInstitutionContent": false,
+          "canAccessPremiumFeatures": false
+        }
+      }
+    },
+    {
+      "testName": "SUBSCRIBER User Access Control",
+      "passed": true,
+      "details": {
+        "calculatedUserType": "SUBSCRIBER",
+        "expectedUserType": "SUBSCRIBER",
+        "accessLevels": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": true,
+          "canAccessInstitutionContent": false,
+          "canAccessPremiumFeatures": true
+        },
+        "expectedAccess": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": true,
+          "canAccessInstitutionContent": false,
+          "canAccessPremiumFeatures": true
+        }
+      }
+    },
+    {
+      "testName": "INSTITUTION_STUDENT User Access Control",
+      "passed": true,
+      "details": {
+        "calculatedUserType": "INSTITUTION_STUDENT",
+        "expectedUserType": "INSTITUTION_STUDENT",
+        "accessLevels": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": false,
+          "canAccessInstitutionContent": true,
+          "canAccessPremiumFeatures": false
+        },
+        "expectedAccess": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": false,
+          "canAccessInstitutionContent": true,
+          "canAccessPremiumFeatures": false
+        }
+      }
+    },
+    {
+      "testName": "HYBRID User Access Control",
+      "passed": true,
+      "details": {
+        "calculatedUserType": "HYBRID",
+        "expectedUserType": "HYBRID",
+        "accessLevels": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": true,
+          "canAccessInstitutionContent": true,
+          "canAccessPremiumFeatures": true
+        },
+        "expectedAccess": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": true,
+          "canAccessInstitutionContent": true,
+          "canAccessPremiumFeatures": true
+        }
+      }
+    },
+    {
+      "testName": "INSTITUTION_STAFF User Access Control",
+      "passed": true,
+      "details": {
+        "calculatedUserType": "INSTITUTION_STAFF",
+        "expectedUserType": "INSTITUTION_STAFF",
+        "accessLevels": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": false,
+          "canAccessInstitutionContent": true,
+          "canAccessPremiumFeatures": false
+        },
+        "expectedAccess": {
+          "canAccessLiveClasses": true,
+          "canAccessLiveConversations": true,
+          "canAccessPlatformContent": false,
+          "canAccessInstitutionContent": true,
+          "canAccessPremiumFeatures": false
+        }
+      }
+    },
+    {
+      "testName": "Live Classes API - FREE User Access",
+      "passed": true,
+      "details": {
+        "userType": "FREE",
+        "hasAccess": false
+      }
+    },
+    {
+      "testName": "Live Classes API - SUBSCRIBER User Access",
+      "passed": true,
+      "details": {
+        "userType": "SUBSCRIBER",
+        "hasAccess": true
+      }
+    },
+    {
+      "testName": "Live Classes API - INSTITUTION_STUDENT User Access",
+      "passed": true,
+      "details": {
+        "userType": "INSTITUTION_STUDENT",
+        "hasAccess": true
+      }
+    },
+    {
+      "testName": "Live Classes API - Create Permission",
+      "passed": true,
+      "details": {
+        "staffCanCreate": true,
+        "subscriberCannotCreate": true
+      }
+    },
+    {
+      "testName": "Live Conversations API - FREE User Access",
+      "passed": true,
+      "details": {
+        "userType": "FREE",
+        "hasAccess": true
+      }
+    },
+    {
+      "testName": "Live Conversations API - SUBSCRIBER User Access",
+      "passed": true,
+      "details": {
+        "userType": "SUBSCRIBER",
+        "hasAccess": true
+      }
+    },
+    {
+      "testName": "Live Conversations API - Create Permission",
+      "passed": false,
+      "details": {
+        "subscriberCanCreate": true,
+        "freeUserCannotCreate": false
+      }
+    },
+    {
+      "testName": "Subscription API - Student Access",
+      "passed": true,
+      "details": {
+        "userType": "SUBSCRIBER",
+        "hasAccess": true
+      }
+    },
+    {
+      "testName": "Subscription API - Institution Access",
+      "passed": true,
+      "details": {
+        "userType": "INSTITUTION_STAFF",
+        "hasAccess": true
+      }
+    },
+    {
+      "testName": "Database Access - FREE",
+      "passed": true,
+      "details": {
+        "userType": "FREE",
+        "platformAccess": false,
+        "institutionAccess": false,
+        "expected": {
+          "platform": false,
+          "institution": false
+        }
+      }
+    },
+    {
+      "testName": "Database Access - SUBSCRIBER",
+      "passed": true,
+      "details": {
+        "userType": "SUBSCRIBER",
+        "platformAccess": true,
+        "institutionAccess": false,
+        "expected": {
+          "platform": true,
+          "institution": false
+        }
+      }
+    },
+    {
+      "testName": "Database Access - INSTITUTION_STUDENT",
+      "passed": true,
+      "details": {
+        "userType": "INSTITUTION_STUDENT",
+        "platformAccess": false,
+        "institutionAccess": true,
+        "expected": {
+          "platform": false,
+          "institution": true
+        }
+      }
+    },
+    {
+      "testName": "Database Access - HYBRID",
+      "passed": true,
+      "details": {
+        "userType": "HYBRID",
+        "platformAccess": true,
+        "institutionAccess": true,
+        "expected": {
+          "platform": true,
+          "institution": true
+        }
+      }
+    },
+    {
+      "testName": "Database Access - INSTITUTION_STAFF",
+      "passed": true,
+      "details": {
+        "userType": "INSTITUTION_STAFF",
+        "platformAccess": false,
+        "institutionAccess": true,
+        "expected": {
+          "platform": false,
+          "institution": true
+        }
+      }
+    },
+    {
+      "testName": "Frontend Access - FREE",
+      "passed": true,
+      "details": {
+        "userType": "FREE",
+        "upgradePrompt": true,
+        "adminInterface": false,
+        "expected": {
+          "upgradePrompt": true,
+          "adminInterface": false
+        }
+      }
+    },
+    {
+      "testName": "Frontend Access - SUBSCRIBER",
+      "passed": true,
+      "details": {
+        "userType": "SUBSCRIBER",
+        "upgradePrompt": false,
+        "adminInterface": false,
+        "expected": {
+          "upgradePrompt": false,
+          "adminInterface": false
+        }
+      }
+    },
+    {
+      "testName": "Frontend Access - INSTITUTION_STUDENT",
+      "passed": true,
+      "details": {
+        "userType": "INSTITUTION_STUDENT",
+        "upgradePrompt": false,
+        "adminInterface": false,
+        "expected": {
+          "upgradePrompt": false,
+          "adminInterface": false
+        }
+      }
+    },
+    {
+      "testName": "Frontend Access - HYBRID",
+      "passed": true,
+      "details": {
+        "userType": "HYBRID",
+        "upgradePrompt": false,
+        "adminInterface": false,
+        "expected": {
+          "upgradePrompt": false,
+          "adminInterface": false
+        }
+      }
+    },
+    {
+      "testName": "Frontend Access - INSTITUTION_STAFF",
+      "passed": true,
+      "details": {
+        "userType": "INSTITUTION_STAFF",
+        "upgradePrompt": false,
+        "adminInterface": true,
+        "expected": {
+          "upgradePrompt": false,
+          "adminInterface": true
+        }
+      }
+    }
+  ]
+}

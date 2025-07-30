@@ -14,36 +14,36 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sessionId = params.id;
+    const conversationId = params.id;
 
     // Find the participant
-    const participant = await prisma.videoSessionParticipant.findFirst({
+    const participant = await prisma.liveConversationParticipant.findFirst({
       where: {
-        sessionId,
+        conversationId,
         userId: session.user.id,
         status: 'JOINED'
       },
       include: {
-        session: true
+        conversation: true
       }
     });
 
     if (!participant) {
-      return NextResponse.json({ error: 'You are not a participant in this session' }, { status: 404 });
+      return NextResponse.json({ error: 'You are not a participant in this conversation' }, { status: 404 });
     }
 
-    // Check if session is active
-    if (participant.session.status !== 'ACTIVE') {
-      return NextResponse.json({ error: 'Session is not active' }, { status: 400 });
+    // Check if conversation is active
+    if (participant.conversation.status !== 'ACTIVE') {
+      return NextResponse.json({ error: 'Conversation is not active' }, { status: 400 });
     }
 
-    // Calculate duration in session
+    // Calculate duration in conversation
     const joinedAt = participant.joinedAt;
     const leftAt = new Date();
     const duration = Math.floor((leftAt.getTime() - joinedAt.getTime()) / 1000); // in seconds
 
     // Update participant status
-    await prisma.videoSessionParticipant.update({
+    await prisma.liveConversationParticipant.update({
       where: { id: participant.id },
       data: {
         leftAt,
@@ -52,9 +52,9 @@ export async function POST(
       }
     });
 
-    // Update session participant count
-    await prisma.videoSession.update({
-      where: { id: sessionId },
+    // Update conversation participant count
+    await prisma.liveConversation.update({
+      where: { id: conversationId },
       data: {
         currentParticipants: {
           decrement: 1
@@ -62,18 +62,18 @@ export async function POST(
       }
     });
 
-    logger.info(`User ${session.user.id} left video session ${sessionId} after ${duration} seconds`);
+    logger.info(`User ${session.user.id} left conversation ${conversationId} after ${duration} seconds`);
 
     return NextResponse.json({
       success: true,
-      message: 'Successfully left video session',
+      message: 'Successfully left conversation',
       duration
     });
 
   } catch (error) {
-    logger.error('Failed to leave video session:', error);
+    logger.error('Failed to leave conversation:', error);
     return NextResponse.json(
-      { error: 'Failed to leave video session' },
+      { error: 'Failed to leave conversation' },
       { status: 500 }
     );
   }

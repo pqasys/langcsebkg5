@@ -1775,7 +1775,7 @@ model Certificate {
   id                String   @id @default(uuid()) @db.VarChar(36)
   certificateId     String   @unique @db.VarChar(50) // Human-readable ID like FS-ABC123
   userId            String   @db.VarChar(36)
-  testAttemptId     String   @db.VarChar(36)
+  testAttemptId     String   @unique @db.VarChar(36)
   language          String   @db.VarChar(10)
   languageName      String   @db.VarChar(50)
   cefrLevel         String   @db.VarChar(5)

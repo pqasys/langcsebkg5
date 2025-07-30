@@ -14,11 +14,11 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sessionId = params.id;
+    const conversationId = params.id;
 
-    // Get the video session
-    const videoSession = await prisma.videoSession.findUnique({
-      where: { id: sessionId },
+    // Get the conversation
+    const conversation = await prisma.liveConversation.findUnique({
+      where: { id: conversationId },
       include: {
         participants: {
           include: {
@@ -38,26 +38,24 @@ export async function GET(
       }
     });
 
-    if (!videoSession) {
-      return NextResponse.json({ error: 'Video session not found' }, { status: 404 });
+    if (!conversation) {
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
     }
 
     // Check if user has access to view participants
-    const hasAccess = await checkUserAccess(session.user.id, videoSession);
+    const hasAccess = await checkUserAccess(session.user.id, conversation);
     if (!hasAccess) {
       return NextResponse.json({ 
-        error: 'You do not have access to view this video session' 
+        error: 'You do not have access to view this conversation' 
       }, { status: 403 });
     }
 
     // Filter participants based on user's access level
-    let participants = videoSession.participants;
+    let participants = conversation.participants;
 
     // If user is not a participant, only show basic info
-    const isParticipant = videoSession.participants.some(p => p.userId === session.user.id);
-    const canManage = await checkUserCanManageSession(session.user.id, videoSession);
-    
-    if (!isParticipant && !canManage) {
+    const isParticipant = conversation.participants.some(p => p.userId === session.user.id);
+    if (!isParticipant) {
       participants = participants.map(p => ({
         ...p,
         user: {
@@ -73,35 +71,33 @@ export async function GET(
       success: true,
       participants,
       total: participants.length,
-      session: {
-        id: videoSession.id,
-        title: videoSession.title,
-        status: videoSession.status,
-        currentParticipants: videoSession.currentParticipants,
-        maxParticipants: videoSession.maxParticipants,
-        startTime: videoSession.startTime,
-        endTime: videoSession.endTime
+      conversation: {
+        id: conversation.id,
+        title: conversation.title,
+        status: conversation.status,
+        currentParticipants: conversation.currentParticipants,
+        maxParticipants: conversation.maxParticipants
       }
     });
 
   } catch (error) {
-    logger.error('Failed to get video session participants:', error);
+    logger.error('Failed to get conversation participants:', error);
     return NextResponse.json(
-      { error: 'Failed to get video session participants' },
+      { error: 'Failed to get conversation participants' },
       { status: 500 }
     );
   }
 }
 
-async function checkUserAccess(userId: string, videoSession: any): Promise<boolean> {
+async function checkUserAccess(userId: string, conversation: any): Promise<boolean> {
   try {
     // Host and instructor can always view participants
-    if (videoSession.hostId === userId || videoSession.instructorId === userId) {
+    if (conversation.hostId === userId || conversation.instructorId === userId) {
       return true;
     }
 
     // Check if user is a participant
-    const isParticipant = videoSession.participants.some(p => p.userId === userId);
+    const isParticipant = conversation.participants.some(p => p.userId === userId);
     if (isParticipant) {
       return true;
     }
@@ -139,32 +135,22 @@ async function checkUserAccess(userId: string, videoSession: any): Promise<boole
       return true;
     }
 
+    // Check if user has a booking for this conversation
+    const booking = await prisma.liveConversationBooking.findFirst({
+      where: {
+        conversationId: conversation.id,
+        studentId: userId,
+        status: { not: 'CANCELLED' }
+      }
+    });
+
+    if (booking) {
+      return true;
+    }
+
     return false;
   } catch (error) {
     logger.error('Error checking user access:', error);
-    return false;
-  }
-}
-
-async function checkUserCanManageSession(userId: string, videoSession: any): Promise<boolean> {
-  try {
-    // Check if user is the host or instructor
-    if (videoSession.hostId === userId || videoSession.instructorId === userId) {
-      return true;
-    }
-
-    // Check if user is institution staff for this institution
-    const user = await prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (user?.role === 'INSTITUTION' && user.institutionId === videoSession.institutionId) {
-      return true;
-    }
-
-    return false;
-  } catch (error) {
-    logger.error('Error checking user can manage session:', error);
     return false;
   }
 } 
