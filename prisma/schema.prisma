@@ -302,6 +302,11 @@ model user {
   
   // Language proficiency test relations
   languageProficiencyTestAttempts LanguageProficiencyTestAttempt[]
+  
+  // Certificate and achievement relations
+  certificates Certificate[]
+  achievements UserAchievement[]
+  communityAnnouncements CommunityAnnouncement[]
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -1758,9 +1763,89 @@ model LanguageProficiencyTestAttempt {
 
   // Relations
   user user @relation(fields: [userId], references: [id])
+  certificate Certificate?
 
   @@index([userId])
   @@index([languageCode])
   @@index([completedAt])
   @@map("language_proficiency_test_attempts")
+}
+
+model Certificate {
+  id                String   @id @default(uuid()) @db.VarChar(36)
+  certificateId     String   @unique @db.VarChar(50) // Human-readable ID like FS-ABC123
+  userId            String   @db.VarChar(36)
+  testAttemptId     String   @db.VarChar(36)
+  language          String   @db.VarChar(10)
+  languageName      String   @db.VarChar(50)
+  cefrLevel         String   @db.VarChar(5)
+  score             Int
+  totalQuestions    Int
+  completionDate    DateTime @default(now())
+  certificateUrl    String?  @db.VarChar(255) // URL to stored PDF
+  isPublic          Boolean  @default(false) // Whether user wants to share publicly
+  sharedAt          DateTime? // When user chose to share
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+
+  // Relations
+  user user @relation(fields: [userId], references: [id])
+  testAttempt LanguageProficiencyTestAttempt @relation(fields: [testAttemptId], references: [id])
+  achievements UserAchievement[]
+  announcements CommunityAnnouncement[]
+
+  @@index([userId], map: "Certificate_userId_fkey")
+  @@index([certificateId], map: "Certificate_certificateId_idx")
+  @@index([language], map: "Certificate_language_idx")
+  @@index([cefrLevel], map: "Certificate_cefrLevel_idx")
+  @@index([isPublic], map: "Certificate_isPublic_idx")
+  @@map("certificate")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  userId        String   @db.VarChar(36)
+  certificateId String   @db.VarChar(36)
+  type          String   @db.VarChar(50) // 'first_test', 'high_score', 'multiple_languages', etc.
+  title         String   @db.VarChar(100)
+  description   String   @db.Text
+  icon          String   @db.VarChar(50) // Icon identifier
+  color         String   @db.VarChar(7) // Hex color
+  isPublic      Boolean  @default(false)
+  earnedAt      DateTime @default(now())
+  metadata      Json?    // Additional achievement data
+
+  // Relations
+  user user @relation(fields: [userId], references: [id])
+  certificate Certificate @relation(fields: [certificateId], references: [id])
+
+  @@index([userId], map: "UserAchievement_userId_fkey")
+  @@index([type], map: "UserAchievement_type_idx")
+  @@index([isPublic], map: "UserAchievement_isPublic_idx")
+  @@map("user_achievement")
+}
+
+model CommunityAnnouncement {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  userId      String   @db.VarChar(36)
+  certificateId String @db.VarChar(36)
+  type        String   @db.VarChar(50) // 'certificate_earned', 'achievement_unlocked', etc.
+  title       String   @db.VarChar(200)
+  message     String   @db.Text
+  language    String   @db.VarChar(10)
+  cefrLevel   String   @db.VarChar(5)
+  isPublic    Boolean  @default(true)
+  likes       Int      @default(0)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime? // Optional expiration date
+
+  // Relations
+  user user @relation(fields: [userId], references: [id])
+  certificate Certificate @relation(fields: [certificateId], references: [id])
+
+  @@index([userId], map: "CommunityAnnouncement_userId_fkey")
+  @@index([type], map: "CommunityAnnouncement_type_idx")
+  @@index([isPublic], map: "CommunityAnnouncement_isPublic_idx")
+  @@index([createdAt], map: "CommunityAnnouncement_createdAt_idx")
+  @@map("community_announcement")
 }

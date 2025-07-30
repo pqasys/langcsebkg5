@@ -29,6 +29,7 @@ import {
   Award
 } from 'lucide-react';
 import { TestQuestion, getBalancedQuestionSet, getRandomQuestions } from '@/lib/data/english-proficiency-questions';
+import { FRENCH_PROFICIENCY_QUESTIONS, getBalancedQuestionSet as getFrenchBalancedQuestionSet } from '@/lib/data/french-proficiency-questions';
 import { LanguageProficiencyService, TestQuestion as ServiceTestQuestion } from '@/lib/services/language-proficiency-service';
 
 interface TestResult {
@@ -74,9 +75,38 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
         setQuestions(selectedQuestions);
       } catch (error) {
         console.error('Error loading questions:', error);
-        // Fallback to static questions
-        const { getBalancedQuestionSet } = await import('@/lib/data/english-proficiency-questions');
-        const staticQuestions = getBalancedQuestionSet(80);
+        // Fallback to static questions based on language
+        let staticQuestions: ServiceTestQuestion[] = [];
+        
+        if (language === 'fr') {
+          // Use French questions
+          const frenchQuestions = getFrenchBalancedQuestionSet(80);
+          staticQuestions = frenchQuestions.map(q => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation,
+            level: q.level,
+            category: q.category,
+            difficulty: q.difficulty
+          }));
+        } else {
+          // Default to English questions
+          const { getBalancedQuestionSet } = await import('@/lib/data/english-proficiency-questions');
+          const englishQuestions = getBalancedQuestionSet(80);
+          staticQuestions = englishQuestions.map(q => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation,
+            level: q.level,
+            category: q.category,
+            difficulty: q.difficulty
+          }));
+        }
+        
         setQuestions(staticQuestions);
       }
     };
