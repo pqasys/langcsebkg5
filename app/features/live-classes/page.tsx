@@ -301,102 +301,33 @@ export default function VideoConferencingFeaturePage() {
       {session?.user && !subscriptionLoading && (
         <section className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            {userType === 'FREE' ? (
-              <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <FaStar className="w-5 h-5 text-yellow-600 mr-3" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-yellow-800">
-                      Upgrade Required
-                    </h3>
-                    <p className="text-sm text-yellow-600">
-                      Subscribe or enroll with an institution to access live classes
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Link href="/subscription-signup">
-                    <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
-                      Subscribe
-                    </Button>
-                  </Link>
-                  <Link href="/institutions">
-                    <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
-                      Find Institution
-                    </Button>
-                  </Link>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className={`w-3 h-3 rounded-full ${canAccessLiveClasses ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {canAccessLiveClasses 
+                      ? userType === 'INSTITUTION_STAFF'
+                        ? 'You have access to create and host live classes'
+                        : 'You have access to live classes'
+                      : 'Live classes require a subscription'
+                    }
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {userType === 'INSTITUTION_STAFF'
+                      ? 'Institution Staff Account'
+                      : canAccessLiveClasses
+                        ? currentPlan ? `Current Plan: ${currentPlan}` : 'Active Subscription'
+                        : 'Upgrade to access live classes'
+                    }
+                  </p>
                 </div>
               </div>
-            ) : userType === 'SUBSCRIBER' ? (
-              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <FaCheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-green-800">
-                      Platform Subscription - {currentPlan} Plan
-                    </h3>
-                    <p className="text-sm text-green-600">
-                      You have access to platform-wide live classes and premium features
-                    </p>
-                  </div>
-                </div>
-                <Link href="/student/settings">
-                  <Button variant="outline" size="sm" className="border-green-300 text-green-700 hover:bg-green-100">
-                    Manage Subscription
-                  </Button>
-                </Link>
-              </div>
-            ) : userType === 'INSTITUTION_STUDENT' ? (
-              <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <FaGraduationCap className="w-5 h-5 text-blue-600 mr-3" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-blue-800">
-                      Institution Student - {institutionEnrollment?.institutionName || 'Your Institution'}
-                    </h3>
-                    <p className="text-sm text-blue-600">
-                      You have access to your institution's live classes and content
-                    </p>
-                  </div>
-                </div>
-                <Link href="/student/dashboard">
-                  <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
-                    View Institution Content
-                  </Button>
-                </Link>
-              </div>
-            ) : userType === 'HYBRID' ? (
-              <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <FaCrown className="w-5 h-5 text-purple-600 mr-3" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-purple-800">
-                      Premium Access - {currentPlan} Plan + Institution
-                    </h3>
-                    <p className="text-sm text-purple-600">
-                      You have access to both platform and institution live classes
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Link href="/student/settings">
-                    <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-100">
-                      Manage Subscription
-                    </Button>
-                  </Link>
-                  <Link href="/student/dashboard">
-                    <Button variant="outline" size="sm" className="border-purple-300 text-purple-700 hover:bg-purple-100">
-                      Institution Content
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            ) : userType === 'INSTITUTION_STAFF' ? (
-              <div className="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-                <div className="flex items-center">
-                  <FaUsersCog className="w-5 h-5 text-indigo-600 mr-3" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-indigo-800">
+              
+              {userType === 'INSTITUTION_STAFF' ? (
+                <div className="flex items-center space-x-4">
+                  <div className="text-right">
+                    <h3 className="text-sm font-medium text-indigo-600">
                       Institution Staff
                     </h3>
                     <p className="text-sm text-indigo-600">
@@ -409,8 +340,8 @@ export default function VideoConferencingFeaturePage() {
                     Manage Classes
                   </Button>
                 </Link>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         </section>
       )}
@@ -549,6 +480,68 @@ export default function VideoConferencingFeaturePage() {
         </div>
       </section>
 
+      {/* Instructors Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Expert Instructors
+            </h2>
+            <p className="text-xl text-gray-600">
+              Learn from certified language teachers and native speakers
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {instructors.map((instructor) => (
+              <Card key={instructor.id} className="hover:shadow-lg transition-shadow duration-300">
+                <CardContent className="p-6 text-center">
+                  <div className="mb-4">
+                    <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-3 flex items-center justify-center">
+                      <FaGraduationCap className="w-8 h-8 text-gray-600" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      {instructor.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {instructor.language} • {instructor.country}
+                    </p>
+                    {instructor.verified && (
+                      <Badge className="bg-green-100 text-green-800 text-xs">
+                        <FaCheckCircle className="w-3 h-3 mr-1" />
+                        Verified
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center justify-center mb-4">
+                    <FaStar className="w-4 h-4 text-yellow-400 mr-1" />
+                    <span className="text-sm font-semibold">{instructor.rating}</span>
+                    <span className="text-sm text-gray-500 ml-1">
+                      ({instructor.students} students)
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-4">
+                    <div>${instructor.hourlyRate}/hour</div>
+                    <div>{instructor.sessions} classes completed</div>
+                  </div>
+                  <div className="space-y-1 mb-4">
+                    {instructor.specialties.map((specialty, index) => (
+                      <span key={index} className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded mr-1 mb-1 inline-block">
+                        {specialty}
+                      </span>
+                    ))}
+                  </div>
+                  <Button variant="outline" className="w-full">
+                    View Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Live Classes Dashboard Section */}
       {canAccessLiveClasses && (
         <section className="py-16 bg-gradient-to-r from-green-50 to-blue-50">
@@ -598,9 +591,9 @@ export default function VideoConferencingFeaturePage() {
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                       <div>
                         <p className="font-medium text-gray-900">
-                          {userType === 'INSTITUTION_STAFF' ? 'Business English - Advanced' : 'Business English'}
+                          {userType === 'INSTITUTION_STAFF' ? 'Business English - Section B' : 'Business English'}
                         </p>
-                        <p className="text-sm text-gray-600">Tomorrow, 5:30 PM</p>
+                        <p className="text-sm text-gray-600">Tomorrow, 2:00 PM</p>
                         {userType === 'INSTITUTION_STAFF' && (
                           <p className="text-xs text-gray-500">8 students enrolled</p>
                         )}
@@ -609,49 +602,51 @@ export default function VideoConferencingFeaturePage() {
                     </div>
                   </div>
                   <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
-                    {userType === 'INSTITUTION_STAFF' ? 'Manage All Classes' : 'View All Classes'}
+                    {userType === 'INSTITUTION_STAFF' ? 'View All Classes' : 'View Schedule'}
                   </Button>
                 </CardContent>
               </Card>
 
-              {/* Learning Progress */}
+              {/* Progress Tracking */}
               <Card className="bg-white shadow-lg">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
                     <FaChartLine className="w-6 h-6 text-green-600 mr-3" />
-                    <h3 className="text-xl font-semibold text-gray-900">Learning Progress</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {userType === 'INSTITUTION_STAFF' ? 'Student Progress' : 'Your Progress'}
+                    </h3>
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Spanish</span>
-                        <span>85%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-green-600 h-2 rounded-full" style={{ width: '85%' }}></div>
-                      </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Classes Completed</span>
+                      <span className="font-semibold text-gray-900">
+                        {userType === 'INSTITUTION_STAFF' ? '24' : '12'}
+                      </span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>English</span>
-                        <span>72%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '72%' }}></div>
-                      </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Hours Learned</span>
+                      <span className="font-semibold text-gray-900">
+                        {userType === 'INSTITUTION_STAFF' ? '48' : '24'}
+                      </span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>French</span>
-                        <span>45%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-purple-600 h-2 rounded-full" style={{ width: '45%' }}></div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Current Streak</span>
+                      <span className="font-semibold text-gray-900">
+                        {userType === 'INSTITUTION_STAFF' ? '7 days' : '5 days'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Average Rating</span>
+                      <div className="flex items-center">
+                        <FaStar className="w-4 h-4 text-yellow-400 mr-1" />
+                        <span className="font-semibold text-gray-900">
+                          {userType === 'INSTITUTION_STAFF' ? '4.8' : '4.9'}
+                        </span>
                       </div>
                     </div>
                   </div>
                   <Button className="w-full mt-4 bg-green-600 hover:bg-green-700">
-                    View Detailed Progress
+                    {userType === 'INSTITUTION_STAFF' ? 'View Analytics' : 'View Details'}
                   </Button>
                 </CardContent>
               </Card>
@@ -660,65 +655,38 @@ export default function VideoConferencingFeaturePage() {
               <Card className="bg-white shadow-lg">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
-                    <FaZap className="w-6 h-6 text-yellow-600 mr-3" />
+                    <FaZap className="w-6 h-6 text-purple-600 mr-3" />
                     <h3 className="text-xl font-semibold text-gray-900">Quick Actions</h3>
                   </div>
                   <div className="space-y-3">
                     {userType === 'INSTITUTION_STAFF' ? (
                       <>
-                        <Button className="w-full justify-start bg-blue-50 text-blue-700 hover:bg-blue-100">
+                        <Button className="w-full bg-indigo-600 hover:bg-indigo-700">
                           <FaVideo className="w-4 h-4 mr-2" />
                           Create New Class
                         </Button>
-                        <Button className="w-full justify-start bg-green-50 text-green-700 hover:bg-green-100">
+                        <Button variant="outline" className="w-full">
                           <FaUsers className="w-4 h-4 mr-2" />
                           Manage Students
                         </Button>
-                        <Button className="w-full justify-start bg-purple-50 text-purple-700 hover:bg-purple-100">
-                          <FaBookOpen className="w-4 h-4 mr-2" />
-                          Upload Materials
-                        </Button>
-                        <Button className="w-full justify-start bg-orange-50 text-orange-700 hover:bg-orange-100">
+                        <Button variant="outline" className="w-full">
                           <FaChartLine className="w-4 h-4 mr-2" />
-                          View Analytics
-                        </Button>
-                      </>
-                    ) : userType === 'INSTITUTION_STUDENT' ? (
-                      <>
-                        <Button className="w-full justify-start bg-blue-50 text-blue-700 hover:bg-blue-100">
-                          <FaVideo className="w-4 h-4 mr-2" />
-                          Join Institution Class
-                        </Button>
-                        <Button className="w-full justify-start bg-green-50 text-green-700 hover:bg-green-100">
-                          <FaUsers className="w-4 h-4 mr-2" />
-                          Institution Study Group
-                        </Button>
-                        <Button className="w-full justify-start bg-purple-50 text-purple-700 hover:bg-purple-100">
-                          <FaBookOpen className="w-4 h-4 mr-2" />
-                          Institution Materials
-                        </Button>
-                        <Button className="w-full justify-start bg-orange-50 text-orange-700 hover:bg-orange-100">
-                          <FaHeadphones className="w-4 h-4 mr-2" />
-                          Contact Instructor
+                          View Reports
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Button className="w-full justify-start bg-blue-50 text-blue-700 hover:bg-blue-100">
-                          <FaVideo className="w-4 h-4 mr-2" />
-                          Schedule New Class
+                        <Button className="w-full bg-green-600 hover:bg-green-700">
+                          <FaPlay className="w-4 h-4 mr-2" />
+                          Join Next Class
                         </Button>
-                        <Button className="w-full justify-start bg-green-50 text-green-700 hover:bg-green-100">
-                          <FaUsers className="w-4 h-4 mr-2" />
-                          Join Study Group
+                        <Button variant="outline" className="w-full">
+                          <FaCalendarAlt className="w-4 h-4 mr-2" />
+                          Book Session
                         </Button>
-                        <Button className="w-full justify-start bg-purple-50 text-purple-700 hover:bg-purple-100">
+                        <Button variant="outline" className="w-full">
                           <FaBookOpen className="w-4 h-4 mr-2" />
-                          Access Materials
-                        </Button>
-                        <Button className="w-full justify-start bg-orange-50 text-orange-700 hover:bg-orange-100">
-                          <FaHeadphones className="w-4 h-4 mr-2" />
-                          Book 1-on-1 Session
+                          View Materials
                         </Button>
                       </>
                     )}
@@ -730,95 +698,31 @@ export default function VideoConferencingFeaturePage() {
         </section>
       )}
 
-      {/* Features Grid */}
-      <section className="py-16 bg-gray-50">
+      {/* Features Section */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Advanced Live Class Features
+              Powerful Features
             </h2>
             <p className="text-xl text-gray-600">
-              Everything you need for professional language learning
+              Everything you need for effective live language learning
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className={`${feature.color} text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Top Instructors */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Meet Our Premium Instructors
-            </h2>
-            <p className="text-xl text-gray-600">
-              Learn from certified native speakers with proven track records
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {instructors.map((instructor) => (
-              <Card key={instructor.id} className={`relative hover:shadow-lg transition-shadow duration-300 ${instructor.featured ? 'border-2 border-yellow-400' : ''}`}>
-                {instructor.featured && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-yellow-500 text-white">
-                      <FaCrown className="w-3 h-3 mr-1" />
-                      Featured
-                    </Badge>
+              <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+                <CardContent className="p-6">
+                  <div className={`${feature.color} text-white rounded-full w-12 h-12 flex items-center justify-center mb-4`}>
+                    {feature.icon}
                   </div>
-                )}
-                <CardContent className="p-6 text-center">
-                  <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <FaGraduationCap className="w-10 h-10 text-gray-600" />
-                  </div>
-                  <div className="flex items-center justify-center mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {instructor.name}
-                    </h3>
-                    {instructor.verified && (
-                      <FaShieldAlt className="w-4 h-4 text-blue-500 ml-2" />
-                    )}
-                  </div>
-                  <p className="text-gray-600 mb-2">
-                    {instructor.language} • {instructor.country}
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600">
+                    {feature.description}
                   </p>
-                  <div className="flex items-center justify-center mb-4">
-                    <FaStar className="w-4 h-4 text-yellow-400 mr-1" />
-                    <span className="text-sm font-semibold">{instructor.rating}</span>
-                    <span className="text-sm text-gray-500 ml-1">
-                      ({instructor.students} students)
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-600 mb-4">
-                    <div>${instructor.hourlyRate}/hour</div>
-                    <div>{instructor.sessions} classes completed</div>
-                  </div>
-                  <div className="space-y-1 mb-4">
-                    {instructor.specialties.map((specialty, index) => (
-                      <span key={index} className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded mr-1 mb-1 inline-block">
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-                  <Button variant="outline" className="w-full">
-                    View Profile
-                  </Button>
                 </CardContent>
               </Card>
             ))}
