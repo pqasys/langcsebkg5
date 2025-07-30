@@ -92,7 +92,7 @@ export default function VideoConferencingCTA({
             )}
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/features/video-conferencing">
+              <Link href="/features/live-classes">
                 <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
                   <FaPlay className="w-5 h-5 mr-2" />
                   Try Free Session
@@ -129,7 +129,7 @@ export default function VideoConferencingCTA({
                 </p>
               </div>
             </div>
-            <Link href="/features/video-conferencing">
+            <Link href="/features/live-classes">
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <FaArrowRight className="w-4 h-4 mr-2" />
                 Learn More
@@ -186,7 +186,7 @@ export default function VideoConferencingCTA({
             )}
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/features/video-conferencing">
+              <Link href="/features/live-classes">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
                   <FaPlay className="w-5 h-5 mr-2" />
                   Try Free Session

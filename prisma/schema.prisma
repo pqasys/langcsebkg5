@@ -296,7 +296,12 @@ model user {
   liveConversationParticipants LiveConversationParticipant[]
   liveConversationMessages    LiveConversationMessage[]
   receivedConversationMessages LiveConversationMessage[] @relation("ConversationMessageRecipient")
-  liveConversationBookings    LiveConversationBooking[]
+  liveConversationBookingsAsStudent LiveConversationBooking[] @relation("LiveConversationBookingStudent")
+  liveConversationBookingsAsInstructor LiveConversationBooking[] @relation("LiveConversationBookingInstructor")
+  liveConversationBookingsCancelled LiveConversationBooking[] @relation("LiveConversationBookingCancelledBy")
+  
+  // Language proficiency test relations
+  languageProficiencyTestAttempts LanguageProficiencyTestAttempt[]
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -1659,28 +1664,103 @@ model LiveConversationMessage {
 }
 
 model LiveConversationBooking {
-  id              String   @id @default(uuid()) @db.VarChar(36)
-  conversationId  String   @db.VarChar(36)
-  userId          String   @db.VarChar(36)
-  status          String   @default("CONFIRMED") @db.VarChar(20) // CONFIRMED, CANCELLED, NO_SHOW, COMPLETED
-  bookedAt        DateTime @default(now())
-  cancelledAt     DateTime?
-  paymentStatus   String   @default("PAID") @db.VarChar(20) // PAID, PENDING, REFUNDED
-  amount          Float    @default(0)
-  currency        String   @default("USD") @db.VarChar(3)
-  paymentMethod   String?  @db.VarChar(50)
-  transactionId   String?  @db.VarChar(255)
-  refundReason    String?  @db.Text
-  metadata        Json?
+  id                    String    @id @default(uuid()) @db.VarChar(36)
+  conversationId        String    @db.VarChar(36)
+  studentId             String    @db.VarChar(36)
+  instructorId          String    @db.VarChar(36)
+  scheduledAt           DateTime
+  duration              Int       @default(30)
+  status                String    @default("PENDING") @db.VarChar(20)
+  price                 Float     @default(0)
+  currency              String    @default("USD") @db.VarChar(3)
+  paymentStatus         String    @default("PENDING") @db.VarChar(20)
+  paymentIntentId       String?   @db.VarChar(255)
+  notes                 String?   @db.Text
+  cancellationReason    String?   @db.Text
+  cancelledAt           DateTime?
+  cancelledBy           String?   @db.VarChar(36)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   // Relations
   conversation LiveConversation @relation(fields: [conversationId], references: [id])
-  user user @relation(fields: [userId], references: [id])
+  student      user             @relation("LiveConversationBookingStudent", fields: [studentId], references: [id])
+  instructor   user             @relation("LiveConversationBookingInstructor", fields: [instructorId], references: [id])
+  cancelledByUser user?         @relation("LiveConversationBookingCancelledBy", fields: [cancelledBy], references: [id])
 
-  @@unique([conversationId, userId])
   @@index([conversationId])
-  @@index([userId])
+  @@index([studentId])
+  @@index([instructorId])
+  @@index([scheduledAt])
   @@index([status])
   @@index([paymentStatus])
+  @@index([cancelledBy], map: "live_conversation_bookings_cancelledBy_fkey")
   @@map("live_conversation_bookings")
+}
+
+// Language Proficiency Question Bank Models
+model LanguageProficiencyQuestionBank {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  languageCode String  @db.VarChar(10) // 'en', 'es', 'fr', etc.
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  totalQuestions Int   @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  questions LanguageProficiencyQuestion[]
+
+  @@unique([languageCode])
+  @@index([languageCode])
+  @@index([isActive])
+  @@map("language_proficiency_question_banks")
+}
+
+model LanguageProficiencyQuestion {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  bankId         String   @db.VarChar(36)
+  level          String   @db.VarChar(10) // A1, A2, B1, B2, C1, C2
+  category       String   @db.VarChar(50) // grammar, vocabulary, reading, etc.
+  difficulty     String   @db.VarChar(20) // easy, medium, hard
+  question       String   @db.Text
+  options        Json     // Array of strings
+  correctAnswer  String   @db.Text
+  explanation    String?  @db.Text
+  usageCount     Int      @default(0)
+  successRate    Float    @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  bank LanguageProficiencyQuestionBank @relation(fields: [bankId], references: [id])
+
+  @@index([bankId])
+  @@index([level])
+  @@index([category])
+  @@index([difficulty])
+  @@index([isActive])
+  @@map("language_proficiency_questions")
+}
+
+model LanguageProficiencyTestAttempt {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  userId    String   @db.VarChar(36)
+  languageCode String @db.VarChar(10)
+  score     Int
+  level     String   @db.VarChar(10)
+  answers   Json     // Record of questionId -> answer
+  timeSpent Int      // in seconds
+  completedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  // Relations
+  user user @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([languageCode])
+  @@index([completedAt])
+  @@map("language_proficiency_test_attempts")
 }

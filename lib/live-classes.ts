@@ -1,7 +1,7 @@
 import { prisma } from './prisma';
 import { logger } from './logger';
 
-export interface VideoSessionData {
+export interface LiveClassData {
   id: string;
   title: string;
   description?: string;
@@ -40,28 +40,28 @@ export interface MeetingData {
   hostKey?: string;
 }
 
-export class VideoConferencingService {
-  private static instance: VideoConferencingService;
+export class LiveClassesService {
+  private static instance: LiveClassesService;
   private config: VideoProviderConfig;
 
   private constructor(config: VideoProviderConfig) {
     this.config = config;
   }
 
-  public static getInstance(config?: VideoProviderConfig): VideoConferencingService {
-    if (!VideoConferencingService.instance) {
+  public static getInstance(config?: VideoProviderConfig): LiveClassesService {
+    if (!LiveClassesService.instance) {
       if (!config) {
-        throw new Error('VideoConferencingService requires configuration on first initialization');
+        throw new Error('LiveClassesService requires configuration on first initialization');
       }
-      VideoConferencingService.instance = new VideoConferencingService(config);
+      LiveClassesService.instance = new LiveClassesService(config);
     }
-    return VideoConferencingService.instance;
+    return LiveClassesService.instance;
   }
 
   /**
-   * Create a new video session
+   * Create a new live class session
    */
-  public async createVideoSession(data: VideoSessionData): Promise<VideoSessionData & { meetingData: MeetingData }> {
+  public async createLiveClass(data: LiveClassData): Promise<LiveClassData & { meetingData: MeetingData }> {
     try {
       // Create session in database
       const session = await prisma.videoSession.create({
@@ -106,8 +106,8 @@ export class VideoConferencingService {
         meetingData
       };
     } catch (error) {
-      logger.error('Failed to create video session:', error);
-      throw new Error('Failed to create video session');
+      logger.error('Failed to create live class session:', error);
+      throw new Error('Failed to create live class session');
     }
   }
 
@@ -265,9 +265,9 @@ export class VideoConferencingService {
   }
 
   /**
-   * Join a video session
+   * Join a live class session
    */
-  public async joinVideoSession(sessionId: string, userId: string): Promise<{
+  public async joinLiveClass(sessionId: string, userId: string): Promise<{
     session: any;
     participant: any;
     meetingData: MeetingData;
@@ -329,15 +329,15 @@ export class VideoConferencingService {
 
       return { session, participant, meetingData };
     } catch (error) {
-      logger.error('Failed to join video session:', error);
-      throw new Error('Failed to join video session');
+      logger.error('Failed to join live class session:', error);
+      throw new Error('Failed to join live class session');
     }
   }
 
   /**
-   * Leave a video session
+   * Leave a live class session
    */
-  public async leaveVideoSession(sessionId: string, userId: string): Promise<void> {
+  public async leaveLiveClass(sessionId: string, userId: string): Promise<void> {
     try {
       const participant = await prisma.videoSessionParticipant.findUnique({
         where: {
@@ -359,8 +359,8 @@ export class VideoConferencingService {
         });
       }
     } catch (error) {
-      logger.error('Failed to leave video session:', error);
-      throw new Error('Failed to leave video session');
+      logger.error('Failed to leave live class session:', error);
+      throw new Error('Failed to leave live class session');
     }
   }
 
@@ -394,7 +394,7 @@ export class VideoConferencingService {
   }
 
   /**
-   * Send message in video session
+   * Send message in live class session
    */
   public async sendMessage(sessionId: string, userId: string, content: string, messageType: string = 'TEXT', recipientId?: string): Promise<any> {
     try {

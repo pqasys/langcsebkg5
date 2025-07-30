@@ -174,96 +174,134 @@ const Navbar = () => {
     <nav className="bg-white shadow-lg relative z-50 w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center">
+          <div className="flex items-center min-w-0">
             <div className="flex-shrink-0 flex items-center">
               <Logo size="xl" variant="badge-image" />
             </div>
             {/* Desktop Navigation - Full on large screens */}
-            <div className="hidden lg:ml-12 lg:flex lg:space-x-8">
+            <div className="hidden xl:ml-12 xl:flex xl:space-x-8 min-w-0">
               <Link
                 href="/"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Home
               </Link>
               <Link
                 href="/students-public"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Learn
               </Link>
               <Link
                 href="/institutions-public"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Partner
               </Link>
               <Link
                 href="/institutions"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Browse Institutions
               </Link>
               <Link
                 href="/features/live-conversations"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Live Conversations
               </Link>
-              <Link
-                href="/features/video-conferencing"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
-              >
-                Video Conferencing
-              </Link>
+                             <Link
+                 href="/features/live-classes"
+                 className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
+               >
+                 Live Classes
+               </Link>
               <Link
                 href="/features/community-learning"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Community
               </Link>
               <Link
                 href="/language-proficiency-test"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
+              >
+                Language Test
+              </Link>
+            </div>
+            
+            {/* Large Navigation - Condensed on large screens */}
+            <div className="hidden lg:ml-8 lg:flex lg:space-x-6 xl:hidden min-w-0">
+              <Link
+                href="/"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
+              >
+                Home
+              </Link>
+              <Link
+                href="/students-public"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
+              >
+                Learn
+              </Link>
+              <Link
+                href="/institutions-public"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
+              >
+                Partner
+              </Link>
+              <Link
+                href="/language-proficiency-test"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Language Test
               </Link>
             </div>
             
             {/* Tablet Navigation - Condensed on medium screens */}
-            <div className="hidden sm:ml-8 sm:flex sm:space-x-4 lg:hidden">
+            <div className="hidden md:ml-6 md:flex md:space-x-4 lg:hidden min-w-0">
               <Link
                 href="/"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Home
               </Link>
               <Link
                 href="/students-public"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Learn
               </Link>
               <Link
-                href="/institutions-public"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                href="/language-proficiency-test"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
-                Partner
+                Language Test
+              </Link>
+            </div>
+            
+            {/* Small Tablet Navigation - Very condensed on small tablets */}
+            <div className="hidden sm:ml-4 sm:flex sm:space-x-3 md:hidden min-w-0">
+              <Link
+                href="/"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
+              >
+                Home
               </Link>
               <Link
                 href="/language-proficiency-test"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline"
+                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium no-hover-underline flex-shrink-0"
               >
                 Language Test
               </Link>
             </div>
           </div>
           
-          {/* Desktop Actions - Full on large screens */}
-          <div className="hidden lg:flex items-center space-x-4">
+                      {/* Desktop Actions - Full on large screens */}
+          <div className="hidden xl:flex items-center space-x-4 flex-shrink-0">
             <Link
               href="/search"
-              className="text-gray-500 hover:text-gray-700 p-2 rounded-md text-sm font-medium"
+              className="text-gray-500 hover:text-gray-700 p-2 rounded-md text-sm font-medium flex-shrink-0"
               title="Search"
             >
               <Search className="h-5 w-5" />
@@ -336,11 +374,11 @@ const Navbar = () => {
             )}
           </div>
           
-          {/* Tablet Actions - Condensed on medium screens */}
-          <div className="hidden sm:flex lg:hidden items-center space-x-2">
+                      {/* Large Actions - Condensed on large screens */}
+          <div className="hidden lg:flex xl:hidden items-center space-x-3 flex-shrink-0">
             <Link
               href="/search"
-              className="text-gray-500 hover:text-gray-700 p-2 rounded-md text-sm font-medium"
+              className="text-gray-500 hover:text-gray-700 p-2 rounded-md text-sm font-medium flex-shrink-0"
               title="Search"
             >
               <Search className="h-5 w-5" />
@@ -391,6 +429,128 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            )}
+          </div>
+          
+          {/* Tablet Actions - Condensed on medium screens */}
+          <div className="hidden md:flex lg:hidden items-center space-x-2 flex-shrink-0">
+            <Link
+              href="/search"
+              className="text-gray-500 hover:text-gray-700 p-2 rounded-md text-sm font-medium flex-shrink-0"
+              title="Search"
+            >
+              <Search className="h-5 w-5" />
+            </Link>
+            {status === 'authenticated' && session ? (
+              <div className="flex items-center space-x-2">
+                {/* Notifications for authenticated users (except admin) */}
+                {session.user.role !== 'ADMIN' && <SimpleNotifications />}
+                
+                {session.user.role === 'INSTITUTION' ? (
+                  (session.user.institutionApproved || institution?.isApproved) ? (
+                    <Link
+                      href="/institution/dashboard"
+                      className="text-gray-500 hover:text-gray-700 px-2 py-2 rounded-md text-sm font-medium"
+                    >
+                      Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/awaiting-approval"
+                      className="bg-yellow-100 text-yellow-800 px-2 py-2 rounded-md text-sm font-medium hover:bg-yellow-200"
+                    >
+                      Awaiting Approval
+                    </Link>
+                  )
+                ) : (
+                  <Link
+                    href={getDashboardLink()}
+                    className="text-gray-500 hover:text-gray-700 px-2 py-2 rounded-md text-sm font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <Button onClick={handleSignOut} variant="outline" size="sm" data-testid="sign-out-button">
+                  Sign Out
+                </Button>
+              </div>
+            ) : mounted ? (
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" onClick={handleSignIn}>
+                  Sign In
+                </Button>
+                <Link href="/auth/signup">
+                  <Button size="sm">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            )}
+          </div>
+
+          {/* Small Tablet Actions - Very condensed on small tablets */}
+          <div className="hidden sm:flex md:hidden items-center space-x-2 flex-shrink-0">
+            <Link
+              href="/search"
+              className="text-gray-500 hover:text-gray-700 p-2 rounded-md text-sm font-medium flex-shrink-0"
+              title="Search"
+            >
+              <Search className="h-5 w-5" />
+            </Link>
+            {status === 'authenticated' && session ? (
+              <div className="flex items-center space-x-1">
+                {/* Notifications for authenticated users (except admin) */}
+                {session.user.role !== 'ADMIN' && <SimpleNotifications />}
+                
+                {session.user.role === 'INSTITUTION' ? (
+                  (session.user.institutionApproved || institution?.isApproved) ? (
+                    <Link
+                      href="/institution/dashboard"
+                      className="text-gray-500 hover:text-gray-700 px-1 py-2 rounded-md text-sm font-medium"
+                    >
+                      Dashboard
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/awaiting-approval"
+                      className="bg-yellow-100 text-yellow-800 px-1 py-2 rounded-md text-sm font-medium hover:bg-yellow-200"
+                    >
+                      Awaiting Approval
+                    </Link>
+                  )
+                ) : (
+                  <Link
+                    href={getDashboardLink()}
+                    className="text-gray-500 hover:text-gray-700 px-1 py-2 rounded-md text-sm font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <Button onClick={handleSignOut} variant="outline" size="sm" data-testid="sign-out-button">
+                  Sign Out
+                </Button>
+              </div>
+            ) : mounted ? (
+              <div className="flex items-center space-x-1">
+                <Button variant="outline" size="sm" onClick={handleSignIn}>
+                  Sign In
+                </Button>
+                <Link href="/auth/signup">
+                  <Button size="sm">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-1">
                 <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
                 <div className="w-16 h-8 bg-gray-200 rounded animate-pulse"></div>
               </div>
@@ -454,13 +614,13 @@ const Navbar = () => {
             >
               Live Conversations
             </Link>
-            <Link
-              href="/features/video-conferencing"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md no-hover-underline"
-              onClick={closeMobileMenu}
-            >
-              Video Conferencing
-            </Link>
+                         <Link
+               href="/features/live-classes"
+               className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md no-hover-underline"
+               onClick={closeMobileMenu}
+             >
+               Live Classes
+             </Link>
             <Link
               href="/features/community-learning"
               className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md no-hover-underline"

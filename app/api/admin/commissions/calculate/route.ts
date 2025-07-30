@@ -43,10 +43,10 @@ export async function POST(request: Request) {
       totalCommission: results.reduce((sum, calc) => sum + calc.commissionAmount, 0)
     });
   } catch (error) {
-    console.error('Error calculating commissions:');
+    console.error('Error calculating commissions:', error);
     return NextResponse.json(
       { error: 'Failed to calculate commissions' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500 }
     );
   }
 }
@@ -79,10 +79,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(summary);
   } catch (error) {
-    console.error('Error getting commission summary:');
+    console.error('Error getting commission summary:', error);
     return NextResponse.json(
       { error: 'Failed to get commission summary' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500 }
     );
   }
 } 

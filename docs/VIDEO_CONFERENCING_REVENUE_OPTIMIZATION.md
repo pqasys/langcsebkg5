@@ -47,7 +47,7 @@ Enterprise: Custom pricing - High-value clients
 - **Positioning**: Between "Live Conversations" and "Community" for logical flow
 
 #### **2. Feature Showcase Page**
-- **URL**: `/features/video-conferencing`
+- **URL**: `/features/live-classes`
 - **SEO Priority**: 0.9 (highest priority for feature pages)
 - **Content Strategy**: 
   - Hero section with compelling value proposition
@@ -123,7 +123,7 @@ Enterprise: Custom pricing - High-value clients
 ### **Key Metrics to Track**
 
 #### **Traffic Metrics**
-- **Page Views**: `/features/video-conferencing`
+- **Page Views**: `/features/live-classes`
 - **Unique Visitors**: New vs returning users
 - **Traffic Sources**: Organic, direct, referral, social
 - **Geographic Distribution**: Target market analysis

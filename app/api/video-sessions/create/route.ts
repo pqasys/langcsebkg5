@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { VideoConferencingService, VideoProviderConfig } from '@/lib/video-conferencing';
+import { LiveClassesService, VideoProviderConfig } from '@/lib/live-classes';
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       webhookSecret: process.env.VIDEO_WEBHOOK_SECRET,
     };
 
-    const videoService = VideoConferencingService.getInstance(config);
+    const videoService = LiveClassesService.getInstance(config);
 
     // Create video session
     const sessionData = {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       allowRecording: allowRecording || false,
     };
 
-    const result = await videoService.createVideoSession(sessionData);
+    const result = await videoService.createLiveClass(sessionData);
 
     return NextResponse.json({
       success: true,

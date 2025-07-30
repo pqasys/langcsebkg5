@@ -310,7 +310,7 @@ Course
 
 ## 📚 **Documentation References**
 
-- [Video Conferencing Setup Guide](./video-conferencing-setup.md)
+- [Live Classes Setup Guide](./live-classes-setup.md)
 - [Revenue Optimization Strategy](./VIDEO_CONFERENCING_REVENUE_TRAFFIC_OPTIMIZATION_STRATEGY.md)
 - [API Documentation](./api-documentation.md)
 - [Database Schema](./database-schema.md)

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { VideoConferencingService, VideoProviderConfig } from '@/lib/video-conferencing';
+import { LiveClassesService, VideoProviderConfig } from '@/lib/live-classes';
 
 export async function POST(
   request: NextRequest,
@@ -24,10 +24,10 @@ export async function POST(
       webhookSecret: process.env.VIDEO_WEBHOOK_SECRET,
     };
 
-    const videoService = VideoConferencingService.getInstance(config);
+    const videoService = LiveClassesService.getInstance(config);
 
     // Join video session
-    const result = await videoService.joinVideoSession(sessionId, session.user.id);
+    const result = await videoService.joinLiveClass(sessionId, session.user.id);
 
     return NextResponse.json({
       success: true,

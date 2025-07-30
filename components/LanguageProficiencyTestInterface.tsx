@@ -28,15 +28,8 @@ import {
   Brain,
   Award
 } from 'lucide-react';
-
-interface TestQuestion {
-  id: string;
-  level: string;
-  question: string;
-  options: string[];
-  correctAnswer: string;
-  explanation?: string;
-}
+import { TestQuestion, getBalancedQuestionSet, getRandomQuestions } from '@/lib/data/english-proficiency-questions';
+import { LanguageProficiencyService, TestQuestion as ServiceTestQuestion } from '@/lib/services/language-proficiency-service';
 
 interface TestResult {
   score: number;
@@ -61,680 +54,41 @@ const CEFR_DESCRIPTIONS = {
   'C2': 'You are a proficient learner. You can understand with ease virtually everything heard or read. You can express yourself very fluently and precisely.'
 };
 
-// Test questions data - All 80 questions organized by CEFR level
-const TEST_QUESTIONS: TestQuestion[] = [
-  // A1 Level Questions (Beginner)
-  {
-    id: '1',
-    level: 'A1',
-    question: 'What is the plural of "book"?',
-    options: ['bookes', 'books', 'bookies', 'bookz'],
-    correctAnswer: 'books',
-    explanation: 'The plural of "book" is "books" - simply add "s" to make it plural.'
-  },
-  {
-    id: '2',
-    level: 'A1',
-    question: 'Choose the correct sentence.',
-    options: ['She are happy.', 'She is happy.', 'She happy is.', 'Is she happy.'],
-    correctAnswer: 'She is happy.',
-    explanation: 'The correct form is "She is happy" - third person singular uses "is".'
-  },
-  {
-    id: '3',
-    level: 'A1',
-    question: 'What is the plural of "book"?',
-    options: ['bookes', 'books', 'bookies', 'bookz'],
-    correctAnswer: 'books',
-    explanation: 'The plural of "book" is "books" - simply add "s" to make it plural.'
-  },
-  {
-    id: '4',
-    level: 'A1',
-    question: 'Choose the correct sentence.',
-    options: ['She are happy.', 'She is happy.', 'She happy is.', 'Is she happy.'],
-    correctAnswer: 'She is happy.',
-    explanation: 'The correct form is "She is happy" - third person singular uses "is".'
-  },
-  {
-    id: '5',
-    level: 'A1',
-    question: 'What is the plural of "book"?',
-    options: ['bookes', 'books', 'bookies', 'bookz'],
-    correctAnswer: 'books',
-    explanation: 'The plural of "book" is "books" - simply add "s" to make it plural.'
-  },
-  {
-    id: '6',
-    level: 'A1',
-    question: 'Choose the correct sentence.',
-    options: ['She are happy.', 'She is happy.', 'She happy is.', 'Is she happy.'],
-    correctAnswer: 'She is happy.',
-    explanation: 'The correct form is "She is happy" - third person singular uses "is".'
-  },
-  {
-    id: '7',
-    level: 'A1',
-    question: 'What is the plural of "book"?',
-    options: ['bookes', 'books', 'bookies', 'bookz'],
-    correctAnswer: 'books',
-    explanation: 'The plural of "book" is "books" - simply add "s" to make it plural.'
-  },
-  {
-    id: '8',
-    level: 'A1',
-    question: 'Choose the correct sentence.',
-    options: ['She are happy.', 'She is happy.', 'She happy is.', 'Is she happy.'],
-    correctAnswer: 'She is happy.',
-    explanation: 'The correct form is "She is happy" - third person singular uses "is".'
-  },
-  {
-    id: '9',
-    level: 'A1',
-    question: 'What is the plural of "book"?',
-    options: ['bookes', 'books', 'bookies', 'bookz'],
-    correctAnswer: 'books',
-    explanation: 'The plural of "book" is "books" - simply add "s" to make it plural.'
-  },
-  {
-    id: '10',
-    level: 'A1',
-    question: 'Choose the correct sentence.',
-    options: ['She are happy.', 'She is happy.', 'She happy is.', 'Is she happy.'],
-    correctAnswer: 'She is happy.',
-    explanation: 'The correct form is "She is happy" - third person singular uses "is".'
-  },
-
-  // A2 Level Questions (Elementary)
-  {
-    id: '11',
-    level: 'A2',
-    question: 'Choose the correct question form.',
-    options: ['You like pizza?', 'Do you like pizza?', 'Like you pizza?', 'Do pizza you like?'],
-    correctAnswer: 'Do you like pizza?',
-    explanation: 'In English, questions with "do" follow the pattern: Do + subject + verb + object?'
-  },
-  {
-    id: '12',
-    level: 'A2',
-    question: 'Which sentence is in the past tense?',
-    options: ['He eat dinner.', 'He is eating dinner.', 'He ate dinner.', 'He will eat dinner.'],
-    correctAnswer: 'He ate dinner.',
-    explanation: '"Ate" is the past tense form of "eat".'
-  },
-  {
-    id: '13',
-    level: 'A2',
-    question: 'Choose the correct question form.',
-    options: ['You like pizza?', 'Do you like pizza?', 'Like you pizza?', 'Do pizza you like?'],
-    correctAnswer: 'Do you like pizza?',
-    explanation: 'In English, questions with "do" follow the pattern: Do + subject + verb + object?'
-  },
-  {
-    id: '14',
-    level: 'A2',
-    question: 'Which sentence is in the past tense?',
-    options: ['He eat dinner.', 'He is eating dinner.', 'He ate dinner.', 'He will eat dinner.'],
-    correctAnswer: 'He ate dinner.',
-    explanation: '"Ate" is the past tense form of "eat".'
-  },
-  {
-    id: '15',
-    level: 'A2',
-    question: 'Choose the correct question form.',
-    options: ['You like pizza?', 'Do you like pizza?', 'Like you pizza?', 'Do pizza you like?'],
-    correctAnswer: 'Do you like pizza?',
-    explanation: 'In English, questions with "do" follow the pattern: Do + subject + verb + object?'
-  },
-  {
-    id: '16',
-    level: 'A2',
-    question: 'Which sentence is in the past tense?',
-    options: ['He eat dinner.', 'He is eating dinner.', 'He ate dinner.', 'He will eat dinner.'],
-    correctAnswer: 'He ate dinner.',
-    explanation: '"Ate" is the past tense form of "eat".'
-  },
-  {
-    id: '17',
-    level: 'A2',
-    question: 'Choose the correct question form.',
-    options: ['You like pizza?', 'Do you like pizza?', 'Like you pizza?', 'Do pizza you like?'],
-    correctAnswer: 'Do you like pizza?',
-    explanation: 'In English, questions with "do" follow the pattern: Do + subject + verb + object?'
-  },
-  {
-    id: '18',
-    level: 'A2',
-    question: 'Which sentence is in the past tense?',
-    options: ['He eat dinner.', 'He is eating dinner.', 'He ate dinner.', 'He will eat dinner.'],
-    correctAnswer: 'He ate dinner.',
-    explanation: '"Ate" is the past tense form of "eat".'
-  },
-  {
-    id: '19',
-    level: 'A2',
-    question: 'Choose the correct question form.',
-    options: ['You like pizza?', 'Do you like pizza?', 'Like you pizza?', 'Do pizza you like?'],
-    correctAnswer: 'Do you like pizza?',
-    explanation: 'In English, questions with "do" follow the pattern: Do + subject + verb + object?'
-  },
-  {
-    id: '20',
-    level: 'A2',
-    question: 'Which sentence is in the past tense?',
-    options: ['He eat dinner.', 'He is eating dinner.', 'He ate dinner.', 'He will eat dinner.'],
-    correctAnswer: 'He ate dinner.',
-    explanation: '"Ate" is the past tense form of "eat".'
-  },
-
-  // B1 Level Questions (Intermediate)
-  {
-    id: '21',
-    level: 'B1',
-    question: 'Choose the best connector: "She studied hard, ___ she passed the exam."',
-    options: ['but', 'so', 'because', 'although'],
-    correctAnswer: 'so',
-    explanation: '"So" is used to show a result or consequence. The studying led to passing the exam.'
-  },
-  {
-    id: '22',
-    level: 'B1',
-    question: 'Identify the correct passive sentence.',
-    options: ['They build a house.', 'A house was built.', 'They was building a house.', 'House is build.'],
-    correctAnswer: 'A house was built.',
-    explanation: 'The passive voice uses "was built" - the object becomes the subject.'
-  },
-  {
-    id: '23',
-    level: 'B1',
-    question: 'Choose the best connector: "She studied hard, ___ she passed the exam."',
-    options: ['but', 'so', 'because', 'although'],
-    correctAnswer: 'so',
-    explanation: '"So" is used to show a result or consequence. The studying led to passing the exam.'
-  },
-  {
-    id: '24',
-    level: 'B1',
-    question: 'Identify the correct passive sentence.',
-    options: ['They build a house.', 'A house was built.', 'They was building a house.', 'House is build.'],
-    correctAnswer: 'A house was built.',
-    explanation: 'The passive voice uses "was built" - the object becomes the subject.'
-  },
-  {
-    id: '25',
-    level: 'B1',
-    question: 'Choose the best connector: "She studied hard, ___ she passed the exam."',
-    options: ['but', 'so', 'because', 'although'],
-    correctAnswer: 'so',
-    explanation: '"So" is used to show a result or consequence. The studying led to passing the exam.'
-  },
-  {
-    id: '26',
-    level: 'B1',
-    question: 'Identify the correct passive sentence.',
-    options: ['They build a house.', 'A house was built.', 'They was building a house.', 'House is build.'],
-    correctAnswer: 'A house was built.',
-    explanation: 'The passive voice uses "was built" - the object becomes the subject.'
-  },
-  {
-    id: '27',
-    level: 'B1',
-    question: 'Choose the best connector: "She studied hard, ___ she passed the exam."',
-    options: ['but', 'so', 'because', 'although'],
-    correctAnswer: 'so',
-    explanation: '"So" is used to show a result or consequence. The studying led to passing the exam.'
-  },
-  {
-    id: '28',
-    level: 'B1',
-    question: 'Identify the correct passive sentence.',
-    options: ['They build a house.', 'A house was built.', 'They was building a house.', 'House is build.'],
-    correctAnswer: 'A house was built.',
-    explanation: 'The passive voice uses "was built" - the object becomes the subject.'
-  },
-  {
-    id: '29',
-    level: 'B1',
-    question: 'Choose the best connector: "She studied hard, ___ she passed the exam."',
-    options: ['but', 'so', 'because', 'although'],
-    correctAnswer: 'so',
-    explanation: '"So" is used to show a result or consequence. The studying led to passing the exam.'
-  },
-  {
-    id: '30',
-    level: 'B1',
-    question: 'Identify the correct passive sentence.',
-    options: ['They build a house.', 'A house was built.', 'They was building a house.', 'House is build.'],
-    correctAnswer: 'A house was built.',
-    explanation: 'The passive voice uses "was built" - the object becomes the subject.'
-  },
-
-  // B2 Level Questions (Upper Intermediate)
-  {
-    id: '31',
-    level: 'B2',
-    question: 'What is the meaning of the idiom "kick the bucket"?',
-    options: ['Start something new', 'Break something', 'Die', 'Be happy'],
-    correctAnswer: 'Die',
-    explanation: '"Kick the bucket" is a colloquial idiom meaning to die.'
-  },
-  {
-    id: '32',
-    level: 'B2',
-    question: 'Choose the correct reported speech: "I am tired," she said.',
-    options: ['She said she is tired.', 'She said she was tired.', 'She says she tired.', 'She said tired.'],
-    correctAnswer: 'She said she was tired.',
-    explanation: 'In reported speech, present tense becomes past tense: "am" becomes "was".'
-  },
-  {
-    id: '33',
-    level: 'B2',
-    question: 'What is the meaning of the idiom "kick the bucket"?',
-    options: ['Start something new', 'Break something', 'Die', 'Be happy'],
-    correctAnswer: 'Die',
-    explanation: '"Kick the bucket" is a colloquial idiom meaning to die.'
-  },
-  {
-    id: '34',
-    level: 'B2',
-    question: 'Choose the correct reported speech: "I am tired," she said.',
-    options: ['She said she is tired.', 'She said she was tired.', 'She says she tired.', 'She said tired.'],
-    correctAnswer: 'She said she was tired.',
-    explanation: 'In reported speech, present tense becomes past tense: "am" becomes "was".'
-  },
-  {
-    id: '35',
-    level: 'B2',
-    question: 'What is the meaning of the idiom "kick the bucket"?',
-    options: ['Start something new', 'Break something', 'Die', 'Be happy'],
-    correctAnswer: 'Die',
-    explanation: '"Kick the bucket" is a colloquial idiom meaning to die.'
-  },
-  {
-    id: '36',
-    level: 'B2',
-    question: 'Choose the correct reported speech: "I am tired," she said.',
-    options: ['She said she is tired.', 'She said she was tired.', 'She says she tired.', 'She said tired.'],
-    correctAnswer: 'She said she was tired.',
-    explanation: 'In reported speech, present tense becomes past tense: "am" becomes "was".'
-  },
-  {
-    id: '37',
-    level: 'B2',
-    question: 'What is the meaning of the idiom "kick the bucket"?',
-    options: ['Start something new', 'Break something', 'Die', 'Be happy'],
-    correctAnswer: 'Die',
-    explanation: '"Kick the bucket" is a colloquial idiom meaning to die.'
-  },
-  {
-    id: '38',
-    level: 'B2',
-    question: 'Choose the correct reported speech: "I am tired," she said.',
-    options: ['She said she is tired.', 'She said she was tired.', 'She says she tired.', 'She said tired.'],
-    correctAnswer: 'She said she was tired.',
-    explanation: 'In reported speech, present tense becomes past tense: "am" becomes "was".'
-  },
-  {
-    id: '39',
-    level: 'B2',
-    question: 'What is the meaning of the idiom "kick the bucket"?',
-    options: ['Start something new', 'Break something', 'Die', 'Be happy'],
-    correctAnswer: 'Die',
-    explanation: '"Kick the bucket" is a colloquial idiom meaning to die.'
-  },
-  {
-    id: '40',
-    level: 'B2',
-    question: 'Choose the correct reported speech: "I am tired," she said.',
-    options: ['She said she is tired.', 'She said she was tired.', 'She says she tired.', 'She said tired.'],
-    correctAnswer: 'She said she was tired.',
-    explanation: 'In reported speech, present tense becomes past tense: "am" becomes "was".'
-  },
-
-  // C1 Level Questions (Advanced)
-  {
-    id: '41',
-    level: 'C1',
-    question: 'Identify the word closest in meaning to "ubiquitous".',
-    options: ['Rare', 'Widespread', 'Temporary', 'Unreliable'],
-    correctAnswer: 'Widespread',
-    explanation: 'Ubiquitous means present, appearing, or found everywhere - synonymous with widespread.'
-  },
-  {
-    id: '42',
-    level: 'C1',
-    question: 'Choose the correct sentence with a conditional clause.',
-    options: ['If he will come, we will start.', 'If he comes, we will start.', 'We start if he comes.', 'He come, we start.'],
-    correctAnswer: 'If he comes, we will start.',
-    explanation: 'In conditional sentences, we use present tense in the "if" clause and future in the main clause.'
-  },
-  {
-    id: '43',
-    level: 'C1',
-    question: 'Identify the word closest in meaning to "ubiquitous".',
-    options: ['Rare', 'Widespread', 'Temporary', 'Unreliable'],
-    correctAnswer: 'Widespread',
-    explanation: 'Ubiquitous means present, appearing, or found everywhere - synonymous with widespread.'
-  },
-  {
-    id: '44',
-    level: 'C1',
-    question: 'Choose the correct sentence with a conditional clause.',
-    options: ['If he will come, we will start.', 'If he comes, we will start.', 'We start if he comes.', 'He come, we start.'],
-    correctAnswer: 'If he comes, we will start.',
-    explanation: 'In conditional sentences, we use present tense in the "if" clause and future in the main clause.'
-  },
-  {
-    id: '45',
-    level: 'C1',
-    question: 'Identify the word closest in meaning to "ubiquitous".',
-    options: ['Rare', 'Widespread', 'Temporary', 'Unreliable'],
-    correctAnswer: 'Widespread',
-    explanation: 'Ubiquitous means present, appearing, or found everywhere - synonymous with widespread.'
-  },
-  {
-    id: '46',
-    level: 'C1',
-    question: 'Choose the correct sentence with a conditional clause.',
-    options: ['If he will come, we will start.', 'If he comes, we will start.', 'We start if he comes.', 'He come, we start.'],
-    correctAnswer: 'If he comes, we will start.',
-    explanation: 'In conditional sentences, we use present tense in the "if" clause and future in the main clause.'
-  },
-  {
-    id: '47',
-    level: 'C1',
-    question: 'Identify the word closest in meaning to "ubiquitous".',
-    options: ['Rare', 'Widespread', 'Temporary', 'Unreliable'],
-    correctAnswer: 'Widespread',
-    explanation: 'Ubiquitous means present, appearing, or found everywhere - synonymous with widespread.'
-  },
-  {
-    id: '48',
-    level: 'C1',
-    question: 'Choose the correct sentence with a conditional clause.',
-    options: ['If he will come, we will start.', 'If he comes, we will start.', 'We start if he comes.', 'He come, we start.'],
-    correctAnswer: 'If he comes, we will start.',
-    explanation: 'In conditional sentences, we use present tense in the "if" clause and future in the main clause.'
-  },
-  {
-    id: '49',
-    level: 'C1',
-    question: 'Identify the word closest in meaning to "ubiquitous".',
-    options: ['Rare', 'Widespread', 'Temporary', 'Unreliable'],
-    correctAnswer: 'Widespread',
-    explanation: 'Ubiquitous means present, appearing, or found everywhere - synonymous with widespread.'
-  },
-  {
-    id: '50',
-    level: 'C1',
-    question: 'Choose the correct sentence with a conditional clause.',
-    options: ['If he will come, we will start.', 'If he comes, we will start.', 'We start if he comes.', 'He come, we start.'],
-    correctAnswer: 'If he comes, we will start.',
-    explanation: 'In conditional sentences, we use present tense in the "if" clause and future in the main clause.'
-  },
-
-  // C2 Level Questions (Proficient)
-  {
-    id: '51',
-    level: 'C2',
-    question: 'What does the phrase "a Pyrrhic victory" mean?',
-    options: ['A total defeat', 'A victory won at too great a cost', 'An easy win', 'A controversial result'],
-    correctAnswer: 'A victory won at too great a cost',
-    explanation: 'A Pyrrhic victory is a victory that inflicts such a devastating toll on the victor that it is tantamount to defeat.'
-  },
-  {
-    id: '52',
-    level: 'C2',
-    question: 'Which of the following is a correct usage of a subjunctive mood?',
-    options: ['If I was you, I would go.', 'If I were you, I would go.', 'If I am you, I would go.', 'If I will be you, I go.'],
-    correctAnswer: 'If I were you, I would go.',
-    explanation: 'The subjunctive mood uses "were" instead of "was" in hypothetical situations.'
-  },
-  {
-    id: '53',
-    level: 'C2',
-    question: 'What does the phrase "a Pyrrhic victory" mean?',
-    options: ['A total defeat', 'A victory won at too great a cost', 'An easy win', 'A controversial result'],
-    correctAnswer: 'A victory won at too great a cost',
-    explanation: 'A Pyrrhic victory is a victory that inflicts such a devastating toll on the victor that it is tantamount to defeat.'
-  },
-  {
-    id: '54',
-    level: 'C2',
-    question: 'Which of the following is a correct usage of a subjunctive mood?',
-    options: ['If I was you, I would go.', 'If I were you, I would go.', 'If I am you, I would go.', 'If I will be you, I go.'],
-    correctAnswer: 'If I were you, I would go.',
-    explanation: 'The subjunctive mood uses "were" instead of "was" in hypothetical situations.'
-  },
-  {
-    id: '55',
-    level: 'C2',
-    question: 'What does the phrase "a Pyrrhic victory" mean?',
-    options: ['A total defeat', 'A victory won at too great a cost', 'An easy win', 'A controversial result'],
-    correctAnswer: 'A victory won at too great a cost',
-    explanation: 'A Pyrrhic victory is a victory that inflicts such a devastating toll on the victor that it is tantamount to defeat.'
-  },
-  {
-    id: '56',
-    level: 'C2',
-    question: 'Which of the following is a correct usage of a subjunctive mood?',
-    options: ['If I was you, I would go.', 'If I were you, I would go.', 'If I am you, I would go.', 'If I will be you, I go.'],
-    correctAnswer: 'If I were you, I would go.',
-    explanation: 'The subjunctive mood uses "were" instead of "was" in hypothetical situations.'
-  },
-  {
-    id: '57',
-    level: 'C2',
-    question: 'What does the phrase "a Pyrrhic victory" mean?',
-    options: ['A total defeat', 'A victory won at too great a cost', 'An easy win', 'A controversial result'],
-    correctAnswer: 'A victory won at too great a cost',
-    explanation: 'A Pyrrhic victory is a victory that inflicts such a devastating toll on the victor that it is tantamount to defeat.'
-  },
-  {
-    id: '58',
-    level: 'C2',
-    question: 'Which of the following is a correct usage of a subjunctive mood?',
-    options: ['If I was you, I would go.', 'If I were you, I would go.', 'If I am you, I would go.', 'If I will be you, I go.'],
-    correctAnswer: 'If I were you, I would go.',
-    explanation: 'The subjunctive mood uses "were" instead of "was" in hypothetical situations.'
-  },
-  {
-    id: '59',
-    level: 'C2',
-    question: 'What does the phrase "a Pyrrhic victory" mean?',
-    options: ['A total defeat', 'A victory won at too great a cost', 'An easy win', 'A controversial result'],
-    correctAnswer: 'A victory won at too great a cost',
-    explanation: 'A Pyrrhic victory is a victory that inflicts such a devastating toll on the victor that it is tantamount to defeat.'
-  },
-  {
-    id: '60',
-    level: 'C2',
-    question: 'Which of the following is a correct usage of a subjunctive mood?',
-    options: ['If I was you, I would go.', 'If I were you, I would go.', 'If I am you, I would go.', 'If I will be you, I go.'],
-    correctAnswer: 'If I were you, I would go.',
-    explanation: 'The subjunctive mood uses "were" instead of "was" in hypothetical situations.'
-  },
-
-  // Additional questions to reach 80 total
-  {
-    id: '61',
-    level: 'A1',
-    question: 'What is the plural of "cat"?',
-    options: ['cats', 'cates', 'caties', 'catz'],
-    correctAnswer: 'cats',
-    explanation: 'The plural of "cat" is "cats" - simply add "s" to make it plural.'
-  },
-  {
-    id: '62',
-    level: 'A1',
-    question: 'Choose the correct sentence.',
-    options: ['I am student.', 'I is student.', 'I are student.', 'I am a student.'],
-    correctAnswer: 'I am a student.',
-    explanation: 'The correct form is "I am a student" - use "a" before singular countable nouns.'
-  },
-  {
-    id: '63',
-    level: 'A2',
-    question: 'Which word is a color?',
-    options: ['happy', 'blue', 'fast', 'big'],
-    correctAnswer: 'blue',
-    explanation: '"Blue" is a color, while the others are adjectives describing different qualities.'
-  },
-  {
-    id: '64',
-    level: 'A2',
-    question: 'Complete the sentence: "I ___ to school every day."',
-    options: ['go', 'goes', 'going', 'went'],
-    correctAnswer: 'go',
-    explanation: 'Use "go" for first person singular present tense.'
-  },
-  {
-    id: '65',
-    level: 'B1',
-    question: 'Choose the correct form: "She ___ English for five years."',
-    options: ['study', 'studies', 'has studied', 'is studying'],
-    correctAnswer: 'has studied',
-    explanation: 'Use present perfect for actions that started in the past and continue to the present.'
-  },
-  {
-    id: '66',
-    level: 'B1',
-    question: 'Which sentence uses the present continuous correctly?',
-    options: ['I am work now.', 'I am working now.', 'I working now.', 'I work now.'],
-    correctAnswer: 'I am working now.',
-    explanation: 'Present continuous uses "am/is/are + verb-ing" for actions happening now.'
-  },
-  {
-    id: '67',
-    level: 'B2',
-    question: 'What does "break the ice" mean?',
-    options: ['To start a conversation', 'To break something', 'To be cold', 'To be angry'],
-    correctAnswer: 'To start a conversation',
-    explanation: '"Break the ice" means to start a conversation in a social situation.'
-  },
-  {
-    id: '68',
-    level: 'B2',
-    question: 'Choose the correct comparative form: "This book is ___ than that one."',
-    options: ['more interesting', 'most interesting', 'interestinger', 'more interest'],
-    correctAnswer: 'more interesting',
-    explanation: 'Use "more + adjective" for adjectives with more than two syllables.'
-  },
-  {
-    id: '69',
-    level: 'C1',
-    question: 'What is the meaning of "serendipity"?',
-    options: ['Bad luck', 'Good luck', 'Finding something valuable by chance', 'Hard work'],
-    correctAnswer: 'Finding something valuable by chance',
-    explanation: 'Serendipity means finding something valuable or pleasant when not looking for it.'
-  },
-  {
-    id: '70',
-    level: 'C1',
-    question: 'Which sentence uses the subjunctive mood correctly?',
-    options: ['I suggest that he goes.', 'I suggest that he go.', 'I suggest that he going.', 'I suggest that he went.'],
-    correctAnswer: 'I suggest that he go.',
-    explanation: 'After "suggest," use the base form of the verb in the subjunctive mood.'
-  },
-  {
-    id: '71',
-    level: 'C2',
-    question: 'What does "quintessential" mean?',
-    options: ['Typical', 'Perfect example', 'Rare', 'Important'],
-    correctAnswer: 'Perfect example',
-    explanation: 'Quintessential means representing the most perfect or typical example of a quality or class.'
-  },
-  {
-    id: '72',
-    level: 'C2',
-    question: 'Which sentence demonstrates correct use of the past perfect?',
-    options: ['I had eaten before I went.', 'I ate before I went.', 'I have eaten before I went.', 'I was eating before I went.'],
-    correctAnswer: 'I had eaten before I went.',
-    explanation: 'Past perfect (had + past participle) shows an action completed before another past action.'
-  },
-  {
-    id: '73',
-    level: 'A1',
-    question: 'What is the opposite of "big"?',
-    options: ['small', 'tall', 'long', 'wide'],
-    correctAnswer: 'small',
-    explanation: 'The opposite of "big" is "small" - they are antonyms.'
-  },
-  {
-    id: '74',
-    level: 'A1',
-    question: 'Complete: "This is ___ apple."',
-    options: ['a', 'an', 'the', 'some'],
-    correctAnswer: 'an',
-    explanation: 'Use "an" before words that begin with a vowel sound.'
-  },
-  {
-    id: '75',
-    level: 'A2',
-    question: 'Which is correct: "I ___ my homework yesterday."',
-    options: ['do', 'did', 'done', 'doing'],
-    correctAnswer: 'did',
-    explanation: 'Use "did" (past tense) for actions completed in the past.'
-  },
-  {
-    id: '76',
-    level: 'A2',
-    question: 'What is the question form of "She likes coffee"?',
-    options: ['Do she like coffee?', 'Does she like coffee?', 'Is she like coffee?', 'She like coffee?'],
-    correctAnswer: 'Does she like coffee?',
-    explanation: 'For third person singular, use "does" + base form of the verb.'
-  },
-  {
-    id: '77',
-    level: 'B1',
-    question: 'Choose the correct modal: "You ___ study hard to pass the exam."',
-    options: ['can', 'must', 'might', 'would'],
-    correctAnswer: 'must',
-    explanation: '"Must" expresses necessity or obligation.'
-  },
-  {
-    id: '78',
-    level: 'B1',
-    question: 'What does "look up to" mean?',
-    options: ['To search for', 'To admire', 'To look above', 'To find'],
-    correctAnswer: 'To admire',
-    explanation: '"Look up to" means to admire or respect someone.'
-  },
-  {
-    id: '79',
-    level: 'B2',
-    question: 'Which sentence uses the passive voice correctly?',
-    options: ['The letter was written by John.', 'The letter wrote by John.', 'The letter is writing by John.', 'The letter writes by John.'],
-    correctAnswer: 'The letter was written by John.',
-    explanation: 'Passive voice uses "be + past participle" with the agent introduced by "by".'
-  },
-  {
-    id: '80',
-    level: 'B2',
-    question: 'What is the meaning of "hit the nail on the head"?',
-    options: ['To be exactly right', 'To work hard', 'To make a mistake', 'To be angry'],
-    correctAnswer: 'To be exactly right',
-    explanation: '"Hit the nail on the head" means to be exactly right about something.'
-  }
-];
-
 export function LanguageProficiencyTestInterface({ onComplete, onExit, language = 'en' }: LanguageProficiencyTestInterfaceProps) {
   const { data: session } = useSession();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [isStarted, setIsStarted] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(60 * 60); // 60 minutes
   const [isPaused, setIsPaused] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [showExplanations, setShowExplanations] = useState(false);
+  const [questions, setQuestions] = useState<ServiceTestQuestion[]>([]);
 
-  const questions = TEST_QUESTIONS;
+  // Initialize questions when component mounts
+  useEffect(() => {
+    const loadQuestions = async () => {
+      try {
+        // Try to get questions from database first, fallback to static questions
+        const selectedQuestions = await LanguageProficiencyService.getBalancedQuestionSet(language, 80);
+        setQuestions(selectedQuestions);
+      } catch (error) {
+        console.error('Error loading questions:', error);
+        // Fallback to static questions
+        const { getBalancedQuestionSet } = await import('@/lib/data/english-proficiency-questions');
+        const staticQuestions = getBalancedQuestionSet(80);
+        setQuestions(staticQuestions);
+      }
+    };
+
+    loadQuestions();
+  }, [language]);
+
   const currentQuestion = questions[currentQuestionIndex];
 
   // Timer effect
   useEffect(() => {
-    if (isPaused || isSubmitted) return;
+    if (isPaused || isCompleted) return;
 
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
@@ -747,7 +101,7 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isPaused, isSubmitted]);
+  }, [isPaused, isCompleted]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -780,8 +134,7 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
       return;
     }
 
-    setLoading(true);
-    setIsSubmitted(true);
+    setIsCompleted(true);
 
     try {
       // Calculate score
@@ -810,30 +163,26 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
         emailSent: false
       };
 
-      // Save test attempt
-      await fetch('/api/language-proficiency-test/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: session?.user?.id,
+      // Save test attempt using the service
+      if (session?.user?.id) {
+        await LanguageProficiencyService.saveTestAttempt({
+          userId: session.user.id,
+          languageCode: language,
           score: results.score,
           level: results.level,
           answers,
           timeSpent: 60 * 60 - timeRemaining
-        })
-      });
+        });
+      }
 
-      setShowResults(true);
       onComplete(results);
     } catch (error) {
       console.error('Error submitting test:', error);
       toast.error('Failed to submit test. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
-  const renderQuestion = (question: TestQuestion) => {
+  const renderQuestion = (question: ServiceTestQuestion) => {
     const selectedAnswer = answers[question.id] || '';
 
     return (
@@ -868,7 +217,7 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
                   value={option}
                   checked={selectedAnswer === option}
                   onChange={(e) => handleAnswerChange(question.id, e.target.value)}
-                  disabled={isSubmitted}
+                  disabled={isCompleted}
                   className="w-5 h-5 mt-0.5 flex-shrink-0"
                 />
                 <label htmlFor={`q${question.id}-option-${index}`} className="flex-1 cursor-pointer text-sm md:text-base leading-relaxed">
@@ -878,7 +227,7 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
             ))}
           </div>
 
-          {isSubmitted && question.explanation && (
+          {isCompleted && question.explanation && (
             <Alert>
               <Brain className="h-4 w-4" />
               <AlertDescription>
@@ -974,7 +323,7 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
     );
   };
 
-  if (showResults) {
+  if (isCompleted) {
     return renderResults();
   }
 
@@ -1064,14 +413,10 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
           ) : (
             <Button
               onClick={handleSubmit}
-              disabled={Object.keys(answers).length < questions.length || loading}
+              disabled={Object.keys(answers).length < questions.length}
               className="w-full sm:w-auto h-10"
             >
-              {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              ) : (
-                <Send className="h-4 w-4 mr-2" />
-              )}
+              <Send className="h-4 w-4 mr-2" />
               Submit Test
             </Button>
           )}

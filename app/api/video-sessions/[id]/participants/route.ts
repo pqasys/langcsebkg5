@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { VideoConferencingService, VideoProviderConfig } from '@/lib/video-conferencing';
+import { LiveClassesService, VideoProviderConfig } from '@/lib/live-classes';
 
 export async function GET(
   request: NextRequest,
@@ -24,7 +24,7 @@ export async function GET(
       webhookSecret: process.env.VIDEO_WEBHOOK_SECRET,
     };
 
-    const videoService = VideoConferencingService.getInstance(config);
+    const videoService = LiveClassesService.getInstance(config);
 
     // Get active participants
     const participants = await videoService.getActiveParticipants(sessionId);

@@ -145,11 +145,11 @@ export default function VideoConferencingFeaturePage() {
       price: '$0',
       period: '1 session',
       features: [
-        '1 free video session',
+        '1 free live class',
         'Basic video features',
         'Screen sharing',
         'Chat functionality',
-        'Session recording (24h)',
+        'Class recording (24h)',
         'Community forum access'
       ],
       cta: 'Start Free Trial',
@@ -161,12 +161,12 @@ export default function VideoConferencingFeaturePage() {
       price: '$24.99',
       period: '/month',
       features: [
-        'Unlimited video sessions',
+        'Unlimited live classes',
         'All languages and instructors',
         'Priority booking',
         'HD video quality',
         'Advanced screen sharing',
-        'Session recordings (30 days)',
+        'Class recordings (30 days)',
         'Breakout rooms',
         'File sharing',
         'Advanced analytics',
@@ -181,7 +181,7 @@ export default function VideoConferencingFeaturePage() {
       price: 'Custom',
       period: '',
       features: [
-        'Custom video programs',
+        'Custom live class programs',
         'Dedicated instructors',
         'Unlimited recordings',
         'Advanced analytics',
@@ -200,7 +200,7 @@ export default function VideoConferencingFeaturePage() {
 
   const features = [
     {
-      title: 'HD Video Quality',
+      title: 'HD Live Video Quality',
       description: 'Crystal clear video with adaptive quality based on your connection',
       icon: <FaVideo className="w-6 h-6" />,
       color: 'bg-blue-500'
@@ -213,7 +213,7 @@ export default function VideoConferencingFeaturePage() {
     },
     {
       title: 'Recording & Playback',
-      description: 'Record sessions for later review and learning reinforcement',
+      description: 'Record live classes for later review and learning reinforcement',
       icon: <FaPlay className="w-6 h-6" />,
       color: 'bg-purple-500'
     },
@@ -225,20 +225,20 @@ export default function VideoConferencingFeaturePage() {
     },
     {
       title: 'Chat & File Sharing',
-      description: 'Real-time messaging and secure file sharing during sessions',
+      description: 'Real-time messaging and secure file sharing during live classes',
       icon: <FaMicrophone className="w-6 h-6" />,
       color: 'bg-pink-500'
     },
     {
       title: 'Mobile Optimized',
-      description: 'Join sessions from any device with our mobile-friendly interface',
+      description: 'Join live classes from any device with our mobile-friendly interface',
       icon: <FaMobile className="w-6 h-6" />,
       color: 'bg-indigo-500'
     }
   ]
 
   const stats = [
-    { number: '10,000+', label: 'Video Sessions', icon: <FaVideo className="w-6 h-6" /> },
+    { number: '10,000+', label: 'Live Classes', icon: <FaVideo className="w-6 h-6" /> },
     { number: '500+', label: 'Certified Instructors', icon: <FaGraduationCap className="w-6 h-6" /> },
     { number: '50+', label: 'Languages', icon: <FaGlobe className="w-6 h-6" /> },
     { number: '99.9%', label: 'Uptime', icon: <FaShieldAlt className="w-6 h-6" /> }
@@ -256,10 +256,10 @@ export default function VideoConferencingFeaturePage() {
               </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Professional Video Conferencing
+              Engaging Live Classes
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-              Experience the future of language learning with our advanced video conferencing platform
+              Experience the future of language learning through our interactive, real-time classes led by expert instructors.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
@@ -301,10 +301,10 @@ export default function VideoConferencingFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Experience Professional Video Sessions
+              Experience Professional Live Classes
             </h2>
             <p className="text-xl text-gray-600">
-              Join upcoming sessions and see the power of our video conferencing platform
+              Join upcoming sessions and see the power of our live class platform
             </p>
           </div>
           
@@ -341,7 +341,7 @@ export default function VideoConferencingFeaturePage() {
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <FaUsers className="w-4 h-4 mr-2" />
-                      {session.participants}/{session.maxParticipants} participants
+                      {session.participants}/{session.maxParticipants} students
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <FaDollarSign className="w-4 h-4 mr-2" />
@@ -360,7 +360,7 @@ export default function VideoConferencingFeaturePage() {
                   <div className="flex gap-2">
                     <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
                       <FaPlay className="w-4 h-4 mr-2" />
-                      Join Session
+                      Join Class
                     </Button>
                     <Button variant="outline" className="px-3">
                       <FaHeart className="w-4 h-4" />
@@ -378,7 +378,7 @@ export default function VideoConferencingFeaturePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Advanced Video Features
+              Advanced Live Class Features
             </h2>
             <p className="text-xl text-gray-600">
               Everything you need for professional language learning
@@ -450,7 +450,7 @@ export default function VideoConferencingFeaturePage() {
                   </div>
                   <div className="text-sm text-gray-600 mb-4">
                     <div>${instructor.hourlyRate}/hour</div>
-                    <div>{instructor.sessions} sessions completed</div>
+                    <div>{instructor.sessions} classes completed</div>
                   </div>
                   <div className="space-y-1 mb-4">
                     {instructor.specialties.map((specialty, index) => (
@@ -522,10 +522,10 @@ export default function VideoConferencingFeaturePage() {
       <section className="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Experience Professional Video Learning?
+            Ready to Experience Professional Live Class Learning?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join thousands of learners who have transformed their language skills through our video conferencing platform
+            Join thousands of learners who have transformed their language skills through our live class platform
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
