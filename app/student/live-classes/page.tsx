@@ -81,8 +81,8 @@ export default function StudentLiveClassesPage() {
         limit: '10',
         type: activeTab,
         ...(searchTerm && { search: searchTerm }),
-        ...(languageFilter && { language: languageFilter }),
-        ...(levelFilter && { level: levelFilter }),
+        ...(languageFilter && languageFilter !== 'all' && { language: languageFilter }),
+        ...(levelFilter && levelFilter !== 'all' && { level: levelFilter }),
       });
 
       const response = await fetch(`/api/student/live-classes?${params}`);
@@ -238,7 +238,7 @@ export default function StudentLiveClassesPage() {
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Languages</SelectItem>
+                <SelectItem value="all">All Languages</SelectItem>
                 <SelectItem value="en">English</SelectItem>
                 <SelectItem value="es">Spanish</SelectItem>
                 <SelectItem value="fr">French</SelectItem>
@@ -256,7 +256,7 @@ export default function StudentLiveClassesPage() {
                 <SelectValue placeholder="Level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Levels</SelectItem>
+                <SelectItem value="all">All Levels</SelectItem>
                 <SelectItem value="BEGINNER">Beginner</SelectItem>
                 <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                 <SelectItem value="ADVANCED">Advanced</SelectItem>

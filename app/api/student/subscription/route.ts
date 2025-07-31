@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const studentId = session.user.id;
 
     // Get comprehensive subscription status
-    const subscriptionStatus = await SubscriptionCommissionService.getStudentSubscriptionStatus(studentId);
+    const subscriptionStatus = await SubscriptionCommissionService.getUserSubscriptionStatus(studentId);
     
     // Get subscription logs
     const logs = await SubscriptionCommissionService.getStudentSubscriptionLogs(studentId, 10);

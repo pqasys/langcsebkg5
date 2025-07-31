@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,27 +11,35 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Mock institution enrollment data
-    // In a real implementation, this would query the database
-    const mockEnrollment = {
-      hasInstitutionEnrollment: false, // Set to true to test institution access
-      institutionId: null,
-      institutionName: null,
-      enrollmentStatus: null,
-      enrollmentDate: null,
-      canAccessInstitutionContent: false
+    // Get user's institution enrollment data using the same approach as live classes API
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { 
+        institutionId: true,
+        institution: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      }
+    });
+
+    const hasInstitutionEnrollment = !!user?.institutionId;
+    const institutionId = user?.institutionId;
+    const institutionName = user?.institution?.name;
+
+    const enrollment = {
+      hasInstitutionEnrollment,
+      institutionId: institutionId || null,
+      institutionName: institutionName || null,
+      enrollmentStatus: hasInstitutionEnrollment ? 'ACTIVE' : null,
+      enrollmentDate: null, // Could be added to user model if needed
+      canAccessInstitutionContent: hasInstitutionEnrollment
     };
 
-    // For testing purposes, you can modify the mock data here
-    // Example: Set hasInstitutionEnrollment to true to test institution access
-    // mockEnrollment.hasInstitutionEnrollment = true;
-    // mockEnrollment.institutionId = 'inst_123';
-    // mockEnrollment.institutionName = 'Test Language School';
-    // mockEnrollment.enrollmentStatus = 'ACTIVE';
-    // mockEnrollment.canAccessInstitutionContent = true;
-
     return NextResponse.json({
-      enrollment: mockEnrollment
+      enrollment
     });
 
   } catch (error) {

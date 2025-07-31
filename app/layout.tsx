@@ -16,16 +16,18 @@ const inter = Inter({
   preload: true,
   fallback: ["system-ui", "arial"],
   variable: "--font-inter",
+  // Turbopack compatibility
+  adjustFontFallback: false,
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
   display: "swap",
-  preload: true, // Re-enable preloading now that Turbopack is disabled
+  preload: true,
   fallback: ["system-ui", "arial"],
   variable: "--font-poppins",
-  adjustFontFallback: false, // Disable font adjustment to prevent issues
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {

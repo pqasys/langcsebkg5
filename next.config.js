@@ -4,53 +4,19 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  
+
   // Disable TypeScript checking during builds to speed up the process
   typescript: {
     ignoreBuildErrors: true,
   },
-  
-  // Temporarily disable Turbopack to fix font loading issues
+
+  // Enable Turbopack to prevent webpack chunk loading errors
   experimental: {
-    // Disable Turbopack temporarily to fix font loading issues
-    // turbo: {
-    //   resolveAlias: {
-    //     '@': './',
-    //   },
-    // },
-    // Performance optimizations
-    optimizeCss: true,
-    scrollRestoration: true,
-    serverComponentsExternalPackages: [],
-  },
-  
-  // Configure images properly
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'example.com',
+    turbo: {
+      resolveAlias: {
+        '@': './',
       },
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-      },
-      {
-        protocol: 'https',
-        hostname: 'localhost',
-      },
-    ],
-    // Allow local images from uploads directory
-    unoptimized: false,
-    // Image optimization settings
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    },
   },
   
   // Configure trailing slashes to prevent 404s
@@ -58,25 +24,27 @@ const nextConfig = {
   
   // Ensure proper asset prefix handling
   assetPrefix: '',
-  
+
   // Disable powered by header
   poweredByHeader: false,
-  
+
   // Configure proper output
   output: 'standalone',
   
   // Ensure proper static export settings
   distDir: '.next',
-  
+
   // Configure proper base path
   basePath: '',
-  
+
   // Compression settings
   compress: false, // Disable compression to prevent API response issues
-  
+
   // Performance optimizations
   swcMinify: true,
-  
+
+
+
   // Headers for better caching
   async headers() {
     return [
@@ -118,7 +86,7 @@ const nextConfig = {
       },
     ];
   },
-  
+
   // Redirects for better SEO and performance
   async redirects() {
     return [
@@ -126,7 +94,7 @@ const nextConfig = {
       // Users should be able to access the main courses page directly
     ];
   },
-  
+
   // Rewrites for API optimization
   async rewrites() {
     return [

@@ -80,22 +80,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Check student's access based on subscription and institution enrollment
-    const [studentSubscription, institutionEnrollment] = await Promise.all([
+    const [studentSubscription, user] = await Promise.all([
       prisma.studentSubscription.findUnique({
         where: { studentId: session.user.id },
         include: { studentTier: true },
       }),
-      prisma.studentInstitution.findFirst({
-        where: { 
-          student_id: session.user.id,
-          status: 'ENROLLED',
-        },
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { institutionId: true },
       }),
     ]);
 
     // Determine access level
     const hasSubscription = studentSubscription?.status === 'ACTIVE';
-    const hasInstitutionAccess = institutionEnrollment && liveClass.institutionId === institutionEnrollment.institution_id;
+    const hasInstitutionAccess = user?.institutionId && liveClass.institutionId === user.institutionId;
 
     // Check if student has access to this live class
     if (!hasSubscription && !hasInstitutionAccess) {

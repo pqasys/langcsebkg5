@@ -329,7 +329,7 @@ export function AdminCourseForm({
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="" disabled>
+                <SelectItem value="none" disabled>
                   No categories available
                 </SelectItem>
               )}

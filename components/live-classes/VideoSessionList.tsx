@@ -80,7 +80,7 @@ export function VideoSessionList({ userType, canCreateSessions }: VideoSessionLi
         page: page.toString(),
         limit: '10',
         ...Object.fromEntries(
-          Object.entries(filters).filter(([_, value]) => value !== '')
+          Object.entries(filters).filter(([_, value]) => value !== '' && value !== 'all')
         )
       });
 
@@ -314,7 +314,7 @@ export function VideoSessionList({ userType, canCreateSessions }: VideoSessionLi
                   <SelectValue placeholder="All statuses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All statuses</SelectItem>
+                  <SelectItem value="all">All statuses</SelectItem>
                   <SelectItem value="SCHEDULED">Scheduled</SelectItem>
                   <SelectItem value="ACTIVE">Live</SelectItem>
                   <SelectItem value="COMPLETED">Completed</SelectItem>
@@ -329,7 +329,7 @@ export function VideoSessionList({ userType, canCreateSessions }: VideoSessionLi
                   <SelectValue placeholder="All languages" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All languages</SelectItem>
+                  <SelectItem value="all">All languages</SelectItem>
                   <SelectItem value="en">English</SelectItem>
                   <SelectItem value="es">Spanish</SelectItem>
                   <SelectItem value="fr">French</SelectItem>
@@ -346,7 +346,7 @@ export function VideoSessionList({ userType, canCreateSessions }: VideoSessionLi
                   <SelectValue placeholder="All levels" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All levels</SelectItem>
+                  <SelectItem value="all">All levels</SelectItem>
                   <SelectItem value="BEGINNER">Beginner</SelectItem>
                   <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                   <SelectItem value="ADVANCED">Advanced</SelectItem>
@@ -361,7 +361,7 @@ export function VideoSessionList({ userType, canCreateSessions }: VideoSessionLi
                   <SelectValue placeholder="All types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All types</SelectItem>
+                  <SelectItem value="all">All types</SelectItem>
                   <SelectItem value="GROUP">Group</SelectItem>
                   <SelectItem value="PRIVATE">Private</SelectItem>
                   <SelectItem value="WORKSHOP">Workshop</SelectItem>

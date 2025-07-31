@@ -71,9 +71,9 @@ export default function AdminLiveClassesPage() {
         page: currentPage.toString(),
         limit: '10',
         ...(searchTerm && { search: searchTerm }),
-        ...(statusFilter && { status: statusFilter }),
-        ...(languageFilter && { language: languageFilter }),
-        ...(levelFilter && { level: levelFilter }),
+        ...(statusFilter && statusFilter !== 'all' && { status: statusFilter }),
+        ...(languageFilter && languageFilter !== 'all' && { language: languageFilter }),
+        ...(levelFilter && levelFilter !== 'all' && { level: levelFilter }),
       });
 
       const response = await fetch(`/api/admin/live-classes?${params}`);
@@ -171,7 +171,7 @@ export default function AdminLiveClassesPage() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="SCHEDULED">Scheduled</SelectItem>
                 <SelectItem value="ACTIVE">Active</SelectItem>
                 <SelectItem value="COMPLETED">Completed</SelectItem>
@@ -183,7 +183,7 @@ export default function AdminLiveClassesPage() {
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Languages</SelectItem>
+                <SelectItem value="all">All Languages</SelectItem>
                 <SelectItem value="en">English</SelectItem>
                 <SelectItem value="es">Spanish</SelectItem>
                 <SelectItem value="fr">French</SelectItem>
@@ -201,7 +201,7 @@ export default function AdminLiveClassesPage() {
                 <SelectValue placeholder="Level" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Levels</SelectItem>
+                <SelectItem value="all">All Levels</SelectItem>
                 <SelectItem value="BEGINNER">Beginner</SelectItem>
                 <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                 <SelectItem value="ADVANCED">Advanced</SelectItem>

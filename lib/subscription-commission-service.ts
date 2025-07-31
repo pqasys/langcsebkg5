@@ -194,34 +194,27 @@ export class SubscriptionCommissionService {
   }
 
   /**
-   * Get subscription status for a student
+   * Get subscription status for a user (student or non-student)
    */
-  static async getStudentSubscriptionStatus(studentId: string): Promise<StudentSubscriptionStatus> {
+  static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscriptionStatus> {
     try {
-      const student = await prisma.student.findUnique({
-        where: { id: studentId },
+      // Check for subscription using the user ID (which could be a student ID or regular user ID)
+      // This handles both students and non-student users with subscriptions
+      const currentSubscription = await prisma.studentSubscription.findUnique({
+        where: { studentId: userId },
         include: {
-          subscriptions: {
-            include: {
-              studentTier: true, // ✅ Use proper relation
-              billingHistory: {
-                orderBy: { billingDate: 'desc' },
-                take: 10
-              }
-            }
+          studentTier: true,
+          billingHistory: {
+            orderBy: { billingDate: 'desc' },
+            take: 10
           }
         }
       });
 
-      if (!student) {
-        throw new Error('Student not found: ' + studentId);
-      }
-
-      const currentSubscription = student.subscriptions[0];
       const hasActiveSubscription = currentSubscription && 
         ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(currentSubscription.status);
 
-      // ✅ Get plan details from studentTier relation
+      // Get plan details from studentTier relation
       const currentPlan = currentSubscription?.studentTier?.planType;
       const subscriptionEndDate = currentSubscription?.endDate;
       const nextBillingDate = currentSubscription?.endDate;

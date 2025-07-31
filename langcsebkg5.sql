@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 30, 2025 at 08:59 PM
+-- Generation Time: Jul 31, 2025 at 07:29 PM
 -- Server version: 8.0.31
 -- PHP Version: 8.1.13
 
@@ -3147,6 +3147,15 @@ CREATE TABLE IF NOT EXISTS `video_sessions` (
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
+  `currency` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'USD',
+  `features` json DEFAULT NULL,
+  `isBooked` tinyint(1) NOT NULL DEFAULT '0',
+  `isCancelled` tinyint(1) NOT NULL DEFAULT '0',
+  `isCompleted` tinyint(1) NOT NULL DEFAULT '0',
+  `materials` json DEFAULT NULL,
+  `rating` float DEFAULT NULL,
+  `reviews` int NOT NULL DEFAULT '0',
+  `tags` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `video_sessions_instructorId_idx` (`instructorId`),
   KEY `video_sessions_institutionId_idx` (`institutionId`),

@@ -116,11 +116,11 @@ export function AdvancedSearch() {
       params.set('sortBy', sortBy);
       params.set('sortOrder', sortOrder);
 
-      // Add filters to params
-      if (searchFilters.category) params.set('category', searchFilters.category);
-      if (searchFilters.level) params.set('level', searchFilters.level);
-      if (searchFilters.institution) params.set('institution', searchFilters.institution);
-      if (searchFilters.framework) params.set('framework', searchFilters.framework);
+      // Add filters to params (exclude "all" values)
+      if (searchFilters.category && searchFilters.category !== 'all') params.set('category', searchFilters.category);
+      if (searchFilters.level && searchFilters.level !== 'all') params.set('level', searchFilters.level);
+      if (searchFilters.institution && searchFilters.institution !== 'all') params.set('institution', searchFilters.institution);
+      if (searchFilters.framework && searchFilters.framework !== 'all') params.set('framework', searchFilters.framework);
       if (searchFilters.priceRange) {
         params.set('minPrice', searchFilters.priceRange[0].toString());
         params.set('maxPrice', searchFilters.priceRange[1].toString());
@@ -154,10 +154,10 @@ export function AdvancedSearch() {
   const updateURL = useCallback((searchQuery: string, searchFilters: SearchFilters) => {
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
-    if (searchFilters.category) params.set('category', searchFilters.category);
-    if (searchFilters.level) params.set('level', searchFilters.level);
-    if (searchFilters.institution) params.set('institution', searchFilters.institution);
-    if (searchFilters.framework) params.set('framework', searchFilters.framework);
+    if (searchFilters.category && searchFilters.category !== 'all') params.set('category', searchFilters.category);
+    if (searchFilters.level && searchFilters.level !== 'all') params.set('level', searchFilters.level);
+    if (searchFilters.institution && searchFilters.institution !== 'all') params.set('institution', searchFilters.institution);
+    if (searchFilters.framework && searchFilters.framework !== 'all') params.set('framework', searchFilters.framework);
     if (searchFilters.priceRange) {
       params.set('minPrice', searchFilters.priceRange[0].toString());
       params.set('maxPrice', searchFilters.priceRange[1].toString());
@@ -293,14 +293,14 @@ export function AdvancedSearch() {
               <div>
                 <Label>Category</Label>
                 <Select
-                  value={filters.category || ''}
+                  value={filters.category || 'all'}
                   onValueChange={(value) => handleFilterChange('category', value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All categories" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px] overflow-y-auto">
-                    <SelectItem value="">All categories</SelectItem>
+                    <SelectItem value="all">All categories</SelectItem>
                     {facets?.categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name} ({category.count})
@@ -314,14 +314,14 @@ export function AdvancedSearch() {
               <div>
                 <Label>Level</Label>
                 <Select
-                  value={filters.level || ''}
+                  value={filters.level || 'all'}
                   onValueChange={(value) => handleFilterChange('level', value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All levels" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px] overflow-y-auto">
-                    <SelectItem value="">All levels</SelectItem>
+                    <SelectItem value="all">All levels</SelectItem>
                     {facets?.levels.map((level) => (
                       <SelectItem key={level.value} value={level.value}>
                         {level.value} ({level.count})
@@ -335,14 +335,14 @@ export function AdvancedSearch() {
               <div>
                 <Label>Institution</Label>
                 <Select
-                  value={filters.institution || ''}
+                  value={filters.institution || 'all'}
                   onValueChange={(value) => handleFilterChange('institution', value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All institutions" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px] overflow-y-auto">
-                    <SelectItem value="">All institutions</SelectItem>
+                    <SelectItem value="all">All institutions</SelectItem>
                     {facets?.institutions.map((institution) => (
                       <SelectItem key={institution.id} value={institution.id}>
                         {institution.name} ({institution.count})
@@ -394,14 +394,14 @@ export function AdvancedSearch() {
               <div>
                 <Label>Framework</Label>
                 <Select
-                  value={filters.framework || ''}
+                  value={filters.framework || 'all'}
                   onValueChange={(value) => handleFilterChange('framework', value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All frameworks" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px] overflow-y-auto">
-                    <SelectItem value="">All frameworks</SelectItem>
+                    <SelectItem value="all">All frameworks</SelectItem>
                     {facets?.frameworks.map((framework) => (
                       <SelectItem key={framework.value} value={framework.value}>
                         {framework.value} ({framework.count})

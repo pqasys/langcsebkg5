@@ -143,12 +143,11 @@ async function checkUserJoinAccess(userId: string, conversation: any): Promise<b
     }
 
     // Check if user has institution enrollment
-    const enrollment = await prisma.studentInstitution.findFirst({
-      where: {
-        student_id: userId,
-        status: 'ENROLLED'
-      }
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { institutionId: true }
     });
+    const enrollment = user?.institutionId ? { institution_id: user.institutionId } : null;
 
     if (enrollment) {
       return true;

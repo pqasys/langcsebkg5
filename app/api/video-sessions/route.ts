@@ -178,27 +178,27 @@ async function getUserAccessLevel(userId: string) {
       }
     });
 
-    // Check institution enrollment
-    const enrollment = await prisma.studentInstitution.findFirst({
-      where: {
-        student_id: userId,
-        status: 'ENROLLED'
-      }
+    // Check institution enrollment (using user.institutionId)
+    const userWithInstitution = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { institutionId: true }
     });
 
-    if (subscription && enrollment) {
+    const hasInstitutionEnrollment = !!userWithInstitution?.institutionId;
+
+    if (subscription && hasInstitutionEnrollment) {
       return {
         userType: 'HYBRID',
-        institutionId: enrollment.institution_id
+        institutionId: userWithInstitution.institutionId
       };
     } else if (subscription) {
       return {
         userType: 'SUBSCRIBER'
       };
-    } else if (enrollment) {
+    } else if (hasInstitutionEnrollment) {
       return {
         userType: 'INSTITUTION_STUDENT',
-        institutionId: enrollment.institution_id
+        institutionId: userWithInstitution.institutionId
       };
     } else {
       return {
