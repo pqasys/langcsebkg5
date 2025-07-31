@@ -194,22 +194,42 @@ export class SubscriptionCommissionService {
   }
 
   /**
-   * Get subscription status for a user (student or non-student)
-   */
-  static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscriptionStatus> {
-    try {
-      // Check for subscription using the user ID (which could be a student ID or regular user ID)
-      // This handles both students and non-student users with subscriptions
-      const currentSubscription = await prisma.studentSubscription.findUnique({
-        where: { studentId: userId },
-        include: {
-          studentTier: true,
-          billingHistory: {
-            orderBy: { billingDate: 'desc' },
-            take: 10
-          }
+ * Get subscription status for a user (student or non-student)
+ * 
+ * IMPORTANT: This method handles subscriptions for ALL user types:
+ * - Students: Regular course-taking users
+ * - Admins: Platform administrators with premium access  
+ * - Institution Staff: Staff members with personal subscriptions
+ * - Regular Users: Any user who wants premium features
+ * 
+ * The 'studentId' field in StudentSubscription actually stores any user ID,
+ * not just student IDs. This naming is historical and should be considered
+ * for future refactoring to UserSubscription.
+ */
+static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscriptionStatus> {
+  try {
+    // Validate that the user exists before checking subscription
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true }
+    });
+
+    if (!user) {
+      throw new Error(`User not found: ${userId}`);
+    }
+
+    // Check for subscription using the user ID (which could be a student ID or regular user ID)
+    // This handles both students and non-student users with subscriptions
+    const currentSubscription = await prisma.studentSubscription.findUnique({
+      where: { studentId: userId },
+      include: {
+        studentTier: true,
+        billingHistory: {
+          orderBy: { billingDate: 'desc' },
+          take: 10
         }
-      });
+      }
+    });
 
       const hasActiveSubscription = currentSubscription && 
         ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(currentSubscription.status);
@@ -260,7 +280,23 @@ export class SubscriptionCommissionService {
   }
 
   /**
-   * Create or update student subscription
+   * Create or update user subscription (currently named for historical reasons)
+   * 
+   * IMPORTANT: This method creates subscriptions for ALL user types, not just students:
+   * - Students: Regular course-taking users
+   * - Admins: Platform administrators with premium access
+   * - Institution Staff: Staff members with personal subscriptions  
+   * - Regular Users: Any user who wants premium features
+   * 
+   * The 'studentId' parameter actually accepts any user ID, not just student IDs.
+   * This naming is historical and should be considered for future refactoring.
+   * 
+   * @param studentId - The user ID (can be any user type, not just students)
+   * @param planType - The subscription plan type
+   * @param billingCycle - Monthly or annual billing
+   * @param userId - The ID of the user performing the action (for logging)
+   * @param startTrial - Whether to start a trial subscription
+   * @param amount - Optional custom amount (overrides tier pricing)
    */
   static async createStudentSubscription(
     studentId: string,
@@ -271,6 +307,26 @@ export class SubscriptionCommissionService {
     amount?: number
   ): Promise<any> {
     try {
+      // Validate that the user exists before creating subscription
+      const user = await prisma.user.findUnique({
+        where: { id: studentId },
+        select: { id: true, role: true, name: true }
+      });
+
+      if (!user) {
+        throw new Error(`User not found: ${studentId}. Cannot create subscription for non-existent user.`);
+      }
+
+      // Validate that the acting user exists
+      const actingUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, role: true }
+      });
+
+      if (!actingUser) {
+        throw new Error(`Acting user not found: ${userId}. Cannot create subscription with invalid acting user.`);
+      }
+
       // Find the appropriate StudentTier
       const studentTier = await prisma.studentTier.findFirst({
         where: { 

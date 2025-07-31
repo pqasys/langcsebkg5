@@ -509,9 +509,23 @@ model StudentTier {
   @@map("student_tiers")
 }
 
+/// UserSubscription model (currently named StudentSubscription for historical reasons)
+/// 
+/// IMPORTANT: This model handles subscriptions for ALL user types, not just students:
+/// - Students: Regular course-taking users
+/// - Admins: Platform administrators with premium access
+/// - Institution Staff: Staff members with personal subscriptions
+/// - Regular Users: Any user who wants premium features
+/// 
+/// The 'studentId' field actually stores any user ID, not just student IDs.
+/// This naming is historical and should be considered for future refactoring
+/// to UserSubscription with a userId field.
+/// 
+/// FUTURE MIGRATION: Consider renaming to UserSubscription with userId field
+/// for better clarity and to reflect the actual usage.
 model StudentSubscription {
   id            String   @id @default(cuid())
-  studentId     String   @unique
+  studentId     String   @unique  // Actually stores any user ID, not just student IDs
   studentTierId String
   status        String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED, PAST_DUE, SUSPENDED
   startDate     DateTime @default(now())
