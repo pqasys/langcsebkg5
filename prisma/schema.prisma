@@ -97,157 +97,6 @@ model Course {
   @@map("course")
 }
 
-model Student {
-  id          String           @id @default(uuid()) @db.VarChar(36)
-  name        String
-  email       String           @unique(map: "email")
-  phone       String?          @db.VarChar(20)
-  address     String?          @db.Text
-  bio         String?          @db.Text
-  status      students_status? @default(active)
-  created_at  DateTime?        @default(now()) @db.Timestamp(0)
-  updated_at  DateTime?        @default(now()) @updatedAt @db.Timestamp(0)
-  last_active DateTime?        @default(now()) @db.Timestamp(0)
-  stripeCustomerId String?     @db.VarChar(255)
-  
-  // Social and language fields
-  native_language String?      @db.VarChar(50)
-  spoken_languages Json?       @db.Json
-  learning_goals String?       @db.Text
-  interests Json?              @db.Json
-  social_visibility SocialVisibility @default(PRIVATE)
-  timezone String?             @db.VarChar(50)
-  date_of_birth DateTime?      @db.Date
-  gender String?               @db.VarChar(20)
-  location String?             @db.VarChar(255)
-  website String?              @db.VarChar(255)
-  social_links Json?           @db.Json
-
-  // Relations
-  enrollments StudentCourseEnrollment[]
-  completions StudentCourseCompletion[] @relation("StudentCompletions")
-  bookings    booking[]
-  subscriptions StudentSubscription[]
-
-  @@index([email], map: "idx_students_email")
-  @@index([native_language])
-  @@index([social_visibility])
-  @@index([location])
-  @@map("students")
-}
-
-model StudentInstitution {
-  id             String                   @id @default(uuid()) @db.VarChar(36)
-  student_id     String                   @db.VarChar(36)
-  institution_id String                   @db.VarChar(36)
-  created_at     DateTime                 @default(now()) @db.Timestamp(0)
-  updated_at     DateTime                 @default(now()) @updatedAt @db.Timestamp(0)
-  notes          String?                  @db.Text
-  status         StudentInstitutionStatus @default(INQUIRY)
-
-  @@unique([student_id, institution_id])
-  @@index([student_id])
-  @@index([institution_id])
-  @@map("student_institutions")
-}
-
-model StudentCourseEnrollment {
-  id            String    @id @default(cuid())
-  studentId     String
-  courseId      String
-  status        String    @default("PENDING_PAYMENT")
-  progress      Float     @default(0)
-  startDate     DateTime  @default(now())
-  endDate       DateTime?
-  paymentStatus String    @default("PENDING")
-  paymentDate   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  stateVersion  Int       @default(1)
-  version       Int       @default(1)
-
-  // Relations
-  student Student @relation(fields: [studentId], references: [id])
-  course  Course  @relation(fields: [courseId], references: [id])
-  payments Payment[]
-
-  @@index([studentId])
-  @@index([courseId])
-  @@map("student_course_enrollments")
-}
-
-model StudentCourseCompletion {
-  id        String   @id @default(uuid()) @db.VarChar(36)
-  courseId  String   @db.VarChar(36)
-  createdAt DateTime @default(now())
-  status    String   @db.VarChar(20)
-  studentId String   @db.VarChar(36)
-  updatedAt DateTime @default(now()) @updatedAt
-
-  // Relations
-  student Student @relation("StudentCompletions", fields: [studentId], references: [id])
-  course  Course  @relation("CourseCompletions", fields: [courseId], references: [id])
-
-  @@index([studentId], map: "StudentCourseCompletion_studentId_fkey")
-  @@index([courseId], map: "StudentCourseCompletion_courseId_fkey")
-  @@map("student_course_completions")
-}
-
-model Tag {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  name        String   @db.VarChar(50)
-  description String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-  categoryId  String?  @db.VarChar(36)
-  slug        String   @unique @db.VarChar(50)
-  parentId    String?  @db.VarChar(36)
-  usageCount  Int      @default(0)
-  color       String?  @db.VarChar(7)
-  icon        String?  @db.VarChar(50)
-  featured    Boolean  @default(false)
-  priority    Int      @default(0)
-
-  // Relations
-  courseTags CourseTag[]
-
-  @@index([categoryId])
-  @@index([parentId])
-  @@index([name])
-  @@map("tag")
-}
-
-model category {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  name        String   @db.VarChar(50)
-  description String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-  slug        String   @unique @db.VarChar(50)
-
-  // Relations
-  courses Course[]
-
-  @@map("category")
-}
-
-model CourseTag {
-  id        String   @id @default(uuid()) @db.VarChar(36)
-  courseId  String   @db.VarChar(36)
-  tagId     String   @db.VarChar(36)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  // Relations
-  course Course @relation(fields: [courseId], references: [id])
-  tag    Tag    @relation(fields: [tagId], references: [id])
-
-  @@unique([courseId, tagId])
-  @@index([courseId])
-  @@index([tagId])
-  @@map("coursetag")
-}
-
 model user {
   id                String    @id @default(uuid()) @db.VarChar(36)
   name              String    @db.VarChar(255)
@@ -356,250 +205,140 @@ model CommissionRateLog {
   @@map("commissionratelog")
 }
 
-model content_items {
-  id          String             @id @db.VarChar(36)
-  module_id   String             @db.VarChar(36)
-  type        content_items_type
-  title       String             @db.VarChar(255)
-  order_index Int                @default(0)
-  created_at  DateTime?          @default(now()) @db.Timestamp(0)
-  updated_at  DateTime?          @default(now()) @db.Timestamp(0)
-  content     String             @db.Text
-
-  // Relations
-  module modules @relation(fields: [module_id], references: [id])
-
-  @@index([module_id], map: "idx_content_items_module_id")
-  @@map("content_items")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model exercises {
-  id          String         @id @db.VarChar(36)
-  module_id   String         @db.VarChar(36)
-  type        exercises_type
-  question    String         @db.Text
-  options     Json?
-  order_index Int            @default(0)
-  created_at  DateTime?      @default(now()) @db.Timestamp(0)
-  updated_at  DateTime?      @default(now()) @db.Timestamp(0)
-  answer      String         @db.Text
-
-  // Relations
-  module modules @relation(fields: [module_id], references: [id])
-
-  @@index([module_id], map: "idx_exercises_module_id")
-  @@map("exercises")
-}
-
-model module_skills {
-  module_id String @db.VarChar(36)
-  skill     String @db.VarChar(50)
-
-  @@id([module_id, skill])
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model modules {
-  id                 String        @id @db.VarChar(36)
-  course_id          String        @db.VarChar(36)
-  title              String        @db.VarChar(255)
-  description        String?       @db.Text
-  level              modules_level
-  order_index        Int           @default(0)
-  estimated_duration Int           @default(0)
-  vocabulary_list    String?       @db.Text
-  grammar_points     String?       @db.Text
-  cultural_notes     String?       @db.Text
-  is_published       Boolean?      @default(false)
-  created_at         DateTime?     @default(now()) @db.Timestamp(0)
-  updated_at         DateTime?     @default(now()) @db.Timestamp(0)
-
-  // Relations
-  course       Course        @relation(fields: [course_id], references: [id])
-  quizzes      quizzes[]
-  contentItems content_items[]
-  exercises    exercises[]
-  videoSessions VideoSession[]
-
-  @@index([course_id], map: "idx_modules_course_id")
-  @@index([order_index], map: "idx_modules_order_index")
-  @@index([course_id, order_index], map: "idx_modules_course_order")
-  @@map("modules")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model quiz_questions {
-  id                 String              @id @db.VarChar(36)
-  quiz_id            String              @db.VarChar(36)
-  type               quiz_questions_type @default(MULTIPLE_CHOICE)
-  question           String              @db.Text
-  options            Json?
-  correct_answer     String?             @db.Text
-  points             Int                 @default(1)
-  order_index        Int                 @default(0)
-  created_at         DateTime?           @default(now()) @db.Timestamp(0)
-  updated_at         DateTime?           @default(now()) @updatedAt @db.Timestamp(0)
-  average_time_spent Int                 @default(0)
-  category           String?             @db.VarChar(100)
-  difficulty         String              @default("MEDIUM") @db.VarChar(20)
-  explanation        String?             @db.Text
-  hints              Json?
-  success_rate       Float               @default(0)
-  tags               Json?
-  times_asked        Int                 @default(0)
-  times_correct      Int                 @default(0)
-  irt_difficulty     Float?
-  irt_discrimination Float?
-  irt_guessing       Float?
-  irt_last_updated   DateTime?           @db.Timestamp(0)
-  media_type         String?             @db.VarChar(50)
-  media_url          String?             @db.VarChar(500)
-  question_config    Json?
-
-  // Relations
-  quiz quizzes @relation(fields: [quiz_id], references: [id])
-
-  @@index([quiz_id], map: "idx_quiz_questions_quiz_id")
-  @@map("quiz_questions")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model quizzes {
-  id                String    @id @db.VarChar(36)
-  module_id         String    @db.VarChar(36)
-  title             String    @db.VarChar(255)
-  description       String?   @db.Text
-  passing_score     Int
-  time_limit        Int?
-  created_at        DateTime? @default(now()) @db.Timestamp(0)
-  updated_at        DateTime? @default(now()) @updatedAt @db.Timestamp(0)
-  mediaUrl          String?   @db.VarChar(255)
-  allow_retry       Boolean   @default(true)
-  average_score     Float     @default(0)
-  average_time      Float     @default(0)
-  category          String?   @db.VarChar(100)
-  difficulty        String    @default("MEDIUM") @db.VarChar(20)
-  instructions      String?   @db.Text
-  max_attempts      Int       @default(3)
-  quiz_type         String    @default("STANDARD") @db.VarChar(20)
-  show_explanations Boolean   @default(false)
-  show_results      Boolean   @default(true)
-  shuffle_questions Boolean   @default(false)
-  success_rate      Float     @default(0)
-  tags              Json?
-  total_attempts    Int       @default(0)
-  total_completions Int       @default(0)
-  adaptive_config   Json?
-  initial_ability   Float     @default(0)
-  max_questions     Int       @default(20)
-  min_questions     Int       @default(5)
-  target_precision  Float     @default(0.3)
-
-  // Relations
-  module        modules        @relation(fields: [module_id], references: [id])
-  quizQuestions quiz_questions[]
-
-  @@index([module_id], map: "idx_quizzes_module_id")
-  @@map("quizzes")
-}
-
-model student_progress {
-  id                  String    @id @db.VarChar(36)
-  student_id          String    @db.VarChar(36)
-  module_id           String    @db.VarChar(36)
-  content_completed   Boolean?  @default(false)
-  exercises_completed Boolean?  @default(false)
-  quiz_completed      Boolean?  @default(false)
-  quiz_score          Int?
-  started_at          DateTime? @default(now()) @db.Timestamp(0)
-  completed_at        DateTime? @db.Timestamp(0)
-
-  @@unique([student_id, module_id], map: "unique_student_module")
-  @@index([module_id], map: "idx_student_progress_module_id")
-  @@index([student_id], map: "idx_student_progress_student_id")
-}
-
-model CourseWeeklyPrice {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  courseId   String   @db.VarChar(36)
-  weekNumber Int
-  year       Int
-  price      Float
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
-
-  @@index([courseId])
-  @@map("course_weekly_prices")
-}
-
-model CourseMonthlyPrice {
+model category {
   id          String   @id @default(uuid()) @db.VarChar(36)
-  courseId    String   @db.VarChar(36)
-  monthNumber Int
-  year        Int
-  price       Float
+  name        String   @db.VarChar(50)
+  description String?  @db.Text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
-
-  @@unique([courseId, monthNumber, year], map: "CourseMonthlyPrice_courseId_monthNumber_year_key")
-  @@index([courseId], map: "CourseMonthlyPrice_courseId_fkey")
-  @@map("course_monthly_price")
-}
-
-model CoursePricingRule {
-  id        String   @id @default(uuid()) @db.VarChar(36)
-  courseId  String   @db.VarChar(36)
-  ruleType  String   @db.VarChar(20)
-  ruleValue Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  @@index([courseId])
-  @@map("course_pricing_rules")
-}
-
-model tagrelation {
-  id        String   @id @db.VarChar(36)
-  tagId     String   @db.VarChar(36)
-  relatedId String   @db.VarChar(36)
-  strength  Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  @@unique([tagId, relatedId], map: "tagRelation_tagId_relatedId_key")
-  @@index([relatedId], map: "tagRelation_relatedId_idx")
-  @@index([tagId], map: "tagRelation_tagId_idx")
-}
-
-model InstitutionCommission {
-  id            String   @id @default(cuid())
-  institutionId String   @unique
-  rate          Float    @default(0)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  slug        String   @unique @db.VarChar(50)
 
   // Relations
-  institution Institution @relation(fields: [institutionId], references: [id])
+  courses Course[]
 
-  @@index([institutionId])
-  @@map("institution_commissions")
+  @@map("category")
 }
 
-model InstitutionPayout {
-  id            String   @id @default(cuid())
-  institutionId String
-  enrollmentId  String
-  amount        Float
-  status        String
-  metadata      Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+model CourseTag {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  courseId  String   @db.VarChar(36)
+  tagId     String   @db.VarChar(36)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([institutionId])
-  @@index([enrollmentId])
-  @@map("institution_payouts")
+  // Relations
+  course Course @relation(fields: [courseId], references: [id])
+  tag    Tag    @relation(fields: [tagId], references: [id])
+
+  @@unique([courseId, tagId])
+  @@index([courseId])
+  @@index([tagId])
+  @@map("coursetag")
+}
+
+model Tag {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  name        String   @db.VarChar(50)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  categoryId  String?  @db.VarChar(36)
+  slug        String   @unique @db.VarChar(50)
+  parentId    String?  @db.VarChar(36)
+  usageCount  Int      @default(0)
+  color       String?  @db.VarChar(7)
+  icon        String?  @db.VarChar(50)
+  featured    Boolean  @default(false)
+  priority    Int      @default(0)
+
+  // Relations
+  courseTags CourseTag[]
+
+  @@index([categoryId])
+  @@index([parentId])
+  @@index([name])
+  @@map("tag")
+}
+
+model Student {
+  id          String           @id @default(uuid()) @db.VarChar(36)
+  name        String
+  email       String           @unique(map: "email")
+  phone       String?          @db.VarChar(20)
+  address     String?          @db.Text
+  bio         String?          @db.Text
+  status      students_status? @default(active)
+  created_at  DateTime?        @default(now()) @db.Timestamp(0)
+  updated_at  DateTime?        @default(now()) @updatedAt @db.Timestamp(0)
+  last_active DateTime?        @default(now()) @db.Timestamp(0)
+  stripeCustomerId String?     @db.VarChar(255)
+  
+  // Social and language fields
+  native_language String?      @db.VarChar(50)
+  spoken_languages Json?       @db.Json
+  learning_goals String?       @db.Text
+  interests Json?              @db.Json
+  social_visibility SocialVisibility @default(PRIVATE)
+  timezone String?             @db.VarChar(50)
+  date_of_birth DateTime?      @db.Date
+  gender String?               @db.VarChar(20)
+  location String?             @db.VarChar(255)
+  website String?              @db.VarChar(255)
+  social_links Json?           @db.Json
+
+  // Relations
+  enrollments StudentCourseEnrollment[]
+  completions StudentCourseCompletion[] @relation("StudentCompletions")
+  bookings    booking[]
+  subscriptions StudentSubscription[]
+
+  @@index([email], map: "idx_students_email")
+  @@index([native_language])
+  @@index([social_visibility])
+  @@index([location])
+  @@map("students")
+}
+
+model StudentCourseEnrollment {
+  id            String    @id @default(cuid())
+  studentId     String
+  courseId      String
+  status        String    @default("PENDING_PAYMENT")
+  progress      Float     @default(0)
+  startDate     DateTime  @default(now())
+  endDate       DateTime?
+  paymentStatus String    @default("PENDING")
+  paymentDate   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  stateVersion  Int       @default(1)
+  version       Int       @default(1)
+
+  // Relations
+  student Student @relation(fields: [studentId], references: [id])
+  course  Course  @relation(fields: [courseId], references: [id])
+  payments Payment[]
+
+  @@index([studentId])
+  @@index([courseId])
+  @@map("student_course_enrollments")
+}
+
+model StudentCourseCompletion {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  courseId  String   @db.VarChar(36)
+  createdAt DateTime @default(now())
+  status    String   @db.VarChar(20)
+  studentId String   @db.VarChar(36)
+  updatedAt DateTime @default(now()) @updatedAt
+
+  // Relations
+  student Student @relation("StudentCompletions", fields: [studentId], references: [id])
+  course  Course  @relation("CourseCompletions", fields: [courseId], references: [id])
+
+  @@index([studentId], map: "StudentCourseCompletion_studentId_fkey")
+  @@index([courseId], map: "StudentCourseCompletion_courseId_fkey")
+  @@map("student_course_completions")
 }
 
 model Payment {
@@ -637,622 +376,21 @@ model Payment {
   @@map("payments")
 }
 
-model EmailSettings {
-  id                 String   @id @default("1")
-  host               String
-  port               Int
-  secure             Boolean  @default(true)
-  username           String
-  password           String
-  fromEmail          String
-  fromName           String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  rejectUnauthorized Boolean  @default(false)
+model InstitutionCommission {
+  id            String   @id @default(cuid())
+  institutionId String   @unique
+  rate          Float    @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  @@map("email_settings")
-}
-
-model AdminSettings {
-  id                                   String   @id @default("1")
-  createdAt                            DateTime @default(now())
-  updatedAt                            DateTime @updatedAt
-  allowInstitutionPaymentApproval      Boolean  @default(true)
-  showInstitutionApprovalButtons       Boolean  @default(true)
-  defaultPaymentStatus                 String   @default("PENDING")
-  institutionApprovableMethods         Json
-  adminOnlyMethods                     Json
-  institutionPaymentApprovalExemptions Json
-  fileUploadMaxSizeMB                  Int      @default(10)
-
-  @@map("admin_settings")
-}
-
-model StudentNotificationPreferences {
-  id                     String   @id @default(uuid()) @db.VarChar(36)
-  student_id             String   @unique @db.VarChar(36)
-  email_notifications    Boolean  @default(true)
-  push_notifications     Boolean  @default(true)
-  sms_notifications      Boolean  @default(false)
-  course_updates         Boolean  @default(true)
-  assignment_reminders   Boolean  @default(true)
-  payment_reminders      Boolean  @default(true)
-  created_at             DateTime @default(now()) @db.Timestamp(0)
-  updated_at             DateTime @default(now()) @updatedAt @db.Timestamp(0)
-  achievement_alerts     Boolean  @default(true)
-  assignment_deadlines   Boolean  @default(true)
-  assignment_feedback    Boolean  @default(true)
-  assignment_grades      Boolean  @default(true)
-  course_announcements   Boolean  @default(true)
-  course_reminders       Boolean  @default(true)
-  course_schedule        Boolean  @default(true)
-  group_messages         Boolean  @default(true)
-  instructor_messages    Boolean  @default(true)
-  milestone_reached      Boolean  @default(true)
-  notification_frequency String   @default("DAILY") @db.VarChar(20)
-  payment_confirmation   Boolean  @default(true)
-  payment_failed         Boolean  @default(true)
-  payment_receipts       Boolean  @default(true)
-  progress_updates       Boolean  @default(true)
-  system_announcements   Boolean  @default(true)
-
-  @@map("student_notification_preferences")
-}
-
-model ModuleProgress {
-  id                  String    @id @default(uuid()) @db.VarChar(36)
-  moduleId            String    @db.VarChar(36)
-  studentId           String    @db.VarChar(36)
-  contentCompleted    Boolean   @default(false)
-  exercisesCompleted  Boolean   @default(false)
-  quizCompleted       Boolean   @default(false)
-  startedAt           DateTime  @default(now())
-  completedAt         DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  difficultyRating    Int?
-  feedback            String?   @db.Text
-  lastAccessedAt      DateTime? @default(now())
-  notes               String?   @db.Text
-  quizScore           Int?
-  timeSpent           Int       @default(0)
-  achievementUnlocked Boolean   @default(false)
-  averageSessionTime  Int       @default(0)
-  bestQuizScore       Int?
-  lastStudyDate       DateTime?
-  learningStreak      Int       @default(0)
-  retryAttempts       Int       @default(0)
-  sessionCount        Int       @default(0)
-
-  @@unique([moduleId, studentId], name: "module_student_unique")
-  @@index([moduleId], map: "module_progress_module_id_idx")
-  @@index([studentId], map: "module_progress_student_id_idx")
-  @@map("module_progress")
-}
-
-model LearningSession {
-  id               String    @id @default(uuid()) @db.VarChar(36)
-  moduleProgressId String    @db.VarChar(36)
-  startedAt        DateTime  @default(now())
-  endedAt          DateTime?
-  duration         Int       @default(0)
-  activityType     String    @db.VarChar(50)
-  completed        Boolean   @default(false)
-  notes            String?   @db.Text
-
-  @@index([moduleProgressId])
-  @@index([startedAt])
-  @@map("learning_sessions")
-}
-
-model StudentAchievement {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  studentId   String   @db.VarChar(36)
-  metadata    Json?
-  achievement String   @db.VarChar(100)
-  earnedAt    DateTime @default(now())
-
-  @@index([studentId])
-  @@map("student_achievements")
-}
-
-model ExerciseAttempt {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  exerciseId  String   @db.VarChar(36)
-  studentId   String   @db.VarChar(36)
-  userAnswer  String   @db.Text
-  isCorrect   Boolean
-  submittedAt DateTime @default(now())
-
-  @@index([exerciseId])
-  @@index([studentId])
-  @@map("exercise_attempts")
-}
-
-model QuizAttempt {
-  id                 String    @id @db.VarChar(36)
-  score              Int
-  percentage         Float
-  status             String    @default("IN_PROGRESS") @db.VarChar(20)
-  ability_estimate   Float?
-  adaptive_history   Json?
-  attempt_number     Int       @default(1)
-  completed_at       DateTime? @db.Timestamp(0)
-  confidence_level   Float?
-  device_info        Json?
-  ip_address         String?   @db.VarChar(45)
-  is_adaptive        Boolean   @default(false)
-  passed             Boolean
-  questions_answered Int       @default(0)
-  quiz_id            String    @db.VarChar(36)
-  started_at         DateTime  @default(now()) @db.Timestamp(0)
-  student_id         String    @db.VarChar(36)
-  termination_reason String?   @db.VarChar(50)
-  time_spent         Int?
-  total_points       Int
-  user_agent         String?   @db.Text
-
-  @@index([quiz_id], map: "idx_quiz_attempts_quiz_id")
-  @@index([student_id], map: "idx_quiz_attempts_student_id")
-  @@map("quiz_attempts")
-}
-
-model QuizResponse {
-  id           String   @id @default(uuid()) @db.VarChar(36)
-  attemptId    String   @db.VarChar(36)
-  questionId   String   @db.VarChar(36)
-  studentId    String   @db.VarChar(36)
-  answer       String?  @db.Text
-  isCorrect    Boolean?
-  pointsEarned Int      @default(0)
-  timeSpent    Int      @default(0)
-  answeredAt   DateTime @default(now())
-
-  @@unique([attemptId, questionId])
-  @@index([attemptId])
-  @@index([questionId])
-  @@index([studentId])
-  @@map("quiz_responses")
-}
-
-model InstitutionPermissions {
-  id                 String   @id @default(cuid())
-  institutionId      String   @unique
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  canCreateCourses   Boolean  @default(false)
-  canEditCourses     Boolean  @default(false)
-  canDeleteCourses   Boolean  @default(false)
-  canPublishCourses  Boolean  @default(false)
-  canCreateContent   Boolean  @default(false)
-  canEditContent     Boolean  @default(false)
-  canDeleteContent   Boolean  @default(false)
-  canUploadMedia     Boolean  @default(false)
-  canCreateQuizzes   Boolean  @default(false)
-  canEditQuizzes     Boolean  @default(false)
-  canDeleteQuizzes   Boolean  @default(false)
-  canViewQuizResults Boolean  @default(false)
-  canViewStudents    Boolean  @default(false)
-  canManageStudents  Boolean  @default(false)
-  canViewEnrollments Boolean  @default(false)
-  canViewPayments    Boolean  @default(false)
-  canViewPayouts     Boolean  @default(false)
-  canManagePricing   Boolean  @default(false)
-  canViewAnalytics   Boolean  @default(false)
-  canViewReports     Boolean  @default(false)
-  canExportData      Boolean  @default(false)
-  canEditProfile     Boolean  @default(false)
-  canManageUsers     Boolean  @default(false)
-  canViewSettings    Boolean  @default(false)
+  // Relations
+  institution Institution @relation(fields: [institutionId], references: [id])
 
   @@index([institutionId])
-  @@map("institution_permissions")
+  @@map("institution_commissions")
 }
 
-model QuestionOption {
-  id          String  @id @default(uuid()) @db.VarChar(36)
-  question_id String  @db.VarChar(36)
-  option_type String  @db.VarChar(50)
-  content     String  @db.Text
-  media_url   String? @db.VarChar(500)
-  order_index Int     @default(0)
-  is_correct  Boolean @default(false)
-  points      Int     @default(0)
-  metadata    Json?
-
-  @@index([question_id])
-  @@map("question_options")
-}
-
-model QuestionTemplate {
-  id              String                  @id @default(uuid()) @db.VarChar(36)
-  name            String                  @db.VarChar(255)
-  description     String?                 @db.Text
-  type            question_templates_type
-  template_config Json
-  category        String?                 @db.VarChar(100)
-  difficulty      String                  @default("MEDIUM") @db.VarChar(20)
-  tags            Json?
-  is_public       Boolean                 @default(false)
-  version         Int                     @default(1)
-  created_by      String                  @db.VarChar(36)
-  created_at      DateTime                @default(now()) @db.Timestamp(0)
-  updated_at      DateTime                @default(now()) @updatedAt @db.Timestamp(0)
-
-  // Relations
-  createdByUser user @relation("QuestionTemplateCreator", fields: [created_by], references: [id])
-  templateUsage QuestionTemplateUsage[]
-  templateVersions QuestionTemplateVersion[]
-  templateSuggestions QuestionTemplateSuggestion[]
-
-  @@index([created_by])
-  @@index([type])
-  @@index([category])
-  @@index([version])
-  @@map("question_templates")
-}
-
-model QuestionTemplateVersion {
-  id              String   @id @default(uuid()) @db.VarChar(36)
-  templateId      String   @db.VarChar(36)
-  versionNumber   Int
-  changes         Json
-  createdBy       String   @db.VarChar(36)
-  createdAt       DateTime @default(now())
-  notes           String?  @db.Text
-
-  // Relations
-  template QuestionTemplate @relation(fields: [templateId], references: [id])
-  createdByUser user @relation("TemplateVersionCreator", fields: [createdBy], references: [id])
-
-  @@unique([templateId, versionNumber])
-  @@index([templateId])
-  @@index([createdBy])
-  @@map("question_template_versions")
-}
-
-model QuestionTemplateUsage {
-  id                String   @id @default(uuid()) @db.VarChar(36)
-  templateId        String   @db.VarChar(36)
-  usedBy            String   @db.VarChar(36)
-  institutionId     String   @db.VarChar(36)
-  usageContext      String   @db.VarChar(50)
-  targetQuestionBankId String? @db.VarChar(36)
-  customizationLevel String  @default("none") @db.VarChar(20)
-  usedAt            DateTime @default(now())
-  metadata          Json?
-
-  // Relations
-  template QuestionTemplate @relation(fields: [templateId], references: [id])
-  usedByUser user @relation("TemplateUsageUser", fields: [usedBy], references: [id])
-  institution Institution @relation("InstitutionTemplateUsage", fields: [institutionId], references: [id])
-
-  @@index([templateId])
-  @@index([usedBy])
-  @@index([institutionId])
-  @@index([usageContext])
-  @@index([usedAt])
-  @@map("question_template_usage")
-}
-
-model QuestionTemplateSuggestion {
-  id              String   @id @default(uuid()) @db.VarChar(36)
-  templateId      String   @db.VarChar(36)
-  suggestionType  String   @db.VarChar(50)
-  title           String   @db.VarChar(255)
-  description     String   @db.Text
-  suggestedChanges Json
-  confidence      Float    @default(0)
-  status          String   @default("PENDING") @db.VarChar(20)
-  reviewedBy      String?  @db.VarChar(36)
-  reviewedAt      DateTime?
-  implementedAt   DateTime?
-  createdAt       DateTime @default(now())
-
-  // Relations
-  template QuestionTemplate @relation(fields: [templateId], references: [id])
-  reviewedByUser user? @relation("TemplateSuggestionReviewer", fields: [reviewedBy], references: [id])
-
-  @@index([templateId])
-  @@index([reviewedBy])
-  @@index([status])
-  @@index([createdAt])
-  @@map("question_template_suggestions")
-}
-
-model QuestionBank {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
-  category    String?  @db.VarChar(100)
-  tags        Json?
-  is_public   Boolean  @default(false)
-  created_by  String   @db.VarChar(36)
-  created_at  DateTime @default(now()) @db.Timestamp(0)
-  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(0)
-
-  @@index([created_by])
-  @@index([category])
-  @@map("question_banks")
-}
-
-model QuestionBankItem {
-  id             String   @id @default(uuid()) @db.VarChar(36)
-  addedAt        DateTime @default(now())
-  addedBy        String   @db.VarChar(36)
-  orderIndex     Int      @default(0)
-  questionBankId String   @db.VarChar(36)
-  questionId     String   @db.VarChar(36)
-
-  // Relations
-  addedByUser user @relation(fields: [addedBy], references: [id])
-
-  @@unique([questionBankId, questionId])
-  @@index([questionBankId])
-  @@index([questionId])
-  @@index([addedBy], map: "question_bank_items_addedBy_fkey")
-  @@map("question_bank_items")
-}
-
-model NotificationTemplate {
-  id        String   @id @default(uuid()) @db.VarChar(36)
-  name      String   @unique @db.VarChar(100)
-  type      String   @db.VarChar(50)
-  subject   String?  @db.VarChar(200)
-  title     String   @db.VarChar(200)
-  content   String   @db.Text
-  variables Json?
-  isActive  Boolean  @default(true)
-  isDefault Boolean  @default(false)
-  category  String   @db.VarChar(50)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  createdBy String   @db.VarChar(36)
-  updatedBy String?  @db.VarChar(36)
-
-  // Relations
-  createdByUser user  @relation("NotificationTemplateCreator", fields: [createdBy], references: [id])
-  updatedByUser user? @relation("NotificationTemplateUpdater", fields: [updatedBy], references: [id])
-
-  @@index([type])
-  @@index([category])
-  @@index([isActive])
-  @@index([createdBy], map: "notification_templates_createdBy_fkey")
-  @@index([updatedBy], map: "notification_templates_updatedBy_fkey")
-  @@map("notification_templates")
-}
-
-model NotificationLog {
-  id             String    @id @default(uuid()) @db.VarChar(36)
-  templateId     String?   @db.VarChar(36)
-  recipientId    String    @db.VarChar(36)
-  recipientEmail String    @db.VarChar(255)
-  recipientName  String    @db.VarChar(255)
-  type           String    @db.VarChar(50)
-  subject        String?   @db.VarChar(200)
-  title          String    @db.VarChar(200)
-  content        String    @db.Text
-  status         String    @db.VarChar(20)
-  errorMessage   String?   @db.Text
-  sentAt         DateTime?
-  readAt         DateTime?
-  metadata       Json?
-  createdAt      DateTime  @default(now())
-  createdBy      String?   @db.VarChar(36)
-
-  // Relations
-  recipient user  @relation("NotificationLogRecipient", fields: [recipientId], references: [id])
-  sender    user? @relation("NotificationLogSender", fields: [createdBy], references: [id])
-
-  @@index([recipientId])
-  @@index([type])
-  @@index([status])
-  @@index([sentAt])
-  @@index([templateId])
-  @@index([createdBy], map: "notification_logs_createdBy_fkey")
-  @@map("notification_logs")
-}
-
-model SystemNotification {
-  id                 String    @id @default(uuid()) @db.VarChar(36)
-  title              String    @db.VarChar(200)
-  content            String    @db.Text
-  type               String    @db.VarChar(50)
-  priority           String    @default("normal") @db.VarChar(20)
-  isActive           Boolean   @default(true)
-  isGlobal           Boolean   @default(false)
-  targetRoles        String?   @db.VarChar(255)
-  targetInstitutions String?   @db.VarChar(500)
-  startDate          DateTime?
-  endDate            DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  createdBy          String    @db.VarChar(36)
-  updatedBy          String?   @db.VarChar(36)
-
-  // Relations
-  createdByUser user  @relation("SystemNotificationCreator", fields: [createdBy], references: [id])
-  updatedByUser user? @relation("SystemNotificationUpdater", fields: [updatedBy], references: [id])
-
-  @@index([type])
-  @@index([priority])
-  @@index([isActive])
-  @@index([isGlobal])
-  @@index([startDate])
-  @@index([endDate])
-  @@index([createdBy], map: "system_notifications_createdBy_fkey")
-  @@index([updatedBy], map: "system_notifications_updatedBy_fkey")
-  @@map("system_notifications")
-}
-
-model PendingWebSocketNotification {
-  id        String    @id @default(uuid()) @db.VarChar(36)
-  userId    String    @db.VarChar(36)
-  type      String    @db.VarChar(50)
-  data      Json
-  timestamp DateTime  @default(now())
-  sent      Boolean   @default(false)
-  sentAt    DateTime?
-  metadata  Json?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  // Relations
-  user user @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([sent])
-  @@index([timestamp])
-  @@map("pending_websocket_notifications")
-}
-
-model RateLimitLog {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  name       String   @db.VarChar(100)
-  identifier String   @db.VarChar(255)
-  count      Int      @default(1)
-  allowed    Boolean  @default(true)
-  timestamp  DateTime @default(now())
-  metadata   Json?
-
-  @@index([name])
-  @@index([identifier(length: 250)])
-  @@index([timestamp])
-  @@index([allowed])
-  @@map("rate_limit_logs")
-}
-
-model AuditLog {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  userId     String?  @db.VarChar(36)
-  action     String   @db.VarChar(100)
-  resource   String   @db.VarChar(100)
-  resourceId String?  @db.VarChar(36)
-  details    Json?
-  ipAddress  String?  @db.VarChar(45)
-  userAgent  String?  @db.Text
-  sessionId  String?  @db.VarChar(255)
-  severity   String   @db.VarChar(20)
-  category   String   @db.VarChar(50)
-  metadata   Json?
-  timestamp  DateTime @default(now())
-
-  // Relations
-  user user? @relation("AuditLogUser", fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([action])
-  @@index([resource])
-  @@index([severity])
-  @@index([category])
-  @@index([timestamp])
-  @@index([ipAddress])
-  @@map("audit_logs")
-}
-
-enum content_items_type {
-  VIDEO
-  AUDIO
-  IMAGE
-  DOCUMENT
-}
-
-enum exercises_type {
-  MULTIPLE_CHOICE
-  FILL_IN_BLANK
-  MATCHING
-  SHORT_ANSWER
-}
-
-enum students_status {
-  active
-  inactive
-}
-
-enum modules_level {
-  CEFR_A1
-  CEFR_A2
-  CEFR_B1
-  CEFR_B2
-  CEFR_C1
-  CEFR_C2
-  ACTFL_NOVICE_LOW
-  ACTFL_NOVICE_MID
-  ACTFL_NOVICE_HIGH
-  ACTFL_INTERMEDIATE_LOW
-  ACTFL_INTERMEDIATE_MID
-  ACTFL_INTERMEDIATE_HIGH
-  ACTFL_ADVANCED_LOW
-  ACTFL_ADVANCED_MID
-  ACTFL_ADVANCED_HIGH
-  ACTFL_SUPERIOR
-  JLPT_N5
-  JLPT_N4
-  JLPT_N3
-  JLPT_N2
-  JLPT_N1
-  HSK_1
-  HSK_2
-  HSK_3
-  HSK_4
-  HSK_5
-  HSK_6
-  TOPIK_1
-  TOPIK_2
-  TOPIK_3
-  TOPIK_4
-  TOPIK_5
-  TOPIK_6
-}
-
-enum course_framework {
-  CEFR
-  ACTFL
-  JLPT
-  HSK
-  TOPIK
-}
-
-enum quiz_questions_type {
-  MULTIPLE_CHOICE
-  FILL_IN_BLANK
-  MATCHING
-  SHORT_ANSWER
-  TRUE_FALSE
-  ESSAY
-  DRAG_AND_DROP
-  HOTSPOT
-}
-
-enum question_templates_type {
-  MULTIPLE_CHOICE
-  FILL_IN_BLANK
-  MATCHING
-  SHORT_ANSWER
-  TRUE_FALSE
-  ESSAY
-  DRAG_AND_DROP
-  HOTSPOT
-}
-
-enum StudentInstitutionStatus {
-  INQUIRY
-  APPLIED
-  REVIEWING
-  ACCEPTED
-  REJECTED
-  ENROLLED
-  ALUMNI
-  MEMBER
-}
-
-enum SocialVisibility {
-  PUBLIC
-  PRIVATE
-  FRIENDS_ONLY
-}
-
-// New model for institution subscriptions
 model InstitutionSubscription {
   id            String   @id @default(cuid())
   institutionId String   @unique
@@ -1278,56 +416,6 @@ model InstitutionSubscription {
   @@map("institution_subscriptions")
 }
 
-// New model for institution subscription logs
-model InstitutionSubscriptionLog {
-  id             String   @id @default(cuid())
-  subscriptionId String
-  action         String   // UPGRADE, DOWNGRADE, CANCEL, RENEW, SUSPEND, REACTIVATE
-  oldPlan        String?
-  newPlan        String?
-  oldAmount      Float?
-  newAmount      Float?
-  oldBillingCycle String?
-  newBillingCycle String?
-  userId         String
-  reason         String?  // Reason for the action
-  metadata       Json?
-  createdAt      DateTime @default(now())
-
-  // Relations
-  subscription InstitutionSubscription @relation(fields: [subscriptionId], references: [id])
-
-  @@index([subscriptionId])
-  @@index([action])
-  @@index([createdAt])
-  @@map("institution_subscription_logs")
-}
-
-// New model for institution billing history
-model InstitutionBillingHistory {
-  id             String   @id @default(cuid())
-  subscriptionId String
-  billingDate    DateTime
-  amount         Float
-  currency       String   @default("USD")
-  status         String   // PAID, PENDING, FAILED, REFUNDED
-  paymentMethod  String?  // STRIPE, PAYPAL, MANUAL, etc.
-  transactionId  String?  // External payment processor transaction ID
-  invoiceNumber  String?  // Internal invoice number
-  description    String?
-  metadata       Json?
-  createdAt      DateTime @default(now())
-
-  // Relations
-  subscription InstitutionSubscription @relation(fields: [subscriptionId], references: [id])
-
-  @@index([subscriptionId])
-  @@index([billingDate])
-  @@index([status])
-  @@map("institution_billing_history")
-}
-
-// New model for commission tiers based on subscription plans
 model CommissionTier {
   id            String   @id @default(cuid())
   planType      String   // STARTER, PROFESSIONAL, ENTERPRISE
@@ -1352,7 +440,53 @@ model CommissionTier {
   @@map("commission_tiers")
 }
 
-// New model for student tiers
+model InstitutionSubscriptionLog {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  action         String   // UPGRADE, DOWNGRADE, CANCEL, RENEW, SUSPEND, REACTIVATE
+  oldPlan        String?
+  newPlan        String?
+  oldAmount      Float?
+  newAmount      Float?
+  oldBillingCycle String?
+  newBillingCycle String?
+  userId         String
+  reason         String?  // Reason for the action
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  // Relations
+  subscription InstitutionSubscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("institution_subscription_logs")
+}
+
+model InstitutionBillingHistory {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  billingDate    DateTime
+  amount         Float
+  currency       String   @default("USD")
+  status         String   // PAID, PENDING, FAILED, REFUNDED
+  paymentMethod  String?  // STRIPE, PAYPAL, MANUAL, etc.
+  transactionId  String?  // External payment processor transaction ID
+  invoiceNumber  String?  // Internal invoice number
+  description    String?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  // Relations
+  subscription InstitutionSubscription @relation(fields: [subscriptionId], references: [id])
+
+  @@index([subscriptionId])
+  @@index([billingDate])
+  @@index([status])
+  @@map("institution_billing_history")
+}
+
 model StudentTier {
   id            String   @id @default(cuid())
   planType      String   // BASIC, PREMIUM, PRO
@@ -1375,7 +509,6 @@ model StudentTier {
   @@map("student_tiers")
 }
 
-// New model for student subscriptions
 model StudentSubscription {
   id            String   @id @default(cuid())
   studentId     String   @unique
@@ -1402,7 +535,6 @@ model StudentSubscription {
   @@map("student_subscriptions")
 }
 
-// New model for student billing history
 model StudentBillingHistory {
   id             String   @id @default(cuid())
   subscriptionId String
@@ -1426,7 +558,6 @@ model StudentBillingHistory {
   @@map("student_billing_history")
 }
 
-// New model for subscription logs
 model SubscriptionLog {
   id             String   @id @default(cuid())
   subscriptionId String
@@ -1451,7 +582,6 @@ model SubscriptionLog {
   @@map("subscription_logs")
 }
 
-// Model for tracking lead events and analytics
 model LeadEvent {
   id            String   @id @default(uuid()) @db.VarChar(36)
   institutionId String   @db.VarChar(36)
@@ -1849,3 +979,765 @@ model CommunityAnnouncement {
   @@index([createdAt], map: "CommunityAnnouncement_createdAt_idx")
   @@map("community_announcement")
 }
+
+// Enums
+enum course_framework {
+  CEFR
+  ACTFL
+  JLPT
+  HSK
+  TOPIK
+}
+
+enum students_status {
+  active
+  inactive
+}
+
+enum SocialVisibility {
+  PUBLIC
+  PRIVATE
+  FRIENDS_ONLY
+}
+
+// Additional models for content and learning
+model content_items {
+  id          String             @id @db.VarChar(36)
+  module_id   String             @db.VarChar(36)
+  type        content_items_type
+  title       String             @db.VarChar(255)
+  order_index Int                @default(0)
+  created_at  DateTime?          @default(now()) @db.Timestamp(0)
+  updated_at  DateTime?          @default(now()) @db.Timestamp(0)
+  content     String             @db.Text
+
+  // Relations
+  module modules @relation(fields: [module_id], references: [id])
+
+  @@index([module_id], map: "idx_content_items_module_id")
+  @@map("content_items")
+}
+
+model exercises {
+  id          String         @id @db.VarChar(36)
+  module_id   String         @db.VarChar(36)
+  type        exercises_type
+  question    String         @db.Text
+  options     Json?
+  order_index Int            @default(0)
+  created_at  DateTime?      @default(now()) @db.Timestamp(0)
+  updated_at  DateTime?      @default(now()) @db.Timestamp(0)
+  answer      String         @db.Text
+
+  // Relations
+  module modules @relation(fields: [module_id], references: [id])
+
+  @@index([module_id], map: "idx_exercises_module_id")
+  @@map("exercises")
+}
+
+model modules {
+  id                 String        @id @db.VarChar(36)
+  course_id          String        @db.VarChar(36)
+  title              String        @db.VarChar(255)
+  description        String?       @db.Text
+  level              modules_level
+  order_index        Int           @default(0)
+  estimated_duration Int           @default(0)
+  vocabulary_list    String?       @db.Text
+  grammar_points     String?       @db.Text
+  cultural_notes     String?       @db.Text
+  is_published       Boolean?      @default(false)
+  created_at         DateTime?     @default(now()) @db.Timestamp(0)
+  updated_at         DateTime?     @default(now()) @db.Timestamp(0)
+
+  // Relations
+  course       Course        @relation(fields: [course_id], references: [id])
+  quizzes      quizzes[]
+  contentItems content_items[]
+  exercises    exercises[]
+  videoSessions VideoSession[]
+
+  @@index([course_id], map: "idx_modules_course_id")
+  @@index([order_index], map: "idx_modules_order_index")
+  @@index([course_id, order_index], map: "idx_modules_course_order")
+  @@map("modules")
+}
+
+model quiz_questions {
+  id                 String              @id @db.VarChar(36)
+  quiz_id            String              @db.VarChar(36)
+  type               quiz_questions_type @default(MULTIPLE_CHOICE)
+  question           String              @db.Text
+  options            Json?
+  correct_answer     String?             @db.Text
+  points             Int                 @default(1)
+  order_index        Int                 @default(0)
+  created_at         DateTime?           @default(now()) @db.Timestamp(0)
+  updated_at         DateTime?           @default(now()) @updatedAt @db.Timestamp(0)
+  average_time_spent Int                 @default(0)
+  category           String?             @db.VarChar(100)
+  difficulty         String              @default("MEDIUM") @db.VarChar(20)
+  explanation        String?             @db.Text
+  hints              Json?
+  success_rate       Float               @default(0)
+  tags               Json?
+  times_asked        Int                 @default(0)
+  times_correct      Int                 @default(0)
+  irt_difficulty     Float?
+  irt_discrimination Float?
+  irt_guessing       Float?
+  irt_last_updated   DateTime?           @db.Timestamp(0)
+  media_type         String?             @db.VarChar(50)
+  media_url          String?             @db.VarChar(500)
+  question_config    Json?
+
+  // Relations
+  quiz quizzes @relation(fields: [quiz_id], references: [id])
+
+  @@index([quiz_id], map: "idx_quiz_questions_quiz_id")
+  @@map("quiz_questions")
+}
+
+model quizzes {
+  id                String    @id @db.VarChar(36)
+  module_id         String    @db.VarChar(36)
+  title             String    @db.VarChar(255)
+  description       String?   @db.Text
+  passing_score     Int
+  time_limit        Int?
+  created_at        DateTime? @default(now()) @db.Timestamp(0)
+  updated_at        DateTime? @default(now()) @updatedAt @db.Timestamp(0)
+  mediaUrl          String?   @db.VarChar(255)
+  allow_retry       Boolean   @default(true)
+  average_score     Float     @default(0)
+  average_time      Float     @default(0)
+  category          String?   @db.VarChar(100)
+  difficulty        String    @default("MEDIUM") @db.VarChar(20)
+  instructions      String?   @db.Text
+  max_attempts      Int       @default(3)
+  quiz_type         String    @default("STANDARD") @db.VarChar(20)
+  show_explanations Boolean   @default(false)
+  show_results      Boolean   @default(true)
+  shuffle_questions Boolean   @default(false)
+  success_rate      Float     @default(0)
+  tags              Json?
+  total_attempts    Int       @default(0)
+  total_completions Int       @default(0)
+  adaptive_config   Json?
+  initial_ability   Float     @default(0)
+  max_questions     Int       @default(20)
+  min_questions     Int       @default(5)
+  target_precision  Float     @default(0.3)
+
+  // Relations
+  module        modules        @relation(fields: [module_id], references: [id])
+  quizQuestions quiz_questions[]
+
+  @@index([module_id], map: "idx_quizzes_module_id")
+  @@map("quizzes")
+}
+
+model student_progress {
+  id                  String    @id @db.VarChar(36)
+  student_id          String    @db.VarChar(36)
+  module_id           String    @db.VarChar(36)
+  content_completed   Boolean?  @default(false)
+  exercises_completed Boolean?  @default(false)
+  quiz_completed      Boolean?  @default(false)
+  quiz_score          Int?
+  started_at          DateTime? @default(now()) @db.Timestamp(0)
+  completed_at        DateTime? @db.Timestamp(0)
+
+  @@unique([student_id, module_id], map: "unique_student_module")
+  @@index([module_id], map: "idx_student_progress_module_id")
+  @@index([student_id], map: "idx_student_progress_student_id")
+}
+
+model ModuleProgress {
+  id                  String    @id @default(uuid()) @db.VarChar(36)
+  moduleId            String    @db.VarChar(36)
+  studentId           String    @db.VarChar(36)
+  contentCompleted    Boolean   @default(false)
+  exercisesCompleted  Boolean   @default(false)
+  quizCompleted       Boolean   @default(false)
+  startedAt           DateTime  @default(now())
+  completedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  difficultyRating    Int?
+  feedback            String?   @db.Text
+  lastAccessedAt      DateTime? @default(now())
+  notes               String?   @db.Text
+  quizScore           Int?
+  timeSpent           Int       @default(0)
+  achievementUnlocked Boolean   @default(false)
+  averageSessionTime  Int       @default(0)
+  bestQuizScore       Int?
+  lastStudyDate       DateTime?
+  learningStreak      Int       @default(0)
+  retryAttempts       Int       @default(0)
+  sessionCount        Int       @default(0)
+
+  @@unique([moduleId, studentId], name: "module_student_unique")
+  @@index([moduleId], map: "module_progress_module_id_idx")
+  @@index([studentId], map: "module_progress_student_id_idx")
+  @@map("module_progress")
+}
+
+model LearningSession {
+  id               String    @id @default(uuid()) @db.VarChar(36)
+  moduleProgressId String    @db.VarChar(36)
+  startedAt        DateTime  @default(now())
+  endedAt          DateTime?
+  duration         Int       @default(0)
+  activityType     String    @db.VarChar(50)
+  completed        Boolean   @default(false)
+  notes            String?   @db.Text
+
+  @@index([moduleProgressId])
+  @@index([startedAt])
+  @@map("learning_sessions")
+}
+
+model StudentAchievement {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  studentId   String   @db.VarChar(36)
+  metadata    Json?
+  achievement String   @db.VarChar(100)
+  earnedAt    DateTime @default(now())
+
+  @@index([studentId])
+  @@map("student_achievements")
+}
+
+model ExerciseAttempt {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  exerciseId  String   @db.VarChar(36)
+  studentId   String   @db.VarChar(36)
+  userAnswer  String   @db.Text
+  isCorrect   Boolean
+  submittedAt DateTime @default(now())
+
+  @@index([exerciseId])
+  @@index([studentId])
+  @@map("exercise_attempts")
+}
+
+model QuizAttempt {
+  id                 String    @id @db.VarChar(36)
+  score              Int
+  percentage         Float
+  status             String    @default("IN_PROGRESS") @db.VarChar(20)
+  ability_estimate   Float?
+  adaptive_history   Json?
+  attempt_number     Int       @default(1)
+  completed_at       DateTime? @db.Timestamp(0)
+  confidence_level   Float?
+  device_info        Json?
+  ip_address         String?   @db.VarChar(45)
+  is_adaptive        Boolean   @default(false)
+  passed             Boolean
+  questions_answered Int       @default(0)
+  quiz_id            String    @db.VarChar(36)
+  started_at         DateTime  @default(now()) @db.Timestamp(0)
+  student_id         String    @db.VarChar(36)
+  termination_reason String?   @db.VarChar(50)
+  time_spent         Int?
+  total_points       Int
+  user_agent         String?   @db.Text
+
+  @@index([quiz_id], map: "idx_quiz_attempts_quiz_id")
+  @@index([student_id], map: "idx_quiz_attempts_student_id")
+  @@map("quiz_attempts")
+}
+
+model QuizResponse {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  attemptId    String   @db.VarChar(36)
+  questionId   String   @db.VarChar(36)
+  studentId    String   @db.VarChar(36)
+  answer       String?  @db.Text
+  isCorrect    Boolean?
+  pointsEarned Int      @default(0)
+  timeSpent    Int      @default(0)
+  answeredAt   DateTime @default(now())
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+  @@index([studentId])
+  @@map("quiz_responses")
+}
+
+// Notification and system models
+model NotificationTemplate {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  name      String   @unique @db.VarChar(100)
+  type      String   @db.VarChar(50)
+  subject   String?  @db.VarChar(200)
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  variables Json?
+  isActive  Boolean  @default(true)
+  isDefault Boolean  @default(false)
+  category  String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String   @db.VarChar(36)
+  updatedBy String?  @db.VarChar(36)
+
+  // Relations
+  createdByUser user  @relation("NotificationTemplateCreator", fields: [createdBy], references: [id])
+  updatedByUser user? @relation("NotificationTemplateUpdater", fields: [updatedBy], references: [id])
+
+  @@index([type])
+  @@index([category])
+  @@index([isActive])
+  @@index([createdBy], map: "notification_templates_createdBy_fkey")
+  @@index([updatedBy], map: "notification_templates_updatedBy_fkey")
+  @@map("notification_templates")
+}
+
+model NotificationLog {
+  id             String    @id @default(uuid()) @db.VarChar(36)
+  templateId     String?   @db.VarChar(36)
+  recipientId    String    @db.VarChar(36)
+  recipientEmail String    @db.VarChar(255)
+  recipientName  String    @db.VarChar(255)
+  type           String    @db.VarChar(50)
+  subject        String?   @db.VarChar(200)
+  title          String    @db.VarChar(200)
+  content        String    @db.Text
+  status         String    @db.VarChar(20)
+  errorMessage   String?   @db.Text
+  sentAt         DateTime?
+  readAt         DateTime?
+  metadata       Json?
+  createdAt      DateTime  @default(now())
+  createdBy      String?   @db.VarChar(36)
+
+  // Relations
+  recipient user  @relation("NotificationLogRecipient", fields: [recipientId], references: [id])
+  sender    user? @relation("NotificationLogSender", fields: [createdBy], references: [id])
+
+  @@index([recipientId])
+  @@index([type])
+  @@index([status])
+  @@index([sentAt])
+  @@index([templateId])
+  @@index([createdBy], map: "notification_logs_createdBy_fkey")
+  @@map("notification_logs")
+}
+
+model SystemNotification {
+  id                 String    @id @default(uuid()) @db.VarChar(36)
+  title              String    @db.VarChar(200)
+  content            String    @db.Text
+  type               String    @db.VarChar(50)
+  priority           String    @default("normal") @db.VarChar(20)
+  isActive           Boolean   @default(true)
+  isGlobal           Boolean   @default(false)
+  targetRoles        String?   @db.VarChar(255)
+  targetInstitutions String?   @db.VarChar(500)
+  startDate          DateTime?
+  endDate            DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  createdBy          String    @db.VarChar(36)
+  updatedBy          String?   @db.VarChar(36)
+
+  // Relations
+  createdByUser user  @relation("SystemNotificationCreator", fields: [createdBy], references: [id])
+  updatedByUser user? @relation("SystemNotificationUpdater", fields: [updatedBy], references: [id])
+
+  @@index([type])
+  @@index([priority])
+  @@index([isActive])
+  @@index([isGlobal])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([createdBy], map: "system_notifications_createdBy_fkey")
+  @@index([updatedBy], map: "system_notifications_updatedBy_fkey")
+  @@map("system_notifications")
+}
+
+model PendingWebSocketNotification {
+  id        String    @id @default(uuid()) @db.VarChar(36)
+  userId    String    @db.VarChar(36)
+  type      String    @db.VarChar(50)
+  data      Json
+  timestamp DateTime  @default(now())
+  sent      Boolean   @default(false)
+  sentAt    DateTime?
+  metadata  Json?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  user user @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([sent])
+  @@index([timestamp])
+  @@map("pending_websocket_notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  userId     String?  @db.VarChar(36)
+  action     String   @db.VarChar(100)
+  resource   String   @db.VarChar(100)
+  resourceId String?  @db.VarChar(36)
+  details    Json?
+  ipAddress  String?  @db.VarChar(45)
+  userAgent  String?  @db.Text
+  sessionId  String?  @db.VarChar(255)
+  severity   String   @db.VarChar(20)
+  category   String   @db.VarChar(50)
+  metadata   Json?
+  timestamp  DateTime @default(now())
+
+  // Relations
+  user user? @relation("AuditLogUser", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([severity])
+  @@index([category])
+  @@index([timestamp])
+  @@index([ipAddress])
+  @@map("audit_logs")
+}
+
+model RateLimitLog {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  name       String   @db.VarChar(100)
+  identifier String   @db.VarChar(255)
+  count      Int      @default(1)
+  allowed    Boolean  @default(true)
+  timestamp  DateTime @default(now())
+  metadata   Json?
+
+  @@index([name])
+  @@index([identifier(length: 250)])
+  @@index([timestamp])
+  @@index([allowed])
+  @@map("rate_limit_logs")
+}
+
+// Question bank and template models
+model QuestionTemplate {
+  id              String                  @id @default(uuid()) @db.VarChar(36)
+  name            String                  @db.VarChar(255)
+  description     String?                 @db.Text
+  type            question_templates_type
+  template_config Json
+  category        String?                 @db.VarChar(100)
+  difficulty      String                  @default("MEDIUM") @db.VarChar(20)
+  tags            Json?
+  is_public       Boolean                 @default(false)
+  version         Int                     @default(1)
+  created_by      String                  @db.VarChar(36)
+  created_at      DateTime                @default(now()) @db.Timestamp(0)
+  updated_at      DateTime                @default(now()) @updatedAt @db.Timestamp(0)
+
+  // Relations
+  createdByUser user @relation("QuestionTemplateCreator", fields: [created_by], references: [id])
+  templateUsage QuestionTemplateUsage[]
+  templateVersions QuestionTemplateVersion[]
+  templateSuggestions QuestionTemplateSuggestion[]
+
+  @@index([created_by])
+  @@index([type])
+  @@index([category])
+  @@index([version])
+  @@map("question_templates")
+}
+
+model QuestionTemplateVersion {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  templateId      String   @db.VarChar(36)
+  versionNumber   Int
+  changes         Json
+  createdBy       String   @db.VarChar(36)
+  createdAt       DateTime @default(now())
+  notes           String?  @db.Text
+
+  // Relations
+  template QuestionTemplate @relation(fields: [templateId], references: [id])
+  createdByUser user @relation("TemplateVersionCreator", fields: [createdBy], references: [id])
+
+  @@unique([templateId, versionNumber])
+  @@index([templateId])
+  @@index([createdBy])
+  @@map("question_template_versions")
+}
+
+model QuestionTemplateUsage {
+  id                String   @id @default(uuid()) @db.VarChar(36)
+  templateId        String   @db.VarChar(36)
+  usedBy            String   @db.VarChar(36)
+  institutionId     String   @db.VarChar(36)
+  usageContext      String   @db.VarChar(50)
+  targetQuestionBankId String? @db.VarChar(36)
+  customizationLevel String  @default("none") @db.VarChar(20)
+  usedAt            DateTime @default(now())
+  metadata          Json?
+
+  // Relations
+  template QuestionTemplate @relation(fields: [templateId], references: [id])
+  usedByUser user @relation("TemplateUsageUser", fields: [usedBy], references: [id])
+  institution Institution @relation("InstitutionTemplateUsage", fields: [institutionId], references: [id])
+
+  @@index([templateId])
+  @@index([usedBy])
+  @@index([institutionId])
+  @@index([usageContext])
+  @@index([usedAt])
+  @@map("question_template_usage")
+}
+
+model QuestionTemplateSuggestion {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  templateId      String   @db.VarChar(36)
+  suggestionType  String   @db.VarChar(50)
+  title           String   @db.VarChar(255)
+  description     String   @db.Text
+  suggestedChanges Json
+  confidence      Float    @default(0)
+  status          String   @default("PENDING") @db.VarChar(20)
+  reviewedBy      String?  @db.VarChar(36)
+  reviewedAt      DateTime?
+  implementedAt   DateTime?
+  createdAt       DateTime @default(now())
+
+  // Relations
+  template QuestionTemplate @relation(fields: [templateId], references: [id])
+  reviewedByUser user? @relation("TemplateSuggestionReviewer", fields: [reviewedBy], references: [id])
+
+  @@index([templateId])
+  @@index([reviewedBy])
+  @@index([status])
+  @@index([createdAt])
+  @@map("question_template_suggestions")
+}
+
+model QuestionBank {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  category    String?  @db.VarChar(100)
+  tags        Json?
+  is_public   Boolean  @default(false)
+  created_by  String   @db.VarChar(36)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamp(0)
+
+  @@index([created_by])
+  @@index([category])
+  @@map("question_banks")
+}
+
+model QuestionBankItem {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  addedAt        DateTime @default(now())
+  addedBy        String   @db.VarChar(36)
+  orderIndex     Int      @default(0)
+  questionBankId String   @db.VarChar(36)
+  questionId     String   @db.VarChar(36)
+
+  // Relations
+  addedByUser user @relation(fields: [addedBy], references: [id])
+
+  @@unique([questionBankId, questionId])
+  @@index([questionBankId])
+  @@index([questionId])
+  @@index([addedBy], map: "question_bank_items_addedBy_fkey")
+  @@map("question_bank_items")
+}
+
+model QuestionOption {
+  id          String  @id @default(uuid()) @db.VarChar(36)
+  question_id String  @db.VarChar(36)
+  option_type String  @db.VarChar(50)
+  content     String  @db.Text
+  media_url   String? @db.VarChar(500)
+  order_index Int     @default(0)
+  is_correct  Boolean @default(false)
+  points      Int     @default(0)
+  metadata    Json?
+
+  @@index([question_id])
+  @@map("question_options")
+}
+
+model InstitutionPermissions {
+  id                 String   @id @default(cuid())
+  institutionId      String   @unique
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  canCreateCourses   Boolean  @default(false)
+  canEditCourses     Boolean  @default(false)
+  canDeleteCourses   Boolean  @default(false)
+  canPublishCourses  Boolean  @default(false)
+  canCreateContent   Boolean  @default(false)
+  canEditContent     Boolean  @default(false)
+  canDeleteContent   Boolean  @default(false)
+  canUploadMedia     Boolean  @default(false)
+  canCreateQuizzes   Boolean  @default(false)
+  canEditQuizzes     Boolean  @default(false)
+  canDeleteQuizzes   Boolean  @default(false)
+  canViewQuizResults Boolean  @default(false)
+  canViewStudents    Boolean  @default(false)
+  canManageStudents  Boolean  @default(false)
+  canViewEnrollments Boolean  @default(false)
+  canViewPayments    Boolean  @default(false)
+  canViewPayouts     Boolean  @default(false)
+  canManagePricing   Boolean  @default(false)
+  canViewAnalytics   Boolean  @default(false)
+  canViewReports     Boolean  @default(false)
+  canExportData      Boolean  @default(false)
+  canEditProfile     Boolean  @default(false)
+  canManageUsers     Boolean  @default(false)
+  canViewSettings    Boolean  @default(false)
+
+  @@index([institutionId])
+  @@map("institution_permissions")
+}
+
+model EmailSettings {
+  id                 String   @id @default("1")
+  host               String
+  port               Int
+  secure             Boolean  @default(true)
+  username           String
+  password           String
+  fromEmail          String
+  fromName           String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  rejectUnauthorized Boolean  @default(false)
+
+  @@map("email_settings")
+}
+
+model AdminSettings {
+  id                                   String   @id @default("1")
+  createdAt                            DateTime @default(now())
+  updatedAt                            DateTime @updatedAt
+  allowInstitutionPaymentApproval      Boolean  @default(true)
+  showInstitutionApprovalButtons       Boolean  @default(true)
+  defaultPaymentStatus                 String   @default("PENDING")
+  institutionApprovableMethods         Json
+  adminOnlyMethods                     Json
+  institutionPaymentApprovalExemptions Json
+  fileUploadMaxSizeMB                  Int      @default(10)
+
+  @@map("admin_settings")
+}
+
+model StudentNotificationPreferences {
+  id                     String   @id @default(uuid()) @db.VarChar(36)
+  student_id             String   @unique @db.VarChar(36)
+  email_notifications    Boolean  @default(true)
+  push_notifications     Boolean  @default(true)
+  sms_notifications      Boolean  @default(false)
+  course_updates         Boolean  @default(true)
+  assignment_reminders   Boolean  @default(true)
+  payment_reminders      Boolean  @default(true)
+  created_at             DateTime @default(now()) @db.Timestamp(0)
+  updated_at             DateTime @default(now()) @updatedAt @db.Timestamp(0)
+  achievement_alerts     Boolean  @default(true)
+  assignment_deadlines   Boolean  @default(true)
+  assignment_feedback    Boolean  @default(true)
+  assignment_grades      Boolean  @default(true)
+  course_announcements   Boolean  @default(true)
+  course_reminders       Boolean  @default(true)
+  course_schedule        Boolean  @default(true)
+  group_messages         Boolean  @default(true)
+  instructor_messages    Boolean  @default(true)
+  milestone_reached      Boolean  @default(true)
+  notification_frequency String   @default("DAILY") @db.VarChar(20)
+  payment_confirmation   Boolean  @default(true)
+  payment_failed         Boolean  @default(true)
+  payment_receipts       Boolean  @default(true)
+  progress_updates       Boolean  @default(true)
+  system_announcements   Boolean  @default(true)
+
+  @@map("student_notification_preferences")
+}
+
+// Additional enums
+enum content_items_type {
+  VIDEO
+  AUDIO
+  IMAGE
+  DOCUMENT
+}
+
+enum exercises_type {
+  MULTIPLE_CHOICE
+  FILL_IN_BLANK
+  MATCHING
+  SHORT_ANSWER
+}
+
+enum modules_level {
+  CEFR_A1
+  CEFR_A2
+  CEFR_B1
+  CEFR_B2
+  CEFR_C1
+  CEFR_C2
+  ACTFL_NOVICE_LOW
+  ACTFL_NOVICE_MID
+  ACTFL_NOVICE_HIGH
+  ACTFL_INTERMEDIATE_LOW
+  ACTFL_INTERMEDIATE_MID
+  ACTFL_INTERMEDIATE_HIGH
+  ACTFL_ADVANCED_LOW
+  ACTFL_ADVANCED_MID
+  ACTFL_ADVANCED_HIGH
+  ACTFL_SUPERIOR
+  JLPT_N5
+  JLPT_N4
+  JLPT_N3
+  JLPT_N2
+  JLPT_N1
+  HSK_1
+  HSK_2
+  HSK_3
+  HSK_4
+  HSK_5
+  HSK_6
+  TOPIK_1
+  TOPIK_2
+  TOPIK_3
+  TOPIK_4
+  TOPIK_5
+  TOPIK_6
+}
+
+enum quiz_questions_type {
+  MULTIPLE_CHOICE
+  FILL_IN_BLANK
+  MATCHING
+  SHORT_ANSWER
+  TRUE_FALSE
+  ESSAY
+  DRAG_AND_DROP
+  HOTSPOT
+}
+
+enum question_templates_type {
+  MULTIPLE_CHOICE
+  FILL_IN_BLANK
+  MATCHING
+  SHORT_ANSWER
+  TRUE_FALSE
+  ESSAY
+  DRAG_AND_DROP
+  HOTSPOT
+} 

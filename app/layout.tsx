@@ -9,20 +9,23 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster as SonnerToaster } from 'sonner';
 import { generateOrganizationStructuredData } from "@/lib/seo-config";
+
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   preload: true,
   fallback: ["system-ui", "arial"],
+  variable: "--font-inter",
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
   display: "swap",
-  preload: false, // Disable preloading to avoid Turbopack issues
+  preload: true, // Re-enable preloading now that Turbopack is disabled
   fallback: ["system-ui", "arial"],
   variable: "--font-poppins",
+  adjustFontFallback: false, // Disable font adjustment to prevent issues
 });
 
 export const metadata: Metadata = {

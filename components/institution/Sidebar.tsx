@@ -19,7 +19,8 @@ import {
   FileQuestion,
   Database,
   ClipboardList,
-  Globe
+  Globe,
+  Calendar
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -43,6 +44,7 @@ export function InstitutionSidebar({ className }: SidebarProps) {
   const isQuestionTemplatesPage = pathname.startsWith('/institution/question-templates');
   const isQuestionBanksPage = pathname.startsWith('/institution/question-banks');
   const isSharedQuestionsPage = pathname.startsWith('/institution/shared-questions');
+  const isLiveClassesPage = pathname.startsWith('/institution/live-classes');
 
   const courses = [
     {
@@ -112,6 +114,16 @@ export function InstitutionSidebar({ className }: SidebarProps) {
             >
               <Settings className="mr-2 h-4 w-4" />
               Settings
+            </Link>
+            <Link
+              href="/institution/live-classes"
+              className={cn(
+                'flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
+                isLiveClassesPage && 'bg-accent'
+              )}
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              Live Classes
             </Link>
           </div>
         </div>

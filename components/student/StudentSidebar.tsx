@@ -17,7 +17,8 @@ import {
   Target,
   Award,
   Calendar,
-  Play
+  Play,
+  Video
 } from 'lucide-react';
 
 const menuItems = [
@@ -32,6 +33,12 @@ const menuItems = [
     href: '/student/courses',
     icon: BookOpen,
     description: 'Browse and access your enrolled courses'
+  },
+  {
+    title: 'Live Classes',
+    href: '/student/live-classes',
+    icon: Video,
+    description: 'Join live language learning sessions'
   },
   {
     title: 'Learning Activities',

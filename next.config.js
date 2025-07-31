@@ -10,15 +10,14 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   
-  // Re-enable Turbopack with conservative settings
+  // Temporarily disable Turbopack to fix font loading issues
   experimental: {
-    // Enable Turbopack with minimal configuration
-    turbo: {
-      // Disable font optimization to prevent loading issues
-      resolveAlias: {
-        '@': './',
-      },
-    },
+    // Disable Turbopack temporarily to fix font loading issues
+    // turbo: {
+    //   resolveAlias: {
+    //     '@': './',
+    //   },
+    // },
     // Performance optimizations
     optimizeCss: true,
     scrollRestoration: true,

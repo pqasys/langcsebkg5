@@ -14,7 +14,8 @@ import {
   Award,
   Calendar,
   Play,
-  User
+  User,
+  Video
 } from 'lucide-react';
 
 const mobileNavItems = [
@@ -29,6 +30,11 @@ const mobileNavItems = [
     icon: BookOpen
   },
   {
+    title: 'Live Classes',
+    href: '/student/live-classes',
+    icon: Video
+  },
+  {
     title: 'Progress',
     href: '/student/progress',
     icon: Target
@@ -37,11 +43,6 @@ const mobileNavItems = [
     title: 'Payments',
     href: '/student/payments',
     icon: CreditCard
-  },
-  {
-    title: 'Language Test',
-    href: '/language-proficiency-test',
-    icon: Award
   },
   {
     title: 'Profile',

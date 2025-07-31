@@ -102,10 +102,10 @@ export default function InstitutionSidebar({ onNavigate }: InstitutionSidebarPro
       description: 'Manage question banks'
     },
     {
-      title: 'Video Sessions',
-      href: '/institution/video-sessions',
+      title: 'Live Classes',
+      href: '/institution/live-classes',
       icon: Video,
-      description: 'Manage video sessions'
+      description: 'Manage live classes and sessions'
     },
     {
       title: 'Shared Questions',

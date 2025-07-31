@@ -31,7 +31,8 @@ import {
   ChevronDown,
   ChevronRight,
   Activity,
-  LogOut
+  LogOut,
+  Video
 } from 'lucide-react';
 // import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -160,6 +161,8 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
   const isNotificationsPage = pathname.startsWith('/admin/settings/notifications/templates');
   // Check if we're on performance page
   const isPerformancePage = pathname.startsWith('/admin/performance');
+  // Check if we're on live classes page
+  const isLiveClassesPage = pathname.startsWith('/admin/live-classes');
 
   return (
     <div className="flex h-full flex-col bg-gray-900">
@@ -249,6 +252,17 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
                   <Tags className="h-4 w-4" />
                   Tag Management
                 </a>
+
+                <Link
+                  href="/admin/live-classes"
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                    isLiveClassesPage ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                  )}
+                >
+                  <Video className="h-4 w-4" />
+                  Live Classes
+                </Link>
               </div>
             </div>
 
