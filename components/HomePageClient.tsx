@@ -98,7 +98,11 @@ export default function HomePageClient() {
     return cachedStats || null // Return null instead of zeros to prevent flashing
   })
   const [loading, setLoading] = useState(() => {
-    // Start loading if we don't have cached data
+    // Ensure consistent behavior between server and client
+    if (typeof window === 'undefined') {
+      // Server-side: always start with loading true to prevent hydration mismatch
+      return true;
+    }
     const shouldLoad = getInitialStats() === null;
     console.log('HomePageClient - Initial loading state:', shouldLoad);
     return shouldLoad;
@@ -122,6 +126,9 @@ export default function HomePageClient() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Prevent hydration mismatch by ensuring consistent initial render
+  const isClient = typeof window !== 'undefined';
   
   // Memoize expensive computations
   const memoizedStats = useMemo(() => stats, [stats])
@@ -533,25 +540,25 @@ export default function HomePageClient() {
               <div className={`grid ${isSmallScreen ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'} gap-4 md:gap-8`}>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-blue-600 mb-2">
-                    {!mounted || loading || !stats ? 'Loading...' : `${stats.students.toLocaleString()}+`}
+                    {typeof window === 'undefined' || !mounted || loading || !stats ? 'Loading...' : `${stats.students.toLocaleString()}+`}
                   </div>
                   <div className="text-sm md:text-base text-gray-600">Active Students</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-indigo-600 mb-2">
-                    {!mounted || loading || !stats ? 'Loading...' : `${stats.institutions.toLocaleString()}+`}
+                    {typeof window === 'undefined' || !mounted || loading || !stats ? 'Loading...' : `${stats.institutions.toLocaleString()}+`}
                   </div>
                   <div className="text-sm md:text-base text-gray-600">Partner Institutions</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-purple-600 mb-2">
-                    {!mounted || loading || !stats ? 'Loading...' : `${stats.courses.toLocaleString()}+`}
+                    {typeof window === 'undefined' || !mounted || loading || !stats ? 'Loading...' : `${stats.courses.toLocaleString()}+`}
                   </div>
                   <div className="text-sm md:text-base text-gray-600">Available Courses</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-cyan-600 mb-2">
-                    {!mounted || loading || !stats ? 'Loading...' : `${stats.languages}+`}
+                    {typeof window === 'undefined' || !mounted || loading || !stats ? 'Loading...' : `${stats.languages}+`}
                   </div>
                   <div className="text-sm md:text-base text-gray-600">Languages Taught</div>
                 </div>
