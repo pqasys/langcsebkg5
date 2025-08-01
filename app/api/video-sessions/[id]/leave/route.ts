@@ -52,15 +52,8 @@ export async function POST(
       }
     });
 
-    // Update session participant count
-    await prisma.videoSession.update({
-      where: { id: sessionId },
-      data: {
-        currentParticipants: {
-          decrement: 1
-        }
-      }
-    });
+    // Note: currentParticipants is calculated dynamically from participants array
+    // No need to update it manually
 
     logger.info(`User ${session.user.id} left video session ${sessionId} after ${duration} seconds`);
 

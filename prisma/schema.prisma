@@ -27,13 +27,9 @@ model Institution {
   contactPhone       String?  @db.VarChar(20)
   contactEmail       String?  @db.VarChar(100)
   logoUrl            String?  @db.VarChar(255)
-  mainImageUrl       String?  @db.VarChar(255)
   facilities         String?  @db.Text
   status             String   @default("PENDING") @db.VarChar(20)
   isApproved         Boolean  @default(false)
-  isActive           Boolean  @default(true)
-  isFeatured         Boolean  @default(false)
-  subscriptionPlan   String   @default("BASIC") @db.VarChar(20)
   currency           String   @default("USD") @db.VarChar(3)
   commissionRate     Float    @default(10) @db.Float
   discountSettings   Json?
@@ -41,17 +37,14 @@ model Institution {
   socialMedia        Json?
   defaultMaxStudents Int      @default(15)
   stripeCustomerId   String?  @db.VarChar(255)
+  mainImageUrl       String?  @db.VarChar(255)
+  subscriptionPlan   String   @default("BASIC") @db.VarChar(20)
+  isFeatured         Boolean  @default(false)
+  isActive           Boolean  @default(true)
 
   // Relations
-  users user[] @relation("UserInstitution")
-  bookings booking[]
-  commissionRateLogs CommissionRateLog[]
-  courses Course[]
-  commission InstitutionCommission?
-  subscription InstitutionSubscription?
-  leadEvents LeadEvent[]
-  templateUsageRecords QuestionTemplateUsage[] @relation("InstitutionTemplateUsage")
-  videoSessions VideoSession[]
+  users user[]
+  videoSessions VideoSession[] @relation("VideoSessionInstitution")
 
   @@map("institution")
 }
@@ -73,19 +66,12 @@ model Course {
   base_price    Float            @default(0)
   pricingPeriod String           @default("WEEKLY") @db.VarChar(20)
   framework     course_framework @default(CEFR)
-  priority      Int              @default(0)
   isFeatured    Boolean          @default(false)
   isSponsored   Boolean          @default(false)
+  priority      Int              @default(0)
 
   // Relations
-  institution Institution @relation(fields: [institutionId], references: [id])
-  category    category    @relation(fields: [categoryId], references: [id])
-  enrollments StudentCourseEnrollment[]
-  completions StudentCourseCompletion[] @relation("CourseCompletions")
-  bookings    booking[]
-  modules     modules[]
-  courseTags  CourseTag[]
-  videoSessions VideoSession[]
+  videoSessions VideoSession[] @relation("VideoSessionCourse")
 
   @@unique([title, institutionId], map: "Course_title_institutionId_key")
   @@index([categoryId], map: "Course_categoryId_fkey")
@@ -94,68 +80,27 @@ model Course {
   @@index([level], map: "Course_level_idx")
   @@index([createdAt], map: "Course_createdAt_idx")
   @@index([institutionId, status], map: "Course_institution_status_idx")
+  @@index([createdAt], map: "idx_course_created_at")
   @@map("course")
 }
 
 model user {
-  id                String    @id @default(uuid()) @db.VarChar(36)
-  name              String    @db.VarChar(255)
-  email             String    @unique @db.VarChar(100)
-  emailVerified     DateTime?
-  image             String?   @db.VarChar(255)
-  password          String    @db.VarChar(255)
-  role              String    @default("STUDENT") @db.VarChar(20)
-  institutionId     String?   @db.VarChar(36)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @default(now()) @updatedAt
-  status            String    @default("ACTIVE") @db.VarChar(20)
-  forcePasswordReset Boolean  @default(false)
+  id                 String    @id @default(uuid()) @db.VarChar(36)
+  name               String    @db.VarChar(255)
+  email              String    @unique @db.VarChar(100)
+  emailVerified      DateTime?
+  image              String?   @db.VarChar(255)
+  password           String    @db.VarChar(255)
+  role               String    @default("STUDENT") @db.VarChar(20)
+  institutionId      String?   @db.VarChar(36)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now()) @updatedAt
+  status             String    @default("ACTIVE") @db.VarChar(20)
+  forcePasswordReset Boolean   @default(false)
 
   // Relations
-  institution           Institution? @relation("UserInstitution", fields: [institutionId], references: [id])
-  bookings              booking[]
-  commissionRateLogs    CommissionRateLog[]
-  auditLogs             AuditLog[] @relation("AuditLogUser")
-  
-  // Notification relations
-  notificationTemplatesCreated NotificationTemplate[] @relation("NotificationTemplateCreator")
-  notificationTemplatesUpdated NotificationTemplate[] @relation("NotificationTemplateUpdater")
-  notificationLogsReceived     NotificationLog[]     @relation("NotificationLogRecipient")
-  notificationLogsSent         NotificationLog[]     @relation("NotificationLogSender")
-  systemNotificationsCreated   SystemNotification[]  @relation("SystemNotificationCreator")
-  systemNotificationsUpdated   SystemNotification[]  @relation("SystemNotificationUpdater")
-  pendingWebSocketNotifications PendingWebSocketNotification[]
-  
-  // Question bank relations
-  questionBankItemsAdded       QuestionBankItem[]
-  questionTemplatesCreated     QuestionTemplate[]    @relation("QuestionTemplateCreator")
-  templateVersionsCreated      QuestionTemplateVersion[] @relation("TemplateVersionCreator")
-  templateUsageRecords         QuestionTemplateUsage[] @relation("TemplateUsageUser")
-  templateSuggestionsReviewed  QuestionTemplateSuggestion[] @relation("TemplateSuggestionReviewer")
-
-  // Video session relations
-  videoSessionsInstructed VideoSession[] @relation("VideoSessionInstructor")
-  videoSessionParticipants VideoSessionParticipant[]
-  videoSessionMessages     VideoSessionMessage[]
-  receivedMessages         VideoSessionMessage[] @relation("MessageRecipient")
-  
-  // Live conversation relations
-  liveConversationsInstructed LiveConversation[] @relation("LiveConversationInstructor")
-  liveConversationsHosted     LiveConversation[] @relation("LiveConversationHost")
-  liveConversationParticipants LiveConversationParticipant[]
-  liveConversationMessages    LiveConversationMessage[]
-  receivedConversationMessages LiveConversationMessage[] @relation("ConversationMessageRecipient")
-  liveConversationBookingsAsStudent LiveConversationBooking[] @relation("LiveConversationBookingStudent")
-  liveConversationBookingsAsInstructor LiveConversationBooking[] @relation("LiveConversationBookingInstructor")
-  liveConversationBookingsCancelled LiveConversationBooking[] @relation("LiveConversationBookingCancelledBy")
-  
-  // Language proficiency test relations
-  languageProficiencyTestAttempts LanguageProficiencyTestAttempt[]
-  
-  // Certificate and achievement relations
-  certificates Certificate[]
-  achievements UserAchievement[]
-  communityAnnouncements CommunityAnnouncement[]
+  institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  instructorSessions VideoSession[] @relation("VideoSessionInstructor")
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -174,16 +119,11 @@ model booking {
   stateVersion  Int      @default(1)
   version       Int      @default(1)
 
-  // Relations
-  user         user         @relation(fields: [userId], references: [id])
-  course       Course       @relation(fields: [courseId], references: [id])
-  institution  Institution  @relation(fields: [institutionId], references: [id])
-  student      Student      @relation(fields: [studentId], references: [id])
-
   @@index([courseId], map: "Booking_courseId_fkey")
   @@index([institutionId], map: "Booking_institutionId_fkey")
   @@index([studentId], map: "Booking_studentId_fkey")
   @@index([userId], map: "Booking_userId_fkey")
+  @@index([courseId], map: "idx_booking_course_id")
   @@map("booking")
 }
 
@@ -195,10 +135,6 @@ model CommissionRateLog {
   changedBy     String   @db.VarChar(36)
   reason        String?  @db.Text
   changedAt     DateTime @default(now())
-
-  // Relations
-  changedByUser user         @relation(fields: [changedBy], references: [id])
-  institution   Institution  @relation(fields: [institutionId], references: [id])
 
   @@index([changedBy], map: "CommissionRateLog_changedBy_idx")
   @@index([institutionId], map: "CommissionRateLog_institutionId_idx")
@@ -213,9 +149,6 @@ model category {
   updatedAt   DateTime @default(now()) @updatedAt
   slug        String   @unique @db.VarChar(50)
 
-  // Relations
-  courses Course[]
-
   @@map("category")
 }
 
@@ -226,13 +159,10 @@ model CourseTag {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  // Relations
-  course Course @relation(fields: [courseId], references: [id])
-  tag    Tag    @relation(fields: [tagId], references: [id])
-
   @@unique([courseId, tagId])
   @@index([courseId])
   @@index([tagId])
+  @@index([courseId], map: "idx_course_tag_course_id")
   @@map("coursetag")
 }
 
@@ -251,9 +181,6 @@ model Tag {
   featured    Boolean  @default(false)
   priority    Int      @default(0)
 
-  // Relations
-  courseTags CourseTag[]
-
   @@index([categoryId])
   @@index([parentId])
   @@index([name])
@@ -261,41 +188,33 @@ model Tag {
 }
 
 model Student {
-  id          String           @id @default(uuid()) @db.VarChar(36)
-  name        String
-  email       String           @unique(map: "email")
-  phone       String?          @db.VarChar(20)
-  address     String?          @db.Text
-  bio         String?          @db.Text
-  status      students_status? @default(active)
-  created_at  DateTime?        @default(now()) @db.Timestamp(0)
-  updated_at  DateTime?        @default(now()) @updatedAt @db.Timestamp(0)
-  last_active DateTime?        @default(now()) @db.Timestamp(0)
-  stripeCustomerId String?     @db.VarChar(255)
-  
-  // Social and language fields
-  native_language String?      @db.VarChar(50)
-  spoken_languages Json?       @db.Json
-  learning_goals String?       @db.Text
-  interests Json?              @db.Json
+  id                String           @id @default(uuid()) @db.VarChar(36)
+  name              String
+  email             String           @unique(map: "email")
+  phone             String?          @db.VarChar(20)
+  address           String?          @db.Text
+  bio               String?          @db.Text
+  status            students_status? @default(active)
+  created_at        DateTime?        @default(now()) @db.Timestamp(0)
+  updated_at        DateTime?        @default(now()) @updatedAt @db.Timestamp(0)
+  last_active       DateTime?        @default(now()) @db.Timestamp(0)
+  stripeCustomerId  String?          @db.VarChar(255)
+  date_of_birth     DateTime?        @db.Date
+  gender            String?          @db.VarChar(20)
+  interests         Json?
+  learning_goals    String?          @db.Text
+  location          String?          @db.VarChar(255)
+  native_language   String?          @db.VarChar(50)
+  social_links      Json?
   social_visibility SocialVisibility @default(PRIVATE)
-  timezone String?             @db.VarChar(50)
-  date_of_birth DateTime?      @db.Date
-  gender String?               @db.VarChar(20)
-  location String?             @db.VarChar(255)
-  website String?              @db.VarChar(255)
-  social_links Json?           @db.Json
-
-  // Relations
-  enrollments StudentCourseEnrollment[]
-  completions StudentCourseCompletion[] @relation("StudentCompletions")
-  bookings    booking[]
-  subscriptions StudentSubscription[]
+  spoken_languages  Json?
+  timezone          String?          @db.VarChar(50)
+  website           String?          @db.VarChar(255)
 
   @@index([email], map: "idx_students_email")
   @@index([native_language])
   @@index([social_visibility])
-  @@index([location])
+  @@index([location(length: 250)])
   @@map("students")
 }
 
@@ -314,13 +233,9 @@ model StudentCourseEnrollment {
   stateVersion  Int       @default(1)
   version       Int       @default(1)
 
-  // Relations
-  student Student @relation(fields: [studentId], references: [id])
-  course  Course  @relation(fields: [courseId], references: [id])
-  payments Payment[]
-
   @@index([studentId])
   @@index([courseId])
+  @@index([courseId], map: "idx_enrollment_course_id")
   @@map("student_course_enrollments")
 }
 
@@ -332,12 +247,9 @@ model StudentCourseCompletion {
   studentId String   @db.VarChar(36)
   updatedAt DateTime @default(now()) @updatedAt
 
-  // Relations
-  student Student @relation("StudentCompletions", fields: [studentId], references: [id])
-  course  Course  @relation("CourseCompletions", fields: [courseId], references: [id])
-
   @@index([studentId], map: "StudentCourseCompletion_studentId_fkey")
   @@index([courseId], map: "StudentCourseCompletion_courseId_fkey")
+  @@index([courseId], map: "idx_completion_course_id")
   @@map("student_course_completions")
 }
 
@@ -365,9 +277,6 @@ model Payment {
   refundAmount      Float?
   refundedAt        DateTime?
 
-  // Relations
-  enrollment StudentCourseEnrollment @relation(fields: [enrollmentId], references: [id])
-
   @@index([institutionId])
   @@index([enrollmentId])
   @@index([payoutId])
@@ -384,79 +293,64 @@ model InstitutionCommission {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  // Relations
-  institution Institution @relation(fields: [institutionId], references: [id])
-
   @@index([institutionId])
   @@map("institution_commissions")
 }
 
 model InstitutionSubscription {
-  id            String   @id @default(cuid())
-  institutionId String   @unique
-  commissionTierId String
-  status        String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED, PAST_DUE, SUSPENDED
-  startDate     DateTime @default(now())
-  endDate       DateTime
-  autoRenew     Boolean  @default(true)
-  cancellationReason String? // Reason for cancellation
-  cancelledAt   DateTime? // When subscription was cancelled
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Relations
-  institution Institution @relation(fields: [institutionId], references: [id])
-  commissionTier CommissionTier @relation(fields: [commissionTierId], references: [id])
-  logs InstitutionSubscriptionLog[]
-  billingHistory InstitutionBillingHistory[]
+  id                 String    @id @default(cuid())
+  institutionId      String    @unique
+  status             String    @default("ACTIVE")
+  startDate          DateTime  @default(now())
+  endDate            DateTime
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  autoRenew          Boolean   @default(true)
+  cancellationReason String?
+  cancelledAt        DateTime?
+  commissionTierId   String
 
   @@index([institutionId])
   @@index([status])
   @@index([endDate])
+  @@index([commissionTierId], map: "institution_subscriptions_commissionTierId_fkey")
   @@map("institution_subscriptions")
 }
 
 model CommissionTier {
-  id            String   @id @default(cuid())
-  planType      String   // STARTER, PROFESSIONAL, ENTERPRISE
-  name          String   // "Starter Plan", "Professional Plan", "Enterprise Plan"
-  description   String   @db.Text
-  price         Float    // Fixed price for this tier
-  currency      String   @default("USD") @db.VarChar(3)
-  billingCycle  String   @default("MONTHLY") @db.VarChar(20)
-  commissionRate Float   // Commission rate as percentage
-  features      Json     // Features included in this tier
-  maxStudents   Int      @default(10)
-  maxCourses    Int      @default(5)
-  maxTeachers   Int      @default(2)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String   @id @default(cuid())
+  planType       String   @unique
+  commissionRate Float
+  features       Json
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  name           String
+  description    String   @db.Text
+  price          Float
+  currency       String   @default("USD") @db.VarChar(3)
+  billingCycle   String   @default("MONTHLY") @db.VarChar(20)
+  maxStudents    Int      @default(10)
+  maxCourses     Int      @default(5)
+  maxTeachers    Int      @default(2)
 
-  // Relations
-  institutionSubscriptions InstitutionSubscription[]
-
-  @@unique([planType])
   @@map("commission_tiers")
 }
 
 model InstitutionSubscriptionLog {
-  id             String   @id @default(cuid())
-  subscriptionId String
-  action         String   // UPGRADE, DOWNGRADE, CANCEL, RENEW, SUSPEND, REACTIVATE
-  oldPlan        String?
-  newPlan        String?
-  oldAmount      Float?
-  newAmount      Float?
+  id              String   @id @default(cuid())
+  subscriptionId  String
+  action          String
+  oldPlan         String?
+  newPlan         String?
+  oldAmount       Float?
+  newAmount       Float?
   oldBillingCycle String?
   newBillingCycle String?
-  userId         String
-  reason         String?  // Reason for the action
-  metadata       Json?
-  createdAt      DateTime @default(now())
-
-  // Relations
-  subscription InstitutionSubscription @relation(fields: [subscriptionId], references: [id])
+  userId          String
+  reason          String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
 
   @@index([subscriptionId])
   @@index([action])
@@ -470,16 +364,13 @@ model InstitutionBillingHistory {
   billingDate    DateTime
   amount         Float
   currency       String   @default("USD")
-  status         String   // PAID, PENDING, FAILED, REFUNDED
-  paymentMethod  String?  // STRIPE, PAYPAL, MANUAL, etc.
-  transactionId  String?  // External payment processor transaction ID
-  invoiceNumber  String?  // Internal invoice number
+  status         String
+  paymentMethod  String?
+  transactionId  String?
+  invoiceNumber  String?
   description    String?
   metadata       Json?
   createdAt      DateTime @default(now())
-
-  // Relations
-  subscription InstitutionSubscription @relation(fields: [subscriptionId], references: [id])
 
   @@index([subscriptionId])
   @@index([billingDate])
@@ -488,64 +379,55 @@ model InstitutionBillingHistory {
 }
 
 model StudentTier {
-  id            String   @id @default(cuid())
-  planType      String   // BASIC, PREMIUM, PRO
-  name          String   // "Basic Plan", "Premium Plan", "Pro Plan"
-  description   String   @db.Text
-  price         Float    // Fixed price for this tier
-  currency      String   @default("USD") @db.VarChar(3)
-  billingCycle  String   @default("MONTHLY") @db.VarChar(20)
-  features      Json     // Features included in this tier
-  maxCourses    Int      @default(5)
-  maxLanguages  Int      @default(5)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  planType     String   @unique
+  name         String
+  description  String   @db.Text
+  price        Float
+  currency     String   @default("USD") @db.VarChar(3)
+  billingCycle String   @default("MONTHLY") @db.VarChar(20)
+  features     Json
+  maxCourses   Int      @default(5)
+  maxLanguages Int      @default(5)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  // Relations
-  studentSubscriptions StudentSubscription[]
-
-  @@unique([planType])
   @@map("student_tiers")
 }
 
 /// UserSubscription model (currently named StudentSubscription for historical reasons)
-/// 
+///
 /// IMPORTANT: This model handles subscriptions for ALL user types, not just students:
 /// - Students: Regular course-taking users
 /// - Admins: Platform administrators with premium access
 /// - Institution Staff: Staff members with personal subscriptions
 /// - Regular Users: Any user who wants premium features
-/// 
+///
 /// The 'studentId' field actually stores any user ID, not just student IDs.
 /// This naming is historical and should be considered for future refactoring
 /// to UserSubscription with a userId field.
-/// 
+///
 /// FUTURE MIGRATION: Consider renaming to UserSubscription with userId field
 /// for better clarity and to reflect the actual usage.
 model StudentSubscription {
-  id            String   @id @default(cuid())
-  studentId     String   @unique  // Actually stores any user ID, not just student IDs
-  studentTierId String
-  status        String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED, PAST_DUE, SUSPENDED
-  startDate     DateTime @default(now())
-  endDate       DateTime
-  autoRenew     Boolean  @default(true)
-  cancellationReason String? // Reason for cancellation
-  cancelledAt   DateTime? // When subscription was cancelled
-  metadata      Json?    // Additional subscription data
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Relations
-  student Student @relation(fields: [studentId], references: [id])
-  studentTier StudentTier @relation(fields: [studentTierId], references: [id])
-  logs SubscriptionLog[]
-  billingHistory StudentBillingHistory[]
+  id                 String    @id @default(cuid())
+  studentId          String    @unique
+  status             String    @default("ACTIVE")
+  startDate          DateTime  @default(now())
+  endDate            DateTime
+  autoRenew          Boolean   @default(true)
+  cancellationReason String?
+  cancelledAt        DateTime?
+  metadata           Json?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  studentTierId      String
 
   @@index([studentId])
   @@index([status])
   @@index([endDate])
+  @@index([studentTierId], map: "student_subscriptions_studentTierId_fkey")
   @@map("student_subscriptions")
 }
 
@@ -555,16 +437,13 @@ model StudentBillingHistory {
   billingDate    DateTime
   amount         Float
   currency       String   @default("USD")
-  status         String   // PAID, PENDING, FAILED, REFUNDED
-  paymentMethod  String?  // STRIPE, PAYPAL, MANUAL, etc.
-  transactionId  String?  // External payment processor transaction ID
-  invoiceNumber  String?  // Internal invoice number
+  status         String
+  paymentMethod  String?
+  transactionId  String?
+  invoiceNumber  String?
   description    String?
   metadata       Json?
   createdAt      DateTime @default(now())
-
-  // Relations
-  subscription StudentSubscription @relation(fields: [subscriptionId], references: [id])
 
   @@index([subscriptionId])
   @@index([billingDate])
@@ -573,22 +452,19 @@ model StudentBillingHistory {
 }
 
 model SubscriptionLog {
-  id             String   @id @default(cuid())
-  subscriptionId String
-  action         String   // UPGRADE, DOWNGRADE, CANCEL, RENEW, SUSPEND, REACTIVATE
-  oldPlan        String?
-  newPlan        String?
-  oldAmount      Float?
-  newAmount      Float?
+  id              String   @id @default(cuid())
+  subscriptionId  String
+  action          String
+  oldPlan         String?
+  newPlan         String?
+  oldAmount       Float?
+  newAmount       Float?
   oldBillingCycle String?
   newBillingCycle String?
-  userId         String
-  reason         String?  // Reason for the action
-  metadata       Json?
-  createdAt      DateTime @default(now())
-
-  // Relations
-  subscription StudentSubscription @relation(fields: [subscriptionId], references: [id])
+  userId          String
+  reason          String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
 
   @@index([subscriptionId])
   @@index([action])
@@ -599,17 +475,14 @@ model SubscriptionLog {
 model LeadEvent {
   id            String   @id @default(uuid()) @db.VarChar(36)
   institutionId String   @db.VarChar(36)
-  eventType     String   @db.VarChar(50) // view, contact, website_click, course_click
+  eventType     String   @db.VarChar(50)
   timestamp     DateTime @default(now())
   userAgent     String?  @db.Text
   referrer      String?  @db.Text
   sessionId     String?  @db.VarChar(255)
-  contactType   String?  @db.VarChar(50) // email, phone, form
+  contactType   String?  @db.VarChar(50)
   contactValue  String?  @db.Text
-  metadata      Json?    // Additional event data like IP, location, etc.
-
-  // Relations
-  institution Institution @relation(fields: [institutionId], references: [id])
+  metadata      Json?
 
   @@index([institutionId])
   @@index([eventType])
@@ -618,135 +491,133 @@ model LeadEvent {
 }
 
 model VideoSession {
-  id                String   @id @default(uuid()) @db.VarChar(36)
-  title             String   @db.VarChar(255)
-  description       String?  @db.Text
-  sessionType       String   @db.VarChar(50) // GROUP, PRIVATE, WORKSHOP
-  language          String   @db.VarChar(50)
-  level             String   @db.VarChar(20)
-  startTime         DateTime
-  endTime           DateTime
-  duration          Int      // in minutes
-  maxParticipants   Int      @default(10)
-  currentParticipants Int    @default(0)
-  price             Float    @default(0)
-  isPublic          Boolean  @default(true)
-  isRecorded        Boolean  @default(false)
-  recordingUrl      String?  @db.VarChar(500)
-  status            String   @default("SCHEDULED") @db.VarChar(20) // SCHEDULED, ACTIVE, COMPLETED, CANCELLED
-  meetingUrl        String?  @db.VarChar(500)
-  meetingId         String?  @db.VarChar(100)
-  meetingPassword   String?  @db.VarChar(100)
-  instructorId      String   @db.VarChar(36)
-  courseId          String?  @db.VarChar(36)
-  moduleId          String?  @db.VarChar(36)
-  institutionId     String   @db.VarChar(36)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  metadata          Json?
+  id               String   @id @default(uuid()) @db.VarChar(36)
+  title            String   @db.VarChar(255)
+  description      String?  @db.Text
+  sessionType      String   @db.VarChar(50)
+  language         String   @db.VarChar(10)
+  level            String   @db.VarChar(20)
+  maxParticipants  Int      @default(10)
+  startTime        DateTime
+  endTime          DateTime
+  duration         Int
+  status           String   @default("SCHEDULED") @db.VarChar(20)
+  meetingUrl       String?  @db.VarChar(500)
+  meetingId        String?  @db.VarChar(100)
+  recordingUrl     String?  @db.VarChar(500)
+  instructorId     String   @db.VarChar(36)
+  institutionId    String?  @db.VarChar(36)
+  courseId         String?  @db.VarChar(36)
+  moduleId         String?  @db.VarChar(36)
+  price            Float    @default(0)
+  isPublic         Boolean  @default(false)
+  isRecorded       Boolean  @default(false)
+  allowChat        Boolean  @default(true)
+  allowScreenShare Boolean  @default(true)
+  allowRecording   Boolean  @default(false)
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  currency         String   @default("USD") @db.VarChar(3)
+  features         Json?
+  isBooked         Boolean  @default(false)
+  isCancelled      Boolean  @default(false)
+  isCompleted      Boolean  @default(false)
+  materials        Json?
+  rating           Float?   @db.Float
+  reviews          Int      @default(0)
+  tags             Json?
 
   // Relations
-  instructor user @relation("VideoSessionInstructor", fields: [instructorId], references: [id])
-  course Course? @relation(fields: [courseId], references: [id])
-  module modules? @relation(fields: [moduleId], references: [id])
-  institution Institution @relation(fields: [institutionId], references: [id])
+  instructor user @relation("VideoSessionInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  institution Institution? @relation("VideoSessionInstitution", fields: [institutionId], references: [id], onDelete: SetNull)
+  course Course? @relation("VideoSessionCourse", fields: [courseId], references: [id], onDelete: SetNull)
   participants VideoSessionParticipant[]
-  messages VideoSessionMessage[]
 
   @@index([instructorId])
   @@index([courseId])
-  @@index([moduleId])
   @@index([institutionId])
   @@index([startTime])
   @@index([status])
   @@index([language])
   @@index([level])
+  @@index([moduleId], map: "video_sessions_moduleId_fkey")
   @@map("video_sessions")
 }
 
 model VideoSessionParticipant {
-  id            String   @id @default(uuid()) @db.VarChar(36)
-  sessionId     String   @db.VarChar(36)
-  userId        String   @db.VarChar(36)
-  joinedAt      DateTime @default(now())
-  leftAt        DateTime?
-  duration      Int      @default(0) // in seconds
-  isInstructor  Boolean  @default(false)
-  isHost        Boolean  @default(false)
-  status        String   @default("JOINED") @db.VarChar(20) // JOINED, LEFT, KICKED, BANNED
-  metadata      Json?
+  id                String    @id @default(uuid()) @db.VarChar(36)
+  sessionId         String    @db.VarChar(36)
+  userId            String    @db.VarChar(36)
+  role              String    @default("PARTICIPANT") @db.VarChar(20)
+  joinedAt          DateTime?
+  leftAt            DateTime?
+  duration          Int       @default(0)
+  isActive          Boolean   @default(false)
+  deviceInfo        Json?
+  connectionQuality String?   @db.VarChar(20)
+  lastSeen          DateTime?
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime
 
   // Relations
-  session VideoSession @relation(fields: [sessionId], references: [id])
-  user user @relation(fields: [userId], references: [id])
+  session VideoSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, userId])
   @@index([sessionId])
   @@index([userId])
-  @@index([status])
+  @@index([isActive])
   @@map("video_session_participants")
 }
 
 model VideoSessionMessage {
-  id        String   @id @default(uuid()) @db.VarChar(36)
-  sessionId String   @db.VarChar(36)
-  senderId  String   @db.VarChar(36)
-  recipientId String? @db.VarChar(36) // null for broadcast messages
-  content   String   @db.Text
-  messageType String @default("TEXT") @db.VarChar(20) // TEXT, SYSTEM, PRIVATE
-  timestamp DateTime @default(now())
-  isRead    Boolean  @default(false)
-  metadata  Json?
-
-  // Relations
-  session VideoSession @relation(fields: [sessionId], references: [id])
-  sender user @relation(fields: [senderId], references: [id])
-  recipient user? @relation("MessageRecipient", fields: [recipientId], references: [id])
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  sessionId   String   @db.VarChar(36)
+  userId      String   @db.VarChar(36)
+  messageType String   @db.VarChar(20)
+  content     String   @db.Text
+  timestamp   DateTime @default(now())
+  isPrivate   Boolean  @default(false)
+  recipientId String?  @db.VarChar(36)
+  metadata    Json?
 
   @@index([sessionId])
-  @@index([senderId])
-  @@index([recipientId])
   @@index([timestamp])
+  @@index([recipientId], map: "video_session_messages_recipientId_fkey")
+  @@index([userId])
   @@map("video_session_messages")
 }
 
-// Live Conversation Models
 model LiveConversation {
-  id                String   @id @default(uuid()) @db.VarChar(36)
-  title             String   @db.VarChar(255)
-  description       String?  @db.Text
-  conversationType  String   @db.VarChar(50) // GROUP, PRIVATE, PRACTICE, CULTURAL
-  language          String   @db.VarChar(50)
-  level             String   @db.VarChar(20)
-  startTime         DateTime
-  endTime           DateTime
-  duration          Int      // in minutes
-  maxParticipants   Int      @default(8)
-  currentParticipants Int    @default(0)
-  price             Float    @default(0)
-  isPublic          Boolean  @default(true)
-  isFree            Boolean  @default(false)
-  status            String   @default("SCHEDULED") @db.VarChar(20) // SCHEDULED, ACTIVE, COMPLETED, CANCELLED
-  meetingUrl        String?  @db.VarChar(500)
-  meetingId         String?  @db.VarChar(100)
-  meetingPassword   String?  @db.VarChar(100)
-  instructorId      String?  @db.VarChar(36) // null for peer-to-peer conversations
-  hostId            String   @db.VarChar(36)
-  topic             String?  @db.VarChar(255)
-  culturalNotes     String?  @db.Text
-  vocabularyList    Json?    // Array of vocabulary words
-  grammarPoints     Json?    // Array of grammar points
-  conversationPrompts Json?  // Array of conversation prompts
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  metadata          Json?
-
-  // Relations
-  instructor user? @relation("LiveConversationInstructor", fields: [instructorId], references: [id])
-  host user @relation("LiveConversationHost", fields: [hostId], references: [id])
-  participants LiveConversationParticipant[]
-  messages LiveConversationMessage[]
-  bookings LiveConversationBooking[]
+  id                  String   @id @default(uuid()) @db.VarChar(36)
+  title               String   @db.VarChar(255)
+  description         String?  @db.Text
+  conversationType    String   @db.VarChar(50)
+  language            String   @db.VarChar(50)
+  level               String   @db.VarChar(20)
+  startTime           DateTime
+  endTime             DateTime
+  duration            Int
+  maxParticipants     Int      @default(8)
+  currentParticipants Int      @default(0)
+  price               Float    @default(0)
+  isPublic            Boolean  @default(true)
+  isFree              Boolean  @default(false)
+  status              String   @default("SCHEDULED") @db.VarChar(20)
+  meetingUrl          String?  @db.VarChar(500)
+  meetingId           String?  @db.VarChar(100)
+  meetingPassword     String?  @db.VarChar(100)
+  instructorId        String?  @db.VarChar(36)
+  hostId              String   @db.VarChar(36)
+  topic               String?  @db.VarChar(255)
+  culturalNotes       String?  @db.Text
+  vocabularyList      Json?
+  grammarPoints       Json?
+  conversationPrompts Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @default(now()) @updatedAt
+  metadata            Json?
 
   @@index([instructorId])
   @@index([hostId])
@@ -760,23 +631,19 @@ model LiveConversation {
 }
 
 model LiveConversationParticipant {
-  id            String   @id @default(uuid()) @db.VarChar(36)
-  conversationId String  @db.VarChar(36)
-  userId        String   @db.VarChar(36)
-  joinedAt      DateTime @default(now())
-  leftAt        DateTime?
-  duration      Int      @default(0) // in seconds
-  isInstructor  Boolean  @default(false)
-  isHost        Boolean  @default(false)
-  status        String   @default("JOINED") @db.VarChar(20) // JOINED, LEFT, KICKED, BANNED
-  speakingTime  Int      @default(0) // in seconds
-  messageCount  Int      @default(0)
-  feedback      Json?    // Participant feedback
-  metadata      Json?
-
-  // Relations
-  conversation LiveConversation @relation(fields: [conversationId], references: [id])
-  user user @relation(fields: [userId], references: [id])
+  id             String    @id @default(uuid()) @db.VarChar(36)
+  conversationId String    @db.VarChar(36)
+  userId         String    @db.VarChar(36)
+  joinedAt       DateTime  @default(now())
+  leftAt         DateTime?
+  duration       Int       @default(0)
+  isInstructor   Boolean   @default(false)
+  isHost         Boolean   @default(false)
+  status         String    @default("JOINED") @db.VarChar(20)
+  speakingTime   Int       @default(0)
+  messageCount   Int       @default(0)
+  feedback       Json?
+  metadata       Json?
 
   @@unique([conversationId, userId])
   @@index([conversationId])
@@ -789,20 +656,15 @@ model LiveConversationMessage {
   id              String   @id @default(uuid()) @db.VarChar(36)
   conversationId  String   @db.VarChar(36)
   senderId        String   @db.VarChar(36)
-  recipientId     String?  @db.VarChar(36) // null for broadcast messages
+  recipientId     String?  @db.VarChar(36)
   content         String   @db.Text
-  messageType     String   @default("TEXT") @db.VarChar(20) // TEXT, SYSTEM, PRIVATE, CORRECTION, TRANSLATION
+  messageType     String   @default("TEXT") @db.VarChar(20)
   language        String   @db.VarChar(50)
   isTranslation   Boolean  @default(false)
-  originalMessage String?  @db.VarChar(36) // ID of original message if this is a translation
+  originalMessage String?  @db.VarChar(36)
   timestamp       DateTime @default(now())
   isRead          Boolean  @default(false)
   metadata        Json?
-
-  // Relations
-  conversation LiveConversation @relation(fields: [conversationId], references: [id])
-  sender user @relation(fields: [senderId], references: [id])
-  recipient user? @relation("ConversationMessageRecipient", fields: [recipientId], references: [id])
 
   @@index([conversationId])
   @@index([senderId])
@@ -813,208 +675,28 @@ model LiveConversationMessage {
 }
 
 model LiveConversationBooking {
-  id                    String    @id @default(uuid()) @db.VarChar(36)
-  conversationId        String    @db.VarChar(36)
-  studentId             String    @db.VarChar(36)
-  instructorId          String    @db.VarChar(36)
-  scheduledAt           DateTime
-  duration              Int       @default(30)
-  status                String    @default("PENDING") @db.VarChar(20)
-  price                 Float     @default(0)
-  currency              String    @default("USD") @db.VarChar(3)
-  paymentStatus         String    @default("PENDING") @db.VarChar(20)
-  paymentIntentId       String?   @db.VarChar(255)
-  notes                 String?   @db.Text
-  cancellationReason    String?   @db.Text
-  cancelledAt           DateTime?
-  cancelledBy           String?   @db.VarChar(36)
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id             String    @id @default(uuid()) @db.VarChar(36)
+  conversationId String    @db.VarChar(36)
+  userId         String    @db.VarChar(36)
+  status         String    @default("CONFIRMED") @db.VarChar(20)
+  bookedAt       DateTime  @default(now())
+  cancelledAt    DateTime?
+  paymentStatus  String    @default("PAID") @db.VarChar(20)
+  amount         Float     @default(0)
+  currency       String    @default("USD") @db.VarChar(3)
+  paymentMethod  String?   @db.VarChar(50)
+  transactionId  String?   @db.VarChar(255)
+  refundReason   String?   @db.Text
+  metadata       Json?
 
-  // Relations
-  conversation LiveConversation @relation(fields: [conversationId], references: [id])
-  student      user             @relation("LiveConversationBookingStudent", fields: [studentId], references: [id])
-  instructor   user             @relation("LiveConversationBookingInstructor", fields: [instructorId], references: [id])
-  cancelledByUser user?         @relation("LiveConversationBookingCancelledBy", fields: [cancelledBy], references: [id])
-
+  @@unique([conversationId, userId])
   @@index([conversationId])
-  @@index([studentId])
-  @@index([instructorId])
-  @@index([scheduledAt])
   @@index([status])
   @@index([paymentStatus])
-  @@index([cancelledBy], map: "live_conversation_bookings_cancelledBy_fkey")
+  @@index([userId])
   @@map("live_conversation_bookings")
 }
 
-// Language Proficiency Question Bank Models
-model LanguageProficiencyQuestionBank {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  languageCode String  @db.VarChar(10) // 'en', 'es', 'fr', etc.
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
-  totalQuestions Int   @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  questions LanguageProficiencyQuestion[]
-
-  @@unique([languageCode])
-  @@index([languageCode])
-  @@index([isActive])
-  @@map("language_proficiency_question_banks")
-}
-
-model LanguageProficiencyQuestion {
-  id             String   @id @default(uuid()) @db.VarChar(36)
-  bankId         String   @db.VarChar(36)
-  level          String   @db.VarChar(10) // A1, A2, B1, B2, C1, C2
-  category       String   @db.VarChar(50) // grammar, vocabulary, reading, etc.
-  difficulty     String   @db.VarChar(20) // easy, medium, hard
-  question       String   @db.Text
-  options        Json     // Array of strings
-  correctAnswer  String   @db.Text
-  explanation    String?  @db.Text
-  usageCount     Int      @default(0)
-  successRate    Float    @default(0)
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  // Relations
-  bank LanguageProficiencyQuestionBank @relation(fields: [bankId], references: [id])
-
-  @@index([bankId])
-  @@index([level])
-  @@index([category])
-  @@index([difficulty])
-  @@index([isActive])
-  @@map("language_proficiency_questions")
-}
-
-model LanguageProficiencyTestAttempt {
-  id        String   @id @default(uuid()) @db.VarChar(36)
-  userId    String   @db.VarChar(36)
-  languageCode String @db.VarChar(10)
-  score     Int
-  level     String   @db.VarChar(10)
-  answers   Json     // Record of questionId -> answer
-  timeSpent Int      // in seconds
-  completedAt DateTime @default(now())
-  createdAt DateTime @default(now())
-
-  // Relations
-  user user @relation(fields: [userId], references: [id])
-  certificate Certificate?
-
-  @@index([userId])
-  @@index([languageCode])
-  @@index([completedAt])
-  @@map("language_proficiency_test_attempts")
-}
-
-model Certificate {
-  id                String   @id @default(uuid()) @db.VarChar(36)
-  certificateId     String   @unique @db.VarChar(50) // Human-readable ID like FS-ABC123
-  userId            String   @db.VarChar(36)
-  testAttemptId     String   @unique @db.VarChar(36)
-  language          String   @db.VarChar(10)
-  languageName      String   @db.VarChar(50)
-  cefrLevel         String   @db.VarChar(5)
-  score             Int
-  totalQuestions    Int
-  completionDate    DateTime @default(now())
-  certificateUrl    String?  @db.VarChar(255) // URL to stored PDF
-  isPublic          Boolean  @default(false) // Whether user wants to share publicly
-  sharedAt          DateTime? // When user chose to share
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @default(now()) @updatedAt
-
-  // Relations
-  user user @relation(fields: [userId], references: [id])
-  testAttempt LanguageProficiencyTestAttempt @relation(fields: [testAttemptId], references: [id])
-  achievements UserAchievement[]
-  announcements CommunityAnnouncement[]
-
-  @@index([userId], map: "Certificate_userId_fkey")
-  @@index([certificateId], map: "Certificate_certificateId_idx")
-  @@index([language], map: "Certificate_language_idx")
-  @@index([cefrLevel], map: "Certificate_cefrLevel_idx")
-  @@index([isPublic], map: "Certificate_isPublic_idx")
-  @@map("certificate")
-}
-
-model UserAchievement {
-  id            String   @id @default(uuid()) @db.VarChar(36)
-  userId        String   @db.VarChar(36)
-  certificateId String   @db.VarChar(36)
-  type          String   @db.VarChar(50) // 'first_test', 'high_score', 'multiple_languages', etc.
-  title         String   @db.VarChar(100)
-  description   String   @db.Text
-  icon          String   @db.VarChar(50) // Icon identifier
-  color         String   @db.VarChar(7) // Hex color
-  isPublic      Boolean  @default(false)
-  earnedAt      DateTime @default(now())
-  metadata      Json?    // Additional achievement data
-
-  // Relations
-  user user @relation(fields: [userId], references: [id])
-  certificate Certificate @relation(fields: [certificateId], references: [id])
-
-  @@index([userId], map: "UserAchievement_userId_fkey")
-  @@index([type], map: "UserAchievement_type_idx")
-  @@index([isPublic], map: "UserAchievement_isPublic_idx")
-  @@map("user_achievement")
-}
-
-model CommunityAnnouncement {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  userId      String   @db.VarChar(36)
-  certificateId String @db.VarChar(36)
-  type        String   @db.VarChar(50) // 'certificate_earned', 'achievement_unlocked', etc.
-  title       String   @db.VarChar(200)
-  message     String   @db.Text
-  language    String   @db.VarChar(10)
-  cefrLevel   String   @db.VarChar(5)
-  isPublic    Boolean  @default(true)
-  likes       Int      @default(0)
-  createdAt   DateTime @default(now())
-  expiresAt   DateTime? // Optional expiration date
-
-  // Relations
-  user user @relation(fields: [userId], references: [id])
-  certificate Certificate @relation(fields: [certificateId], references: [id])
-
-  @@index([userId], map: "CommunityAnnouncement_userId_fkey")
-  @@index([type], map: "CommunityAnnouncement_type_idx")
-  @@index([isPublic], map: "CommunityAnnouncement_isPublic_idx")
-  @@index([createdAt], map: "CommunityAnnouncement_createdAt_idx")
-  @@map("community_announcement")
-}
-
-// Enums
-enum course_framework {
-  CEFR
-  ACTFL
-  JLPT
-  HSK
-  TOPIK
-}
-
-enum students_status {
-  active
-  inactive
-}
-
-enum SocialVisibility {
-  PUBLIC
-  PRIVATE
-  FRIENDS_ONLY
-}
-
-// Additional models for content and learning
 model content_items {
   id          String             @id @db.VarChar(36)
   module_id   String             @db.VarChar(36)
@@ -1024,9 +706,6 @@ model content_items {
   created_at  DateTime?          @default(now()) @db.Timestamp(0)
   updated_at  DateTime?          @default(now()) @db.Timestamp(0)
   content     String             @db.Text
-
-  // Relations
-  module modules @relation(fields: [module_id], references: [id])
 
   @@index([module_id], map: "idx_content_items_module_id")
   @@map("content_items")
@@ -1042,9 +721,6 @@ model exercises {
   created_at  DateTime?      @default(now()) @db.Timestamp(0)
   updated_at  DateTime?      @default(now()) @db.Timestamp(0)
   answer      String         @db.Text
-
-  // Relations
-  module modules @relation(fields: [module_id], references: [id])
 
   @@index([module_id], map: "idx_exercises_module_id")
   @@map("exercises")
@@ -1064,13 +740,6 @@ model modules {
   is_published       Boolean?      @default(false)
   created_at         DateTime?     @default(now()) @db.Timestamp(0)
   updated_at         DateTime?     @default(now()) @db.Timestamp(0)
-
-  // Relations
-  course       Course        @relation(fields: [course_id], references: [id])
-  quizzes      quizzes[]
-  contentItems content_items[]
-  exercises    exercises[]
-  videoSessions VideoSession[]
 
   @@index([course_id], map: "idx_modules_course_id")
   @@index([order_index], map: "idx_modules_order_index")
@@ -1106,9 +775,6 @@ model quiz_questions {
   media_url          String?             @db.VarChar(500)
   question_config    Json?
 
-  // Relations
-  quiz quizzes @relation(fields: [quiz_id], references: [id])
-
   @@index([quiz_id], map: "idx_quiz_questions_quiz_id")
   @@map("quiz_questions")
 }
@@ -1143,10 +809,6 @@ model quizzes {
   max_questions     Int       @default(20)
   min_questions     Int       @default(5)
   target_precision  Float     @default(0.3)
-
-  // Relations
-  module        modules        @relation(fields: [module_id], references: [id])
-  quizQuestions quiz_questions[]
 
   @@index([module_id], map: "idx_quizzes_module_id")
   @@map("quizzes")
@@ -1284,7 +946,6 @@ model QuizResponse {
   @@map("quiz_responses")
 }
 
-// Notification and system models
 model NotificationTemplate {
   id        String   @id @default(uuid()) @db.VarChar(36)
   name      String   @unique @db.VarChar(100)
@@ -1300,10 +961,6 @@ model NotificationTemplate {
   updatedAt DateTime @updatedAt
   createdBy String   @db.VarChar(36)
   updatedBy String?  @db.VarChar(36)
-
-  // Relations
-  createdByUser user  @relation("NotificationTemplateCreator", fields: [createdBy], references: [id])
-  updatedByUser user? @relation("NotificationTemplateUpdater", fields: [updatedBy], references: [id])
 
   @@index([type])
   @@index([category])
@@ -1331,10 +988,6 @@ model NotificationLog {
   createdAt      DateTime  @default(now())
   createdBy      String?   @db.VarChar(36)
 
-  // Relations
-  recipient user  @relation("NotificationLogRecipient", fields: [recipientId], references: [id])
-  sender    user? @relation("NotificationLogSender", fields: [createdBy], references: [id])
-
   @@index([recipientId])
   @@index([type])
   @@index([status])
@@ -1361,10 +1014,6 @@ model SystemNotification {
   createdBy          String    @db.VarChar(36)
   updatedBy          String?   @db.VarChar(36)
 
-  // Relations
-  createdByUser user  @relation("SystemNotificationCreator", fields: [createdBy], references: [id])
-  updatedByUser user? @relation("SystemNotificationUpdater", fields: [updatedBy], references: [id])
-
   @@index([type])
   @@index([priority])
   @@index([isActive])
@@ -1388,9 +1037,6 @@ model PendingWebSocketNotification {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  // Relations
-  user user @relation(fields: [userId], references: [id])
-
   @@index([userId])
   @@index([sent])
   @@index([timestamp])
@@ -1411,9 +1057,6 @@ model AuditLog {
   category   String   @db.VarChar(50)
   metadata   Json?
   timestamp  DateTime @default(now())
-
-  // Relations
-  user user? @relation("AuditLogUser", fields: [userId], references: [id])
 
   @@index([userId])
   @@index([action])
@@ -1441,7 +1084,6 @@ model RateLimitLog {
   @@map("rate_limit_logs")
 }
 
-// Question bank and template models
 model QuestionTemplate {
   id              String                  @id @default(uuid()) @db.VarChar(36)
   name            String                  @db.VarChar(255)
@@ -1452,16 +1094,10 @@ model QuestionTemplate {
   difficulty      String                  @default("MEDIUM") @db.VarChar(20)
   tags            Json?
   is_public       Boolean                 @default(false)
-  version         Int                     @default(1)
   created_by      String                  @db.VarChar(36)
   created_at      DateTime                @default(now()) @db.Timestamp(0)
   updated_at      DateTime                @default(now()) @updatedAt @db.Timestamp(0)
-
-  // Relations
-  createdByUser user @relation("QuestionTemplateCreator", fields: [created_by], references: [id])
-  templateUsage QuestionTemplateUsage[]
-  templateVersions QuestionTemplateVersion[]
-  templateSuggestions QuestionTemplateSuggestion[]
+  version         Int                     @default(1)
 
   @@index([created_by])
   @@index([type])
@@ -1471,17 +1107,13 @@ model QuestionTemplate {
 }
 
 model QuestionTemplateVersion {
-  id              String   @id @default(uuid()) @db.VarChar(36)
-  templateId      String   @db.VarChar(36)
-  versionNumber   Int
-  changes         Json
-  createdBy       String   @db.VarChar(36)
-  createdAt       DateTime @default(now())
-  notes           String?  @db.Text
-
-  // Relations
-  template QuestionTemplate @relation(fields: [templateId], references: [id])
-  createdByUser user @relation("TemplateVersionCreator", fields: [createdBy], references: [id])
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  changes       Json
+  createdAt     DateTime @default(now())
+  createdBy     String   @db.VarChar(36)
+  notes         String?  @db.Text
+  templateId    String   @db.VarChar(36)
+  versionNumber Int
 
   @@unique([templateId, versionNumber])
   @@index([templateId])
@@ -1490,20 +1122,15 @@ model QuestionTemplateVersion {
 }
 
 model QuestionTemplateUsage {
-  id                String   @id @default(uuid()) @db.VarChar(36)
-  templateId        String   @db.VarChar(36)
-  usedBy            String   @db.VarChar(36)
-  institutionId     String   @db.VarChar(36)
-  usageContext      String   @db.VarChar(50)
-  targetQuestionBankId String? @db.VarChar(36)
-  customizationLevel String  @default("none") @db.VarChar(20)
-  usedAt            DateTime @default(now())
-  metadata          Json?
-
-  // Relations
-  template QuestionTemplate @relation(fields: [templateId], references: [id])
-  usedByUser user @relation("TemplateUsageUser", fields: [usedBy], references: [id])
-  institution Institution @relation("InstitutionTemplateUsage", fields: [institutionId], references: [id])
+  id                   String   @id @default(uuid()) @db.VarChar(36)
+  customizationLevel   String   @default("none") @db.VarChar(20)
+  institutionId        String   @db.VarChar(36)
+  metadata             Json?
+  targetQuestionBankId String?  @db.VarChar(36)
+  templateId           String   @db.VarChar(36)
+  usageContext         String   @db.VarChar(50)
+  usedAt               DateTime @default(now())
+  usedBy               String   @db.VarChar(36)
 
   @@index([templateId])
   @@index([usedBy])
@@ -1514,22 +1141,18 @@ model QuestionTemplateUsage {
 }
 
 model QuestionTemplateSuggestion {
-  id              String   @id @default(uuid()) @db.VarChar(36)
-  templateId      String   @db.VarChar(36)
-  suggestionType  String   @db.VarChar(50)
-  title           String   @db.VarChar(255)
-  description     String   @db.Text
+  id               String    @id @default(uuid()) @db.VarChar(36)
+  title            String    @db.VarChar(255)
+  description      String    @db.Text
+  status           String    @default("PENDING") @db.VarChar(20)
+  confidence       Float     @default(0)
+  createdAt        DateTime  @default(now())
+  implementedAt    DateTime?
+  reviewedAt       DateTime?
+  reviewedBy       String?   @db.VarChar(36)
   suggestedChanges Json
-  confidence      Float    @default(0)
-  status          String   @default("PENDING") @db.VarChar(20)
-  reviewedBy      String?  @db.VarChar(36)
-  reviewedAt      DateTime?
-  implementedAt   DateTime?
-  createdAt       DateTime @default(now())
-
-  // Relations
-  template QuestionTemplate @relation(fields: [templateId], references: [id])
-  reviewedByUser user? @relation("TemplateSuggestionReviewer", fields: [reviewedBy], references: [id])
+  suggestionType   String    @db.VarChar(50)
+  templateId       String    @db.VarChar(36)
 
   @@index([templateId])
   @@index([reviewedBy])
@@ -1561,9 +1184,6 @@ model QuestionBankItem {
   orderIndex     Int      @default(0)
   questionBankId String   @db.VarChar(36)
   questionId     String   @db.VarChar(36)
-
-  // Relations
-  addedByUser user @relation(fields: [addedBy], references: [id])
 
   @@unique([questionBankId, questionId])
   @@index([questionBankId])
@@ -1683,7 +1303,127 @@ model StudentNotificationPreferences {
   @@map("student_notification_preferences")
 }
 
-// Additional enums
+model course_monthly_price {
+  id          String   @id @db.VarChar(36)
+  courseId    String   @db.VarChar(36)
+  monthNumber Int
+  year        Int
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  @@unique([courseId, monthNumber, year], map: "CourseMonthlyPrice_courseId_monthNumber_year_key")
+  @@index([courseId], map: "CourseMonthlyPrice_courseId_fkey")
+}
+
+model course_pricing_rules {
+  id        String   @id @db.VarChar(36)
+  courseId  String   @db.VarChar(36)
+  ruleType  String   @db.VarChar(20)
+  ruleValue Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([courseId])
+}
+
+model course_weekly_prices {
+  id         String   @id @db.VarChar(36)
+  courseId   String   @db.VarChar(36)
+  weekNumber Int
+  year       Int
+  price      Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  @@index([courseId])
+}
+
+model institution_payouts {
+  id            String   @id
+  institutionId String
+  enrollmentId  String
+  amount        Float
+  status        String
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+
+  @@index([enrollmentId])
+  @@index([institutionId])
+}
+
+model module_skills {
+  module_id String @db.VarChar(36)
+  skill     String @db.VarChar(50)
+
+  @@id([module_id, skill])
+}
+
+model student_institutions {
+  id             String                      @id @db.VarChar(36)
+  student_id     String                      @db.VarChar(36)
+  institution_id String                      @db.VarChar(36)
+  created_at     DateTime                    @default(now()) @db.Timestamp(0)
+  updated_at     DateTime                    @default(now()) @db.Timestamp(0)
+  notes          String?                     @db.Text
+  status         student_institutions_status @default(INQUIRY)
+
+  @@unique([student_id, institution_id])
+  @@index([institution_id])
+  @@index([student_id])
+}
+
+model tagrelation {
+  id        String   @id @db.VarChar(36)
+  tagId     String   @db.VarChar(36)
+  relatedId String   @db.VarChar(36)
+  strength  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([tagId, relatedId], map: "tagRelation_tagId_relatedId_key")
+  @@index([relatedId], map: "tagRelation_relatedId_idx")
+  @@index([tagId], map: "tagRelation_tagId_idx")
+}
+
+model video_session_recordings {
+  id           String   @id @db.VarChar(36)
+  sessionId    String   @db.VarChar(36)
+  recordingUrl String   @db.VarChar(500)
+  duration     Int
+  fileSize     Int
+  quality      String   @db.VarChar(20)
+  status       String   @default("PROCESSING") @db.VarChar(20)
+  thumbnailUrl String?  @db.VarChar(500)
+  transcript   String?  @db.Text
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+
+  @@index([sessionId])
+  @@index([status])
+}
+
+enum course_framework {
+  CEFR
+  ACTFL
+  JLPT
+  HSK
+  TOPIK
+}
+
+enum students_status {
+  active
+  inactive
+}
+
+enum SocialVisibility {
+  PUBLIC
+  PRIVATE
+  FRIENDS_ONLY
+}
+
 enum content_items_type {
   VIDEO
   AUDIO
@@ -1754,4 +1494,15 @@ enum question_templates_type {
   ESSAY
   DRAG_AND_DROP
   HOTSPOT
-} 
+}
+
+enum student_institutions_status {
+  INQUIRY
+  APPLIED
+  REVIEWING
+  ACCEPTED
+  REJECTED
+  ENROLLED
+  ALUMNI
+  MEMBER
+}

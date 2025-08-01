@@ -77,7 +77,7 @@ export async function GET(
         id: videoSession.id,
         title: videoSession.title,
         status: videoSession.status,
-        currentParticipants: videoSession.currentParticipants,
+        currentParticipants: videoSession.participants?.length || 0,
         maxParticipants: videoSession.maxParticipants,
         startTime: videoSession.startTime,
         endTime: videoSession.endTime

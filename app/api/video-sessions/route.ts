@@ -215,7 +215,8 @@ async function getUserAccessLevel(userId: string) {
 
 function canUserJoinSession(session: any, userAccess: any): boolean {
   // Check if session is active and not full
-  if (session.status !== 'ACTIVE' || session.currentParticipants >= session.maxParticipants) {
+  const currentParticipants = session.participants?.length || 0;
+  if (session.status !== 'ACTIVE' || currentParticipants >= session.maxParticipants) {
     return false;
   }
 
