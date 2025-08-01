@@ -25,8 +25,7 @@ const Navbar = () => {
     setMounted(true);
   }, []);
 
-  // Prevent hydration mismatch by ensuring consistent initial render
-  const isClient = typeof window !== 'undefined';
+
 
   // Debug log to check session data - only log when status changes
   useEffect(() => {
@@ -298,7 +297,7 @@ const Navbar = () => {
                   Sign Out
                 </Button>
               </div>
-            ) : (typeof window !== 'undefined' && mounted) ? (
+                          ) : mounted ? (
               <div className="flex items-center space-x-4">
                 <Button variant="outline" size="sm" onClick={handleSignIn}>
                   Sign In

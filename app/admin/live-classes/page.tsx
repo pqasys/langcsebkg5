@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Search, Plus, Eye, Edit, Trash2, Calendar, Users, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 interface LiveClass {
   id: string;
@@ -144,10 +145,12 @@ export default function AdminLiveClassesPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Live Classes Management</h1>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Live Class
-        </Button>
+        <Link href="/admin/live-classes/create">
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Create Live Class
+          </Button>
+        </Link>
       </div>
 
       {/* Filters */}

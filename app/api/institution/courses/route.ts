@@ -52,44 +52,17 @@ export async function GET() {
         institutionId: session.user.institutionId,
       },
       include: {
-        category: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
-        courseTags: {
-          include: {
-            tag: {
-              select: {
-                id: true,
-                name: true,
-                color: true,
-                icon: true
-              }
-            }
-          }
-        },
-        modules: {
+        videoSessions: {
           select: {
             id: true,
             title: true,
-            description: true,
-            order_index: true,
-            level: true,
-            estimated_duration: true,
-            is_published: true,
-            created_at: true,
-            updated_at: true
-          },
-          orderBy: {
-            order_index: 'asc'
+            startTime: true,
+            endTime: true
           }
         },
         _count: {
           select: {
-            bookings: true,
-            modules: true
+            videoSessions: true
           }
         }
       },
@@ -101,20 +74,21 @@ export async function GET() {
     // Transform the data to match expected format
     const transformedCourses = coursesWithData.map(course => ({
       ...course,
-      modules: course.modules || [],
+      modules: [], // No modules relation in schema
       _count: {
-        bookings: course._count.bookings,
-        modules: course._count.modules
+        bookings: 0, // No bookings relation in schema
+        modules: 0, // No modules relation in schema
+        videoSessions: course._count.videoSessions
       }
     }));
 
     const result = { courses: transformedCourses };
     const endTime = Date.now();
     
-    console.log(`Fetched courses with modules in ${endTime - startTime}ms:`, transformedCourses.map(course => ({
+    console.log(`Fetched courses in ${endTime - startTime}ms:`, transformedCourses.map(course => ({
       id: course.id,
       title: course.title,
-      moduleCount: course.modules?.length
+      videoSessionCount: course._count.videoSessions
     })));
 
     // Cache the result for 10 minutes (increased from 5 minutes)

@@ -50,8 +50,8 @@ export async function GET() {
         createdAt: true,
         _count: {
           select: {
-            courses: true,
-            bookings: true,
+            users: true,
+            videoSessions: true,
           },
         },
       },

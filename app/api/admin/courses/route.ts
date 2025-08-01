@@ -52,42 +52,12 @@ export async function GET(request: Request) {
     const courses = await prisma.course.findMany({
       where,
       include: {
-        institution: {
+        videoSessions: {
           select: {
             id: true,
-            name: true,
-            country: true,
-            city: true,
-            commissionRate: true
-          }
-        },
-        category: {
-          select: {
-            id: true,
-            name: true,
-            description: true
-          }
-        },
-        courseTags: {
-          select: {
-            id: true,
-            tag: {
-              select: {
-                id: true,
-                name: true,
-                color: true,
-                icon: true
-              }
-            }
-          }
-        },
-        _count: {
-          select: {
-            enrollments: true,
-            completions: true,
-            courseTags: true,
-            bookings: true,
-            modules: true
+            title: true,
+            startTime: true,
+            endTime: true
           }
         }
       },
