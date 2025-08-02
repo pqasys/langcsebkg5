@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 01, 2025 at 09:52 PM
+-- Generation Time: Aug 02, 2025 at 12:35 PM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -274,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `course` (
   `duration` int NOT NULL,
   `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `institutionId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `institutionId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `categoryId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -3110,7 +3110,13 @@ INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`,
 ('b1c0e68c-31c0-45c6-9745-4481ce5e6045', 'Grace Jones', 'grace@ges.ac.uk', NULL, NULL, '$2b$10$qdok6/a/wo9IWZcsnw2Y3On3hDBVTiAc7TTDE9X.mr6vV.8zgZABm', 'INSTITUTION', '9f71efc3-7b31-4953-b398-29f2197af202', '2025-07-01 22:02:16.480', '2025-07-01 22:02:17.507', 'ACTIVE', 0),
 ('c98a0b89-011b-482f-843e-a5522de40b1e', 'Nisha Test', 'nisha@sterlingcollegelondon.com', NULL, NULL, '$2b$10$270rbxzD7QcM.Csbl71mROab8x4i3hJmAPYyoLBo3Fq.GIn9VAsQq', 'STUDENT', NULL, '2025-07-12 21:39:11.400', '2025-07-12 21:39:11.400', 'ACTIVE', 0),
 ('ccb77175-fa66-4d1f-bbb9-0701df84384d', 'Student4', 'rodrigo@amitycollege.co.uk', NULL, NULL, '$2b$10$Y1xb73MSRSoxH/8Iyk5ch.CN3SK8YrAFX4ZmVsWuSPxl4dHT69tjG', 'STUDENT', NULL, '2025-07-12 21:13:08.978', '2025-07-12 21:13:08.978', 'ACTIVE', 0),
-('5c39be61-c09b-4fb0-b6da-fad403dd2470', 'Admin User', 'admin@example.com', NULL, NULL, '$2b$10$FoPDZ6moKaZnRFy.e95wXeHjtzZB1svOepg0ms4a9K7pNDKfCfkRK', 'ADMIN', NULL, '2025-07-14 11:19:57.030', '2025-07-14 11:19:57.030', 'ACTIVE', 0);
+('5c39be61-c09b-4fb0-b6da-fad403dd2470', 'Admin User', 'admin@example.com', NULL, NULL, '$2b$10$FoPDZ6moKaZnRFy.e95wXeHjtzZB1svOepg0ms4a9K7pNDKfCfkRK', 'ADMIN', NULL, '2025-07-14 11:19:57.030', '2025-07-14 11:19:57.030', 'ACTIVE', 0),
+('d00a7d05-f380-46f1-8cb4-344f0d04c0f2', 'Sarah Johnson', 'sarah.johnson@example.com', NULL, NULL, '$2b$10$LrsxTIhW3TEmcjGVM1Ce0.GAgC8iQFOcJFoPRY9hnfm6MhRvbOqau', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.380', '2025-08-02 02:28:34.380', 'ACTIVE', 0),
+('4bbffaa9-d10a-446b-a837-ce9fbf5b9e4b', 'Michael Chen', 'michael.chen@example.com', NULL, NULL, '$2b$10$A22lepI2Mzy8UrokQlH5SuaLQk7GuQzOSyumjxTvag.jdDssrYdYq', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.460', '2025-08-02 02:28:34.460', 'ACTIVE', 0),
+('1cd8b0b9-7976-4fb4-bff8-a47982da2d8a', 'Emma Rodriguez', 'emma.rodriguez@example.com', NULL, NULL, '$2b$10$FP35FMCtoCTFCNnXhSFjk.KtZfmjUmPkMIHC80ga7cbVEfjASPi.C', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.530', '2025-08-02 02:28:34.530', 'ACTIVE', 0),
+('57e9928e-4118-4563-aea4-57b0136c52cd', 'Dr. Maria Garcia', 'maria.garcia@example.com', NULL, NULL, '$2b$10$jI640yfalClNogPqPLAKiuPptasY33GVOb.b2loVuyGMGzc.HopRi', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.085', '2025-08-02 02:36:48.085', 'ACTIVE', 0),
+('94dfaf16-10eb-4918-a129-185e8da28473', 'Prof. David Kim', 'david.kim@example.com', NULL, NULL, '$2b$10$dvWH82LLeOqqghNy5CNZvu9ECoWgY.w2gUFBq9rdeltXjH7VHXypm', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.164', '2025-08-02 02:36:48.164', 'ACTIVE', 0),
+('0339a71c-92d8-4e75-9c28-62d394d041af', 'Dr. Lisa Thompson', 'lisa.thompson@example.com', NULL, NULL, '$2b$10$UTmAQ7w5Hevq460xirr/M.SVsB2VqC5a67Yyc20lk/BzqC3ztq.Ce', 'INSTRUCTOR', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-08-02 02:36:48.235', '2025-08-02 02:36:48.235', 'ACTIVE', 0);
 
 -- --------------------------------------------------------
 

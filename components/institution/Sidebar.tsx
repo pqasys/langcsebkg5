@@ -96,6 +96,16 @@ export function InstitutionSidebar({ className }: SidebarProps) {
               Students
             </Link>
             <Link
+              href="/institution/instructors"
+              className={cn(
+                'flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
+                isActive('/institution/instructors') && 'bg-accent'
+              )}
+            >
+              <Users className="mr-2 h-4 w-4" />
+              Instructors
+            </Link>
+            <Link
               href="/institution/courses"
               className={cn(
                 'flex items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',

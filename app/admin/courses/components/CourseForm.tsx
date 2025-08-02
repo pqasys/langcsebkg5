@@ -75,7 +75,7 @@ const courseFormSchema = z.object({
     icon: z.string().optional()
   })),
   pricingPeriod: z.enum(['FULL_COURSE', 'WEEKLY', 'MONTHLY']),
-  institutionId: z.string().min(1, 'Institution is required'),
+  institutionId: z.string().optional(),
   priority: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 0, {
     message: 'Priority must be a valid number greater than or equal to 0'
   }),
@@ -134,9 +134,7 @@ export function AdminCourseForm({
     if (!data.categoryId) {
       errors.categoryId = 'Category is required';
     }
-    if (!data.institutionId) {
-      errors.institutionId = 'Institution is required';
-    }
+    // Institution is optional for platform-wide courses
     if (!data.base_price || isNaN(Number(data.base_price)) || Number(data.base_price) < 0) {
       errors.base_price = 'Valid base price is required';
     }
@@ -283,21 +281,25 @@ export function AdminCourseForm({
     <form onSubmit={handleFormSubmit} className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="institution">Institution *</Label>
+          <Label htmlFor="institution">Institution</Label>
           <Select
-            value={formData.institutionId}
-            onValueChange={(value) => handleFormChange('institutionId', value)}
+            value={formData.institutionId || "none"}
+            onValueChange={(value) => handleFormChange('institutionId', value === "none" ? "" : value)}
             disabled={!!selectedCourse}
           >
             <SelectTrigger>
               <SelectValue>
                 {(() => {
+                  if (!formData.institutionId) {
+                    return 'Platform-wide (no institution)';
+                  }
                   const institution = Array.isArray(institutions) ? institutions.find(i => i.id.toString() === formData.institutionId) : null;
                   return institution ? institution.name : 'Select institution';
                 })()}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="none">Platform-wide (available to all subscribers)</SelectItem>
               {Array.isArray(institutions) && institutions.map((institution) => (
                 <SelectItem key={institution.id} value={institution.id.toString()}>
                   {institution.name}
@@ -305,6 +307,9 @@ export function AdminCourseForm({
               ))}
             </SelectContent>
           </Select>
+          <p className="text-xs text-gray-500">
+            Platform-wide courses are available to all subscribers. Institution-specific courses are only available to students enrolled in that institution.
+          </p>
           <ErrorMessage field="institutionId" />
         </div>
 

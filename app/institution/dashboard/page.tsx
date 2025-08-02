@@ -214,33 +214,63 @@ export default async function InstitutionDashboardPage() {
   // Get additional data for recent students
   const recentStudentsWithEnrollments = await Promise.all(
     recentStudents.map(async (student) => {
+      // First get course IDs for this institution
+      const institutionCourses = await prisma.course.findMany({
+        where: {
+          institutionId: session.user.institutionId
+        },
+        select: {
+          id: true
+        }
+      });
+      
+      const courseIds = institutionCourses.map(c => c.id);
+      
       const studentEnrollments = await prisma.studentCourseEnrollment.findMany({
         where: {
           studentId: student.id,
-          course: {
-            institutionId: session.user.institutionId
+          courseId: {
+            in: courseIds
           }
         },
         select: {
           id: true,
           studentId: true,
           courseId: true,
-          createdAt: true,
-          course: {
-            select: {
-              title: true
-            }
-          }
+          createdAt: true
         },
         orderBy: {
           createdAt: 'desc'
         }
       });
 
+      // Get course details for the enrollments
+      const enrollmentCourseIds = studentEnrollments.map(e => e.courseId);
+      const courses = await prisma.course.findMany({
+        where: {
+          id: {
+            in: enrollmentCourseIds
+          }
+        },
+        select: {
+          id: true,
+          title: true
+        }
+      });
+
+      // Create a map for quick lookup
+      const courseMap = new Map(courses.map(c => [c.id, c]));
+
+      // Add course data to enrollments
+      const enrollmentsWithCourseData = studentEnrollments.map(enrollment => ({
+        ...enrollment,
+        course: courseMap.get(enrollment.courseId)
+      }));
+
       return {
         ...student,
         enrollmentCount: studentEnrollments.length,
-        latestEnrollment: studentEnrollments[0]
+        latestEnrollment: enrollmentsWithCourseData[0]
       };
     })
   );

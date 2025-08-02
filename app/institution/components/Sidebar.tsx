@@ -17,6 +17,11 @@ const menuItems = [
     icon: <Users className="h-5 w-5" />,
   },
   {
+    title: 'Instructors',
+    href: '/institution/instructors',
+    icon: <Users className="h-5 w-5" />,
+  },
+  {
     title: 'Payments',
     href: '/institution/payments',
     icon: <CreditCard className="h-5 w-5" />,

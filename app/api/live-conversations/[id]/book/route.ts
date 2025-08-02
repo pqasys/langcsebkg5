@@ -228,11 +228,11 @@ async function checkUserBookingAccess(userId: string): Promise<boolean> {
     }
 
     // Check if user has institution enrollment
-    const user = await prisma.user.findUnique({
+    const userWithInstitution = await prisma.user.findUnique({
       where: { id: userId },
       select: { institutionId: true }
     });
-    const enrollment = user?.institutionId ? { institution_id: user.institutionId } : null;
+    const enrollment = userWithInstitution?.institutionId ? { institution_id: userWithInstitution.institutionId } : null;
 
     if (enrollment) {
       return true;

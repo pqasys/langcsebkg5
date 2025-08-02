@@ -218,6 +218,17 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
                   Users
                 </Link>
 
+                <Link
+                  href="/admin/instructors"
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                    pathname === '/admin/instructors' ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                  )}
+                >
+                  <Users className="h-4 w-4" />
+                  Instructors
+                </Link>
+
                 <a
                   href="#"
                   onClick={handleCoursesClick}

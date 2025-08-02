@@ -23,8 +23,6 @@ interface LiveClassFormData {
   maxParticipants: number;
   startTime: string;
   endTime: string;
-  price: number;
-  currency: string;
   isPublic: boolean;
   isRecorded: boolean;
   allowChat: boolean;
@@ -39,6 +37,10 @@ interface Instructor {
   id: string;
   name: string;
   email: string;
+  institution?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 interface Institution {
@@ -49,6 +51,10 @@ interface Institution {
 interface Course {
   id: string;
   title: string;
+  institution?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 export default function AdminCreateLiveClassPage() {
@@ -67,8 +73,6 @@ export default function AdminCreateLiveClassPage() {
     maxParticipants: 10,
     startTime: '',
     endTime: '',
-    price: 0,
-    currency: 'USD',
     isPublic: true,
     isRecorded: false,
     allowChat: true,
@@ -86,14 +90,25 @@ export default function AdminCreateLiveClassPage() {
       return;
     }
 
-    fetchInstructors();
+    fetchInstructors(); // Fetch all instructors initially
     fetchInstitutions();
     fetchCourses();
   }, [session, router]);
 
-  const fetchInstructors = async () => {
+  const fetchInstructors = async (institutionId?: string, courseId?: string) => {
     try {
-      const response = await fetch('/api/admin/users?role=INSTRUCTOR');
+      const params = new URLSearchParams();
+      params.append('role', 'INSTRUCTOR');
+      
+      if (institutionId) {
+        params.append('institutionId', institutionId);
+      }
+      
+      if (courseId) {
+        params.append('courseId', courseId);
+      }
+
+      const response = await fetch(`/api/admin/users?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
         setInstructors(data.users || []);
@@ -144,6 +159,26 @@ export default function AdminCreateLiveClassPage() {
       ...prev,
       [field]: value
     }));
+
+    // Refetch instructors when institution or course changes
+    if (field === 'institutionId' || field === 'courseId') {
+      const newInstitutionId = field === 'institutionId' ? value : formData.institutionId;
+      const newCourseId = field === 'courseId' ? value : formData.courseId;
+      
+      // Clear instructor selection when context changes
+      if (field === 'institutionId' || field === 'courseId') {
+        setFormData(prev => ({
+          ...prev,
+          instructorId: ''
+        }));
+      }
+      
+      // Fetch instructors based on new context
+      fetchInstructors(
+        newInstitutionId === 'none' ? undefined : newInstitutionId,
+        newCourseId === 'none' ? undefined : newCourseId
+      );
+    }
   };
 
   const calculateDuration = () => {
@@ -192,11 +227,6 @@ export default function AdminCreateLiveClassPage() {
       return false;
     }
 
-    if (formData.price < 0) {
-      toast.error('Price cannot be negative');
-      return false;
-    }
-
     return true;
   };
 
@@ -219,6 +249,8 @@ export default function AdminCreateLiveClassPage() {
         // Handle empty values for optional fields
         institutionId: formData.institutionId || null,
         courseId: formData.courseId || null,
+        price: 0, // Live classes are free for subscribers
+        currency: 'USD', // Default currency
       };
 
       const response = await fetch('/api/admin/live-classes', {
@@ -274,7 +306,7 @@ export default function AdminCreateLiveClassPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Create Live Class</h1>
             <p className="text-gray-600">
-              Create platform-wide or institution-specific live class sessions
+              Create platform-wide or institution-specific live class sessions (included in subscriptions)
             </p>
           </div>
         </div>
@@ -375,22 +407,6 @@ export default function AdminCreateLiveClassPage() {
                     required
                   />
                 </div>
-
-                <div>
-                  <Label htmlFor="currency">Currency *</Label>
-                  <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USD">USD</SelectItem>
-                      <SelectItem value="EUR">EUR</SelectItem>
-                      <SelectItem value="GBP">GBP</SelectItem>
-                      <SelectItem value="CAD">CAD</SelectItem>
-                      <SelectItem value="AUD">AUD</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -409,18 +425,30 @@ export default function AdminCreateLiveClassPage() {
                       <SelectValue placeholder="Select instructor" />
                     </SelectTrigger>
                     <SelectContent>
-                      {instructors.map((instructor) => (
-                        <SelectItem key={instructor.id} value={instructor.id}>
-                          {instructor.name} ({instructor.email})
+                      {instructors.length === 0 ? (
+                        <SelectItem value="" disabled>
+                          No instructors available for selected context
                         </SelectItem>
-                      ))}
+                      ) : (
+                        instructors.map((instructor) => (
+                          <SelectItem key={instructor.id} value={instructor.id}>
+                            {instructor.name} ({instructor.email})
+                            {instructor.institution ? ` - ${instructor.institution.name}` : ' - Platform-wide'}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
+                  {instructors.length === 0 && (
+                    <p className="text-sm text-amber-600 mt-1">
+                      No instructors available. Try selecting a different institution or course.
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <Label htmlFor="institutionId">Institution</Label>
-                  <Select value={formData.institutionId || "none"} onValueChange={(value) => handleInputChange('institutionId', value === "none" ? "" : value)}>
+                  <Select value={formData.institutionId || "none"} onValueChange={(value) => handleInputChange('institutionId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Platform-wide (no institution)" />
                     </SelectTrigger>
@@ -437,7 +465,7 @@ export default function AdminCreateLiveClassPage() {
 
                 <div>
                   <Label htmlFor="courseId">Course</Label>
-                  <Select value={formData.courseId || "none"} onValueChange={(value) => handleInputChange('courseId', value === "none" ? "" : value)}>
+                  <Select value={formData.courseId || "none"} onValueChange={(value) => handleInputChange('courseId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select course (optional)" />
                     </SelectTrigger>
@@ -445,7 +473,7 @@ export default function AdminCreateLiveClassPage() {
                       <SelectItem value="none">No specific course</SelectItem>
                       {courses.map((course) => (
                         <SelectItem key={course.id} value={course.id}>
-                          {course.title}
+                          {course.title} {course.institution ? `(${course.institution.name})` : '(Platform-wide)'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -502,26 +530,26 @@ export default function AdminCreateLiveClassPage() {
             </CardContent>
           </Card>
 
-          {/* Pricing */}
+          {/* Subscription Access */}
           <Card>
             <CardHeader>
-              <CardTitle>Pricing</CardTitle>
+              <CardTitle>Subscription Access</CardTitle>
             </CardHeader>
             <CardContent>
-              <div>
-                <Label htmlFor="price">Price</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
-                  placeholder="0.00"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Set to 0 for free sessions
-                </p>
+              <div className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-2">Live Classes are included in subscriptions:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• <strong>BASIC</strong> ($12.99/month): No video conferencing</li>
+                    <li>• <strong>PREMIUM</strong> ($24.99/month): Limited video sessions (2/month)</li>
+                    <li>• <strong>PRO</strong> ($49.99/month): Unlimited video sessions</li>
+                    <li>• <strong>Institutions</strong>: Video conferencing included in PROFESSIONAL and ENTERPRISE tiers</li>
+                  </ul>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p><strong>Platform-wide classes:</strong> Available to all subscribers based on their tier limits.</p>
+                  <p><strong>Institution classes:</strong> Available to institution students based on their subscription tier.</p>
+                </div>
               </div>
             </CardContent>
           </Card>

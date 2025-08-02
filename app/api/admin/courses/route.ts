@@ -52,6 +52,14 @@ export async function GET(request: Request) {
     const courses = await prisma.course.findMany({
       where,
       include: {
+        institution: {
+          select: {
+            id: true,
+            name: true,
+            country: true,
+            city: true
+          }
+        },
         videoSessions: {
           select: {
             id: true,
@@ -154,8 +162,8 @@ export async function POST(request: Request) {
     } = body;
 
     // Validate required fields
-    if (!title || !institutionId || !categoryId) {
-      // // // // // // // // // // // // console.log('Missing required fields:', { title, institutionId, categoryId });
+    if (!title || !categoryId) {
+      // // // // // // // // // // // // console.log('Missing required fields:', { title, categoryId });
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -175,7 +183,7 @@ export async function POST(request: Request) {
       title,
       base_price,
       pricingPeriod,
-      institutionId,
+      institutionId: institutionId || 'PLATFORM_WIDE',
       categoryId,
       tags: tags?.length,
       weeklyPrices: weeklyPrices?.length,
@@ -190,7 +198,7 @@ export async function POST(request: Request) {
         description,
         base_price: parseFloat(base_price),
         pricingPeriod: pricingPeriod || 'WEEKLY',
-        institutionId,
+        institutionId: institutionId || null, // Allow null for platform-wide courses
         categoryId,
         framework: framework || 'GENERAL',
         level: level || 'BEGINNER',

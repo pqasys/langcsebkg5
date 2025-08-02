@@ -109,6 +109,19 @@ const Navbar = () => {
     }
   }
 
+  const getInstructorsLink = () => {
+    if (!session?.user) return null;
+    
+    switch (session.user.role) {
+      case 'INSTITUTION':
+        return { href: '/institution/instructors', label: 'Instructors' };
+      case 'ADMIN':
+        return { href: '/admin/instructors', label: 'Instructors' };
+      default:
+        return null;
+    }
+  }
+
   const getSettingsLink = () => {
     if (!session?.user) return null;
     
@@ -130,6 +143,7 @@ const Navbar = () => {
     return [
       { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/admin/users', label: 'Users', icon: Building2 },
+      { href: '/admin/instructors', label: 'Instructors', icon: Building2 },
       { href: '/admin/courses', label: 'Courses', icon: BookOpen },
       { href: '/admin/institutions', label: 'Institutions', icon: Building2 },
       { href: '/admin/categories', label: 'Categories', icon: BookOpen },

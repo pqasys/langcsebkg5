@@ -24,8 +24,6 @@ interface LiveClassFormData {
   maxParticipants: number;
   startTime: string;
   endTime: string;
-  price: number;
-  currency: string;
   isPublic: boolean;
   isRecorded: boolean;
   allowChat: boolean;
@@ -55,8 +53,6 @@ export default function InstitutionCreateLiveClassPage() {
     maxParticipants: 10,
     startTime: '',
     endTime: '',
-    price: 0,
-    currency: 'USD',
     isPublic: true,
     isRecorded: false,
     allowChat: true,
@@ -164,6 +160,8 @@ export default function InstitutionCreateLiveClassPage() {
         duration,
         title: formData.title.trim(),
         description: formData.description.trim(),
+        price: 0, // Live classes are free for subscribers
+        currency: 'USD', // Default currency
       };
 
       const response = await fetch('/api/institution/live-classes', {
@@ -227,7 +225,7 @@ export default function InstitutionCreateLiveClassPage() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Create Live Class</h1>
             <p className="text-gray-600">
-              Create a new live class session for your institution
+              Create a new live class session for your institution (included in subscriptions)
             </p>
           </div>
         </div>
@@ -414,26 +412,25 @@ export default function InstitutionCreateLiveClassPage() {
             </CardContent>
           </Card>
 
-          {/* Pricing */}
+          {/* Subscription Access */}
           <Card>
             <CardHeader>
-              <CardTitle>Pricing</CardTitle>
+              <CardTitle>Subscription Access</CardTitle>
             </CardHeader>
             <CardContent>
-              <div>
-                <Label htmlFor="price">Price</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
-                  placeholder="0.00"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Set to 0 for free sessions
-                </p>
+              <div className="space-y-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-2">Live Classes are included in institution subscriptions:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• <strong>STARTER</strong> ($99/month): Basic video conferencing</li>
+                    <li>• <strong>PROFESSIONAL</strong> ($299/month): Advanced video conferencing with module integration</li>
+                    <li>• <strong>ENTERPRISE</strong> ($799/month): Unlimited video conferencing with all features</li>
+                  </ul>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p><strong>Institution classes:</strong> Available to institution students based on their subscription tier.</p>
+                  <p><strong>Access control:</strong> Students must be enrolled in this institution to join.</p>
+                </div>
               </div>
             </CardContent>
           </Card>

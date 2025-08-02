@@ -92,24 +92,12 @@ export default function HomePageClient() {
     return []
   }
 
-  const [countries, setCountries] = useState<Array<{ country: string; courseCount: number }>>(getInitialCountries())
-  const [stats, setStats] = useState(() => {
-    const cachedStats = getInitialStats()
-    return cachedStats || null // Return null instead of zeros to prevent flashing
-  })
+  const [countries, setCountries] = useState<Array<{ country: string; courseCount: number }>>([])
+  const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [sessionTimeout, setSessionTimeout] = useState(false)
-  const [isOfflineData, setIsOfflineData] = useState(() => {
-    // Only show offline data indicator if we're actually offline
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      const isActuallyOffline = !navigator.onLine;
-      const hasCachedData = getInitialStats() !== null || getInitialCountries().length > 0;
-      console.log('HomePageClient - Initial offline check:', { isActuallyOffline, hasCachedData });
-      return isActuallyOffline && hasCachedData;
-    }
-    return false
-  })
+  const [isOfflineData, setIsOfflineData] = useState(false)
   const hasFetchedData = useRef(false)
   const [mounted, setMounted] = useState(false);
 
@@ -118,6 +106,34 @@ export default function HomePageClient() {
     setMounted(true);
   }, []);
 
+  // Load cached data after mount to avoid hydration mismatch
+  useEffect(() => {
+    if (mounted) {
+      // Load cached countries data
+      if (countries.length === 0) {
+        const cachedCountries = getInitialCountries();
+        if (cachedCountries.length > 0) {
+          setCountries(cachedCountries);
+        }
+      }
+      
+      // Load cached stats data
+      if (stats === null) {
+        const cachedStats = getInitialStats();
+        if (cachedStats) {
+          setStats(cachedStats);
+        }
+      }
+      
+      // Check offline status after mount
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const isActuallyOffline = !navigator.onLine;
+        const hasCachedData = getInitialStats() !== null || getInitialCountries().length > 0;
+        console.log('HomePageClient - Initial offline check:', { isActuallyOffline, hasCachedData });
+        setIsOfflineData(isActuallyOffline && hasCachedData);
+      }
+    }
+  }, [mounted]);
 
   
   // Memoize expensive computations
@@ -571,7 +587,7 @@ export default function HomePageClient() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3 md:gap-4 lg:gap-6">
-            {loading && countries.length === 0 ? (
+            {!mounted || (loading && countries.length === 0) ? (
               // Loading skeleton for countries
               Array.from({ length: 4 }).map((_, index) => (
                 <Card key={index} className="text-center w-[150px] md:w-[180px] lg:w-[200px] flex-shrink-0">

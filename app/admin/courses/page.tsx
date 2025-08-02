@@ -47,10 +47,10 @@ interface Course {
   duration: number;
   level: string;
   status: string;
-  institution: {
+  institution?: {
     id: string;
     name: string;
-  };
+  } | null;
   _count: {
     bookings: number;
     enrollments: number;
@@ -201,6 +201,7 @@ function AdminCoursesContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedInstitution, setSelectedInstitution] = useState<Institution | null>(null);
+  const [showPlatformWideOnly, setShowPlatformWideOnly] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isWeeklyPricingOpen, setIsWeeklyPricingOpen] = useState(false);
@@ -556,9 +557,14 @@ function AdminCoursesContent() {
   const handleInstitutionChange = (institutionId: string | null) => {
     if (institutionId === 'all' || !institutionId) {
       setSelectedInstitution(null);
+      setShowPlatformWideOnly(false);
+    } else if (institutionId === 'platform') {
+      setSelectedInstitution(null);
+      setShowPlatformWideOnly(true);
     } else {
       const institution = Array.isArray(institutions) ? institutions.find(i => i.id.toString() === institutionId) : null;
       setSelectedInstitution(institution || null);
+      setShowPlatformWideOnly(false);
     }
     setPage(1);
   };
@@ -926,9 +932,15 @@ function AdminCoursesContent() {
         ? course.status?.toUpperCase() === selectedStatus.toUpperCase()
         : true;
 
-      return matchesSearch && matchesCategory && matchesStatus;
+      const matchesInstitution = showPlatformWideOnly
+        ? !course.institution // Show only platform-wide courses (no institution)
+        : selectedInstitution
+        ? course.institution?.id === selectedInstitution.id // Show only courses from selected institution
+        : true; // Show all courses
+
+      return matchesSearch && matchesCategory && matchesStatus && matchesInstitution;
     });
-  }, [courses, searchQuery, selectedCategory, selectedStatus]);
+  }, [courses, searchQuery, selectedCategory, selectedStatus, selectedInstitution, showPlatformWideOnly]);
 
   const handleFormDataChange = useCallback((data: CourseFormData) => {
     setFormData(data);
@@ -1208,7 +1220,7 @@ function AdminCoursesContent() {
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-xl sm:text-2xl font-bold">
-          {selectedInstitution ? 'Institution Courses' : 'All Courses'}
+                      {showPlatformWideOnly ? 'Platform-wide Courses' : selectedInstitution ? 'Institution Courses' : 'All Courses'}
         </h1>
         <div className="flex items-center gap-2 sm:gap-4">
           <div className="flex gap-2">
@@ -1284,7 +1296,7 @@ function AdminCoursesContent() {
           />
         </div>
         <Select
-          value={selectedInstitution ? selectedInstitution.id.toString() : 'all'}
+                      value={showPlatformWideOnly ? 'platform' : selectedInstitution ? selectedInstitution.id.toString() : 'all'}
           onValueChange={handleInstitutionChange}
         >
           <SelectTrigger className="w-full sm:w-[200px]">
@@ -1292,6 +1304,7 @@ function AdminCoursesContent() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Institutions</SelectItem>
+            <SelectItem value="platform">Platform-wide Courses</SelectItem>
             {Array.isArray(institutions) && institutions.map((institution) => (
               <SelectItem key={institution.id} value={institution.id.toString()}>
                 {institution.name}
@@ -1439,7 +1452,14 @@ function AdminCoursesContent() {
                     
                     {/* Institution Info */}
                     <div className="mb-4 text-sm text-gray-500">
-                      <span className="font-medium">{course.institution.name}</span>
+                      <span className="font-medium">
+                        {course.institution ? course.institution.name : 'Platform-wide'}
+                      </span>
+                      {!course.institution && (
+                        <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          Available to all subscribers
+                        </span>
+                      )}
                     </div>
                     
                     {/* Course Tags */}
