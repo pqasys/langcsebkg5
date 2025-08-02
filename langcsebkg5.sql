@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 02, 2025 at 12:35 PM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 02, 2025 at 07:02 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -274,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `course` (
   `duration` int NOT NULL,
   `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `institutionId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `institutionId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `categoryId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
