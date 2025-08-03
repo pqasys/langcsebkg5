@@ -247,11 +247,14 @@ export default function AdminCreateLiveClassPage() {
         title: formData.title.trim(),
         description: formData.description.trim(),
         // Handle empty values for optional fields
+        instructorId: formData.instructorId || undefined,
         institutionId: formData.institutionId || null,
         courseId: formData.courseId || null,
         price: 0, // Live classes are free for subscribers
         currency: 'USD', // Default currency
       };
+
+      console.log('Submitting session data:', sessionData);
 
       const response = await fetch('/api/admin/live-classes', {
         method: 'POST',
@@ -261,18 +264,14 @@ export default function AdminCreateLiveClassPage() {
         body: JSON.stringify(sessionData),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create live class');
-      }
-
       const data = await response.json();
 
-      if (data.success) {
-        toast.success('Live class created successfully');
-        router.push('/admin/live-classes');
-      } else {
-        throw new Error(data.error || 'Failed to create live class');
+      if (!response.ok) {
+        throw new Error(data.error || `Failed to create live class (${response.status})`);
       }
+
+      toast.success('Live class created successfully');
+      router.push('/admin/live-classes');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to create live class');
     } finally {
@@ -426,7 +425,7 @@ export default function AdminCreateLiveClassPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {instructors.length === 0 ? (
-                        <SelectItem value="" disabled>
+                        <SelectItem value="no-instructors" disabled>
                           No instructors available for selected context
                         </SelectItem>
                       ) : (
@@ -560,74 +559,134 @@ export default function AdminCreateLiveClassPage() {
               <CardTitle>Session Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="isPublic">Public Session</Label>
-                  <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <Label htmlFor="isPublic" className="text-base font-medium text-gray-900">
+                    Public Session
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
                     Allow anyone to see and join this session
                   </p>
                 </div>
-                <Switch
-                  id="isPublic"
-                  checked={formData.isPublic}
-                  onCheckedChange={(checked) => handleInputChange('isPublic', checked)}
-                />
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    formData.isPublic 
+                      ? 'bg-green-100 text-green-800 border border-green-200' 
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {formData.isPublic ? 'ON' : 'OFF'}
+                  </div>
+                  <Switch
+                    id="isPublic"
+                    checked={formData.isPublic}
+                    onCheckedChange={(checked) => handleInputChange('isPublic', checked)}
+                    aria-label="Toggle public session"
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="isRecorded">Record Session</Label>
-                  <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <Label htmlFor="isRecorded" className="text-base font-medium text-gray-900">
+                    Record Session
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
                     Automatically record the session for later viewing
                   </p>
                 </div>
-                <Switch
-                  id="isRecorded"
-                  checked={formData.isRecorded}
-                  onCheckedChange={(checked) => handleInputChange('isRecorded', checked)}
-                />
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    formData.isRecorded 
+                      ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {formData.isRecorded ? 'ON' : 'OFF'}
+                  </div>
+                  <Switch
+                    id="isRecorded"
+                    checked={formData.isRecorded}
+                    onCheckedChange={(checked) => handleInputChange('isRecorded', checked)}
+                    aria-label="Toggle session recording"
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="allowChat">Allow Chat</Label>
-                  <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <Label htmlFor="allowChat" className="text-base font-medium text-gray-900">
+                    Allow Chat
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
                     Enable text chat during the session
                   </p>
                 </div>
-                <Switch
-                  id="allowChat"
-                  checked={formData.allowChat}
-                  onCheckedChange={(checked) => handleInputChange('allowChat', checked)}
-                />
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    formData.allowChat 
+                      ? 'bg-green-100 text-green-800 border border-green-200' 
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {formData.allowChat ? 'ENABLED' : 'DISABLED'}
+                  </div>
+                  <Switch
+                    id="allowChat"
+                    checked={formData.allowChat}
+                    onCheckedChange={(checked) => handleInputChange('allowChat', checked)}
+                    aria-label="Toggle chat functionality"
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="allowScreenShare">Allow Screen Sharing</Label>
-                  <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <Label htmlFor="allowScreenShare" className="text-base font-medium text-gray-900">
+                    Allow Screen Sharing
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
                     Enable screen sharing for participants
                   </p>
                 </div>
-                <Switch
-                  id="allowScreenShare"
-                  checked={formData.allowScreenShare}
-                  onCheckedChange={(checked) => handleInputChange('allowScreenShare', checked)}
-                />
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    formData.allowScreenShare 
+                      ? 'bg-green-100 text-green-800 border border-green-200' 
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {formData.allowScreenShare ? 'ENABLED' : 'DISABLED'}
+                  </div>
+                  <Switch
+                    id="allowScreenShare"
+                    checked={formData.allowScreenShare}
+                    onCheckedChange={(checked) => handleInputChange('allowScreenShare', checked)}
+                    aria-label="Toggle screen sharing functionality"
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="allowRecording">Allow Participant Recording</Label>
-                  <p className="text-sm text-gray-500">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <Label htmlFor="allowRecording" className="text-base font-medium text-gray-900">
+                    Allow Participant Recording
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
                     Allow participants to record their own sessions
                   </p>
                 </div>
-                <Switch
-                  id="allowRecording"
-                  checked={formData.allowRecording}
-                  onCheckedChange={(checked) => handleInputChange('allowRecording', checked)}
-                />
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    formData.allowRecording 
+                      ? 'bg-orange-100 text-orange-800 border border-orange-200' 
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {formData.allowRecording ? 'ALLOWED' : 'BLOCKED'}
+                  </div>
+                  <Switch
+                    id="allowRecording"
+                    checked={formData.allowRecording}
+                    onCheckedChange={(checked) => handleInputChange('allowRecording', checked)}
+                    aria-label="Toggle participant recording functionality"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { isValid, isBefore } from 'date-fns';
 
+export const dynamic = 'force-dynamic';
+
 const calculateMonthlyPrice = (monthNumber: number, basePrice: number) => {
   // Calculate total price for all months up to current month
   const totalPrice = basePrice * monthNumber;
@@ -67,11 +69,11 @@ export async function POST(request: Request) {
 
     // Get pricing data separately
     const [weeklyPrices, monthlyPrices] = await Promise.all([
-      prisma.courseWeeklyPrice.findMany({
+      prisma.course_weekly_prices.findMany({
         where: { courseId: courseId },
         orderBy: { weekNumber: 'asc' }
       }),
-      prisma.courseMonthlyPrice.findMany({
+      prisma.course_monthly_price.findMany({
         where: { courseId: courseId },
         orderBy: { monthNumber: 'asc' }
       })
@@ -268,7 +270,7 @@ export async function POST(request: Request) {
           error: 'Invalid price calculated',
           details: 'The calculated price is invalid. Please contact support.'
         },
-        { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+        { status: 500 }
       );
     }
 
@@ -291,14 +293,14 @@ export async function POST(request: Request) {
         (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1 : undefined
     });
   } catch (error) {
-    console.error('Error calculating course price:');
+    console.error('Error calculating course price:', error);
     return NextResponse.json(
       { 
         error: 'Failed to calculate course price',
         details: 'An unexpected error occurred. Please try again later.',
         technicalDetails: error instanceof Error ? error.message : 'Unknown error'
       },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500 }
     );
   }
 } 

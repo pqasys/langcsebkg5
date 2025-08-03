@@ -223,7 +223,6 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
     const currentSubscription = await prisma.studentSubscription.findUnique({
       where: { studentId: userId },
       include: {
-        studentTier: true,
         billingHistory: {
           orderBy: { billingDate: 'desc' },
           take: 10
@@ -234,8 +233,8 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
       const hasActiveSubscription = currentSubscription && 
         ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(currentSubscription.status);
 
-      // Get plan details from studentTier relation
-      const currentPlan = currentSubscription?.studentTier?.planType;
+      // Get plan details from subscription
+      const currentPlan = currentSubscription?.planType;
       const subscriptionEndDate = currentSubscription?.endDate;
       const nextBillingDate = currentSubscription?.endDate;
 
@@ -244,9 +243,9 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
 
       // Determine upgrade/downgrade options
       const canUpgrade = !isFallback && hasActiveSubscription && 
-        currentSubscription?.studentTier?.planType !== 'PRO';
+        currentSubscription?.planType !== 'PRO';
       const canDowngrade = !isFallback && hasActiveSubscription && 
-        currentSubscription?.studentTier?.planType !== 'BASIC';
+        currentSubscription?.planType !== 'BASIC';
       const canCancel = hasActiveSubscription && !isFallback;
 
       const billingHistory: BillingHistoryItem[] = currentSubscription?.billingHistory?.map(bill => ({
@@ -264,7 +263,7 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
       return {
         hasActiveSubscription,
         currentPlan,
-        features: currentSubscription?.studentTier?.features as Record<string, any> || {},
+        features: currentSubscription?.features as Record<string, any> || {},
         subscriptionEndDate,
         canUpgrade,
         canDowngrade,
@@ -353,8 +352,7 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
 
       // Get existing subscription for logging
       const existingSubscription = await prisma.studentSubscription.findUnique({
-        where: { studentId },
-        include: { studentTier: true }
+        where: { studentId }
       });
 
       // Create or update subscription
@@ -383,11 +381,11 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
       await this.logStudentSubscriptionAction(
         subscription.id,
         existingSubscription ? 'UPGRADE' : 'CREATE',
-        existingSubscription?.studentTier?.planType,
+        existingSubscription?.planType,
         planType,
-        existingSubscription?.studentTier?.price,
+        existingSubscription?.amount,
         calculatedAmount,
-        existingSubscription?.studentTier?.billingCycle,
+        existingSubscription?.billingCycle,
         billingCycle,
         userId,
         existingSubscription ? 'Plan upgrade' : (startTrial ? 'Trial subscription created' : 'New subscription created')

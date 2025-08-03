@@ -28,19 +28,14 @@ export async function GET() {
             status: true,
             subscriptionPlan: true, // Legacy field for backward compatibility
             isFeatured: true, // For featured institution status
-            subscription: {
+            subscriptions: {
               include: {
                 commissionTier: true
               }
             }
           }
         },
-        category: {
-          select: {
-            id: true,
-            name: true
-          }
-        },
+
         courseTags: {
           include: {
             tag: true
@@ -74,9 +69,9 @@ export async function GET() {
       // Subscription plan bonus - use new unified architecture when available
       let subscriptionPlan = 'BASIC'; // Default fallback
       
-      if (course.institution.subscription?.status === 'ACTIVE' && course.institution.subscription.commissionTier) {
+      if (course.institution.subscriptions?.[0]?.status === 'ACTIVE' && course.institution.subscriptions[0].commissionTier) {
         // Use new unified architecture
-        subscriptionPlan = course.institution.subscription.commissionTier.planType;
+        subscriptionPlan = course.institution.subscriptions[0].commissionTier.planType;
       } else if (course.institution.subscriptionPlan) {
         // Fallback to legacy field for backward compatibility
         subscriptionPlan = course.institution.subscriptionPlan;

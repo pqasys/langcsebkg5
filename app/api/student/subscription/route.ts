@@ -66,24 +66,23 @@ export async function POST(request: NextRequest) {
       amount
     );
 
-    // Get the subscription with tier details for response
-    const subscriptionWithTier = await prisma.studentSubscription.findUnique({
-      where: { id: subscription.id },
-      include: { studentTier: true }
+    // Get the subscription details for response
+    const subscriptionDetails = await prisma.studentSubscription.findUnique({
+      where: { id: subscription.id }
     });
 
     return NextResponse.json({
       message: 'Subscription created successfully',
       subscription: {
         id: subscription.id,
-        planType: subscriptionWithTier?.studentTier?.planType,
+        planType: subscription.planType,
         status: subscription.status,
         startDate: subscription.startDate.toISOString(),
         endDate: subscription.endDate.toISOString(),
-        billingCycle: subscriptionWithTier?.studentTier?.billingCycle,
-        amount: subscriptionWithTier?.studentTier?.price,
-        currency: subscriptionWithTier?.studentTier?.currency,
-        features: subscriptionWithTier?.studentTier?.features,
+        billingCycle: subscription.billingCycle,
+        amount: subscription.amount,
+        currency: subscription.currency,
+        features: subscription.features,
         autoRenew: subscription.autoRenew
       }
     });
@@ -111,8 +110,7 @@ export async function PUT(request: NextRequest) {
 
     // Get current subscription
     const currentSubscription = await prisma.studentSubscription.findUnique({
-      where: { studentId },
-      include: { studentTier: true }
+      where: { studentId }
     });
 
     if (!currentSubscription) {
@@ -129,7 +127,7 @@ export async function PUT(request: NextRequest) {
         
         // Validate upgrade
         const planHierarchy = { BASIC: 1, PREMIUM: 2, PRO: 3 };
-        const currentLevel = planHierarchy[currentSubscription.studentTier?.planType as keyof typeof planHierarchy];
+        const currentLevel = planHierarchy[currentSubscription.planType as keyof typeof planHierarchy];
         const newLevel = planHierarchy[planType as keyof typeof planHierarchy];
         
         if (newLevel <= currentLevel) {
@@ -140,7 +138,7 @@ export async function PUT(request: NextRequest) {
         subscription = await SubscriptionCommissionService.createStudentSubscription(
           studentId,
           planType,
-          billingCycle || currentSubscription.studentTier?.billingCycle || 'MONTHLY',
+          billingCycle || currentSubscription.billingCycle || 'MONTHLY',
           session.user.id
         );
         break;
@@ -151,7 +149,7 @@ export async function PUT(request: NextRequest) {
         }
         
         // Validate downgrade
-        if (currentSubscription.studentTier?.planType === 'BASIC') {
+        if (currentSubscription.planType === 'BASIC') {
           return NextResponse.json({ error: 'Cannot downgrade from BASIC plan' }, { status: 400 });
         }
 
@@ -159,7 +157,7 @@ export async function PUT(request: NextRequest) {
         subscription = await SubscriptionCommissionService.createStudentSubscription(
           studentId,
           planType,
-          billingCycle || currentSubscription.studentTier?.billingCycle || 'MONTHLY',
+          billingCycle || currentSubscription.billingCycle || 'MONTHLY',
           session.user.id
         );
         break;
@@ -170,7 +168,7 @@ export async function PUT(request: NextRequest) {
         }
 
         const newEndDate = new Date();
-        newEndDate.setMonth(newEndDate.getMonth() + (currentSubscription.studentTier?.billingCycle === 'ANNUAL' ? 12 : 1));
+        newEndDate.setMonth(newEndDate.getMonth() + (currentSubscription.billingCycle === 'ANNUAL' ? 12 : 1));
 
         subscription = await prisma.studentSubscription.update({
           where: { id: currentSubscription.id },
@@ -190,23 +188,22 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
 
-    // Get the subscription with tier details for response
-    const subscriptionWithTier = await prisma.studentSubscription.findUnique({
-      where: { id: subscription.id },
-      include: { studentTier: true }
+    // Get the subscription details for response
+    const subscriptionDetails = await prisma.studentSubscription.findUnique({
+      where: { id: subscription.id }
     });
 
     return NextResponse.json({
       message: `Subscription ${action.toLowerCase()}d successfully`,
       subscription: {
         id: subscription.id,
-        planType: subscriptionWithTier?.studentTier?.planType,
+        planType: subscription.planType,
         status: subscription.status,
         startDate: subscription.startDate.toISOString(),
         endDate: subscription.endDate.toISOString(),
-        billingCycle: subscriptionWithTier?.studentTier?.billingCycle,
-        amount: subscriptionWithTier?.studentTier?.price,
-        currency: subscriptionWithTier?.studentTier?.currency,
+        billingCycle: subscription.billingCycle,
+        amount: subscription.amount,
+        currency: subscription.currency,
         autoRenew: subscription.autoRenew
       }
     });
@@ -229,8 +226,7 @@ export async function DELETE(request: NextRequest) {
 
     // Get current subscription
     const subscription = await prisma.studentSubscription.findUnique({
-      where: { studentId },
-      include: { studentTier: true }
+      where: { studentId }
     });
 
     if (!subscription) {
@@ -257,9 +253,9 @@ export async function DELETE(request: NextRequest) {
       data: {
         subscriptionId: cancelledSubscription.id,
         action: 'CANCEL',
-        oldPlan: subscription.studentTier?.planType,
-        oldAmount: subscription.studentTier?.price,
-        oldBillingCycle: subscription.studentTier?.billingCycle,
+        oldPlan: subscription.planType,
+        oldAmount: subscription.amount,
+        oldBillingCycle: subscription.billingCycle,
         userId: session.user.id,
         reason
       }
@@ -269,7 +265,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Subscription cancelled successfully',
       subscription: {
         id: cancelledSubscription.id,
-        planType: subscription.studentTier?.planType,
+        planType: subscription.planType,
         status: cancelledSubscription.status,
         cancelledAt: cancelledSubscription.cancelledAt?.toISOString(),
         cancellationReason: cancelledSubscription.cancellationReason

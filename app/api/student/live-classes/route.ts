@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/student/live-classes - Get available live classes for the student
 export async function GET(request: NextRequest) {
   try {
@@ -36,7 +38,6 @@ export async function GET(request: NextRequest) {
       [studentSubscription, user] = await Promise.all([
         prisma.studentSubscription.findUnique({
           where: { studentId: session.user.id },
-          include: { studentTier: true },
         }),
         prisma.user.findUnique({
           where: { id: session.user.id },

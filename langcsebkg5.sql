@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 02, 2025 at 07:02 PM
--- Server version: 8.0.31
--- PHP Version: 8.1.13
+-- Generation Time: Aug 03, 2025 at 02:11 AM
+-- Server version: 9.1.0
+-- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -3172,6 +3172,13 @@ CREATE TABLE IF NOT EXISTS `video_sessions` (
   KEY `video_sessions_level_idx` (`level`),
   KEY `video_sessions_moduleId_fkey` (`moduleId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `video_sessions`
+--
+
+INSERT INTO `video_sessions` (`id`, `title`, `description`, `sessionType`, `language`, `level`, `maxParticipants`, `startTime`, `endTime`, `duration`, `status`, `meetingUrl`, `meetingId`, `recordingUrl`, `instructorId`, `institutionId`, `courseId`, `moduleId`, `price`, `isPublic`, `isRecorded`, `allowChat`, `allowScreenShare`, `allowRecording`, `metadata`, `createdAt`, `updatedAt`, `currency`, `features`, `isBooked`, `isCancelled`, `isCompleted`, `materials`, `rating`, `reviews`, `tags`) VALUES
+('7e069093-62e9-4d4d-b837-6fd8a88210af', 'General French - Basic', 'Learn French with the FluentShip.com, the official French Language Centre. Our native French speaking teachers will deliver you the best French courses in London or online.', 'GROUP', 'fr', 'BEGINNER', 10, '2025-08-03 01:00:00.000', '2025-08-03 17:00:00.000', 960, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 00:48:06.259', '2025-08-03 00:48:06.259', 'USD', 'null', 0, 0, 0, 'null', NULL, 0, 'null');
 
 -- --------------------------------------------------------
 

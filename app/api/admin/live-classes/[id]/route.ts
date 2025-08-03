@@ -39,17 +39,7 @@ export async function GET(
             title: true,
           },
         },
-        participants: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
+        participants: true,
       },
     });
 

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, Edit, Trash2, LayoutGrid, List, Shield, Building, GraduationCap } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, LayoutGrid, List, Shield, Building, GraduationCap, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -30,9 +30,15 @@ interface User {
   id: string;
   email: string;
   name: string | null;
-  role: 'ADMIN' | 'INSTITUTION' | 'STUDENT';
+  role: 'ADMIN' | 'INSTITUTION' | 'STUDENT' | 'INSTRUCTOR';
   createdAt: string;
   bookingsCount: number;
+  status?: string;
+  lastLogin?: string;
+  institution?: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 export default function AdminUsers() {
@@ -42,14 +48,17 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'ADMIN' | 'INSTITUTION' | 'STUDENT' | 'INSTRUCTOR'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [institutions, setInstitutions] = useState<{ id: string; name: string; }[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     role: 'STUDENT',
+    institutionId: 'platform',
   });
   const [password, setPassword] = useState('');
   const [inputKey, setInputKey] = useState(0);
@@ -70,13 +79,17 @@ export default function AdminUsers() {
     }
 
     fetchUsers();
+    fetchInstitutions();
   }, [session, status]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/admin/users');
+      const url = roleFilter === 'all' 
+        ? '/api/admin/users' 
+        : `/api/admin/users?role=${roleFilter}`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch users');
       }
@@ -91,12 +104,25 @@ export default function AdminUsers() {
     }
   };
 
+  const fetchInstitutions = async () => {
+    try {
+      const response = await fetch('/api/admin/institutions');
+      if (response.ok) {
+        const data = await response.json();
+        setInstitutions(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching institutions:', error);
+    }
+  };
+
   const resetForm = useCallback(() => {
     console.log('Resetting form');
     setFormData({
       name: '',
       email: '',
       role: 'STUDENT',
+      institutionId: 'platform',
     });
     setPassword('');
     setInputKey(prev => prev + 1);
@@ -136,6 +162,7 @@ export default function AdminUsers() {
       const requestBody = {
         ...formData,
         password: password || undefined,
+        institutionId: formData.institutionId === 'platform' ? undefined : formData.institutionId,
       };
       console.log('Request body:', requestBody);
 
@@ -205,6 +232,8 @@ export default function AdminUsers() {
         return <Building className="w-4 h-4" />;
       case 'STUDENT':
         return <GraduationCap className="w-4 h-4" />;
+      case 'INSTRUCTOR':
+        return <User className="w-4 h-4" />;
       default:
         return null;
     }
@@ -218,6 +247,8 @@ export default function AdminUsers() {
         return 'bg-blue-100 text-blue-800';
       case 'STUDENT':
         return 'bg-green-100 text-green-800';
+      case 'INSTRUCTOR':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -228,6 +259,13 @@ export default function AdminUsers() {
     user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.role.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Refetch users when role filter changes
+  useEffect(() => {
+    if (session?.user?.role?.toUpperCase() === 'ADMIN') {
+      fetchUsers();
+    }
+  }, [roleFilter]);
 
   if (loading) {
     return (
@@ -318,7 +356,7 @@ export default function AdminUsers() {
                   <label className="block text-xs font-normal text-gray-600 mb-1">Role</label>
                   <Select
                     value={formData.role}
-                    onValueChange={(value) => setFormData({ ...formData, role: value })}
+                    onValueChange={(value) => setFormData({ ...formData, role: value, institutionId: value === 'INSTRUCTOR' ? formData.institutionId : 'platform' })}
                   >
                     <SelectTrigger className="bg-white border border-gray-200">
                       <SelectValue placeholder="Select role" />
@@ -327,9 +365,31 @@ export default function AdminUsers() {
                       <SelectItem value="ADMIN">Administrator</SelectItem>
                       <SelectItem value="INSTITUTION">Institution</SelectItem>
                       <SelectItem value="STUDENT">Student</SelectItem>
+                      <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+                {formData.role === 'INSTRUCTOR' && (
+                  <div>
+                    <label className="block text-xs font-normal text-gray-600 mb-1">Institution (Optional)</label>
+                    <Select
+                      value={formData.institutionId}
+                      onValueChange={(value) => setFormData({ ...formData, institutionId: value })}
+                    >
+                      <SelectTrigger className="bg-white border border-gray-200">
+                        <SelectValue placeholder="Select institution (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="platform">Platform Instructor</SelectItem>
+                        {institutions.map((institution) => (
+                          <SelectItem key={institution.id} value={institution.id}>
+                            {institution.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-900 text-white">
                   Create User
                 </Button>
@@ -348,6 +408,20 @@ export default function AdminUsers() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="h-10"
           />
+        </div>
+        <div className="flex gap-2">
+          <Select value={roleFilter} onValueChange={(value: any) => setRoleFilter(value)}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="ADMIN">Administrators</SelectItem>
+              <SelectItem value="INSTITUTION">Institutions</SelectItem>
+              <SelectItem value="STUDENT">Students</SelectItem>
+              <SelectItem value="INSTRUCTOR">Instructors</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -373,6 +447,15 @@ export default function AdminUsers() {
                     <span>{user.bookingsCount} bookings</span>
                     <span>{new Date(user.createdAt).toLocaleDateString()}</span>
                   </div>
+                  {user.role === 'INSTRUCTOR' && (
+                    <div className="text-xs text-muted-foreground">
+                      {user.institution ? (
+                        <span className="text-blue-600">{user.institution.name}</span>
+                      ) : (
+                        <span className="text-purple-600">Platform Instructor</span>
+                      )}
+                    </div>
+                  )}
                   <div className="flex items-center gap-1 sm:gap-2 pt-2">
                     <Button
                       variant="outline"
@@ -383,6 +466,7 @@ export default function AdminUsers() {
                           name: user.name || '',
                           email: user.email,
                           role: user.role,
+                          institutionId: user.institution?.id || 'platform',
                         });
                         setIsEditModalOpen(true);
                       }}
@@ -428,6 +512,18 @@ export default function AdminUsers() {
                       <span>{user.bookingsCount} bookings</span>
                       <span>•</span>
                       <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                      {user.role === 'INSTRUCTOR' && user.institution && (
+                        <>
+                          <span>•</span>
+                          <span className="text-blue-600">{user.institution.name}</span>
+                        </>
+                      )}
+                      {user.role === 'INSTRUCTOR' && !user.institution && (
+                        <>
+                          <span>•</span>
+                          <span className="text-purple-600">Platform Instructor</span>
+                        </>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-2">
@@ -440,6 +536,7 @@ export default function AdminUsers() {
                           name: user.name || '',
                           email: user.email,
                           role: user.role,
+                          institutionId: user.institution?.id || 'platform',
                         });
                         setIsEditModalOpen(true);
                       }}
@@ -517,7 +614,7 @@ export default function AdminUsers() {
               <label className="block text-xs font-normal text-gray-600 mb-1">Role</label>
               <Select
                 value={formData.role}
-                onValueChange={(value) => setFormData({ ...formData, role: value })}
+                onValueChange={(value) => setFormData({ ...formData, role: value, institutionId: value === 'INSTRUCTOR' ? formData.institutionId : 'platform' })}
               >
                 <SelectTrigger className="bg-white border border-gray-200">
                   <SelectValue placeholder="Select role" />
@@ -526,9 +623,31 @@ export default function AdminUsers() {
                   <SelectItem value="ADMIN">Administrator</SelectItem>
                   <SelectItem value="INSTITUTION">Institution</SelectItem>
                   <SelectItem value="STUDENT">Student</SelectItem>
+                  <SelectItem value="INSTRUCTOR">Instructor</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {formData.role === 'INSTRUCTOR' && (
+              <div>
+                <label className="block text-xs font-normal text-gray-600 mb-1">Institution (Optional)</label>
+                <Select
+                  value={formData.institutionId}
+                  onValueChange={(value) => setFormData({ ...formData, institutionId: value })}
+                >
+                  <SelectTrigger className="bg-white border border-gray-200">
+                    <SelectValue placeholder="Select institution (optional)" />
+                  </SelectTrigger>
+                                        <SelectContent>
+                        <SelectItem value="platform">Platform Instructor</SelectItem>
+                        {institutions.map((institution) => (
+                          <SelectItem key={institution.id} value={institution.id}>
+                            {institution.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                </Select>
+              </div>
+            )}
             <Button type="submit" className="w-full bg-gray-800 hover:bg-gray-900 text-white">
               Update User
             </Button>
