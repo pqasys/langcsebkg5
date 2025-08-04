@@ -4,12 +4,19 @@ const next = require('next');
 const { Server: SocketIOServer } = require('socket.io');
 const { initializeSignalingServer } = require('./lib/websocket-server.js');
 
+// Enable Turbopack
+process.env.TURBOPACK = '1';
+
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
-// Prepare the Next.js app
-const app = next({ dev, hostname, port });
+// Prepare the Next.js app with Turbopack enabled
+const app = next({ 
+  dev, 
+  hostname, 
+  port
+});
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
