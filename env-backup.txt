@@ -1,5 +1,5 @@
 # Database
-DATABASE_URL="mysql://root:@localhost:3306/langcsebkg4"
+DATABASE_URL="mysql://root:@localhost:3306/langcsebkg5"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:3000"
@@ -29,3 +29,7 @@ COMMISSION_RATE="0.30"
 #Alternative admin login credentials
 #ADMIN_EMAIL="admin@example.com"
 #ADMIN_PASSWORD="admin123"
+
+VIDEO_PROVIDER=WEBRTC
+WEBRTC_ICE_SERVERS=stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302
+# Add other provider-specific keys as needed
