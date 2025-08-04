@@ -285,21 +285,39 @@ export default function VideoConferencingFeaturePage() {
 
   // Load upcoming classes data
   useEffect(() => {
+    const fetchLiveClassesData = async () => {
+      try {
+        // Fetch ready to join classes
+        const readyResponse = await fetch('/api/features/live-classes/ready-to-join');
+        if (readyResponse.ok) {
+          const readyData = await readyResponse.json();
+          setReadyToJoinClasses(readyData.readyToJoinClasses || []);
+        }
+
+        // Fetch upcoming classes
+        const upcomingResponse = await fetch('/api/features/live-classes/upcoming');
+        if (upcomingResponse.ok) {
+          const upcomingData = await upcomingResponse.json();
+          setUpcomingClassesData(upcomingData.upcomingClasses || []);
+        }
+      } catch (error) {
+        console.error('Error fetching live classes data:', error);
+        // Fallback to static data if API fails
+        setUpcomingClassesData(getUpcomingClasses());
+        setReadyToJoinClasses(getReadyToJoinClasses());
+      }
+    };
+
     if (canAccessLiveClasses) {
-      setUpcomingClassesData(getUpcomingClasses());
-      setReadyToJoinClasses(getReadyToJoinClasses());
+      fetchLiveClassesData();
     }
   }, [canAccessLiveClasses]);
 
   // Join specific upcoming class
   const handleJoinUpcomingClass = (classId: string) => {
     if (canAccessLiveClasses) {
-      const classData = getLiveClassById(classId);
-      if (classData?.meetingLink) {
-        window.open(classData.meetingLink, '_blank');
-      } else {
-        alert('Meeting link not available yet. Please wait until the class is ready to join.');
-      }
+      // Use the WebRTC session page instead of external meeting link
+      window.open(`/student/live-classes/session/${classId}`, '_blank');
     } else {
       setShowTrialModal(true);
     }

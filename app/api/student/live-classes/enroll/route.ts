@@ -83,7 +83,6 @@ export async function POST(request: NextRequest) {
     const [studentSubscription, user] = await Promise.all([
       prisma.studentSubscription.findUnique({
         where: { studentId: session.user.id },
-        include: { studentTier: true },
       }),
       prisma.user.findUnique({
         where: { id: session.user.id },
@@ -118,6 +117,7 @@ export async function POST(request: NextRequest) {
         userId: session.user.id,
         role: 'PARTICIPANT',
         isActive: false, // Will be set to true when they join
+        updatedAt: new Date(),
       },
     });
 

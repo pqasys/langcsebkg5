@@ -300,6 +300,9 @@ export default function StudentSubscriptionCard() {
                               <SelectValue placeholder="Choose a plan" />
                             </SelectTrigger>
                             <SelectContent>
+                              {subscriptionData.currentPlan !== 'BASIC' && (
+                                <SelectItem value="BASIC">Basic</SelectItem>
+                              )}
                               {subscriptionData.currentPlan !== 'PREMIUM' && (
                                 <SelectItem value="PREMIUM">Premium</SelectItem>
                               )}

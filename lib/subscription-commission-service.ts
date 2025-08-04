@@ -116,28 +116,48 @@ export class SubscriptionCommissionService {
       const institution = await prisma.institution.findUnique({
         where: { id: institutionId },
         include: {
-          subscription: {
+          subscriptions: {
             include: {
-              commissionTier: true,
-              billingHistory: {
-                orderBy: { billingDate: 'desc' },
-                take: 10
-              }
+              commissionTier: true
             }
           }
         }
       });
 
+      // Get billing history separately since the relation is not defined in the schema
+      let billingHistory: BillingHistoryItem[] = [];
+      if (institution?.subscriptions && institution.subscriptions.length > 0) {
+        const currentSubscription = institution.subscriptions[0]; // Get the first subscription
+        const billingHistoryRecords = await prisma.institutionBillingHistory.findMany({
+          where: { subscriptionId: currentSubscription.id },
+          orderBy: { billingDate: 'desc' },
+          take: 10
+        });
+        
+        billingHistory = billingHistoryRecords.map(bill => ({
+          id: bill.id,
+          billingDate: bill.billingDate,
+          amount: bill.amount,
+          currency: bill.currency,
+          status: bill.status,
+          paymentMethod: bill.paymentMethod,
+          transactionId: bill.transactionId,
+          invoiceNumber: bill.invoiceNumber,
+          description: bill.description
+        }));
+      }
+
       if (!institution) {
         throw new Error('Institution not found: ' + institutionId);
       }
 
-      const hasActiveSubscription = institution.subscription && 
-        ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(institution.subscription.status);
+      const currentSubscription = institution.subscriptions?.[0]; // Get the first subscription
+      const hasActiveSubscription = currentSubscription && 
+        ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(currentSubscription.status);
 
-      const currentPlan = institution.subscription?.commissionTier?.planType;
-      const subscriptionEndDate = institution.subscription?.endDate;
-      const nextBillingDate = institution.subscription?.endDate;
+      const currentPlan = currentSubscription?.commissionTier?.planType;
+      const subscriptionEndDate = currentSubscription?.endDate;
+      const nextBillingDate = currentSubscription?.endDate;
 
       // Determine commission rate with proper null checks
       let commissionRate = 20; // Default fallback rate
@@ -148,37 +168,25 @@ export class SubscriptionCommissionService {
       }
       
       // If institution has an active subscription, try to get from subscription's commission tier
-      if (institution.subscription && institution.subscription.status === 'ACTIVE' && institution.subscription.commissionTier) {
-        commissionRate = institution.subscription.commissionTier.commissionRate;
+      if (currentSubscription && currentSubscription.status === 'ACTIVE' && currentSubscription.commissionTier) {
+        commissionRate = currentSubscription.commissionTier.commissionRate;
       }
 
       // Check if subscription is a fallback plan
-      const isFallback = institution.subscription?.metadata?.isFallback || false;
+      const isFallback = currentSubscription?.metadata?.isFallback || false;
 
       // Determine upgrade/downgrade options
       const canUpgrade = !isFallback && hasActiveSubscription && 
-        institution.subscription?.commissionTier?.planType !== 'ENTERPRISE';
+        currentSubscription?.commissionTier?.planType !== 'ENTERPRISE';
       const canDowngrade = !isFallback && hasActiveSubscription && 
-        institution.subscription?.commissionTier?.planType !== 'STARTER';
+        currentSubscription?.commissionTier?.planType !== 'STARTER';
       const canCancel = hasActiveSubscription && !isFallback;
-
-      const billingHistory: BillingHistoryItem[] = institution.subscription?.billingHistory?.map(bill => ({
-        id: bill.id,
-        billingDate: bill.billingDate,
-        amount: bill.amount,
-        currency: bill.currency,
-        status: bill.status,
-        paymentMethod: bill.paymentMethod,
-        transactionId: bill.transactionId,
-        invoiceNumber: bill.invoiceNumber,
-        description: bill.description
-      })) || [];
 
       return {
         hasActiveSubscription,
         currentPlan,
         commissionRate,
-        features: institution.subscription?.commissionTier?.features as Record<string, any> || {},
+        features: currentSubscription?.commissionTier?.features as Record<string, any> || {},
         subscriptionEndDate,
         canUpgrade,
         canDowngrade,
@@ -221,34 +229,27 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
     // Check for subscription using the user ID (which could be a student ID or regular user ID)
     // This handles both students and non-student users with subscriptions
     const currentSubscription = await prisma.studentSubscription.findUnique({
-      where: { studentId: userId },
-      include: {
-        billingHistory: {
-          orderBy: { billingDate: 'desc' },
-          take: 10
-        }
-      }
+      where: { studentId: userId }
     });
 
-      const hasActiveSubscription = currentSubscription && 
-        ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(currentSubscription.status);
+    // Get the student tier separately since the relation is not defined in the schema
+    let studentTier = null;
+    if (currentSubscription) {
+      studentTier = await prisma.studentTier.findUnique({
+        where: { id: currentSubscription.studentTierId }
+      });
+    }
 
-      // Get plan details from subscription
-      const currentPlan = currentSubscription?.planType;
-      const subscriptionEndDate = currentSubscription?.endDate;
-      const nextBillingDate = currentSubscription?.endDate;
-
-      // Check if subscription is a fallback plan
-      const isFallback = currentSubscription?.metadata?.isFallback || false;
-
-      // Determine upgrade/downgrade options
-      const canUpgrade = !isFallback && hasActiveSubscription && 
-        currentSubscription?.planType !== 'PRO';
-      const canDowngrade = !isFallback && hasActiveSubscription && 
-        currentSubscription?.planType !== 'BASIC';
-      const canCancel = hasActiveSubscription && !isFallback;
-
-      const billingHistory: BillingHistoryItem[] = currentSubscription?.billingHistory?.map(bill => ({
+    // Get billing history separately since the relation is not defined in the schema
+    let billingHistory: BillingHistoryItem[] = [];
+    if (currentSubscription) {
+      const billingHistoryRecords = await prisma.studentBillingHistory.findMany({
+        where: { subscriptionId: currentSubscription.id },
+        orderBy: { billingDate: 'desc' },
+        take: 10
+      });
+      
+      billingHistory = billingHistoryRecords.map(bill => ({
         id: bill.id,
         billingDate: bill.billingDate,
         amount: bill.amount,
@@ -258,25 +259,44 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
         transactionId: bill.transactionId,
         invoiceNumber: bill.invoiceNumber,
         description: bill.description
-      })) || [];
-
-      return {
-        hasActiveSubscription,
-        currentPlan,
-        features: currentSubscription?.features as Record<string, any> || {},
-        subscriptionEndDate,
-        canUpgrade,
-        canDowngrade,
-        canCancel,
-        nextBillingDate,
-        billingHistory,
-        isFallback
-      };
-    } catch (error) {
-      console.error('Error getting student subscription status:', error);
-      throw error;
+      }));
     }
+
+    const hasActiveSubscription = currentSubscription && 
+      ['ACTIVE', 'TRIAL', 'PAST_DUE'].includes(currentSubscription.status);
+
+    // Get plan details from the related StudentTier
+    const currentPlan = studentTier?.planType;
+    const subscriptionEndDate = currentSubscription?.endDate;
+    const nextBillingDate = currentSubscription?.endDate;
+
+    // Check if subscription is a fallback plan
+    const isFallback = (currentSubscription?.metadata as any)?.isFallback || false;
+
+    // Determine upgrade/downgrade options
+    const canUpgrade = !isFallback && hasActiveSubscription && 
+      currentPlan !== 'PRO';
+    const canDowngrade = !isFallback && hasActiveSubscription && 
+      currentPlan !== 'BASIC';
+    const canCancel = hasActiveSubscription && !isFallback;
+
+    return {
+      hasActiveSubscription,
+      currentPlan,
+      features: studentTier?.features as Record<string, any> || {},
+      subscriptionEndDate,
+      canUpgrade,
+      canDowngrade,
+      canCancel,
+      nextBillingDate,
+      billingHistory,
+      isFallback
+    };
+  } catch (error) {
+    console.error('Error getting student subscription status:', error);
+    throw error;
   }
+}
 
   /**
    * Create or update user subscription (currently named for historical reasons)
@@ -336,7 +356,7 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
       });
 
       if (!studentTier) {
-        throw new Error('Student tier not found for plan: ' + planType);
+        throw new Error(`Student tier not found for plan: ${planType} with billing cycle: ${billingCycle}`);
       }
 
       const calculatedAmount = amount || studentTier.price;
@@ -350,16 +370,24 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
         endDate.setMonth(endDate.getMonth() + (billingCycle === 'ANNUAL' ? 12 : 1));
       }
 
-      // Get existing subscription for logging
-      const existingSubscription = await prisma.studentSubscription.findUnique({
-        where: { studentId }
-      });
+             // Get existing subscription for logging
+       const existingSubscription = await prisma.studentSubscription.findUnique({
+         where: { studentId }
+       });
+
+       // Get existing tier for logging
+       let existingTier = null;
+       if (existingSubscription) {
+         existingTier = await prisma.studentTier.findUnique({
+           where: { id: existingSubscription.studentTierId }
+         });
+       }
 
       // Create or update subscription
       const subscription = await prisma.studentSubscription.upsert({
         where: { studentId },
         update: {
-          studentTierId: studentTier.id, // ✅ Use studentTierId
+          studentTierId: studentTier.id,
           status: startTrial ? 'TRIAL' : 'ACTIVE',
           endDate,
           autoRenew: true,
@@ -368,7 +396,7 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
         },
         create: {
           studentId,
-          studentTierId: studentTier.id, // ✅ Use studentTierId
+          studentTierId: studentTier.id,
           status: startTrial ? 'TRIAL' : 'ACTIVE',
           startDate,
           endDate,
@@ -377,19 +405,19 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
         }
       });
 
-      // Log the action
-      await this.logStudentSubscriptionAction(
-        subscription.id,
-        existingSubscription ? 'UPGRADE' : 'CREATE',
-        existingSubscription?.planType,
-        planType,
-        existingSubscription?.amount,
-        calculatedAmount,
-        existingSubscription?.billingCycle,
-        billingCycle,
-        userId,
-        existingSubscription ? 'Plan upgrade' : (startTrial ? 'Trial subscription created' : 'New subscription created')
-      );
+             // Log the action
+       await this.logStudentSubscriptionAction(
+         subscription.id,
+         existingSubscription ? 'UPGRADE' : 'CREATE',
+         existingTier?.planType,
+         planType,
+         existingSubscription?.amount || 0,
+         calculatedAmount,
+         existingTier?.billingCycle || 'MONTHLY',
+         billingCycle,
+         userId,
+         existingSubscription ? 'Plan upgrade' : (startTrial ? 'Trial subscription created' : 'New subscription created')
+       );
 
       // Create billing history entry
       await this.createStudentBillingHistory(
@@ -403,7 +431,15 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
         startTrial ? `Trial subscription for ${planType} plan` : `Initial payment for ${planType} plan`
       );
 
-      return subscription;
+      // Return subscription with tier information
+      return {
+        ...subscription,
+        planType: studentTier.planType,
+        billingCycle: studentTier.billingCycle,
+        amount: calculatedAmount,
+        currency: studentTier.currency,
+        features: studentTier.features
+      };
     } catch (error) {
       console.error('Error creating student subscription:', error);
       throw error;

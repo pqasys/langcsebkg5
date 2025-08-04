@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Calendar, Users, DollarSign, Clock, BookOpen, Bookmark } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Search, Calendar, Users, DollarSign, Clock, BookOpen, Bookmark, Video, MessageCircle, Share2, User } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface LiveClass {
@@ -68,6 +69,13 @@ export default function StudentLiveClassesPage() {
     hasInstitutionAccess: false,
   });
   const [activeTab, setActiveTab] = useState('available');
+  const [enrollmentModal, setEnrollmentModal] = useState<{
+    isOpen: boolean;
+    liveClass: LiveClass | null;
+  }>({
+    isOpen: false,
+    liveClass: null,
+  });
 
   useEffect(() => {
     fetchLiveClasses();
@@ -99,14 +107,23 @@ export default function StudentLiveClassesPage() {
     }
   };
 
-  const handleEnroll = async (liveClassId: string) => {
+  const handleEnrollClick = (liveClass: LiveClass) => {
+    setEnrollmentModal({
+      isOpen: true,
+      liveClass,
+    });
+  };
+
+  const handleEnrollConfirm = async () => {
+    if (!enrollmentModal.liveClass) return;
+
     try {
       const response = await fetch('/api/student/live-classes/enroll', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ liveClassId }),
+        body: JSON.stringify({ liveClassId: enrollmentModal.liveClass.id }),
       });
 
       if (!response.ok) {
@@ -115,12 +132,17 @@ export default function StudentLiveClassesPage() {
         return;
       }
 
-      // Refresh the list
+      // Close modal and refresh the list
+      setEnrollmentModal({ isOpen: false, liveClass: null });
       fetchLiveClasses();
     } catch (error) {
       console.error('Error enrolling in live class:', error);
       alert('Failed to enroll in live class');
     }
+  };
+
+  const handleEnrollCancel = () => {
+    setEnrollmentModal({ isOpen: false, liveClass: null });
   };
 
   const handleUnenroll = async (liveClassId: string) => {
@@ -140,6 +162,57 @@ export default function StudentLiveClassesPage() {
     } catch (error) {
       console.error('Error unenrolling from live class:', error);
       alert('Failed to unenroll from live class');
+    }
+  };
+
+  const handleJoinClass = async (liveClass: LiveClass) => {
+    try {
+      // Check if class has started
+      const now = new Date();
+      const startTime = new Date(liveClass.startTime);
+      const endTime = new Date(liveClass.endTime);
+      const earlyAccessTime = new Date(startTime.getTime() - 30 * 60 * 1000); // 30 minutes before
+
+      if (now < earlyAccessTime) {
+        alert('This class has not started yet. Please wait until 30 minutes before the scheduled start time.');
+        return;
+      }
+
+      if (now > endTime) {
+        alert('This class has already ended.');
+        return;
+      }
+
+      // Check if this is early access
+      const isEarlyAccess = now >= earlyAccessTime && now < startTime;
+
+      // Always use the WebRTC session page for joining classes
+      window.open(`/student/live-classes/session/${liveClass.id}`, '_blank');
+
+      // Show appropriate message for early access
+      if (isEarlyAccess) {
+        alert('Welcome to early access! You can now familiarize yourself with the environment. The instructor will join at the scheduled start time.');
+      }
+
+      // Optionally, mark the student as active in the session
+      try {
+        const response = await fetch('/api/student/live-classes/join', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ liveClassId: liveClass.id }),
+        });
+
+        if (!response.ok) {
+          console.warn('Failed to mark student as active in session');
+        }
+      } catch (error) {
+        console.warn('Error marking student as active:', error);
+      }
+    } catch (error) {
+      console.error('Error joining live class:', error);
+      alert('Failed to join live class');
     }
   };
 
@@ -339,7 +412,7 @@ export default function StudentLiveClassesPage() {
                           <div className="pt-2">
                             <Button 
                               className="w-full" 
-                              onClick={() => handleEnroll(liveClass.id)}
+                              onClick={() => handleEnrollClick(liveClass)}
                             >
                               Enroll Now
                             </Button>
@@ -404,9 +477,54 @@ export default function StudentLiveClassesPage() {
                             {getLevelBadge(liveClass.level)}
                           </div>
                           <div className="pt-2 space-y-2">
-                            <Button className="w-full" variant="outline">
-                              Join Class
-                            </Button>
+                            {(() => {
+                              const now = new Date();
+                              const startTime = new Date(liveClass.startTime);
+                              const endTime = new Date(liveClass.endTime);
+                              const earlyAccessTime = new Date(startTime.getTime() - 30 * 60 * 1000); // 30 minutes before
+                              
+                              if (now < earlyAccessTime) {
+                                return (
+                                  <Button 
+                                    className="w-full" 
+                                    variant="outline"
+                                    disabled
+                                  >
+                                    Class Not Started
+                                  </Button>
+                                );
+                              } else if (now >= earlyAccessTime && now < startTime) {
+                                return (
+                                  <Button 
+                                    className="w-full" 
+                                    variant="outline"
+                                    onClick={() => handleJoinClass(liveClass)}
+                                  >
+                                    Join Early (30 min before)
+                                  </Button>
+                                );
+                              } else if (now > endTime) {
+                                return (
+                                  <Button 
+                                    className="w-full" 
+                                    variant="outline"
+                                    disabled
+                                  >
+                                    Class Ended
+                                  </Button>
+                                );
+                              } else {
+                                return (
+                                  <Button 
+                                    className="w-full" 
+                                    variant="outline"
+                                    onClick={() => handleJoinClass(liveClass)}
+                                  >
+                                    Join Class
+                                  </Button>
+                                );
+                              }
+                            })()}
                             <Button 
                               className="w-full" 
                               variant="outline"
@@ -461,6 +579,130 @@ export default function StudentLiveClassesPage() {
           </Button>
         </div>
       )}
+
+      {/* Enrollment Confirmation Modal */}
+      <Dialog open={enrollmentModal.isOpen} onOpenChange={(open) => !open && handleEnrollCancel()}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+              Confirm Enrollment
+            </DialogTitle>
+            <DialogDescription>
+              Please review the class details before confirming your enrollment.
+            </DialogDescription>
+          </DialogHeader>
+
+          {enrollmentModal.liveClass && (
+            <div className="space-y-6">
+              {/* Class Overview */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {enrollmentModal.liveClass.title}
+                </h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  {enrollmentModal.liveClass.description}
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-700">
+                      {enrollmentModal.liveClass.instructor.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-700">
+                      {format(new Date(enrollmentModal.liveClass.startTime), 'MMM dd, yyyy')}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-700">
+                      {format(new Date(enrollmentModal.liveClass.startTime), 'HH:mm')} - {format(new Date(enrollmentModal.liveClass.endTime), 'HH:mm')}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-700">
+                      {enrollmentModal.liveClass.duration} minutes
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <Badge variant="outline">{enrollmentModal.liveClass.language.toUpperCase()}</Badge>
+                  {getLevelBadge(enrollmentModal.liveClass.level)}
+                  <Badge variant="secondary">{enrollmentModal.liveClass.sessionType}</Badge>
+                </div>
+              </div>
+
+              {/* What to Expect */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">What to Expect</h4>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Video className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-gray-900">Live Video Session</p>
+                      <p className="text-sm text-gray-600">
+                        Join the class via video conferencing. You'll receive a meeting link before the session starts.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <MessageCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-gray-900">Interactive Chat</p>
+                      <p className="text-sm text-gray-600">
+                        Participate in real-time discussions and ask questions during the session.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Share2 className="w-5 h-5 text-purple-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-gray-900">Screen Sharing</p>
+                      <p className="text-sm text-gray-600">
+                        Instructor may share their screen for presentations and demonstrations.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Users className="w-5 h-5 text-orange-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-gray-900">Group Learning</p>
+                      <p className="text-sm text-gray-600">
+                        Learn alongside other students in an interactive group environment.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Important Information */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">Important Information</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Early access available 30 minutes before class starts - familiarize yourself with the environment</li>
+                  <li>• Please join the session at least 5 minutes before the scheduled start time</li>
+                  <li>• Ensure you have a stable internet connection and working microphone</li>
+                  <li>• You can access the meeting link from your enrolled classes once the session starts</li>
+                  <li>• The session will be recorded if enabled by the instructor</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={handleEnrollCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleEnrollConfirm} className="bg-blue-600 hover:bg-blue-700">
+              Confirm Enrollment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

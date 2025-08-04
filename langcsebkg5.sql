@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 03, 2025 at 02:11 AM
+-- Generation Time: Aug 04, 2025 at 12:28 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -2697,7 +2697,8 @@ INSERT INTO `student_billing_history` (`id`, `subscriptionId`, `billingDate`, `a
 ('994d74de-e749-4238-8449-0b4a8fa752c5', 'cmd0rq6de000qp73dn3b3o498', '2025-07-14 13:58:54.411', 12.99, 'USD', 'PAID', 'CREDIT_CARD', 'txn_8fff4b45b3e34e75b06b8d54968e0a51', 'INV-1752501534411', 'Monthly subscription for Basic Plan', NULL, '2025-07-14 13:58:54.412'),
 ('f6d3da3c-a705-4692-8b6d-7643c32e66db', '0b370e62-e185-4337-b025-2148ae36bbce', '2025-07-14 13:58:54.417', 24.99, 'USD', 'PAID', 'CREDIT_CARD', 'txn_98b29635900d4ffd85f7ef53a7450933', 'INV-1752501534417', 'Monthly subscription for Premium Plan', NULL, '2025-07-14 13:58:54.419'),
 ('cmdgrmrfv0005li90zs52igk7', 'cmckkosgt0009cb32hkzlxg54', '2025-07-24 02:20:50.909', 12.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1753323650923', 'Initial payment for BASIC plan', NULL, '2025-07-24 02:20:50.924'),
-('cmdgrp6he000bli90blk8mqne', 'cmckkosgt0009cb32hkzlxg54', '2025-07-24 02:22:43.721', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1753323763728', 'Initial payment for PREMIUM plan', NULL, '2025-07-24 02:22:43.730');
+('cmdgrp6he000bli90blk8mqne', 'cmckkosgt0009cb32hkzlxg54', '2025-07-24 02:22:43.721', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1753323763728', 'Initial payment for PREMIUM plan', NULL, '2025-07-24 02:22:43.730'),
+('cmdw7ud9c000254pr51hjy8a5', 'cmckkosgt0009cb32hkzlxg54', '2025-08-03 21:51:12.265', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1754257872287', 'Initial payment for PREMIUM plan', NULL, '2025-08-03 21:51:12.288');
 
 -- --------------------------------------------------------
 
@@ -2889,7 +2890,7 @@ CREATE TABLE IF NOT EXISTS `student_subscriptions` (
 --
 
 INSERT INTO `student_subscriptions` (`id`, `studentId`, `status`, `startDate`, `endDate`, `autoRenew`, `cancellationReason`, `cancelledAt`, `metadata`, `createdAt`, `updatedAt`, `studentTierId`) VALUES
-('cmckkosgt0009cb32hkzlxg54', '5b5fbd13-8776-4f96-ada9-091973974873', 'ACTIVE', '2025-06-01 13:37:50.617', '2025-08-24 02:22:43.721', 1, NULL, NULL, '{}', '2025-07-01 13:37:50.621', '2025-07-24 02:22:43.722', 'premium-tier'),
+('cmckkosgt0009cb32hkzlxg54', '5b5fbd13-8776-4f96-ada9-091973974873', 'ACTIVE', '2025-06-01 13:37:50.617', '2025-09-03 21:51:12.265', 1, NULL, NULL, '{}', '2025-07-01 13:37:50.621', '2025-08-03 21:51:12.266', 'premium-tier'),
 ('cmckkoslo000lcb323d05as3r', 'e6c31370-dc9c-4aae-b9c5-db40c4d9584a', 'ACTIVE', '2025-06-01 13:37:50.794', '2025-07-31 13:37:50.794', 1, NULL, NULL, NULL, '2025-07-01 13:37:50.797', '2025-07-01 13:37:50.797', 'basic-tier'),
 ('cmd0qsotc000cp73dw0kd2rmy', 'ccb77175-fa66-4d1f-bbb9-0701df84384d', 'ACTIVE', '2025-07-12 21:13:09.023', '2026-07-14 13:58:54.381', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:13:09.023Z\"}', '2025-07-12 21:13:09.024', '2025-07-14 13:58:54.382', 'basic-tier'),
 ('cmd0r7t5x000jp73dpf3kdduh', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 'ACTIVE', '2025-07-12 21:24:54.498', '2026-07-14 13:58:54.390', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:24:54.498Z\"}', '2025-07-12 21:24:54.501', '2025-07-14 13:58:54.392', 'basic-tier'),
@@ -2970,7 +2971,8 @@ INSERT INTO `subscription_logs` (`id`, `subscriptionId`, `action`, `oldPlan`, `n
 ('cmd0r7t65000np73d78oxgj95', 'cmd0r7t5x000jp73dpf3kdduh', 'CREATE', NULL, 'BASIC', NULL, 12.99, NULL, 'MONTHLY', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 'New subscription created during registration', NULL, '2025-07-12 21:24:54.509'),
 ('cmd0rq6dq000up73dno46dlih', 'cmd0rq6de000qp73dn3b3o498', 'CREATE', NULL, 'PREMIUM', NULL, 24.99, NULL, 'MONTHLY', 'c98a0b89-011b-482f-843e-a5522de40b1e', 'New subscription created during registration', NULL, '2025-07-12 21:39:11.438'),
 ('cmdgrmrfr0003li90rh5ald4z', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', 'PRO', 'BASIC', 49.99, 12.99, 'MONTHLY', 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-07-24 02:20:50.920'),
-('cmdgrp6ha0009li90gmli39l9', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', 'BASIC', 'PREMIUM', 12.99, 24.99, 'MONTHLY', 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-07-24 02:22:43.727');
+('cmdgrp6ha0009li90gmli39l9', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', 'BASIC', 'PREMIUM', 12.99, 24.99, 'MONTHLY', 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-07-24 02:22:43.727'),
+('cmdw7ud98000154prgz1eujct', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', NULL, 'PREMIUM', NULL, 24.99, NULL, 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-08-03 21:51:12.284');
 
 -- --------------------------------------------------------
 
@@ -3178,7 +3180,11 @@ CREATE TABLE IF NOT EXISTS `video_sessions` (
 --
 
 INSERT INTO `video_sessions` (`id`, `title`, `description`, `sessionType`, `language`, `level`, `maxParticipants`, `startTime`, `endTime`, `duration`, `status`, `meetingUrl`, `meetingId`, `recordingUrl`, `instructorId`, `institutionId`, `courseId`, `moduleId`, `price`, `isPublic`, `isRecorded`, `allowChat`, `allowScreenShare`, `allowRecording`, `metadata`, `createdAt`, `updatedAt`, `currency`, `features`, `isBooked`, `isCancelled`, `isCompleted`, `materials`, `rating`, `reviews`, `tags`) VALUES
-('7e069093-62e9-4d4d-b837-6fd8a88210af', 'General French - Basic', 'Learn French with the FluentShip.com, the official French Language Centre. Our native French speaking teachers will deliver you the best French courses in London or online.', 'GROUP', 'fr', 'BEGINNER', 10, '2025-08-03 01:00:00.000', '2025-08-03 17:00:00.000', 960, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 00:48:06.259', '2025-08-03 00:48:06.259', 'USD', 'null', 0, 0, 0, 'null', NULL, 0, 'null');
+('517661d9-0ae2-4806-b29f-ed4d15c51f50', 'German Grammar Workshop', 'Learn German grammar fundamentals with practical exercises', 'WORKSHOP', 'de', 'BEGINNER', 10, '2025-08-06 23:10:10.442', '2025-08-07 00:40:10.442', 90, 'SCHEDULED', 'https://meet.example.com/german-1754262610442', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-03 23:10:10.443', '2025-08-03 23:10:10.443', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
+('bfa9ce20-219c-4e66-a886-671b8edfdba5', 'Advanced English Writing', 'Master advanced English writing techniques and academic writing', 'TUTORIAL', 'en', 'ADVANCED', 8, '2025-08-07 23:10:10.445', '2025-08-08 01:10:10.445', 120, 'SCHEDULED', 'https://meet.example.com/english-1754262610445', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-03 23:10:10.446', '2025-08-03 23:10:10.446', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
+('81083189-d4d1-44b6-a3d2-90fcc1b5b5df', 'Spanish Conversation - Intermediate', 'Practice Spanish conversation skills in an interactive group setting', 'CONVERSATION', 'es', 'INTERMEDIATE', 12, '2025-08-05 23:10:10.439', '2025-08-06 00:10:10.439', 60, 'SCHEDULED', 'https://meet.example.com/spanish-1754262610439', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 23:10:10.440', '2025-08-03 23:10:10.440', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
+('528510ba-0420-4223-a3fa-e4aabfd4e9c9', 'Test Live Class - Premium Access', 'This is a test live class to verify Premium subscription access', 'GROUP', 'en', 'BEGINNER', 15, '2025-08-04 13:00:00.000', '2025-08-04 14:00:00.000', 60, 'SCHEDULED', 'https://meet.example.com/528510ba-0420-4223-a3fa-e4aabfd4e9c9', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 22:25:58.889', '2025-08-03 23:10:10.425', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
+('7e069093-62e9-4d4d-b837-6fd8a88210af', 'General French - Basic', 'Learn French with the FluentShip.com, the official French Language Centre. Our native French speaking teachers will deliver you the best French courses in London or online.', 'GROUP', 'fr', 'BEGINNER', 10, '2025-08-04 00:30:00.000', '2025-08-04 13:00:00.000', 480, 'SCHEDULED', 'https://meet.example.com/7e069093-62e9-4d4d-b837-6fd8a88210af', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 00:48:06.259', '2025-08-04 00:15:41.757', 'USD', 'null', 0, 0, 0, 'null', NULL, 0, 'null');
 
 -- --------------------------------------------------------
 
@@ -3203,6 +3209,16 @@ CREATE TABLE IF NOT EXISTS `video_session_messages` (
   KEY `video_session_messages_timestamp_idx` (`timestamp`),
   KEY `video_session_messages_recipientId_fkey` (`recipientId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `video_session_messages`
+--
+
+INSERT INTO `video_session_messages` (`id`, `sessionId`, `userId`, `messageType`, `content`, `timestamp`, `isPrivate`, `recipientId`, `metadata`) VALUES
+('3168ca8b-b604-41dd-9b54-1aa071d70560', '7e069093-62e9-4d4d-b837-6fd8a88210af', '5b5fbd13-8776-4f96-ada9-091973974873', 'SYSTEM', 'James Maybank joined early (30 min before class starts)', '2025-08-03 23:47:46.732', 0, NULL, NULL),
+('555df9e7-6f77-47d2-8601-067457f39d4a', '7e069093-62e9-4d4d-b837-6fd8a88210af', '5b5fbd13-8776-4f96-ada9-091973974873', 'SYSTEM', 'James Maybank joined the session', '2025-08-04 00:00:01.958', 0, NULL, NULL),
+('cb55adda-b762-4e63-94d5-d369602f57a8', '7e069093-62e9-4d4d-b837-6fd8a88210af', '5b5fbd13-8776-4f96-ada9-091973974873', 'SYSTEM', 'James Maybank joined the session', '2025-08-04 00:00:18.288', 0, NULL, NULL),
+('192e6c89-5746-4f92-bd22-6781099f6e48', '7e069093-62e9-4d4d-b837-6fd8a88210af', '5b5fbd13-8776-4f96-ada9-091973974873', 'SYSTEM', 'James Maybank joined early (30 min before class starts)', '2025-08-04 00:16:36.229', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3232,6 +3248,14 @@ CREATE TABLE IF NOT EXISTS `video_session_participants` (
   KEY `video_session_participants_userId_idx` (`userId`),
   KEY `video_session_participants_isActive_idx` (`isActive`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `video_session_participants`
+--
+
+INSERT INTO `video_session_participants` (`id`, `sessionId`, `userId`, `role`, `joinedAt`, `leftAt`, `duration`, `isActive`, `deviceInfo`, `connectionQuality`, `lastSeen`, `metadata`, `createdAt`, `updatedAt`) VALUES
+('a10cf355-79db-41c8-b474-c55345f5da9f', '528510ba-0420-4223-a3fa-e4aabfd4e9c9', '5b5fbd13-8776-4f96-ada9-091973974873', 'PARTICIPANT', NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, '2025-08-03 22:32:38.731', '2025-08-03 22:32:38.730'),
+('d6c2807d-5cb3-4642-be43-65f5123e229a', '7e069093-62e9-4d4d-b837-6fd8a88210af', '5b5fbd13-8776-4f96-ada9-091973974873', 'PARTICIPANT', '2025-08-04 00:16:36.229', NULL, 0, 1, NULL, NULL, '2025-08-04 00:16:36.229', NULL, '2025-08-03 23:36:34.565', '2025-08-04 00:16:36.229');
 
 -- --------------------------------------------------------
 

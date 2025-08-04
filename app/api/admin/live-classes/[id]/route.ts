@@ -102,7 +102,7 @@ export async function PUT(
     }
 
     // Validate institution if provided
-    if (body.institutionId) {
+    if (body.institutionId && body.institutionId !== 'platform') {
       const institution = await prisma.institution.findUnique({
         where: { id: body.institutionId },
       });
@@ -116,7 +116,7 @@ export async function PUT(
     }
 
     // Validate course if provided
-    if (body.courseId) {
+    if (body.courseId && body.courseId !== 'no-course') {
       const course = await prisma.course.findUnique({
         where: { id: body.courseId },
       });
@@ -150,8 +150,8 @@ export async function PUT(
         allowScreenShare: body.allowScreenShare,
         allowRecording: body.allowRecording,
         instructorId: body.instructorId,
-        institutionId: body.institutionId,
-        courseId: body.courseId,
+        institutionId: body.institutionId === 'platform' ? null : body.institutionId,
+        courseId: body.courseId === 'no-course' ? null : body.courseId,
         moduleId: body.moduleId,
         features: body.features ? JSON.parse(JSON.stringify(body.features)) : undefined,
         tags: body.tags ? JSON.parse(JSON.stringify(body.tags)) : undefined,
