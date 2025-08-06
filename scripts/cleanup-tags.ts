@@ -51,7 +51,7 @@ async function cleanupTags() {
 
     // Delete course-tag associations first
     for (const tag of tagsToDelete) {
-      await prisma.coursetag.deleteMany({
+      await prisma.courseTag.deleteMany({
         where: {
           tagId: tag.id
         }

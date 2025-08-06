@@ -233,7 +233,7 @@ async function main() {
           // Add tags to the course
           console.log('Adding tags to the course...');
           for (const tag of courseTags) {
-            await prisma.coursetag.create({
+            await prisma.courseTag.create({
               data: {
                 id: uuidv4(),
                 courseId: course.id,

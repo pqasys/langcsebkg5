@@ -23,7 +23,17 @@ const courseSchema = z.object({
   duration: z.number().min(1, 'Duration must be at least 1'),
   tags: z.array(z.string()).optional(),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
-  institutionId: z.string().min(1, 'Institution ID is required')
+  institutionId: z.string().min(1, 'Institution ID is required'),
+  // New course type fields
+  courseType: z.enum(['STANDARD', 'LIVE_ONLY', 'BLENDED', 'PLATFORM_WIDE']).optional(),
+  deliveryMode: z.enum(['SELF_PACED', 'LIVE_ONLY', 'BLENDED']).optional(),
+  enrollmentType: z.enum(['COURSE_BASED', 'SUBSCRIPTION_BASED', 'PLATFORM_WIDE']).optional(),
+  hasLiveClasses: z.boolean().optional(),
+  liveClassType: z.string().optional(),
+  liveClassFrequency: z.string().optional(),
+  requiresSubscription: z.boolean().optional(),
+  subscriptionTier: z.string().optional(),
+  isPlatformCourse: z.boolean().optional()
 });
 
 // GET all courses for the institution
@@ -174,7 +184,17 @@ export async function POST(req: Request) {
           pricingPeriod: validatedData.pricingPeriod,
           duration: validatedData.duration,
           status: validatedData.status || 'DRAFT',
-          institutionId: validatedData.institutionId
+          institutionId: validatedData.institutionId,
+          // New course type fields
+          courseType: validatedData.courseType || 'STANDARD',
+          deliveryMode: validatedData.deliveryMode || 'SELF_PACED',
+          enrollmentType: validatedData.enrollmentType || 'COURSE_BASED',
+          hasLiveClasses: validatedData.hasLiveClasses || false,
+          liveClassType: validatedData.liveClassType || null,
+          liveClassFrequency: validatedData.liveClassFrequency || null,
+          requiresSubscription: validatedData.requiresSubscription || false,
+          subscriptionTier: validatedData.subscriptionTier || null,
+          isPlatformCourse: validatedData.isPlatformCourse || false
         }
       });
 

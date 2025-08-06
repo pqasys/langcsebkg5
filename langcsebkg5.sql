@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 04, 2025 at 12:28 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 06, 2025 at 05:11 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -287,6 +287,14 @@ CREATE TABLE IF NOT EXISTS `course` (
   `isFeatured` tinyint(1) NOT NULL DEFAULT '0',
   `isSponsored` tinyint(1) NOT NULL DEFAULT '0',
   `priority` int NOT NULL DEFAULT '0',
+  `courseType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STANDARD',
+  `deliveryMode` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SELF_PACED',
+  `enrollmentType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'COURSE_BASED',
+  `isPlatformCourse` tinyint(1) NOT NULL DEFAULT '0',
+  `liveClassFrequency` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `liveClassSchedule` json DEFAULT NULL,
+  `requiresSubscription` tinyint(1) NOT NULL DEFAULT '0',
+  `subscriptionTier` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `Course_title_institutionId_key` (`title`,`institutionId`),
   KEY `Course_categoryId_fkey` (`categoryId`),
@@ -295,23 +303,28 @@ CREATE TABLE IF NOT EXISTS `course` (
   KEY `Course_level_idx` (`level`),
   KEY `Course_createdAt_idx` (`createdAt`),
   KEY `Course_institution_status_idx` (`institutionId`,`status`),
-  KEY `idx_course_created_at` (`createdAt`)
+  KEY `idx_course_created_at` (`createdAt`),
+  KEY `course_courseType_idx` (`courseType`),
+  KEY `course_deliveryMode_idx` (`deliveryMode`),
+  KEY `course_enrollmentType_idx` (`enrollmentType`),
+  KEY `course_isPlatformCourse_idx` (`isPlatformCourse`),
+  KEY `course_requiresSubscription_idx` (`requiresSubscription`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `course`
 --
 
-INSERT INTO `course` (`id`, `title`, `description`, `duration`, `level`, `status`, `institutionId`, `categoryId`, `createdAt`, `updatedAt`, `startDate`, `endDate`, `maxStudents`, `base_price`, `pricingPeriod`, `framework`, `isFeatured`, `isSponsored`, `priority`) VALUES
-('5002bdce-b66b-4be2-95b7-a1d08d8c0981', 'General English', 'General English language courses are designed to improve your general English language level for use in everyday situations...', 150, 'CEFR_A1', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-06 16:06:22.981', '2025-07-03 23:15:00.881', '2025-07-10 23:15:00.877', '2026-09-05 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 1, 0, 95),
-('e9b6464b-d232-4c5f-a2b4-f30865e9237d', 'IELTS Exam Preparation', 'The IELTS (International English Language Testing Systems) exam is a good choice if you\'re preparing to study or work in an English-speaking country.', 150, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-08 22:15:49.068', '2025-07-03 23:15:00.885', '2025-07-17 23:15:00.884', '2025-09-05 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 85),
-('d5975219-7eda-4507-bc4c-3fe2048dfc06', 'Business English', 'The course will cover necessary business skills such as telephone language, English for business meetings, presentations, report writing, emailing, and liaising with clients.', 150, 'CEFR_B1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'a495e997-47b3-4e59-b88c-978cfe9a4c02', '2025-06-08 22:20:04.812', '2025-07-25 22:38:11.274', '2025-07-24 00:00:00.000', '2025-09-19 00:00:00.000', 15, 2750, 'FULL_COURSE', 'CEFR', 0, 0, 75),
-('78bfbb28-7f43-423d-9454-1910b1fdabcf', 'One-to-One English', 'Our One to One English lessons give you the chance to follow a course that is entirely tailored to your requirements.', 10, 'CEFR_B1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 01:03:25.457', '2025-07-12 01:00:24.865', '2025-07-07 00:00:00.000', '2025-08-29 00:00:00.000', 25, 3500, 'FULL_COURSE', 'CEFR', 0, 0, 0),
-('12de3567-2474-4760-a8ff-f58d22cde02d', 'English for Academic Purposes', 'English for Academic Purposes (EAP) is an English language course for speakers of other languages. The course is designed to bring English skills to a level that will help students be successful in college courses.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', 'ee97012a-5fca-47df-ab1c-86f4acc180c0', '2025-06-13 12:11:28.930', '2025-07-12 00:44:52.006', '2025-07-07 00:00:00.000', '2025-10-10 00:00:00.000', 15, 3500, 'MONTHLY', 'CEFR', 0, 0, 0),
-('9c8dc68e-b7b7-4362-b4cc-c3913682b4a8', 'IELTS Exam Preparation', 'The IELTS (International English Language Testing Systems) exam is a good choice if you\'re preparing to study or work in an English-speaking country....', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:18:22.744', '2025-07-12 01:05:19.618', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 25, 720, 'MONTHLY', 'CEFR', 0, 0, 0),
-('c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'Cambridge Exams Preparation - CPE', 'The Cambridge examinations are recognised worldwide as a proof of your English language ability. They can be useful when applying for jobs where English Language competence is assessed, and, in some cases, for universities.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:32:01.989', '2025-07-12 00:54:55.427', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 270, 'WEEKLY', 'CEFR', 0, 0, 0),
-('7e806add-bd45-43f6-a28f-fb736707653c', 'Conversation & Pronunciation', 'Our Conversation and Pronunciation classes take place in small groups to allow as much speaking time as possible.', 10, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 17:12:21.300', '2025-07-12 00:31:03.308', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 100, 'WEEKLY', 'CEFR', 0, 0, 0),
-('6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'General French', 'Learn French in the heart of London on this lively interactive course for beginners. The course will be taught in French, with an emphasis on developing your speaking and listening skills.', 12, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-07-26 15:47:30.135', '2025-07-26 15:47:54.978', '2025-09-01 00:00:00.000', '2025-11-21 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 0);
+INSERT INTO `course` (`id`, `title`, `description`, `duration`, `level`, `status`, `institutionId`, `categoryId`, `createdAt`, `updatedAt`, `startDate`, `endDate`, `maxStudents`, `base_price`, `pricingPeriod`, `framework`, `isFeatured`, `isSponsored`, `priority`, `courseType`, `deliveryMode`, `enrollmentType`, `isPlatformCourse`, `liveClassFrequency`, `liveClassSchedule`, `requiresSubscription`, `subscriptionTier`) VALUES
+('5002bdce-b66b-4be2-95b7-a1d08d8c0981', 'General English', 'General English language courses are designed to improve your general English language level for use in everyday situations...', 150, 'CEFR_A1', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-06 16:06:22.981', '2025-07-03 23:15:00.881', '2025-07-10 23:15:00.877', '2026-09-05 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 1, 0, 95, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('e9b6464b-d232-4c5f-a2b4-f30865e9237d', 'IELTS Exam Preparation', 'The IELTS (International English Language Testing Systems) exam is a good choice if you\'re preparing to study or work in an English-speaking country.', 150, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-08 22:15:49.068', '2025-07-03 23:15:00.885', '2025-07-17 23:15:00.884', '2025-09-05 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 85, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('d5975219-7eda-4507-bc4c-3fe2048dfc06', 'Business English', 'The course will cover necessary business skills such as telephone language, English for business meetings, presentations, report writing, emailing, and liaising with clients.', 150, 'CEFR_B1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'a495e997-47b3-4e59-b88c-978cfe9a4c02', '2025-06-08 22:20:04.812', '2025-07-25 22:38:11.274', '2025-07-24 00:00:00.000', '2025-09-19 00:00:00.000', 15, 2750, 'FULL_COURSE', 'CEFR', 0, 0, 75, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('78bfbb28-7f43-423d-9454-1910b1fdabcf', 'One-to-One English', 'Our One to One English lessons give you the chance to follow a course that is entirely tailored to your requirements.', 10, 'CEFR_B1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 01:03:25.457', '2025-07-12 01:00:24.865', '2025-07-07 00:00:00.000', '2025-08-29 00:00:00.000', 25, 3500, 'FULL_COURSE', 'CEFR', 0, 0, 0, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('12de3567-2474-4760-a8ff-f58d22cde02d', 'English for Academic Purposes', 'English for Academic Purposes (EAP) is an English language course for speakers of other languages. The course is designed to bring English skills to a level that will help students be successful in college courses.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', 'ee97012a-5fca-47df-ab1c-86f4acc180c0', '2025-06-13 12:11:28.930', '2025-07-12 00:44:52.006', '2025-07-07 00:00:00.000', '2025-10-10 00:00:00.000', 15, 3500, 'MONTHLY', 'CEFR', 0, 0, 0, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('9c8dc68e-b7b7-4362-b4cc-c3913682b4a8', 'IELTS Exam Preparation', 'The IELTS (International English Language Testing Systems) exam is a good choice if you\'re preparing to study or work in an English-speaking country....', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:18:22.744', '2025-07-12 01:05:19.618', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 25, 720, 'MONTHLY', 'CEFR', 0, 0, 0, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'Cambridge Exams Preparation - CPE', 'The Cambridge examinations are recognised worldwide as a proof of your English language ability. They can be useful when applying for jobs where English Language competence is assessed, and, in some cases, for universities.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:32:01.989', '2025-07-12 00:54:55.427', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 270, 'WEEKLY', 'CEFR', 0, 0, 0, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('7e806add-bd45-43f6-a28f-fb736707653c', 'Conversation & Pronunciation', 'Our Conversation and Pronunciation classes take place in small groups to allow as much speaking time as possible.', 10, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 17:12:21.300', '2025-07-12 00:31:03.308', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 100, 'WEEKLY', 'CEFR', 0, 0, 0, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL),
+('6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'General French', 'Learn French in the heart of London on this lively interactive course for beginners. The course will be taught in French, with an emphasis on developing your speaking and listening skills.', 12, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-07-26 15:47:30.135', '2025-07-26 15:47:54.978', '2025-09-01 00:00:00.000', '2025-11-21 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 0, 'STANDARD', 'SELF_PACED', 'COURSE_BASED', 0, NULL, NULL, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -827,7 +840,7 @@ CREATE TABLE IF NOT EXISTS `institution` (
 
 INSERT INTO `institution` (`id`, `name`, `description`, `address`, `city`, `state`, `country`, `postcode`, `email`, `website`, `createdAt`, `updatedAt`, `institutionEmail`, `telephone`, `contactName`, `contactJobTitle`, `contactPhone`, `contactEmail`, `logoUrl`, `facilities`, `status`, `isApproved`, `currency`, `commissionRate`, `discountSettings`, `metadata`, `socialMedia`, `defaultMaxStudents`, `stripeCustomerId`, `mainImageUrl`, `subscriptionPlan`, `isFeatured`, `isActive`) VALUES
 ('42308252-a934-4eef-b663-37a7076bb177', 'XYZ Language School', 'XYZ Language School - Premium language education with personalized learning paths and certified instructors.', '12 Upper Road', 'London', 'England', 'United Kingdom', 'E17 1AA', 'jbloggs@xyz.com', 'https://www.xyz.com', '2025-06-05 23:50:18.379', '2025-07-15 17:36:47.358', 'info@xyz.com', '0123456789', 'Ed Burns', 'Admissions Manager', '01234567890', 'ed.burns@xyz.com', '/uploads/logo/42308252-a934-4eef-b663-37a7076bb177/f456af5c-8db6-46ad-a7b5-287899223a84.png', '[\"/uploads/facilities/42308252-a934-4eef-b663-37a7076bb177/1752600283429-3nayxhx4tkc.jpg\",\"/uploads/facilities/42308252-a934-4eef-b663-37a7076bb177/1752600291977-en752yzdgz.jpg\",\"/uploads/facilities/42308252-a934-4eef-b663-37a7076bb177/1752600302495-emrpa7gmo1r.jpg\",\"/uploads/facilities/42308252-a934-4eef-b663-37a7076bb177/1752600318752-fybviq0tky.jpg\",\"/uploads/facilities/42308252-a934-4eef-b663-37a7076bb177/1752600331468-a8htwjf1bhr.jpg\"]', 'ACTIVE', 1, 'USD', 20, '{\"enabled\": false, \"startingRate\": 5, \"incrementRate\": 2.5, \"maxDiscountCap\": 50, \"incrementPeriodWeeks\": 4}', NULL, NULL, 15, NULL, '/uploads/mainImage/42308252-a934-4eef-b663-37a7076bb177/dde1a58d-dc44-4fb1-b205-4932310edfad.jpg', 'ENTERPRISE', 1, 1),
-('c5962019-07ca-4a78-a97f-3cf394e5bf94', 'ABC Shool of English', 'ABC Shool of English - Professional language training with industry-focused curriculum.', '123 Test Street', 'Madison', 'Wisconsin', 'United States', '45678', 'tjones@abc.ac.uk', 'https://www.abc.ac.uk', '2025-06-05 23:50:57.130', '2025-07-03 23:15:00.864', 'info@abc.ac.uk', '0123456789', 'Andy Caperone', 'Admissions Manager', '0123456789', 'andy.caperon@abc.ac.uk', '/uploads/logo/c5962019-07ca-4a78-a97f-3cf394e5bf94/2dbe8c64-6ef4-4e52-88f4-3a3978ff44cb.png', '[\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/417fec33-6eab-45eb-9066-21cc0a4c734b.jpg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/3ae0c44e-828f-4b83-97b1-3a4a35c88d77.jpg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/03cde774-4146-4c1a-a4df-2d2e2fc32347.jpeg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/15107098-eb8b-445a-9a83-34fca03abd63.jpg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/7204facb-b09e-4077-b862-1ab84cd93804.jpg\"]', 'ACTIVE', 1, 'USD', 18, '{\"enabled\": false, \"startingRate\": 5, \"incrementRate\": 2.5, \"maxDiscountCap\": 50, \"incrementPeriodWeeks\": 4}', NULL, NULL, 15, NULL, '/uploads/mainImage/c5962019-07ca-4a78-a97f-3cf394e5bf94/179f2a8c-7be6-4921-8b7a-7ec7350a13b5.jpg', 'PROFESSIONAL', 0, 1),
+('c5962019-07ca-4a78-a97f-3cf394e5bf94', 'ABC Shool of English', 'ABC Shool of English - Professional language training with industry-focused curriculum.', '123 Test Street', 'Madison', 'Wisconsin', 'United States', '45678', 'tjones@abc.ac.uk', 'https://www.abc.ac.uk', '2025-06-05 23:50:57.130', '2025-08-06 16:16:52.397', 'info@abc.ac.uk', '0123456789', 'Andy Caperone', 'Admissions Manager', '0123456789', 'andy.caperon@abc.ac.uk', '/uploads/logo/c5962019-07ca-4a78-a97f-3cf394e5bf94/2dbe8c64-6ef4-4e52-88f4-3a3978ff44cb.png', '[\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/417fec33-6eab-45eb-9066-21cc0a4c734b.jpg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/3ae0c44e-828f-4b83-97b1-3a4a35c88d77.jpg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/03cde774-4146-4c1a-a4df-2d2e2fc32347.jpeg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/15107098-eb8b-445a-9a83-34fca03abd63.jpg\",\"/uploads/facility/c5962019-07ca-4a78-a97f-3cf394e5bf94/7204facb-b09e-4077-b862-1ab84cd93804.jpg\"]', 'ACTIVE', 1, 'USD', 18, '{\"enabled\": false, \"startingRate\": 5, \"incrementRate\": 2.5, \"maxDiscountCap\": 50, \"incrementPeriodWeeks\": 4}', NULL, NULL, 15, NULL, '/uploads/mainImage/c5962019-07ca-4a78-a97f-3cf394e5bf94/179f2a8c-7be6-4921-8b7a-7ec7350a13b5.jpg', 'PROFESSIONAL', 0, 1),
 ('9f71efc3-7b31-4953-b398-29f2197af202', 'GraceFul English School', 'Institution description will be updated after approval', '123 la Rue', 'Lorient', 'Brittany', 'France', '5621', 'grace@ges.ac.uk', 'https://www.ges.ac.uk', '2025-07-01 22:02:16.480', '2025-07-03 17:39:59.512', 'admin@ges.ac.uk', '0123456789', 'Fred Astire', 'Admissions', '0123456789', 'fred.astire@ges.ac.uk', '/uploads/logo/9f71efc3-7b31-4953-b398-29f2197af202/5a8067a3-54c2-4d40-8244-a3b20fd2ca19.png', '[\"/uploads/facility/9f71efc3-7b31-4953-b398-29f2197af202/654b7d7b-e606-4798-9b56-97e9876ac0b4.jpg\",\"/uploads/facility/9f71efc3-7b31-4953-b398-29f2197af202/454f373a-032b-4cf0-aff8-664a60929aef.jpg\",\"/uploads/facility/9f71efc3-7b31-4953-b398-29f2197af202/d7a53988-d3f2-4a7b-968a-3348a067b16c.jpg\",\"/uploads/facility/9f71efc3-7b31-4953-b398-29f2197af202/36afc99e-2e6a-4c08-8f95-bf6888f98c9e.jpg\",\"/uploads/facility/9f71efc3-7b31-4953-b398-29f2197af202/7ccdc57d-23f9-430b-8b91-7a7c610a38bf.jpg\"]', 'PENDING', 0, 'USD', 0, NULL, NULL, NULL, 15, NULL, '/uploads/mainImage/9f71efc3-7b31-4953-b398-29f2197af202/6f0c2c89-9c5a-4eca-83c8-1e08ba7d4d7f.jpg', 'BASIC', 0, 1);
 
 -- --------------------------------------------------------
@@ -2584,6 +2597,36 @@ CREATE TABLE IF NOT EXISTS `rate_limit_logs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `recurring_session_patterns`
+--
+
+DROP TABLE IF EXISTS `recurring_session_patterns`;
+CREATE TABLE IF NOT EXISTS `recurring_session_patterns` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `courseId` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `patternType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frequency` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `dayOfWeek` int DEFAULT NULL,
+  `timeOfDay` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duration` int NOT NULL,
+  `timezone` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UTC',
+  `startDate` datetime(3) NOT NULL,
+  `endDate` datetime(3) NOT NULL,
+  `maxParticipants` int NOT NULL DEFAULT '10',
+  `isPublic` tinyint(1) NOT NULL DEFAULT '0',
+  `isRecorded` tinyint(1) NOT NULL DEFAULT '0',
+  `allowChat` tinyint(1) NOT NULL DEFAULT '1',
+  `allowScreenShare` tinyint(1) NOT NULL DEFAULT '1',
+  `isActive` tinyint(1) NOT NULL DEFAULT '1',
+  `autoGenerate` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `recurring_session_patterns_courseId_idx` (`courseId`),
+  KEY `recurring_session_patterns_isActive_idx` (`isActive`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `students`
 --
 
@@ -2741,23 +2784,39 @@ CREATE TABLE IF NOT EXISTS `student_course_enrollments` (
   `updatedAt` datetime(3) NOT NULL,
   `stateVersion` int NOT NULL DEFAULT '1',
   `version` int NOT NULL DEFAULT '1',
+  `accessExpiry` datetime(3) DEFAULT NULL,
+  `accessMethod` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DIRECT',
+  `attendanceQuotaUsed` int NOT NULL DEFAULT '0',
+  `enrollmentQuotaUsed` tinyint(1) NOT NULL DEFAULT '0',
+  `enrollmentType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'COURSE_BASED',
+  `hasLiveClassAccess` tinyint(1) NOT NULL DEFAULT '0',
+  `isActive` tinyint(1) NOT NULL DEFAULT '1',
+  `isPlatformCourse` tinyint(1) NOT NULL DEFAULT '0',
+  `liveClassAccessExpiry` datetime(3) DEFAULT NULL,
+  `subscriptionId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subscriptionTier` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `student_course_enrollments_studentId_idx` (`studentId`),
   KEY `student_course_enrollments_courseId_idx` (`courseId`),
-  KEY `idx_enrollment_course_id` (`courseId`)
+  KEY `idx_enrollment_course_id` (`courseId`),
+  KEY `student_course_enrollments_enrollmentType_idx` (`enrollmentType`),
+  KEY `student_course_enrollments_accessMethod_idx` (`accessMethod`),
+  KEY `student_course_enrollments_subscriptionId_idx` (`subscriptionId`),
+  KEY `student_course_enrollments_isPlatformCourse_idx` (`isPlatformCourse`),
+  KEY `student_course_enrollments_isActive_idx` (`isActive`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `student_course_enrollments`
 --
 
-INSERT INTO `student_course_enrollments` (`id`, `studentId`, `courseId`, `status`, `progress`, `startDate`, `endDate`, `paymentStatus`, `paymentDate`, `createdAt`, `updatedAt`, `stateVersion`, `version`) VALUES
-('cmc9nqqaf0009nfpuade5uuis', '5b5fbd13-8776-4f96-ada9-091973974873', '12de3567-2474-4760-a8ff-f58d22cde02d', 'ENROLLED', 0, '2025-07-07 00:00:00.000', '2025-10-07 00:00:00.000', 'PAID', '2025-06-23 22:21:53.050', '2025-06-23 22:17:52.023', '2025-06-23 22:21:53.052', 1, 1),
-('cmcd9i1td0002wifriuxiimz4', '5b5fbd13-8776-4f96-ada9-091973974873', 'd5975219-7eda-4507-bc4c-3fe2048dfc06', 'ENROLLED', 0, '2025-07-07 00:00:00.000', '2025-09-19 00:00:00.000', 'PAID', '2025-06-26 10:57:39.184', '2025-06-26 10:50:17.081', '2025-07-16 13:12:16.641', 1, 1),
-('cmcjfsy7x0002hfzgyyaxhx3y', '5b5fbd13-8776-4f96-ada9-091973974873', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'ENROLLED', 0, '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 'PAID', '2025-07-14 01:54:44.089', '2025-06-30 18:33:20.445', '2025-07-14 01:54:44.092', 1, 1),
-('cmdfxzczf0007b4ejk2ggjy0u', '5b5fbd13-8776-4f96-ada9-091973974873', '7e806add-bd45-43f6-a28f-fb736707653c', 'PENDING_PAYMENT', 0, '2025-07-23 12:30:15.839', '2025-09-12 00:00:00.000', 'PENDING', NULL, '2025-07-23 12:30:50.236', '2025-07-23 12:30:50.236', 1, 1),
-('cmdfxjuwr0002b4ejo5suxfwp', '5b5fbd13-8776-4f96-ada9-091973974873', '78bfbb28-7f43-423d-9454-1910b1fdabcf', 'PENDING_PAYMENT', 0, '2025-07-23 12:18:19.570', '2025-08-29 00:00:00.000', 'PENDING', NULL, '2025-07-23 12:18:46.971', '2025-07-23 12:18:46.971', 1, 1),
-('cmdg69uuh00029kkxm7wbnam0', '5b5fbd13-8776-4f96-ada9-091973974873', '5002bdce-b66b-4be2-95b7-a1d08d8c0981', 'PENDING_PAYMENT', 0, '2025-07-23 15:46:54.128', '2025-09-05 00:00:00.000', 'PENDING', NULL, '2025-07-23 16:22:56.186', '2025-07-23 16:22:56.186', 1, 1);
+INSERT INTO `student_course_enrollments` (`id`, `studentId`, `courseId`, `status`, `progress`, `startDate`, `endDate`, `paymentStatus`, `paymentDate`, `createdAt`, `updatedAt`, `stateVersion`, `version`, `accessExpiry`, `accessMethod`, `attendanceQuotaUsed`, `enrollmentQuotaUsed`, `enrollmentType`, `hasLiveClassAccess`, `isActive`, `isPlatformCourse`, `liveClassAccessExpiry`, `subscriptionId`, `subscriptionTier`) VALUES
+('cmc9nqqaf0009nfpuade5uuis', '5b5fbd13-8776-4f96-ada9-091973974873', '12de3567-2474-4760-a8ff-f58d22cde02d', 'ENROLLED', 0, '2025-07-07 00:00:00.000', '2025-10-07 00:00:00.000', 'PAID', '2025-06-23 22:21:53.050', '2025-06-23 22:17:52.023', '2025-08-05 16:23:06.781', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
+('cmcd9i1td0002wifriuxiimz4', '5b5fbd13-8776-4f96-ada9-091973974873', 'd5975219-7eda-4507-bc4c-3fe2048dfc06', 'ENROLLED', 0, '2025-07-07 00:00:00.000', '2025-09-19 00:00:00.000', 'PAID', '2025-06-26 10:57:39.184', '2025-06-26 10:50:17.081', '2025-08-05 16:23:06.786', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
+('cmcjfsy7x0002hfzgyyaxhx3y', '5b5fbd13-8776-4f96-ada9-091973974873', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'ENROLLED', 0, '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 'PAID', '2025-07-14 01:54:44.089', '2025-06-30 18:33:20.445', '2025-08-05 16:23:06.794', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
+('cmdfxzczf0007b4ejk2ggjy0u', '5b5fbd13-8776-4f96-ada9-091973974873', '7e806add-bd45-43f6-a28f-fb736707653c', 'PENDING_PAYMENT', 0, '2025-07-23 12:30:15.839', '2025-09-12 00:00:00.000', 'PENDING', NULL, '2025-07-23 12:30:50.236', '2025-08-05 16:23:06.800', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
+('cmdfxjuwr0002b4ejo5suxfwp', '5b5fbd13-8776-4f96-ada9-091973974873', '78bfbb28-7f43-423d-9454-1910b1fdabcf', 'PENDING_PAYMENT', 0, '2025-07-23 12:18:19.570', '2025-08-29 00:00:00.000', 'PENDING', NULL, '2025-07-23 12:18:46.971', '2025-08-05 16:23:06.809', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
+('cmdg69uuh00029kkxm7wbnam0', '5b5fbd13-8776-4f96-ada9-091973974873', '5002bdce-b66b-4be2-95b7-a1d08d8c0981', 'PENDING_PAYMENT', 0, '2025-07-23 15:46:54.128', '2025-09-05 00:00:00.000', 'PENDING', NULL, '2025-07-23 16:22:56.186', '2025-08-05 16:23:06.826', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2877,25 +2936,38 @@ CREATE TABLE IF NOT EXISTS `student_subscriptions` (
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
   `studentTierId` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attendanceQuota` int NOT NULL DEFAULT '10',
+  `canAccessLiveClasses` tinyint(1) NOT NULL DEFAULT '0',
+  `canAccessRecordings` tinyint(1) NOT NULL DEFAULT '0',
+  `canUseHDVideo` tinyint(1) NOT NULL DEFAULT '0',
+  `currentEnrollments` int NOT NULL DEFAULT '0',
+  `enrollmentQuota` int NOT NULL DEFAULT '1',
+  `maxActiveCourses` int NOT NULL DEFAULT '1',
+  `maxEnrollments` int NOT NULL DEFAULT '1',
+  `monthlyAttendance` int NOT NULL DEFAULT '0',
+  `monthlyEnrollments` int NOT NULL DEFAULT '0',
+  `planType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'BASIC',
   PRIMARY KEY (`id`),
   UNIQUE KEY `student_subscriptions_studentId_key` (`studentId`),
   KEY `student_subscriptions_studentId_idx` (`studentId`),
   KEY `student_subscriptions_status_idx` (`status`),
   KEY `student_subscriptions_endDate_idx` (`endDate`),
-  KEY `student_subscriptions_studentTierId_fkey` (`studentTierId`)
+  KEY `student_subscriptions_studentTierId_fkey` (`studentTierId`),
+  KEY `student_subscriptions_planType_idx` (`planType`),
+  KEY `student_subscriptions_currentEnrollments_idx` (`currentEnrollments`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `student_subscriptions`
 --
 
-INSERT INTO `student_subscriptions` (`id`, `studentId`, `status`, `startDate`, `endDate`, `autoRenew`, `cancellationReason`, `cancelledAt`, `metadata`, `createdAt`, `updatedAt`, `studentTierId`) VALUES
-('cmckkosgt0009cb32hkzlxg54', '5b5fbd13-8776-4f96-ada9-091973974873', 'ACTIVE', '2025-06-01 13:37:50.617', '2025-09-03 21:51:12.265', 1, NULL, NULL, '{}', '2025-07-01 13:37:50.621', '2025-08-03 21:51:12.266', 'premium-tier'),
-('cmckkoslo000lcb323d05as3r', 'e6c31370-dc9c-4aae-b9c5-db40c4d9584a', 'ACTIVE', '2025-06-01 13:37:50.794', '2025-07-31 13:37:50.794', 1, NULL, NULL, NULL, '2025-07-01 13:37:50.797', '2025-07-01 13:37:50.797', 'basic-tier'),
-('cmd0qsotc000cp73dw0kd2rmy', 'ccb77175-fa66-4d1f-bbb9-0701df84384d', 'ACTIVE', '2025-07-12 21:13:09.023', '2026-07-14 13:58:54.381', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:13:09.023Z\"}', '2025-07-12 21:13:09.024', '2025-07-14 13:58:54.382', 'basic-tier'),
-('cmd0r7t5x000jp73dpf3kdduh', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 'ACTIVE', '2025-07-12 21:24:54.498', '2026-07-14 13:58:54.390', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:24:54.498Z\"}', '2025-07-12 21:24:54.501', '2025-07-14 13:58:54.392', 'basic-tier'),
-('cmd0rq6de000qp73dn3b3o498', 'c98a0b89-011b-482f-843e-a5522de40b1e', 'ACTIVE', '2025-07-12 21:39:11.423', '2026-07-14 13:58:54.404', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:39:11.423Z\"}', '2025-07-12 21:39:11.427', '2025-07-14 13:58:54.407', 'basic-tier'),
-('0c20dc4a-afa5-4c40-a041-5fa049fc6725', 'bdcbbab6-9436-43d1-80e6-b9543b48dd06', 'ACTIVE', '2025-07-14 13:58:54.344', '2026-07-14 13:58:54.344', 1, NULL, NULL, NULL, '2025-07-14 13:58:54.346', '2025-07-14 13:58:54.346', 'premium-tier');
+INSERT INTO `student_subscriptions` (`id`, `studentId`, `status`, `startDate`, `endDate`, `autoRenew`, `cancellationReason`, `cancelledAt`, `metadata`, `createdAt`, `updatedAt`, `studentTierId`, `attendanceQuota`, `canAccessLiveClasses`, `canAccessRecordings`, `canUseHDVideo`, `currentEnrollments`, `enrollmentQuota`, `maxActiveCourses`, `maxEnrollments`, `monthlyAttendance`, `monthlyEnrollments`, `planType`) VALUES
+('cmckkosgt0009cb32hkzlxg54', '5b5fbd13-8776-4f96-ada9-091973974873', 'ACTIVE', '2025-06-01 13:37:50.617', '2025-09-03 21:51:12.265', 1, NULL, NULL, '{}', '2025-07-01 13:37:50.621', '2025-08-05 16:23:06.081', 'premium-tier', 30, 0, 0, 0, 6, 10, 1, 10, 1, 0, 'BASIC'),
+('cmckkoslo000lcb323d05as3r', 'e6c31370-dc9c-4aae-b9c5-db40c4d9584a', 'ACTIVE', '2025-06-01 13:37:50.794', '2025-07-31 13:37:50.794', 1, NULL, NULL, NULL, '2025-07-01 13:37:50.797', '2025-08-05 16:23:06.095', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
+('cmd0qsotc000cp73dw0kd2rmy', 'ccb77175-fa66-4d1f-bbb9-0701df84384d', 'ACTIVE', '2025-07-12 21:13:09.023', '2026-07-14 13:58:54.381', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:13:09.023Z\"}', '2025-07-12 21:13:09.024', '2025-08-05 16:23:06.119', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
+('cmd0r7t5x000jp73dpf3kdduh', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 'ACTIVE', '2025-07-12 21:24:54.498', '2026-07-14 13:58:54.390', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:24:54.498Z\"}', '2025-07-12 21:24:54.501', '2025-08-05 16:23:06.135', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
+('cmd0rq6de000qp73dn3b3o498', 'c98a0b89-011b-482f-843e-a5522de40b1e', 'ACTIVE', '2025-07-12 21:39:11.423', '2026-07-14 13:58:54.404', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:39:11.423Z\"}', '2025-07-12 21:39:11.427', '2025-08-05 16:23:06.150', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
+('0c20dc4a-afa5-4c40-a041-5fa049fc6725', 'bdcbbab6-9436-43d1-80e6-b9543b48dd06', 'ACTIVE', '2025-07-14 13:58:54.344', '2026-07-14 13:58:54.344', 1, NULL, NULL, NULL, '2025-07-14 13:58:54.346', '2025-08-05 16:23:06.166', 'premium-tier', 30, 0, 0, 0, 0, 10, 1, 10, 0, 0, 'BASIC');
 
 -- --------------------------------------------------------
 
@@ -2914,10 +2986,15 @@ CREATE TABLE IF NOT EXISTS `student_tiers` (
   `billingCycle` varchar(20) NOT NULL DEFAULT 'MONTHLY',
   `features` json NOT NULL,
   `maxCourses` int NOT NULL DEFAULT '5',
-  `maxLanguages` int NOT NULL DEFAULT '5',
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
+  `maxLiveClasses` int NOT NULL DEFAULT '10',
+  `maxStudents` int NOT NULL DEFAULT '1',
+  `maxInstructors` int NOT NULL DEFAULT '1',
+  `enrollmentQuota` int NOT NULL DEFAULT '5',
+  `attendanceQuota` int NOT NULL DEFAULT '20',
+  `gracePeriodDays` int NOT NULL DEFAULT '7',
   PRIMARY KEY (`id`),
   UNIQUE KEY `student_tiers_planType_key` (`planType`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -2926,10 +3003,11 @@ CREATE TABLE IF NOT EXISTS `student_tiers` (
 -- Dumping data for table `student_tiers`
 --
 
-INSERT INTO `student_tiers` (`id`, `planType`, `name`, `description`, `price`, `currency`, `billingCycle`, `features`, `maxCourses`, `maxLanguages`, `isActive`, `createdAt`, `updatedAt`) VALUES
-('basic-tier', 'BASIC', 'Basic Plan', 'Perfect for beginners starting their language journey', 12.99, 'USD', 'MONTHLY', '{\"maxCourses\": 5, \"aiAssistant\": false, \"basicLessons\": true, \"certificates\": false, \"emailSupport\": true, \"maxLanguages\": 5, \"mobileAccess\": true, \"offlineAccess\": false, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": false, \"videoConferencing\": false, \"customLearningPaths\": false}', 5, 5, 1, '2025-07-05 02:45:40.000', '2025-07-28 19:53:13.525'),
-('premium-tier', 'PREMIUM', 'Premium Plan', 'Most popular choice for serious language learners', 24.99, 'USD', 'MONTHLY', '{\"maxCourses\": 20, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"culturalContent\": true, \"prioritySupport\": true, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": true, \"videoConferencing\": \"limited\", \"customLearningPaths\": false}', 20, -1, 1, '2025-07-05 02:45:40.000', '2025-07-28 19:53:13.664'),
-('pro-tier', 'PRO', 'Pro Plan', 'Complete language learning experience with personal tutoring', 49.99, 'USD', 'MONTHLY', '{\"maxCourses\": -1, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"careerGuidance\": true, \"culturalContent\": true, \"dedicatedSupport\": true, \"exclusiveContent\": true, \"personalTutoring\": true, \"progressTracking\": true, \"liveConversations\": true, \"portfolioBuilding\": true, \"videoConferencing\": \"unlimited\", \"advancedAssessment\": true, \"groupStudySessions\": true, \"customLearningPaths\": true}', -1, -1, 1, '2025-07-05 02:45:40.000', '2025-07-28 19:53:13.665');
+INSERT INTO `student_tiers` (`id`, `planType`, `name`, `description`, `price`, `currency`, `billingCycle`, `features`, `maxCourses`, `isActive`, `createdAt`, `updatedAt`, `maxLiveClasses`, `maxStudents`, `maxInstructors`, `enrollmentQuota`, `attendanceQuota`, `gracePeriodDays`) VALUES
+('basic-tier', 'BASIC', 'Basic Plan', 'Perfect for beginners starting their language journey', 12.99, 'USD', 'MONTHLY', '{\"maxCourses\": 5, \"aiAssistant\": false, \"basicLessons\": true, \"certificates\": false, \"emailSupport\": true, \"maxLanguages\": 5, \"mobileAccess\": true, \"offlineAccess\": false, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": false, \"videoConferencing\": false, \"customLearningPaths\": false}', 5, 1, '2025-07-05 02:45:40.000', '2025-08-05 16:23:05.936', 5, 1, 1, 3, 10, 7),
+('premium-tier', 'PREMIUM', 'Premium Plan', 'Most popular choice for serious language learners', 24.99, 'USD', 'MONTHLY', '{\"maxCourses\": 20, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"culturalContent\": true, \"prioritySupport\": true, \"personalTutoring\": false, \"progressTracking\": true, \"liveConversations\": true, \"videoConferencing\": \"limited\", \"customLearningPaths\": false}', 20, 1, '2025-07-05 02:45:40.000', '2025-08-05 16:23:05.941', 15, 2, 2, 10, 30, 14),
+('pro-tier', 'PRO', 'Pro Plan', 'Complete language learning experience with personal tutoring', 49.99, 'USD', 'MONTHLY', '{\"maxCourses\": -1, \"aiAssistant\": true, \"basicLessons\": true, \"certificates\": true, \"maxLanguages\": -1, \"mobileAccess\": true, \"videoLessons\": true, \"offlineAccess\": true, \"careerGuidance\": true, \"culturalContent\": true, \"dedicatedSupport\": true, \"exclusiveContent\": true, \"personalTutoring\": true, \"progressTracking\": true, \"liveConversations\": true, \"portfolioBuilding\": true, \"videoConferencing\": \"unlimited\", \"advancedAssessment\": true, \"groupStudySessions\": true, \"customLearningPaths\": true}', -1, 1, '2025-07-05 02:45:40.000', '2025-08-05 16:23:05.946', 10, 1, 1, 5, 20, 7),
+('cmdyr057b00007ld1die1tpon', 'ENTERPRISE', 'Enterprise Plan', 'Complete solution for institutions and organizations', 49.99, 'USD', 'MONTHLY', '{\"hdVideo\": true, \"analytics\": true, \"apiAccess\": true, \"recordings\": true, \"liveClasses\": true, \"customBranding\": true, \"prioritySupport\": true, \"selfPacedCourses\": true}', 50, 1, '2025-08-05 16:23:06.839', '2025-08-05 16:23:06.839', 50, 5, 5, 25, 100, 30);
 
 -- --------------------------------------------------------
 
@@ -3164,6 +3242,10 @@ CREATE TABLE IF NOT EXISTS `video_sessions` (
   `rating` float DEFAULT NULL,
   `reviews` int NOT NULL DEFAULT '0',
   `tags` json DEFAULT NULL,
+  `isAutoGenerated` tinyint(1) NOT NULL DEFAULT '0',
+  `isRecurring` tinyint(1) NOT NULL DEFAULT '0',
+  `recurringPatternId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sessionNumber` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `video_sessions_instructorId_idx` (`instructorId`),
   KEY `video_sessions_institutionId_idx` (`institutionId`),
@@ -3172,19 +3254,21 @@ CREATE TABLE IF NOT EXISTS `video_sessions` (
   KEY `video_sessions_status_idx` (`status`),
   KEY `video_sessions_language_idx` (`language`),
   KEY `video_sessions_level_idx` (`level`),
-  KEY `video_sessions_moduleId_fkey` (`moduleId`)
+  KEY `video_sessions_moduleId_fkey` (`moduleId`),
+  KEY `video_sessions_recurringPatternId_idx` (`recurringPatternId`),
+  KEY `video_sessions_isRecurring_idx` (`isRecurring`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `video_sessions`
 --
 
-INSERT INTO `video_sessions` (`id`, `title`, `description`, `sessionType`, `language`, `level`, `maxParticipants`, `startTime`, `endTime`, `duration`, `status`, `meetingUrl`, `meetingId`, `recordingUrl`, `instructorId`, `institutionId`, `courseId`, `moduleId`, `price`, `isPublic`, `isRecorded`, `allowChat`, `allowScreenShare`, `allowRecording`, `metadata`, `createdAt`, `updatedAt`, `currency`, `features`, `isBooked`, `isCancelled`, `isCompleted`, `materials`, `rating`, `reviews`, `tags`) VALUES
-('517661d9-0ae2-4806-b29f-ed4d15c51f50', 'German Grammar Workshop', 'Learn German grammar fundamentals with practical exercises', 'WORKSHOP', 'de', 'BEGINNER', 10, '2025-08-06 23:10:10.442', '2025-08-07 00:40:10.442', 90, 'SCHEDULED', 'https://meet.example.com/german-1754262610442', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-03 23:10:10.443', '2025-08-03 23:10:10.443', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
-('bfa9ce20-219c-4e66-a886-671b8edfdba5', 'Advanced English Writing', 'Master advanced English writing techniques and academic writing', 'TUTORIAL', 'en', 'ADVANCED', 8, '2025-08-07 23:10:10.445', '2025-08-08 01:10:10.445', 120, 'SCHEDULED', 'https://meet.example.com/english-1754262610445', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-03 23:10:10.446', '2025-08-03 23:10:10.446', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
-('81083189-d4d1-44b6-a3d2-90fcc1b5b5df', 'Spanish Conversation - Intermediate', 'Practice Spanish conversation skills in an interactive group setting', 'CONVERSATION', 'es', 'INTERMEDIATE', 12, '2025-08-05 23:10:10.439', '2025-08-06 00:10:10.439', 60, 'SCHEDULED', 'https://meet.example.com/spanish-1754262610439', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 23:10:10.440', '2025-08-03 23:10:10.440', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
-('528510ba-0420-4223-a3fa-e4aabfd4e9c9', 'Test Live Class - Premium Access', 'This is a test live class to verify Premium subscription access', 'GROUP', 'en', 'BEGINNER', 15, '2025-08-04 13:00:00.000', '2025-08-04 14:00:00.000', 60, 'SCHEDULED', 'https://meet.example.com/528510ba-0420-4223-a3fa-e4aabfd4e9c9', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 22:25:58.889', '2025-08-03 23:10:10.425', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL),
-('7e069093-62e9-4d4d-b837-6fd8a88210af', 'General French - Basic', 'Learn French with the FluentShip.com, the official French Language Centre. Our native French speaking teachers will deliver you the best French courses in London or online.', 'GROUP', 'fr', 'BEGINNER', 10, '2025-08-04 00:30:00.000', '2025-08-04 13:00:00.000', 480, 'SCHEDULED', 'https://meet.example.com/7e069093-62e9-4d4d-b837-6fd8a88210af', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 00:48:06.259', '2025-08-04 00:15:41.757', 'USD', 'null', 0, 0, 0, 'null', NULL, 0, 'null');
+INSERT INTO `video_sessions` (`id`, `title`, `description`, `sessionType`, `language`, `level`, `maxParticipants`, `startTime`, `endTime`, `duration`, `status`, `meetingUrl`, `meetingId`, `recordingUrl`, `instructorId`, `institutionId`, `courseId`, `moduleId`, `price`, `isPublic`, `isRecorded`, `allowChat`, `allowScreenShare`, `allowRecording`, `metadata`, `createdAt`, `updatedAt`, `currency`, `features`, `isBooked`, `isCancelled`, `isCompleted`, `materials`, `rating`, `reviews`, `tags`, `isAutoGenerated`, `isRecurring`, `recurringPatternId`, `sessionNumber`) VALUES
+('517661d9-0ae2-4806-b29f-ed4d15c51f50', 'German Grammar Workshop', 'Learn German grammar fundamentals with practical exercises', 'WORKSHOP', 'de', 'BEGINNER', 10, '2025-08-06 23:10:10.442', '2025-08-07 00:40:10.442', 90, 'SCHEDULED', 'https://meet.example.com/german-1754262610442', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-03 23:10:10.443', '2025-08-03 23:10:10.443', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('bfa9ce20-219c-4e66-a886-671b8edfdba5', 'Advanced English Writing', 'Master advanced English writing techniques and academic writing', 'TUTORIAL', 'en', 'ADVANCED', 8, '2025-08-07 23:10:10.445', '2025-08-08 01:10:10.445', 120, 'SCHEDULED', 'https://meet.example.com/english-1754262610445', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-03 23:10:10.446', '2025-08-03 23:10:10.446', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('81083189-d4d1-44b6-a3d2-90fcc1b5b5df', 'Spanish Conversation - Intermediate', 'Practice Spanish conversation skills in an interactive group setting', 'CONVERSATION', 'es', 'INTERMEDIATE', 12, '2025-08-05 23:10:10.439', '2025-08-06 00:10:10.439', 60, 'SCHEDULED', 'https://meet.example.com/spanish-1754262610439', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 23:10:10.440', '2025-08-03 23:10:10.440', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('528510ba-0420-4223-a3fa-e4aabfd4e9c9', 'Test Live Class - Premium Access', 'This is a test live class to verify Premium subscription access', 'GROUP', 'en', 'BEGINNER', 15, '2025-08-04 13:00:00.000', '2025-08-04 14:00:00.000', 60, 'SCHEDULED', 'https://meet.example.com/528510ba-0420-4223-a3fa-e4aabfd4e9c9', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 22:25:58.889', '2025-08-03 23:10:10.425', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('7e069093-62e9-4d4d-b837-6fd8a88210af', 'General French - Basic', 'Learn French with the FluentShip.com, the official French Language Centre. Our native French speaking teachers will deliver you the best French courses in London or online.', 'GROUP', 'fr', 'BEGINNER', 10, '2025-08-04 00:30:00.000', '2025-08-04 13:00:00.000', 480, 'SCHEDULED', 'https://meet.example.com/7e069093-62e9-4d4d-b837-6fd8a88210af', NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, NULL, NULL, 0, 1, 0, 1, 1, 0, NULL, '2025-08-03 00:48:06.259', '2025-08-04 00:15:41.757', 'USD', 'null', 0, 0, 0, 'null', NULL, 0, 'null', 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3242,20 +3326,25 @@ CREATE TABLE IF NOT EXISTS `video_session_participants` (
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
+  `attendanceType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'REGULAR',
+  `quotaUsed` tinyint(1) NOT NULL DEFAULT '0',
+  `subscriptionId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `video_session_participants_sessionId_userId_key` (`sessionId`,`userId`),
   KEY `video_session_participants_sessionId_idx` (`sessionId`),
   KEY `video_session_participants_userId_idx` (`userId`),
-  KEY `video_session_participants_isActive_idx` (`isActive`)
+  KEY `video_session_participants_isActive_idx` (`isActive`),
+  KEY `video_session_participants_subscriptionId_idx` (`subscriptionId`),
+  KEY `video_session_participants_quotaUsed_idx` (`quotaUsed`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `video_session_participants`
 --
 
-INSERT INTO `video_session_participants` (`id`, `sessionId`, `userId`, `role`, `joinedAt`, `leftAt`, `duration`, `isActive`, `deviceInfo`, `connectionQuality`, `lastSeen`, `metadata`, `createdAt`, `updatedAt`) VALUES
-('a10cf355-79db-41c8-b474-c55345f5da9f', '528510ba-0420-4223-a3fa-e4aabfd4e9c9', '5b5fbd13-8776-4f96-ada9-091973974873', 'PARTICIPANT', NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, '2025-08-03 22:32:38.731', '2025-08-03 22:32:38.730'),
-('d6c2807d-5cb3-4642-be43-65f5123e229a', '7e069093-62e9-4d4d-b837-6fd8a88210af', '5b5fbd13-8776-4f96-ada9-091973974873', 'PARTICIPANT', '2025-08-04 00:16:36.229', NULL, 0, 1, NULL, NULL, '2025-08-04 00:16:36.229', NULL, '2025-08-03 23:36:34.565', '2025-08-04 00:16:36.229');
+INSERT INTO `video_session_participants` (`id`, `sessionId`, `userId`, `role`, `joinedAt`, `leftAt`, `duration`, `isActive`, `deviceInfo`, `connectionQuality`, `lastSeen`, `metadata`, `createdAt`, `updatedAt`, `attendanceType`, `quotaUsed`, `subscriptionId`) VALUES
+('a10cf355-79db-41c8-b474-c55345f5da9f', '528510ba-0420-4223-a3fa-e4aabfd4e9c9', '5b5fbd13-8776-4f96-ada9-091973974873', 'PARTICIPANT', NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, '2025-08-03 22:32:38.731', '2025-08-03 22:32:38.730', 'REGULAR', 0, NULL),
+('d6c2807d-5cb3-4642-be43-65f5123e229a', '7e069093-62e9-4d4d-b837-6fd8a88210af', '5b5fbd13-8776-4f96-ada9-091973974873', 'PARTICIPANT', '2025-08-04 00:16:36.229', NULL, 0, 1, NULL, NULL, '2025-08-04 00:16:36.229', NULL, '2025-08-03 23:36:34.565', '2025-08-04 00:16:36.229', 'REGULAR', 0, NULL);
 
 -- --------------------------------------------------------
 

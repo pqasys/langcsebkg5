@@ -51,7 +51,7 @@ export async function GET() {
         _count: {
           select: {
             users: true,
-            videoSessions: true,
+            courses: true,
           },
         },
       },

@@ -93,6 +93,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
+import { LiveClassGovernanceService } from '@/lib/live-class-governance-service';
+
 // POST /api/institution/live-classes - Create a new live class for the institution
 export async function POST(request: NextRequest) {
   try {
@@ -136,87 +138,65 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate instructor exists and belongs to this institution
-    const instructor = await prisma.user.findFirst({
-      where: {
-        id: instructorId,
-        institutionId: session.user.institutionId,
-        role: 'INSTRUCTOR',
-      },
-    });
+    // Use governance service to create live class
+    const sessionData = {
+      title,
+      description,
+      sessionType,
+      language,
+      level,
+      maxParticipants: maxParticipants || 10,
+      startTime,
+      endTime,
+      duration: duration || Math.ceil((new Date(endTime).getTime() - new Date(startTime).getTime()) / (1000 * 60)),
+      price: price || 0,
+      currency: currency || 'USD',
+      isPublic: isPublic || false,
+      isRecorded: isRecorded || false,
+      allowChat: allowChat !== false,
+      allowScreenShare: allowScreenShare !== false,
+      allowRecording: allowRecording || false,
+      instructorId,
+      institutionId: session.user.institutionId,
+      courseId,
+      moduleId,
+      features: features ? JSON.parse(JSON.stringify(features)) : null,
+      tags: tags ? JSON.parse(JSON.stringify(tags)) : null,
+      materials: materials ? JSON.parse(JSON.stringify(materials)) : null,
+    };
 
-    if (!instructor) {
+    const result = await LiveClassGovernanceService.createLiveClassWithGovernance(sessionData);
+
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Instructor not found or not associated with this institution' },
-        { status: 404 }
+        { 
+          error: 'Live class creation failed',
+          details: result.errors
+        },
+        { status: 400 }
       );
     }
 
-    // Validate course if provided (must belong to this institution)
-    if (courseId) {
-      const course = await prisma.course.findFirst({
-        where: {
-          id: courseId,
-          institutionId: session.user.institutionId,
+    // Get the created live class with details
+    const liveClass = await prisma.videoSession.findUnique({
+      where: { id: result.sessionId },
+      include: {
+        instructor: {
+          select: { id: true, name: true, email: true }
         },
-      });
-
-      if (!course) {
-        return NextResponse.json(
-          { error: 'Course not found or not associated with this institution' },
-          { status: 404 }
-        );
+        course: {
+          select: { id: true, title: true }
+        }
       }
-    }
-
-    // Create the live class
-    const liveClass = await prisma.videoSession.create({
-      data: {
-        title,
-        description,
-        sessionType,
-        language,
-        level,
-        maxParticipants: maxParticipants || 10,
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
-        duration: duration || Math.ceil((new Date(endTime).getTime() - new Date(startTime).getTime()) / (1000 * 60)),
-        price: price || 0,
-        currency: currency || 'USD',
-        isPublic: isPublic || false,
-        isRecorded: isRecorded || false,
-        allowChat: allowChat !== false,
-        allowScreenShare: allowScreenShare !== false,
-        allowRecording: allowRecording || false,
-        instructorId,
-        institutionId: session.user.institutionId, // Always set to current institution
-        courseId,
-        moduleId,
-        features: features ? JSON.parse(JSON.stringify(features)) : null,
-        tags: tags ? JSON.parse(JSON.stringify(tags)) : null,
-        materials: materials ? JSON.parse(JSON.stringify(materials)) : null,
-      },
     });
 
-    // Get instructor and course details
-    const [instructorDetails, courseDetails] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: liveClass.instructorId },
-        select: { id: true, name: true, email: true },
-      }),
-      liveClass.courseId ? prisma.course.findUnique({
-        where: { id: liveClass.courseId },
-        select: { id: true, title: true },
-      }) : null,
-    ]);
+    const response: any = { ...liveClass };
+    
+    if (result.warnings) {
+      response.warnings = result.warnings;
+    }
 
-    const liveClassWithDetails = {
-      ...liveClass,
-      instructor: instructorDetails,
-      course: courseDetails,
-    };
-
-    return NextResponse.json(liveClassWithDetails, { status: 201 });
+    return NextResponse.json(response, { status: 201 });
   } catch (error) {
     console.error('Error creating live class:', error);
     return NextResponse.json(

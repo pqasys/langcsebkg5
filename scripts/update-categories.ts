@@ -88,7 +88,7 @@ async function updateCategories() {
     console.log('Updating courses with new categories...');
     const courses = await prisma.course.findMany({
       include: {
-        coursetag: {
+        courseTags: {
           include: {
             tag: true
           }
@@ -98,7 +98,7 @@ async function updateCategories() {
 
     for (const course of courses) {
       // Find the primary language tag
-      const languageTag = course.coursetag.find(ct => 
+              const languageTag = course.courseTags.find(ct => 
         languageCategories.map(lc => lc.name).includes(ct.tag.name)
       );
 

@@ -45,41 +45,45 @@ model Institution {
   // Relations
   users user[]
   courses Course[]
-  videoSessions VideoSession[] @relation("VideoSessionInstitution")
-  payments Payment[]
-  commissions InstitutionCommission[]
-  subscriptions InstitutionSubscription[]
 
   @@map("institution")
 }
 
 model Course {
-  id            String           @id @default(uuid()) @db.VarChar(36)
-  title         String           @db.VarChar(100)
-  description   String?          @db.Text
-  duration      Int
-  level         String           @db.VarChar(20)
-  status        String           @db.VarChar(20)
-  institutionId String?          @db.VarChar(36)
-  categoryId    String           @db.VarChar(36)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @default(now()) @updatedAt
-  startDate     DateTime
-  endDate       DateTime
-  maxStudents   Int              @default(15)
-  base_price    Float            @default(0)
-  pricingPeriod String           @default("WEEKLY") @db.VarChar(20)
-  framework     course_framework @default(CEFR)
-  isFeatured    Boolean          @default(false)
-  isSponsored   Boolean          @default(false)
-  priority      Int              @default(0)
+  id                   String           @id @default(uuid()) @db.VarChar(36)
+  title                String           @db.VarChar(100)
+  description          String?          @db.Text
+  duration             Int
+  level                String           @db.VarChar(20)
+  status               String           @db.VarChar(20)
+  institutionId        String?          @db.VarChar(36)
+  categoryId           String           @db.VarChar(36)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @default(now()) @updatedAt
+  startDate            DateTime
+  endDate              DateTime
+  maxStudents          Int              @default(15)
+  base_price           Float            @default(0)
+  pricingPeriod        String           @default("WEEKLY") @db.VarChar(20)
+  framework            course_framework @default(CEFR)
+  isFeatured           Boolean          @default(false)
+  isSponsored          Boolean          @default(false)
+  priority             Int              @default(0)
+  courseType           String           @default("STANDARD")
+  deliveryMode         String           @default("SELF_PACED")
+  enrollmentType       String           @default("COURSE_BASED")
+  isPlatformCourse     Boolean          @default(false)
+  liveClassFrequency   String?
+  liveClassSchedule    Json?
+  requiresSubscription Boolean          @default(false)
+  subscriptionTier     String?
 
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  videoSessions VideoSession[] @relation("VideoSessionCourse")
-  enrollments StudentCourseEnrollment[]
-  completions StudentCourseCompletion[]
+  category category @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   courseTags CourseTag[]
+  videoSessions VideoSession[]
+  enrollments StudentCourseEnrollment[]
 
   @@unique([title, institutionId], map: "Course_title_institutionId_key")
   @@index([categoryId], map: "Course_categoryId_fkey")
@@ -89,6 +93,11 @@ model Course {
   @@index([createdAt], map: "Course_createdAt_idx")
   @@index([institutionId, status], map: "Course_institution_status_idx")
   @@index([createdAt], map: "idx_course_created_at")
+  @@index([courseType])
+  @@index([deliveryMode])
+  @@index([enrollmentType])
+  @@index([isPlatformCourse])
+  @@index([requiresSubscription])
   @@map("course")
 }
 
@@ -108,7 +117,6 @@ model user {
 
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  instructorSessions VideoSession[] @relation("VideoSessionInstructor")
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -156,6 +164,9 @@ model category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
   slug        String   @unique @db.VarChar(50)
+
+  // Relations
+  courses Course[]
 
   @@map("category")
 }
@@ -226,10 +237,6 @@ model Student {
   timezone          String?          @db.VarChar(50)
   website           String?          @db.VarChar(255)
 
-  // Relations
-  enrollments StudentCourseEnrollment[]
-  completions StudentCourseCompletion[]
-
   @@index([email], map: "idx_students_email")
   @@index([native_language])
   @@index([social_visibility])
@@ -238,28 +245,42 @@ model Student {
 }
 
 model StudentCourseEnrollment {
-  id            String    @id @default(cuid())
-  studentId     String
-  courseId      String
-  status        String    @default("PENDING_PAYMENT")
-  progress      Float     @default(0)
-  startDate     DateTime  @default(now())
-  endDate       DateTime?
-  paymentStatus String    @default("PENDING")
-  paymentDate   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  stateVersion  Int       @default(1)
-  version       Int       @default(1)
+  id                    String    @id @default(cuid())
+  studentId             String
+  courseId              String
+  status                String    @default("PENDING_PAYMENT")
+  progress              Float     @default(0)
+  startDate             DateTime  @default(now())
+  endDate               DateTime?
+  paymentStatus         String    @default("PENDING")
+  paymentDate           DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  stateVersion          Int       @default(1)
+  version               Int       @default(1)
+  accessExpiry          DateTime?
+  accessMethod          String    @default("DIRECT")
+  attendanceQuotaUsed   Int       @default(0)
+  enrollmentQuotaUsed   Boolean   @default(false)
+  enrollmentType        String    @default("COURSE_BASED")
+  hasLiveClassAccess    Boolean   @default(false)
+  isActive              Boolean   @default(true)
+  isPlatformCourse      Boolean   @default(false)
+  liveClassAccessExpiry DateTime?
+  subscriptionId        String?
+  subscriptionTier      String?
 
   // Relations
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  payments Payment[]
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([courseId])
   @@index([courseId], map: "idx_enrollment_course_id")
+  @@index([enrollmentType])
+  @@index([accessMethod])
+  @@index([subscriptionId])
+  @@index([isPlatformCourse])
+  @@index([isActive])
   @@map("student_course_enrollments")
 }
 
@@ -270,10 +291,6 @@ model StudentCourseCompletion {
   status    String   @db.VarChar(20)
   studentId String   @db.VarChar(36)
   updatedAt DateTime @default(now()) @updatedAt
-
-  // Relations
-  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([studentId], map: "StudentCourseCompletion_studentId_fkey")
   @@index([courseId], map: "StudentCourseCompletion_courseId_fkey")
@@ -305,10 +322,6 @@ model Payment {
   refundAmount      Float?
   refundedAt        DateTime?
 
-  // Relations
-  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  enrollment StudentCourseEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
   @@index([institutionId])
   @@index([enrollmentId])
   @@index([payoutId])
@@ -324,9 +337,6 @@ model InstitutionCommission {
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  // Relations
-  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([institutionId])
   @@map("institution_commissions")
@@ -344,10 +354,6 @@ model InstitutionSubscription {
   cancellationReason String?
   cancelledAt        DateTime?
   commissionTierId   String
-
-  // Relations
-  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  commissionTier CommissionTier @relation(fields: [commissionTierId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@index([institutionId])
   @@index([status])
@@ -372,9 +378,6 @@ model CommissionTier {
   maxStudents    Int      @default(10)
   maxCourses     Int      @default(5)
   maxTeachers    Int      @default(2)
-
-  // Relations
-  institutionSubscriptions InstitutionSubscription[]
 
   @@map("commission_tiers")
 }
@@ -422,18 +425,33 @@ model InstitutionBillingHistory {
 
 model StudentTier {
   id           String   @id @default(cuid())
-  planType     String   @unique
+  planType     String   @unique // BASIC, PREMIUM, ENTERPRISE
   name         String
   description  String   @db.Text
   price        Float
   currency     String   @default("USD") @db.VarChar(3)
   billingCycle String   @default("MONTHLY") @db.VarChar(20)
-  features     Json
+  
+  // Flexible limits
   maxCourses   Int      @default(5)
-  maxLanguages Int      @default(5)
+  maxLiveClasses Int    @default(10)
+  maxStudents  Int      @default(1) // For instructors
+  maxInstructors Int    @default(1) // For institutions
+  
+  // Features
+  features     Json     // { "hdVideo": true, "recordings": true, "analytics": true }
+  
+  // Governance
+  enrollmentQuota Int   @default(5)
+  attendanceQuota Int   @default(20)
+  gracePeriodDays Int   @default(7)
+  
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  // Relations
+  subscriptions StudentSubscription[]
 
   @@map("student_tiers")
 }
@@ -453,23 +471,39 @@ model StudentTier {
 /// FUTURE MIGRATION: Consider renaming to UserSubscription with userId field
 /// for better clarity and to reflect the actual usage.
 model StudentSubscription {
-  id                 String    @id @default(cuid())
-  studentId          String    @unique
-  status             String    @default("ACTIVE")
-  startDate          DateTime  @default(now())
-  endDate            DateTime
-  autoRenew          Boolean   @default(true)
-  cancellationReason String?
-  cancelledAt        DateTime?
-  metadata           Json?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  studentTierId      String
+  id                   String    @id @default(cuid())
+  studentId            String    @unique
+  status               String    @default("ACTIVE")
+  startDate            DateTime  @default(now())
+  endDate              DateTime
+  autoRenew            Boolean   @default(true)
+  cancellationReason   String?
+  cancelledAt          DateTime?
+  metadata             Json?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  studentTierId        String
+  attendanceQuota      Int       @default(10)
+  canAccessLiveClasses Boolean   @default(false)
+  canAccessRecordings  Boolean   @default(false)
+  canUseHDVideo        Boolean   @default(false)
+  currentEnrollments   Int       @default(0)
+  enrollmentQuota      Int       @default(1)
+  maxActiveCourses     Int       @default(1)
+  maxEnrollments       Int       @default(1)
+  monthlyAttendance    Int       @default(0)
+  monthlyEnrollments   Int       @default(0)
+  planType             String    @default("BASIC")
+
+  // Relations
+  studentTier StudentTier @relation(fields: [studentTierId], references: [id])
 
   @@index([studentId])
   @@index([status])
   @@index([endDate])
   @@index([studentTierId], map: "student_subscriptions_studentTierId_fkey")
+  @@index([planType])
+  @@index([currentEnrollments])
   @@map("student_subscriptions")
 }
 
@@ -533,47 +567,49 @@ model LeadEvent {
 }
 
 model VideoSession {
-  id               String   @id @default(uuid()) @db.VarChar(36)
-  title            String   @db.VarChar(255)
-  description      String?  @db.Text
-  sessionType      String   @db.VarChar(50)
-  language         String   @db.VarChar(10)
-  level            String   @db.VarChar(20)
-  maxParticipants  Int      @default(10)
-  startTime        DateTime
-  endTime          DateTime
-  duration         Int
-  status           String   @default("SCHEDULED") @db.VarChar(20)
-  meetingUrl       String?  @db.VarChar(500)
-  meetingId        String?  @db.VarChar(100)
-  recordingUrl     String?  @db.VarChar(500)
-  instructorId     String   @db.VarChar(36)
-  institutionId    String?  @db.VarChar(36)
-  courseId         String?  @db.VarChar(36)
-  moduleId         String?  @db.VarChar(36)
-  price            Float    @default(0)
-  isPublic         Boolean  @default(false)
-  isRecorded       Boolean  @default(false)
-  allowChat        Boolean  @default(true)
-  allowScreenShare Boolean  @default(true)
-  allowRecording   Boolean  @default(false)
-  metadata         Json?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  currency         String   @default("USD") @db.VarChar(3)
-  features         Json?
-  isBooked         Boolean  @default(false)
-  isCancelled      Boolean  @default(false)
-  isCompleted      Boolean  @default(false)
-  materials        Json?
-  rating           Float?   @db.Float
-  reviews          Int      @default(0)
-  tags             Json?
+  id                 String   @id @default(uuid()) @db.VarChar(36)
+  title              String   @db.VarChar(255)
+  description        String?  @db.Text
+  sessionType        String   @db.VarChar(50)
+  language           String   @db.VarChar(10)
+  level              String   @db.VarChar(20)
+  maxParticipants    Int      @default(10)
+  startTime          DateTime
+  endTime            DateTime
+  duration           Int
+  status             String   @default("SCHEDULED") @db.VarChar(20)
+  meetingUrl         String?  @db.VarChar(500)
+  meetingId          String?  @db.VarChar(100)
+  recordingUrl       String?  @db.VarChar(500)
+  instructorId       String   @db.VarChar(36)
+  institutionId      String?  @db.VarChar(36)
+  courseId           String?  @db.VarChar(36)
+  moduleId           String?  @db.VarChar(36)
+  price              Float    @default(0)
+  isPublic           Boolean  @default(false)
+  isRecorded         Boolean  @default(false)
+  allowChat          Boolean  @default(true)
+  allowScreenShare   Boolean  @default(true)
+  allowRecording     Boolean  @default(false)
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  currency           String   @default("USD") @db.VarChar(3)
+  features           Json?
+  isBooked           Boolean  @default(false)
+  isCancelled        Boolean  @default(false)
+  isCompleted        Boolean  @default(false)
+  materials          Json?
+  rating             Float?   @db.Float
+  reviews            Int      @default(0)
+  tags               Json?
+  isAutoGenerated    Boolean  @default(false)
+  isRecurring        Boolean  @default(false)
+  recurringPatternId String?
+  sessionNumber      Int?
 
   // Relations
-  instructor user @relation("VideoSessionInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
-  institution Institution? @relation("VideoSessionInstitution", fields: [institutionId], references: [id], onDelete: SetNull)
-  course Course? @relation("VideoSessionCourse", fields: [courseId], references: [id], onDelete: SetNull)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   participants VideoSessionParticipant[]
 
   @@index([instructorId])
@@ -584,7 +620,33 @@ model VideoSession {
   @@index([language])
   @@index([level])
   @@index([moduleId], map: "video_sessions_moduleId_fkey")
+  @@index([recurringPatternId])
+  @@index([isRecurring])
   @@map("video_sessions")
+}
+
+model RecurringSessionPattern {
+  id               String   @id @default(uuid()) @db.VarChar(36)
+  courseId         String
+  patternType      String
+  frequency        String
+  dayOfWeek        Int?
+  timeOfDay        String
+  duration         Int
+  timezone         String   @default("UTC")
+  startDate        DateTime
+  endDate          DateTime
+  maxParticipants  Int      @default(10)
+  isPublic         Boolean  @default(false)
+  isRecorded       Boolean  @default(false)
+  allowChat        Boolean  @default(true)
+  allowScreenShare Boolean  @default(true)
+  isActive         Boolean  @default(true)
+  autoGenerate     Boolean  @default(true)
+
+  @@index([courseId])
+  @@index([isActive])
+  @@map("recurring_session_patterns")
 }
 
 model VideoSessionParticipant {
@@ -602,6 +664,9 @@ model VideoSessionParticipant {
   metadata          Json?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime
+  attendanceType    String    @default("REGULAR")
+  quotaUsed         Boolean   @default(false)
+  subscriptionId    String?
 
   // Relations
   session VideoSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -610,6 +675,8 @@ model VideoSessionParticipant {
   @@index([sessionId])
   @@index([userId])
   @@index([isActive])
+  @@index([subscriptionId])
+  @@index([quotaUsed])
   @@map("video_session_participants")
 }
 

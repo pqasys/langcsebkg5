@@ -39,7 +39,11 @@ class Logger {
   private isDevelopment: boolean;
 
   constructor() {
-    this.logLevel = (process.env.LOG_LEVEL as LogLevel) || LogLevel.INFO;
+    const logLevelStr = process.env.LOG_LEVEL;
+    const validLogLevels = ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'];
+    this.logLevel = (logLevelStr && validLogLevels.includes(logLevelStr)) 
+      ? LogLevel[logLevelStr as keyof typeof LogLevel] 
+      : LogLevel.INFO;
     this.isDevelopment = process.env.NODE_ENV === 'development';
   }
 
@@ -94,7 +98,7 @@ class Logger {
     }
   }
 
-  private sendToExternalService(level: LogLevel, message: string, context?: LogContext, error?: Error): void {
+  private sendToExternalService(_level: LogLevel, _message: string, _context?: LogContext, _error?: Error): void {
     // TODO: Implement external logging service integration (see roadmap: 'Security - audit logging system')
     // Examples: DataDog, LogRocket, Sentry, etc.
     // This is where you'd send logs to your preferred service

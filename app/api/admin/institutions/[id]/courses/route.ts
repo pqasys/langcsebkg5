@@ -22,7 +22,7 @@ export async function GET(
       include: {
         courses: {
           include: {
-            coursetag: {
+            courseTags: {
               include: {
                 tag: {
                   select: {

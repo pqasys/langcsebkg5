@@ -80,7 +80,17 @@ const courseFormSchema = z.object({
     message: 'Priority must be a valid number greater than or equal to 0'
   }),
   isFeatured: z.boolean().default(false),
-  isSponsored: z.boolean().default(false)
+  isSponsored: z.boolean().default(false),
+  // New course type fields
+  courseType: z.enum(['STANDARD', 'LIVE_ONLY', 'BLENDED', 'PLATFORM_LIVE']).default('STANDARD'),
+  deliveryMode: z.enum(['SELF_PACED', 'LIVE_ONLY', 'BLENDED', 'PLATFORM_LIVE']).default('SELF_PACED'),
+  enrollmentType: z.enum(['COURSE_BASED', 'SUBSCRIPTION_BASED']).default('COURSE_BASED'),
+  hasLiveClasses: z.boolean().default(false),
+  liveClassType: z.string().optional(),
+  liveClassFrequency: z.string().optional(),
+  requiresSubscription: z.boolean().default(false),
+  subscriptionTier: z.string().optional(),
+  isPlatformCourse: z.boolean().default(false)
 });
 
 type CourseFormData = Omit<z.infer<typeof courseFormSchema>, 'tags'> & { tags: Tag[] };
@@ -133,6 +143,15 @@ export function AdminCourseForm({
     }
     if (!data.categoryId) {
       errors.categoryId = 'Category is required';
+    }
+    if (!data.courseType) {
+      errors.courseType = 'Course type is required';
+    }
+    if (!data.deliveryMode) {
+      errors.deliveryMode = 'Delivery mode is required';
+    }
+    if (!data.enrollmentType) {
+      errors.enrollmentType = 'Enrollment type is required';
     }
     // Institution is optional for platform-wide courses
     if (!data.base_price || isNaN(Number(data.base_price)) || Number(data.base_price) < 0) {
@@ -314,19 +333,222 @@ export function AdminCourseForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => handleFormChange('title', e.target.value)}
+          <Label htmlFor="courseType" className="text-sm font-medium">Course Type *</Label>
+          <Select
+            value={formData.courseType}
+            onValueChange={(value) => handleFormChange('courseType', value)}
             required
-            className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-              errors.title ? 'border-red-500' : ''
-            }`}
-            aria-required="true"
-          />
-          <ErrorMessage field="title" />
+          >
+            <SelectTrigger id="courseType" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+              errors.courseType ? 'border-red-500' : ''
+            }`}>
+              <SelectValue placeholder="Select course type" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="STANDARD">Standard Course</SelectItem>
+              <SelectItem value="LIVE_ONLY">Live-Only Course</SelectItem>
+              <SelectItem value="BLENDED">Blended Course</SelectItem>
+              <SelectItem value="PLATFORM_LIVE">Platform Live Course</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-gray-500">
+            STANDARD: Traditional self-paced courses | LIVE_ONLY: Live classes only | BLENDED: Mix of self-paced and live | PLATFORM_LIVE: Platform-wide live courses
+          </p>
+          <ErrorMessage field="courseType" />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="deliveryMode" className="text-sm font-medium">Delivery Mode *</Label>
+          <Select
+            value={formData.deliveryMode}
+            onValueChange={(value) => handleFormChange('deliveryMode', value)}
+            required
+          >
+            <SelectTrigger id="deliveryMode" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+              errors.deliveryMode ? 'border-red-500' : ''
+            }`}>
+              <SelectValue placeholder="Select delivery mode" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="SELF_PACED">Self-Paced</SelectItem>
+              <SelectItem value="LIVE_ONLY">Live-Only</SelectItem>
+              <SelectItem value="BLENDED">Blended</SelectItem>
+              <SelectItem value="PLATFORM_LIVE">Platform Live</SelectItem>
+            </SelectContent>
+          </Select>
+          <ErrorMessage field="deliveryMode" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="enrollmentType" className="text-sm font-medium">Enrollment Type *</Label>
+          <Select
+            value={formData.enrollmentType}
+            onValueChange={(value) => handleFormChange('enrollmentType', value)}
+            required
+          >
+            <SelectTrigger id="enrollmentType" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+              errors.enrollmentType ? 'border-red-500' : ''
+            }`}>
+              <SelectValue placeholder="Select enrollment type" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="COURSE_BASED">Course-Based</SelectItem>
+              <SelectItem value="SUBSCRIPTION_BASED">Subscription-Based</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-gray-500">
+            COURSE_BASED: One-time purchase | SUBSCRIPTION_BASED: Requires active subscription
+          </p>
+          <ErrorMessage field="enrollmentType" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="hasLiveClasses" className="text-sm font-medium">Has Live Classes</Label>
+          <Select
+            value={formData.hasLiveClasses ? 'true' : 'false'}
+            onValueChange={(value) => handleFormChange('hasLiveClasses', value === 'true')}
+          >
+            <SelectTrigger id="hasLiveClasses" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+              errors.hasLiveClasses ? 'border-red-500' : ''
+            }`}>
+              <SelectValue placeholder="Select if course has live classes" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="true">Yes</SelectItem>
+              <SelectItem value="false">No</SelectItem>
+            </SelectContent>
+          </Select>
+          <ErrorMessage field="hasLiveClasses" />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="isPlatformCourse" className="text-sm font-medium">Is Platform Course</Label>
+          <Select
+            value={formData.isPlatformCourse ? 'true' : 'false'}
+            onValueChange={(value) => handleFormChange('isPlatformCourse', value === 'true')}
+          >
+            <SelectTrigger id="isPlatformCourse" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+              errors.isPlatformCourse ? 'border-red-500' : ''
+            }`}>
+              <SelectValue placeholder="Select if course is platform-wide" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="true">Yes</SelectItem>
+              <SelectItem value="false">No</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-gray-500">
+            Platform courses are available to all users with appropriate subscription
+          </p>
+          <ErrorMessage field="isPlatformCourse" />
+        </div>
+      </div>
+
+      {formData.hasLiveClasses && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="liveClassType" className="text-sm font-medium">Live Class Type</Label>
+            <Select
+              value={formData.liveClassType || ''}
+              onValueChange={(value) => handleFormChange('liveClassType', value)}
+            >
+              <SelectTrigger id="liveClassType" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+                errors.liveClassType ? 'border-red-500' : ''
+              }`}>
+                <SelectValue placeholder="Select live class type" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="LIVE_ONLY">Live-Only</SelectItem>
+                <SelectItem value="BLENDED">Blended</SelectItem>
+                <SelectItem value="PLATFORM_LIVE">Platform Live</SelectItem>
+              </SelectContent>
+            </Select>
+            <ErrorMessage field="liveClassType" />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="liveClassFrequency" className="text-sm font-medium">Live Class Frequency</Label>
+            <Select
+              value={formData.liveClassFrequency || ''}
+              onValueChange={(value) => handleFormChange('liveClassFrequency', value)}
+            >
+              <SelectTrigger id="liveClassFrequency" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+                errors.liveClassFrequency ? 'border-red-500' : ''
+              }`}>
+                <SelectValue placeholder="Select live class frequency" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="WEEKLY">Weekly</SelectItem>
+                <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
+                <SelectItem value="MONTHLY">Monthly</SelectItem>
+                <SelectItem value="CUSTOM">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+            <ErrorMessage field="liveClassFrequency" />
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="requiresSubscription" className="text-sm font-medium">Requires Subscription</Label>
+          <Select
+            value={formData.requiresSubscription ? 'true' : 'false'}
+            onValueChange={(value) => handleFormChange('requiresSubscription', value === 'true')}
+          >
+            <SelectTrigger id="requiresSubscription" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+              errors.requiresSubscription ? 'border-red-500' : ''
+            }`}>
+              <SelectValue placeholder="Select if course requires subscription" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              <SelectItem value="true">Yes</SelectItem>
+              <SelectItem value="false">No</SelectItem>
+            </SelectContent>
+          </Select>
+          <ErrorMessage field="requiresSubscription" />
+        </div>
+
+        {formData.requiresSubscription && (
+          <div className="space-y-2">
+            <Label htmlFor="subscriptionTier" className="text-sm font-medium">Subscription Tier</Label>
+            <Select
+              value={formData.subscriptionTier || ''}
+              onValueChange={(value) => handleFormChange('subscriptionTier', value)}
+            >
+              <SelectTrigger id="subscriptionTier" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+                errors.subscriptionTier ? 'border-red-500' : ''
+              }`}>
+                <SelectValue placeholder="Select subscription tier" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="BASIC">Basic</SelectItem>
+                <SelectItem value="PREMIUM">Premium</SelectItem>
+                <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+              </SelectContent>
+            </Select>
+            <ErrorMessage field="subscriptionTier" />
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => handleFormChange('title', e.target.value)}
+          required
+          className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+            errors.title ? 'border-red-500' : ''
+          }`}
+          aria-required="true"
+        />
+        <ErrorMessage field="title" />
       </div>
 
       <div className="space-y-2">

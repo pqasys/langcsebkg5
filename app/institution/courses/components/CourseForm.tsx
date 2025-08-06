@@ -32,6 +32,16 @@ interface CourseFormData {
   weeklyPrices?: unknown[];
   monthlyPrices?: unknown[];
   price?: string;
+  // New course type fields
+  courseType: 'STANDARD' | 'LIVE_ONLY' | 'BLENDED' | 'PLATFORM_WIDE';
+  deliveryMode: 'SELF_PACED' | 'LIVE_ONLY' | 'BLENDED';
+  enrollmentType: 'COURSE_BASED' | 'SUBSCRIPTION_BASED' | 'PLATFORM_WIDE';
+  hasLiveClasses: boolean;
+  liveClassType: string;
+  liveClassFrequency: string;
+  requiresSubscription: boolean;
+  subscriptionTier: string;
+  isPlatformCourse: boolean;
 }
 
 interface CourseFormProps {
@@ -136,7 +146,17 @@ export function CourseForm({
     base_price: '',
     pricingPeriod: 'FULL_COURSE',
     duration: '',
-    tags: []
+    tags: [],
+    // New course type fields
+    courseType: 'STANDARD',
+    deliveryMode: 'SELF_PACED',
+    enrollmentType: 'COURSE_BASED',
+    hasLiveClasses: false,
+    liveClassType: '',
+    liveClassFrequency: '',
+    requiresSubscription: false,
+    subscriptionTier: '',
+    isPlatformCourse: false
   };
 
   const getFrameworkLevels = (framework: string) => {
@@ -353,6 +373,174 @@ export function CourseForm({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          {/* New Course Classification Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="courseType">Course Type *</Label>
+              <Select
+                value={formData.courseType}
+                onValueChange={(value) => handleFormChange('courseType', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select course type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="STANDARD">Standard Course</SelectItem>
+                  <SelectItem value="LIVE_ONLY">Live-Only Course</SelectItem>
+                  <SelectItem value="BLENDED">Blended Learning</SelectItem>
+                  <SelectItem value="PLATFORM_WIDE">Platform-Wide Course</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">Defines the primary delivery method and scope</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deliveryMode">Delivery Mode *</Label>
+              <Select
+                value={formData.deliveryMode}
+                onValueChange={(value) => handleFormChange('deliveryMode', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select delivery mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SELF_PACED">Self-Paced</SelectItem>
+                  <SelectItem value="LIVE_ONLY">Live-Only</SelectItem>
+                  <SelectItem value="BLENDED">Blended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="enrollmentType">Enrollment Type *</Label>
+              <Select
+                value={formData.enrollmentType}
+                onValueChange={(value) => handleFormChange('enrollmentType', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select enrollment type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="COURSE_BASED">Course-Based</SelectItem>
+                  <SelectItem value="SUBSCRIPTION_BASED">Subscription-Based</SelectItem>
+                  <SelectItem value="PLATFORM_WIDE">Platform-Wide</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">How students can enroll in this course</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="hasLiveClasses">Has Live Classes</Label>
+              <Select
+                value={formData.hasLiveClasses ? 'true' : 'false'}
+                onValueChange={(value) => handleFormChange('hasLiveClasses', value === 'true')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Yes</SelectItem>
+                  <SelectItem value="false">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.hasLiveClasses && (
+              <div className="space-y-2">
+                <Label htmlFor="liveClassType">Live Class Type</Label>
+                <Select
+                  value={formData.liveClassType}
+                  onValueChange={(value) => handleFormChange('liveClassType', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select live class type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INSTITUTION_ONLY">Institution-Only</SelectItem>
+                    <SelectItem value="BLENDED">Blended</SelectItem>
+                    <SelectItem value="PLATFORM_WIDE">Platform-Wide</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {formData.hasLiveClasses && (
+              <div className="space-y-2">
+                <Label htmlFor="liveClassFrequency">Live Class Frequency</Label>
+                <Select
+                  value={formData.liveClassFrequency}
+                  onValueChange={(value) => handleFormChange('liveClassFrequency', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="WEEKLY">Weekly</SelectItem>
+                    <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
+                    <SelectItem value="MONTHLY">Monthly</SelectItem>
+                    <SelectItem value="CUSTOM">Custom Schedule</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="requiresSubscription">Requires Subscription</Label>
+              <Select
+                value={formData.requiresSubscription ? 'true' : 'false'}
+                onValueChange={(value) => handleFormChange('requiresSubscription', value === 'true')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Yes</SelectItem>
+                  <SelectItem value="false">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.requiresSubscription && (
+              <div className="space-y-2">
+                <Label htmlFor="subscriptionTier">Subscription Tier</Label>
+                <Select
+                  value={formData.subscriptionTier}
+                  onValueChange={(value) => handleFormChange('subscriptionTier', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select subscription tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="BASIC">Basic</SelectItem>
+                    <SelectItem value="PREMIUM">Premium</SelectItem>
+                    <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="isPlatformCourse">Is Platform Course</Label>
+              <Select
+                value={formData.isPlatformCourse ? 'true' : 'false'}
+                onValueChange={(value) => handleFormChange('isPlatformCourse', value === 'true')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Yes</SelectItem>
+                  <SelectItem value="false">No</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">Available to all platform users</p>
             </div>
           </div>
           

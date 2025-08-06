@@ -10,7 +10,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Enable Turbopack to prevent webpack chunk loading errors
+  // Enable Turbopack with proper configuration for Next.js 14.2.30
   experimental: {
     turbo: {
       resolveAlias: {
@@ -42,6 +42,17 @@ const nextConfig = {
 
   // Performance optimizations
   swcMinify: true,
+
+  // Webpack configuration for better font handling with Turbopack
+  webpack: (config, { isServer }) => {
+    // Handle font files properly
+    config.module.rules.push({
+      test: /\.(woff|woff2|eot|ttf|otf)$/i,
+      type: 'asset/resource',
+    });
+
+    return config;
+  },
 
 
 

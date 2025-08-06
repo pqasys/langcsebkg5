@@ -13,10 +13,9 @@ import { generateOrganizationStructuredData } from "@/lib/seo-config";
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  preload: true,
+  preload: false, // Disable preloading to avoid Turbopack issues
   fallback: ["system-ui", "arial"],
   variable: "--font-inter",
-  // Turbopack compatibility
   adjustFontFallback: false,
 });
 
@@ -24,7 +23,7 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
   display: "swap",
-  preload: true,
+  preload: false, // Disable preloading to avoid Turbopack issues
   fallback: ["system-ui", "arial"],
   variable: "--font-poppins",
   adjustFontFallback: false,
@@ -139,6 +138,8 @@ export default function RootLayout({
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Fallback Google Fonts for Turbopack compatibility */}
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700&display=swap" />
         <link rel="dns-prefetch" href="//www.google-analytics.com" />
         <link rel="dns-prefetch" href="//www.googletagmanager.com" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

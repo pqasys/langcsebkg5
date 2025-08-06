@@ -55,6 +55,16 @@ interface CourseFormProps {
     tags: { id: string; name: string; color?: string; icon?: string }[];
     pricingPeriod: 'FULL_COURSE' | 'WEEKLY' | 'MONTHLY';
     institutionId: string;
+    // New course type fields
+    courseType: 'STANDARD' | 'LIVE_ONLY' | 'BLENDED' | 'PLATFORM_WIDE';
+    deliveryMode: 'SELF_PACED' | 'LIVE_ONLY' | 'BLENDED';
+    enrollmentType: 'COURSE_BASED' | 'SUBSCRIPTION_BASED' | 'PLATFORM_WIDE';
+    hasLiveClasses: boolean;
+    liveClassType: string;
+    liveClassFrequency: string;
+    requiresSubscription: boolean;
+    subscriptionTier: string;
+    isPlatformCourse: boolean;
   };
   setFormData: (data: unknown) => void;
   categories: unknown[];

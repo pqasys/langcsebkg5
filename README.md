@@ -7,6 +7,10 @@ A comprehensive language learning platform with subscription management, live cl
 ### Architecture
 - [Subscription Architecture](./docs/SUBSCRIPTION_ARCHITECTURE.md) - Current subscription system design and usage
 - [Future Migration Plan](./docs/FUTURE_MIGRATION_PLAN.md) - Planned migration from StudentSubscription to UserSubscription
+- [Live Classes Architecture](./docs/LIVE_CLASSES_ARCHITECTURE.md) - Three-scenario live classes support
+- [Course Enrollment Architecture](./docs/COURSE_ENROLLMENT_ARCHITECTURE.md) - Course discovery and enrollment flows
+- [Subscription Enrollment Governance](./docs/SUBSCRIPTION_ENROLLMENT_GOVERNANCE.md) - Platform-wide enrollment governance
+- [Implementation Summary](./docs/IMPLEMENTATION_SUMMARY.md) - Summary of completed implementation
 
 ### Key Features
 - Multi-user subscription system (students, admins, institution staff, regular users)

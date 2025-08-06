@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { LiveClassGovernanceService } from '@/lib/live-class-governance-service';
 
 // POST /api/student/live-classes/enroll - Enroll in a live class
 export async function POST(request: NextRequest) {
@@ -79,33 +80,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check student's access based on subscription and institution enrollment
-    const [studentSubscription, user] = await Promise.all([
-      prisma.studentSubscription.findUnique({
-        where: { studentId: session.user.id },
-      }),
-      prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { institutionId: true },
-      }),
-    ]);
-
-    // Determine access level
-    const hasSubscription = studentSubscription?.status === 'ACTIVE';
-    const hasInstitutionAccess = user?.institutionId && liveClass.institutionId === user.institutionId;
-
-    // Check if student has access to this live class
-    if (!hasSubscription && !hasInstitutionAccess) {
+    // Use governance service to validate user can join live class
+    const canJoin = await LiveClassGovernanceService.validateUserCanJoinLiveClass(session.user.id, liveClassId);
+    
+    if (!canJoin) {
       return NextResponse.json(
-        { error: 'You need a subscription or institution enrollment to enroll in this live class' },
-        { status: 403 }
-      );
-    }
-
-    // If it's an institution class, verify the student is enrolled in that institution
-    if (liveClass.institutionId && !hasInstitutionAccess) {
-      return NextResponse.json(
-        { error: 'You must be enrolled in this institution to join their live classes' },
+        { error: 'You do not have permission to join this live class. Please check your subscription status and enrollment limits.' },
         { status: 403 }
       );
     }

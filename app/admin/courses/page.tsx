@@ -172,7 +172,17 @@ const resetFormData = (): CourseFormData => ({
   endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
   priority: '0',
   isFeatured: false,
-  isSponsored: false
+  isSponsored: false,
+  // New course type fields
+  courseType: 'STANDARD',
+  deliveryMode: 'SELF_PACED',
+  enrollmentType: 'COURSE_BASED',
+  hasLiveClasses: false,
+  liveClassType: '',
+  liveClassFrequency: '',
+  requiresSubscription: false,
+  subscriptionTier: '',
+  isPlatformCourse: false
 });
 
 function AdminCoursesContent() {
@@ -1093,7 +1103,17 @@ function AdminCoursesContent() {
         institutionId: course.institution.id,
         priority: (course.priority || 0).toString(),
         isFeatured: course.isFeatured || false,
-        isSponsored: course.isSponsored || false
+        isSponsored: course.isSponsored || false,
+        // New course type fields
+        courseType: course.courseType || 'STANDARD',
+        deliveryMode: course.deliveryMode || 'SELF_PACED',
+        enrollmentType: course.enrollmentType || 'COURSE_BASED',
+        hasLiveClasses: course.hasLiveClasses || false,
+        liveClassType: course.liveClassType || '',
+        liveClassFrequency: course.liveClassFrequency || '',
+        requiresSubscription: course.requiresSubscription || false,
+        subscriptionTier: course.subscriptionTier || '',
+        isPlatformCourse: course.isPlatformCourse || false
       };
       
 

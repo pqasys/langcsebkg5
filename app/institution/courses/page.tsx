@@ -56,6 +56,16 @@ interface Course {
   maxStudents: number;
   framework?: string;
   pricingPeriod?: string;
+  // New course type fields
+  courseType?: string;
+  deliveryMode?: string;
+  enrollmentType?: string;
+  hasLiveClasses?: boolean;
+  liveClassType?: string;
+  liveClassFrequency?: string;
+  requiresSubscription?: boolean;
+  subscriptionTier?: string;
+  isPlatformCourse?: boolean;
   _count: {
     bookings: number;
   };
@@ -123,7 +133,17 @@ export default function InstitutionCoursesPage() {
     pricingPeriod: 'FULL_COURSE' as 'FULL_COURSE' | 'WEEKLY' | 'MONTHLY',
     duration: '',
     tags: [],
-    institutionId: session?.user?.institutionId || ''
+    institutionId: session?.user?.institutionId || '',
+    // New course type fields
+    courseType: 'STANDARD' as 'STANDARD' | 'LIVE_ONLY' | 'BLENDED' | 'PLATFORM_WIDE',
+    deliveryMode: 'SELF_PACED' as 'SELF_PACED' | 'LIVE_ONLY' | 'BLENDED',
+    enrollmentType: 'COURSE_BASED' as 'COURSE_BASED' | 'SUBSCRIPTION_BASED' | 'PLATFORM_WIDE',
+    hasLiveClasses: false,
+    liveClassType: '',
+    liveClassFrequency: '',
+    requiresSubscription: false,
+    subscriptionTier: '',
+    isPlatformCourse: false
   });
   const [isWeeklyPricingOpen, setIsWeeklyPricingOpen] = useState(false);
   const [selectedCourseForPricing, setSelectedCourseForPricing] = useState<any>(null);
@@ -299,7 +319,17 @@ export default function InstitutionCoursesPage() {
         color: ct.tag.color,
         icon: ct.tag.icon
       })),
-      institutionId: course.institutionId
+      institutionId: course.institutionId,
+      // New course type fields
+      courseType: course.courseType || 'STANDARD',
+      deliveryMode: course.deliveryMode || 'SELF_PACED',
+      enrollmentType: course.enrollmentType || 'COURSE_BASED',
+      hasLiveClasses: course.hasLiveClasses || false,
+      liveClassType: course.liveClassType || '',
+      liveClassFrequency: course.liveClassFrequency || '',
+      requiresSubscription: course.requiresSubscription || false,
+      subscriptionTier: course.subscriptionTier || '',
+      isPlatformCourse: course.isPlatformCourse || false
     });
     setIsCourseModalOpen(true);
   };
@@ -344,7 +374,17 @@ export default function InstitutionCoursesPage() {
         pricingPeriod: 'FULL_COURSE' as 'FULL_COURSE' | 'WEEKLY' | 'MONTHLY',
         duration: '',
         tags: [],
-        institutionId: session?.user?.institutionId || ''
+        institutionId: session?.user?.institutionId || '',
+        // New course type fields
+        courseType: 'STANDARD' as 'STANDARD' | 'LIVE_ONLY' | 'BLENDED' | 'PLATFORM_WIDE',
+        deliveryMode: 'SELF_PACED' as 'SELF_PACED' | 'LIVE_ONLY' | 'BLENDED',
+        enrollmentType: 'COURSE_BASED' as 'COURSE_BASED' | 'SUBSCRIPTION_BASED' | 'PLATFORM_WIDE',
+        hasLiveClasses: false,
+        liveClassType: '',
+        liveClassFrequency: '',
+        requiresSubscription: false,
+        subscriptionTier: '',
+        isPlatformCourse: false
       });
       setSelectedCourse(null);
     }
