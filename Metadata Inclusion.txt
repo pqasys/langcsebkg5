@@ -1,0 +1,2 @@
+How to include metadata on pages without causing 'use client' directive errors
+I can see that the Course model doesn't have a metadata field

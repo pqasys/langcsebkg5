@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const nextYear = year + 1;
 
     // First, get the prices from next year
-    const nextYearPrices = await prisma.courseWeeklyPrice.findMany({
+    const nextYearPrices = await prisma.course_weekly_prices.findMany({
       where: {
         courseId,
         year: nextYear
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     // Delete any existing prices for current year
-    await prisma.courseWeeklyPrice.deleteMany({
+          await prisma.course_weekly_prices.deleteMany({
       where: {
         courseId,
         year: year
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     // Create new prices for current year based on next year's prices
     const currentYearPrices = await Promise.all(
       nextYearPrices.map(price => 
-        prisma.courseWeeklyPrice.create({
+        prisma.course_weekly_prices.create({
           data: {
             courseId,
             year: year,

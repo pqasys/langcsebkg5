@@ -69,14 +69,18 @@ model Course {
   isFeatured           Boolean          @default(false)
   isSponsored          Boolean          @default(false)
   priority             Int              @default(0)
-  courseType           String           @default("STANDARD")
-  deliveryMode         String           @default("SELF_PACED")
-  enrollmentType       String           @default("COURSE_BASED")
-  isPlatformCourse     Boolean          @default(false)
+  // Simplified course classification
+  hasLiveClasses       Boolean          @default(false)
+  liveClassType        String?
   liveClassFrequency   String?
   liveClassSchedule    Json?
+  isPlatformCourse     Boolean          @default(false)
   requiresSubscription Boolean          @default(false)
   subscriptionTier     String?
+  
+  // Marketing fields
+  marketingType        String           @default("SELF_PACED") @db.VarChar(50)
+  marketingDescription String?          @db.Text
 
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
@@ -93,11 +97,10 @@ model Course {
   @@index([createdAt], map: "Course_createdAt_idx")
   @@index([institutionId, status], map: "Course_institution_status_idx")
   @@index([createdAt], map: "idx_course_created_at")
-  @@index([courseType])
-  @@index([deliveryMode])
-  @@index([enrollmentType])
   @@index([isPlatformCourse])
   @@index([requiresSubscription])
+  @@index([hasLiveClasses])
+  @@index([marketingType])
   @@map("course")
 }
 

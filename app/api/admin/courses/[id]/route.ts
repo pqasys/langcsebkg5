@@ -67,8 +67,8 @@ export async function GET(
       prisma.studentCourseEnrollment.count({ where: { courseId: course.id } }),
       prisma.studentCourseCompletion.count({ where: { courseId: course.id } }),
       prisma.courseTag.count({ where: { courseId: course.id } }),
-      prisma.courseWeeklyPrice.count({ where: { courseId: course.id } }),
-      prisma.coursePricingRule.count({ where: { courseId: course.id } })
+      prisma.course_weekly_prices.count({ where: { courseId: course.id } }),
+      prisma.course_pricing_rules.count({ where: { courseId: course.id } })
     ]);
 
     const courseWithCounts = {
@@ -85,7 +85,6 @@ export async function GET(
     console.log('Course found:', {
       id: courseWithCounts.id,
       title: courseWithCounts.title,
-      weeklyPricesCount: courseWithCounts.weeklyPrices?.length,
       _count: courseWithCounts._count
     });
 

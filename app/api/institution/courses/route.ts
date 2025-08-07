@@ -265,7 +265,7 @@ export async function PUT(req: Request) {
     }
 
     // Update weekly prices year to 2024 if they exist
-    await prisma.courseWeeklyPrice.updateMany({
+            await prisma.course_weekly_prices.updateMany({
       where: {
         courseId: id,
         year: 2025

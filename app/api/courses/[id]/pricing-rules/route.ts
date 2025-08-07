@@ -36,14 +36,14 @@ export async function POST(
     }
 
     // Delete existing rules
-    await prisma.coursePricingRule.deleteMany({
+          await prisma.course_pricing_rules.deleteMany({
       where: {
         courseId
       }
     });
 
     // Create new rules
-    const pricingRules = await prisma.coursePricingRule.createMany({
+          const pricingRules = await prisma.course_pricing_rules.createMany({
       data: rules.map((rule: unknown) => ({
         id: uuidv4(),
         courseId,
@@ -75,7 +75,7 @@ export async function GET(
 
     const courseId = params.id;
 
-    const rules = await prisma.coursePricingRule.findMany({
+    const rules = await prisma.course_pricing_rules.findMany({
       where: {
         courseId
       },

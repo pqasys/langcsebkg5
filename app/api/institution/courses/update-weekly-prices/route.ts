@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const { courseId } = await req.json();
 
     // Update weekly prices year to 2024
-    const updatedPrices = await prisma.courseWeeklyPrice.updateMany({
+    const updatedPrices = await prisma.course_weekly_prices.updateMany({
       where: {
         courseId,
         year: 2025

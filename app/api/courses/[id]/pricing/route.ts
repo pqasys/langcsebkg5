@@ -40,7 +40,7 @@ export async function POST(
     }
 
     // Delete existing prices for the course and year
-    await prisma.courseWeeklyPrice.deleteMany({
+          await prisma.course_weekly_prices.deleteMany({
       where: {
         courseId,
         year
@@ -49,7 +49,7 @@ export async function POST(
 
     // Create new prices
     const now = new Date();
-    const weeklyPrices = await prisma.courseWeeklyPrice.createMany({
+          const weeklyPrices = await prisma.course_weekly_prices.createMany({
       data: prices.map((price: unknown, index: number) => ({
         courseId,
         weekNumber: index + 1,
@@ -102,7 +102,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const prices = await prisma.courseWeeklyPrice.findMany({
+    const prices = await prisma.course_weekly_prices.findMany({
       where: {
         courseId,
         year

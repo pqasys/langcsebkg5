@@ -10,14 +10,14 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Enable Turbopack with proper configuration for Next.js 14.2.30
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        '@': './',
-      },
-    },
-  },
+  // Temporarily disable Turbopack experimental config to fix font issues
+  // experimental: {
+  //   turbo: {
+  //     resolveAlias: {
+  //       '@': './',
+  //     },
+  //   },
+  // },
   
   // Configure trailing slashes to prevent 404s
   trailingSlash: false,

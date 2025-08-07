@@ -16,6 +16,7 @@ import { z } from 'zod';
 const toast = {
   success: (message: string) => console.log('Success:', message),
   error: (message: string) => console.error('Error:', message),
+  info: (message: string) => console.log('Info:', message),
   loading: (message: string) => {
     console.log('Loading:', message);
     return 'toast-id'; // Return a dummy ID for compatibility

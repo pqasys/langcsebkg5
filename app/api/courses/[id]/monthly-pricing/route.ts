@@ -17,7 +17,7 @@ export async function GET(
     const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString());
 
     // Get monthly prices for the course
-    const monthlyPrices = await prisma.courseMonthlyPrice.findMany({
+    const monthlyPrices = await prisma.course_monthly_price.findMany({
       where: {
         courseId: params.id,
         year: year
@@ -58,7 +58,7 @@ export async function POST(
     }
 
     // Delete existing prices for the year
-    await prisma.courseMonthlyPrice.deleteMany({
+          await prisma.course_monthly_price.deleteMany({
       where: {
         courseId: params.id,
         year: year
@@ -66,7 +66,7 @@ export async function POST(
     });
 
     // Create new prices
-    const createdPrices = await prisma.courseMonthlyPrice.createMany({
+          const createdPrices = await prisma.course_monthly_price.createMany({
       data: prices.map((price: unknown) => ({
         courseId: params.id,
         monthNumber: price.monthNumber,

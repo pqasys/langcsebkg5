@@ -32,7 +32,7 @@ export async function PUT(
     // Start a transaction to ensure data consistency
     const result = await prisma.$transaction(async (tx) => {
       // Delete existing prices for the year
-      await tx.courseMonthlyPrice.deleteMany({
+      await tx.course_monthly_price.deleteMany({
         where: {
           courseId: params.id,
           year: year
@@ -40,7 +40,7 @@ export async function PUT(
       });
 
       // Create new prices
-      const monthlyPrices = await tx.courseMonthlyPrice.createMany({
+      const monthlyPrices = await tx.course_monthly_price.createMany({
         data: prices.map((price: unknown) => ({
           id: uuidv4(),
           courseId: params.id,
@@ -56,7 +56,7 @@ export async function PUT(
     });
 
     // Fetch the updated prices
-    const updatedPrices = await prisma.courseMonthlyPrice.findMany({
+    const updatedPrices = await prisma.course_monthly_price.findMany({
       where: {
         courseId: params.id,
         year: year
@@ -113,7 +113,7 @@ export async function GET(
     }
 
     // Fetch monthly prices for the course and year
-    const monthlyPrices = await prisma.courseMonthlyPrice.findMany({
+    const monthlyPrices = await prisma.course_monthly_price.findMany({
       where: {
         courseId: params.id,
         year: year
