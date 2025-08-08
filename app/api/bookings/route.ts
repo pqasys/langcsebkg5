@@ -133,7 +133,7 @@ export async function GET(request: Request) {
     })
 
     // Get institution data for all courses
-    const institutionIds = [...new Set(bookings.map(b => b.course.institutionId))];
+    const institutionIds = [...new Set(bookings.map(b => b.course.institutionId).filter(Boolean))];
     const institutions = await prisma.institution.findMany({
       where: {
         id: {

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 07, 2025 at 05:55 PM
--- Server version: 8.0.31
--- PHP Version: 8.1.13
+-- Generation Time: Aug 08, 2025 at 09:19 AM
+-- Server version: 9.1.0
+-- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -159,7 +159,6 @@ INSERT INTO `category` (`id`, `name`, `description`, `createdAt`, `updatedAt`, `
 ('9a8557e3-bb34-467c-90f8-6c621f338a19', 'Intensive Courses', 'Fast-paced, immersive courses for rapid language acquisition', '2025-06-29 14:33:23.854', '2025-06-29 14:33:23.854', 'intensive-courses'),
 ('8eb1f92f-3786-4017-9af4-6f6ff2babd05', 'Online & Virtual', 'Digital learning programs with flexible scheduling and remote access', '2025-06-29 14:33:23.858', '2025-06-29 14:33:23.858', 'online-virtual'),
 ('ce366ec5-bc1c-45c3-976e-11dd7c69600d', 'Blended Learning', 'Combined online and in-person learning experiences', '2025-06-29 14:33:23.862', '2025-06-29 14:33:23.862', 'blended-learning'),
-('2e5fc4a1-17ea-46df-8255-3bf0f88d25ad', 'Test Category', 'Test category for integration tests', '2025-07-09 20:58:09.629', '2025-07-09 20:58:09.629', 'test-category'),
 ('f38802ff-daee-4361-a92a-9116cd4da630', 'General English', 'Courses for everyday English communication', '2025-07-14 11:19:56.495', '2025-07-14 11:19:56.495', 'general-english'),
 ('67dd6c79-f824-426e-8edc-e78c2d32e85c', 'Business English', 'Courses for professional and business English', '2025-07-14 11:19:56.495', '2025-07-14 11:19:56.495', 'business-english'),
 ('c89ec824-2b38-435f-ae66-1f215663369b', 'Conversation Skills', 'Courses focused on speaking and listening', '2025-07-14 11:19:56.495', '2025-07-14 11:19:56.495', 'conversation-skills'),
@@ -288,14 +287,14 @@ CREATE TABLE IF NOT EXISTS `course` (
   `isSponsored` tinyint(1) NOT NULL DEFAULT '0',
   `priority` int NOT NULL DEFAULT '0',
   `isPlatformCourse` tinyint(1) NOT NULL DEFAULT '0',
-  `liveClassFrequency` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `liveClassFrequency` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `liveClassSchedule` json DEFAULT NULL,
   `requiresSubscription` tinyint(1) NOT NULL DEFAULT '0',
-  `subscriptionTier` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subscriptionTier` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `hasLiveClasses` tinyint(1) NOT NULL DEFAULT '0',
-  `liveClassType` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `marketingDescription` text COLLATE utf8mb4_unicode_ci,
-  `marketingType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SELF_PACED',
+  `liveClassType` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `marketingDescription` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `marketingType` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'SELF_PACED',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Course_title_institutionId_key` (`title`,`institutionId`),
   KEY `Course_categoryId_fkey` (`categoryId`),
@@ -322,11 +321,11 @@ INSERT INTO `course` (`id`, `title`, `description`, `duration`, `level`, `status
 ('78bfbb28-7f43-423d-9454-1910b1fdabcf', 'One-to-One English', 'Our One to One English lessons give you the chance to follow a course that is entirely tailored to your requirements.', 10, 'CEFR_B1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 01:03:25.457', '2025-08-07 17:47:51.627', '2025-07-07 00:00:00.000', '2025-08-29 00:00:00.000', 25, 3500, 'FULL_COURSE', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'One-to-One English - Self-paced learning', 'SELF_PACED'),
 ('12de3567-2474-4760-a8ff-f58d22cde02d', 'English for Academic Purposes', 'English for Academic Purposes (EAP) is an English language course for speakers of other languages. The course is designed to bring English skills to a level that will help students be successful in college courses.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', 'ee97012a-5fca-47df-ab1c-86f4acc180c0', '2025-06-13 12:11:28.930', '2025-08-07 17:47:51.634', '2025-07-07 00:00:00.000', '2025-10-10 00:00:00.000', 15, 3500, 'MONTHLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'English for Academic Purposes - Self-paced learning', 'SELF_PACED'),
 ('9c8dc68e-b7b7-4362-b4cc-c3913682b4a8', 'IELTS Exam Preparation', 'The IELTS (International English Language Testing Systems) exam is a good choice if you\'re preparing to study or work in an English-speaking country....', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:18:22.744', '2025-08-07 17:47:51.641', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 25, 720, 'MONTHLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'IELTS Exam Preparation - Self-paced learning', 'SELF_PACED'),
-('c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'Cambridge Exams Preparation - CPE', 'The Cambridge examinations are recognised worldwide as a proof of your English language ability. They can be useful when applying for jobs where English Language competence is assessed, and, in some cases, for universities.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:32:01.989', '2025-08-07 17:47:51.648', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 270, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'Cambridge Exams Preparation - CPE - Self-paced learning', 'SELF_PACED'),
+('c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'Cambridge Exams Preparation - CPE', 'The Cambridge examinations are recognised worldwide as a proof of your English language ability. They can be useful when applying for jobs where English Language competence is assessed, and, in some cases, for universities.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:32:01.989', '2025-08-07 22:33:12.228', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 270, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, 'null', 0, NULL, 0, NULL, NULL, 'IN_PERSON'),
 ('7e806add-bd45-43f6-a28f-fb736707653c', 'Conversation & Pronunciation', 'Our Conversation and Pronunciation classes take place in small groups to allow as much speaking time as possible.', 10, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 17:12:21.300', '2025-08-07 17:47:51.655', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 100, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'Conversation & Pronunciation - Self-paced learning', 'SELF_PACED'),
 ('6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'General French', 'Learn French in the heart of London on this lively interactive course for beginners. The course will be taught in French, with an emphasis on developing your speaking and listening skills.', 12, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-07-26 15:47:30.135', '2025-08-07 17:47:51.903', '2025-09-01 00:00:00.000', '2025-11-21 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'General French - Self-paced learning', 'SELF_PACED'),
 ('21058bb2-c9f3-4af1-90fc-235b350f5718', 'Advanced Spanish Conversation - Live Classes', 'Master Spanish conversation through interactive live sessions with native speakers. This intensive course features real-time practice, immediate feedback, and cultural immersion.', 12, 'ADVANCED', 'ACTIVE', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.203', '2025-08-07 17:47:51.917', '2024-02-01 00:00:00.000', '2024-04-30 00:00:00.000', 15, 299.99, 'WEEKLY', 'CEFR', 0, 0, 0, 0, 'WEEKLY', '{\"time\": \"19:00\", \"duration\": 90, \"timezone\": \"UTC-5\", \"dayOfWeek\": \"Wednesday\"}', 0, NULL, 1, 'CONVERSATION', 'Advanced Spanish Conversation - Live Classes - Interactive live conversation practice', 'LIVE_ONLINE'),
-('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'INTERMEDIATE', 'ACTIVE', NULL, 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-07 17:47:51.941', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 0, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', '{\"time\": \"14:00\", \"duration\": 120, \"timezone\": \"UTC\", \"dayOfWeek\": \"Saturday\"}', 1, 'PREMIUM', 1, 'COMPREHENSIVE', 'Global English Mastery - Live Platform Course - Live interactive sessions with global participants', 'LIVE_ONLINE');
+('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'CEFR_B1', 'PUBLISHED', NULL, 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-07 22:31:55.140', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 0, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', 'null', 1, 'PREMIUM', 1, 'COMPREHENSIVE', NULL, 'LIVE_ONLINE');
 
 -- --------------------------------------------------------
 
@@ -374,10 +373,10 @@ INSERT INTO `coursetag` (`id`, `courseId`, `tagId`, `createdAt`, `updatedAt`) VA
 ('e9fa0552-936f-4b43-ab0c-ae68f76580d4', '78bfbb28-7f43-423d-9454-1910b1fdabcf', '6724fbd1-241f-4ba5-9d5a-c2036d94b8fd', '2025-07-12 01:00:24.865', '2025-07-12 01:00:24.865'),
 ('a9be82d4-ba7f-415b-a771-1e7e42ba79dc', '78bfbb28-7f43-423d-9454-1910b1fdabcf', '65c262ee-43e8-46e8-9be6-06c650a42d5e', '2025-07-12 01:00:24.865', '2025-07-12 01:00:24.865'),
 ('8b364015-c0cb-4e48-b685-a3be20479dad', '78bfbb28-7f43-423d-9454-1910b1fdabcf', '4ad8fe74-dcb5-4a65-8184-a956b7c73d8c', '2025-07-12 01:00:24.865', '2025-07-12 01:00:24.865'),
-('ce0110c4-f4ad-42f7-9b9e-5a2b52e8f770', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', '4ad8fe74-dcb5-4a65-8184-a956b7c73d8c', '2025-07-12 00:54:55.427', '2025-07-12 00:54:55.427'),
-('3c151ba8-7824-483c-87d2-5a65bf0626a1', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', '59a2614b-9279-46ca-a1d9-1e068f05dd96', '2025-07-12 00:54:55.427', '2025-07-12 00:54:55.427'),
-('01342467-5dce-490d-be1d-067f5ffcb53e', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', '65c262ee-43e8-46e8-9be6-06c650a42d5e', '2025-07-12 00:54:55.427', '2025-07-12 00:54:55.427'),
-('5f1e6664-2514-4a55-a375-11d1ad0e586b', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'c7306dac-83f1-44d4-afbd-5719e1fdad5b', '2025-07-12 00:54:55.427', '2025-07-12 00:54:55.427'),
+('836aefef-6a4c-49f3-acb0-244ed840ed70', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', '4ad8fe74-dcb5-4a65-8184-a956b7c73d8c', '2025-08-07 22:33:12.228', '2025-08-07 22:33:12.228'),
+('71cb428f-c1e8-49d7-81cb-81bc6e16f166', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'c7306dac-83f1-44d4-afbd-5719e1fdad5b', '2025-08-07 22:33:12.228', '2025-08-07 22:33:12.228'),
+('465144b1-4d19-4f45-88ca-665e73066dbe', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', '65c262ee-43e8-46e8-9be6-06c650a42d5e', '2025-08-07 22:33:12.228', '2025-08-07 22:33:12.228'),
+('4685d441-7d92-483e-888c-4c65a34ade12', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', '59a2614b-9279-46ca-a1d9-1e068f05dd96', '2025-08-07 22:33:12.228', '2025-08-07 22:33:12.228'),
 ('298b331a-0eed-4d35-af0a-0d730ae9f106', '7e806add-bd45-43f6-a28f-fb736707653c', '6724fbd1-241f-4ba5-9d5a-c2036d94b8fd', '2025-07-12 00:31:03.308', '2025-07-12 00:31:03.308'),
 ('337d4ffe-7ef3-4931-9475-143cf96f2dae', '7e806add-bd45-43f6-a28f-fb736707653c', '4ad8fe74-dcb5-4a65-8184-a956b7c73d8c', '2025-07-12 00:31:03.308', '2025-07-12 00:31:03.308'),
 ('6b2d8bea-1403-4636-ba77-7797e9c1c3af', '7e806add-bd45-43f6-a28f-fb736707653c', '488913d7-8108-4926-a49e-c768d63f1bd6', '2025-07-12 00:31:03.308', '2025-07-12 00:31:03.308'),
@@ -398,7 +397,10 @@ INSERT INTO `coursetag` (`id`, `courseId`, `tagId`, `createdAt`, `updatedAt`) VA
 ('e0b8538b-97fd-43c4-981b-354f758515cc', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', '048f677e-0e5b-4704-9415-19d10a5be921', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442'),
 ('de64acf9-dd9f-485b-b331-f55ec62c2be5', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'dda75544-c43a-422b-a994-748e396be685', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442'),
 ('486a1eac-a237-4995-a65f-bf06fb67bed8', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', '67b01751-5587-4230-8d8c-118da2270485', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442'),
-('260f4f3f-3f2c-49e1-af44-ca8f44d397f0', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', '6724fbd1-241f-4ba5-9d5a-c2036d94b8fd', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442');
+('260f4f3f-3f2c-49e1-af44-ca8f44d397f0', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', '6724fbd1-241f-4ba5-9d5a-c2036d94b8fd', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442'),
+('23555852-951a-47b5-b56c-73378a46228a', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', '67b01751-5587-4230-8d8c-118da2270485', '2025-08-07 22:31:55.140', '2025-08-07 22:31:55.140'),
+('4c4633e1-cc94-4f29-a2af-7e3d7ec7649f', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'dda75544-c43a-422b-a994-748e396be685', '2025-08-07 22:31:55.140', '2025-08-07 22:31:55.140'),
+('d3c32a10-abbf-4482-ba06-b231a76d6f04', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', '048f677e-0e5b-4704-9415-19d10a5be921', '2025-08-07 22:31:55.140', '2025-08-07 22:31:55.140');
 
 -- --------------------------------------------------------
 
@@ -2605,14 +2607,14 @@ CREATE TABLE IF NOT EXISTS `rate_limit_logs` (
 
 DROP TABLE IF EXISTS `recurring_session_patterns`;
 CREATE TABLE IF NOT EXISTS `recurring_session_patterns` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `courseId` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `patternType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `frequency` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `courseId` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `patternType` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frequency` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `dayOfWeek` int DEFAULT NULL,
-  `timeOfDay` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `timeOfDay` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `duration` int NOT NULL,
-  `timezone` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UTC',
+  `timezone` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UTC',
   `startDate` datetime(3) NOT NULL,
   `endDate` datetime(3) NOT NULL,
   `maxParticipants` int NOT NULL DEFAULT '10',
@@ -2788,16 +2790,16 @@ CREATE TABLE IF NOT EXISTS `student_course_enrollments` (
   `stateVersion` int NOT NULL DEFAULT '1',
   `version` int NOT NULL DEFAULT '1',
   `accessExpiry` datetime(3) DEFAULT NULL,
-  `accessMethod` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DIRECT',
+  `accessMethod` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DIRECT',
   `attendanceQuotaUsed` int NOT NULL DEFAULT '0',
   `enrollmentQuotaUsed` tinyint(1) NOT NULL DEFAULT '0',
-  `enrollmentType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'COURSE_BASED',
+  `enrollmentType` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'COURSE_BASED',
   `hasLiveClassAccess` tinyint(1) NOT NULL DEFAULT '0',
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `isPlatformCourse` tinyint(1) NOT NULL DEFAULT '0',
   `liveClassAccessExpiry` datetime(3) DEFAULT NULL,
-  `subscriptionId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `subscriptionTier` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subscriptionId` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subscriptionTier` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `student_course_enrollments_studentId_idx` (`studentId`),
   KEY `student_course_enrollments_courseId_idx` (`courseId`),
@@ -2949,7 +2951,7 @@ CREATE TABLE IF NOT EXISTS `student_subscriptions` (
   `maxEnrollments` int NOT NULL DEFAULT '1',
   `monthlyAttendance` int NOT NULL DEFAULT '0',
   `monthlyEnrollments` int NOT NULL DEFAULT '0',
-  `planType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'BASIC',
+  `planType` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'BASIC',
   PRIMARY KEY (`id`),
   UNIQUE KEY `student_subscriptions_studentId_key` (`studentId`),
   KEY `student_subscriptions_studentId_idx` (`studentId`),
@@ -3199,7 +3201,10 @@ INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`,
 ('1cd8b0b9-7976-4fb4-bff8-a47982da2d8a', 'Emma Rodriguez', 'emma.rodriguez@example.com', NULL, NULL, '$2b$10$FP35FMCtoCTFCNnXhSFjk.KtZfmjUmPkMIHC80ga7cbVEfjASPi.C', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.530', '2025-08-02 02:28:34.530', 'ACTIVE', 0),
 ('57e9928e-4118-4563-aea4-57b0136c52cd', 'Dr. Maria Garcia', 'maria.garcia@example.com', NULL, NULL, '$2b$10$jI640yfalClNogPqPLAKiuPptasY33GVOb.b2loVuyGMGzc.HopRi', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.085', '2025-08-02 02:36:48.085', 'ACTIVE', 0),
 ('94dfaf16-10eb-4918-a129-185e8da28473', 'Prof. David Kim', 'david.kim@example.com', NULL, NULL, '$2b$10$dvWH82LLeOqqghNy5CNZvu9ECoWgY.w2gUFBq9rdeltXjH7VHXypm', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.164', '2025-08-02 02:36:48.164', 'ACTIVE', 0),
-('0339a71c-92d8-4e75-9c28-62d394d041af', 'Dr. Lisa Thompson', 'lisa.thompson@example.com', NULL, NULL, '$2b$10$UTmAQ7w5Hevq460xirr/M.SVsB2VqC5a67Yyc20lk/BzqC3ztq.Ce', 'INSTRUCTOR', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-08-02 02:36:48.235', '2025-08-02 02:36:48.235', 'ACTIVE', 0);
+('0339a71c-92d8-4e75-9c28-62d394d041af', 'Dr. Lisa Thompson', 'lisa.thompson@example.com', NULL, NULL, '$2b$10$UTmAQ7w5Hevq460xirr/M.SVsB2VqC5a67Yyc20lk/BzqC3ztq.Ce', 'INSTRUCTOR', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-08-02 02:36:48.235', '2025-08-02 02:36:48.235', 'ACTIVE', 0),
+('16fbfb4b-3854-4091-bbbe-5355e5ec2b3c', 'Test Admin', 'integration.test.admin@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'ADMIN', NULL, '2025-08-08 00:09:00.359', '2025-08-08 00:09:00.359', 'ACTIVE', 0),
+('be41ba5f-4ebf-4f8e-9344-009646ab3283', 'Test Student', 'integration.test.student@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.366', '2025-08-08 00:09:00.366', 'ACTIVE', 0),
+('5b56f446-0ec4-415d-b8b1-c2dd86ba0958', 'Test Institution', 'test@institution.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'INSTITUTION', NULL, '2025-08-08 00:09:00.368', '2025-08-08 00:09:00.368', 'ACTIVE', 0);
 
 -- --------------------------------------------------------
 
@@ -3247,7 +3252,7 @@ CREATE TABLE IF NOT EXISTS `video_sessions` (
   `tags` json DEFAULT NULL,
   `isAutoGenerated` tinyint(1) NOT NULL DEFAULT '0',
   `isRecurring` tinyint(1) NOT NULL DEFAULT '0',
-  `recurringPatternId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recurringPatternId` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sessionNumber` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `video_sessions_instructorId_idx` (`instructorId`),
@@ -3349,9 +3354,9 @@ CREATE TABLE IF NOT EXISTS `video_session_participants` (
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
-  `attendanceType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'REGULAR',
+  `attendanceType` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'REGULAR',
   `quotaUsed` tinyint(1) NOT NULL DEFAULT '0',
-  `subscriptionId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subscriptionId` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `video_session_participants_sessionId_userId_key` (`sessionId`,`userId`),
   KEY `video_session_participants_sessionId_idx` (`sessionId`),

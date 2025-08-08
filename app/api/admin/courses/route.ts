@@ -159,16 +159,17 @@ export async function POST(request: Request) {
       startDate,
       endDate,
       maxStudents,
-      // New course type fields
-      courseType,
-      deliveryMode,
-      enrollmentType,
+      // Simplified course classification fields
       hasLiveClasses,
       liveClassType,
       liveClassFrequency,
+      liveClassSchedule,
+      isPlatformCourse,
       requiresSubscription,
       subscriptionTier,
-      isPlatformCourse
+      // Marketing fields
+      marketingType,
+      marketingDescription
     } = body;
 
     // Validate required fields
@@ -217,16 +218,17 @@ export async function POST(request: Request) {
         startDate: startDate ? new Date(startDate) : new Date(),
         endDate: endDate ? new Date(endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         maxStudents: parseInt(maxStudents) || 30,
-        // New course type fields
-        courseType: courseType || 'STANDARD',
-        deliveryMode: deliveryMode || 'SELF_PACED',
-        enrollmentType: enrollmentType || 'COURSE_BASED',
+        // Simplified course classification fields
         hasLiveClasses: hasLiveClasses || false,
         liveClassType: liveClassType || null,
         liveClassFrequency: liveClassFrequency || null,
+        liveClassSchedule: liveClassSchedule || null,
+        isPlatformCourse: isPlatformCourse || false,
         requiresSubscription: requiresSubscription || false,
         subscriptionTier: subscriptionTier || null,
-        isPlatformCourse: isPlatformCourse || false,
+        // Marketing fields
+        marketingType: marketingType || 'SELF_PACED',
+        marketingDescription: marketingDescription || null,
         courseTags: {
           create: tags?.map((tag: { id: string }) => ({
             tagId: tag.id

@@ -27,7 +27,10 @@ export async function GET() {
     });
 
     // Get all institutions in one query
-    const institutionIds = coursesByCountry.map(group => group.institutionId);
+    const institutionIds = coursesByCountry
+      .map(group => group.institutionId)
+      .filter((id): id is string => id !== null); // Filter out null values
+    
     const institutions = await prisma.institution.findMany({
       where: {
         id: { in: institutionIds }

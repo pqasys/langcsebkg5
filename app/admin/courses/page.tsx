@@ -149,7 +149,7 @@ const courseFormSchema = z.object({
     name: z.string()
   })),
   pricingPeriod: z.enum(['FULL_COURSE', 'WEEKLY', 'MONTHLY']),
-  institutionId: z.string().min(1, 'Institution is required')
+  institutionId: z.string().optional()
 });
 
 type CourseFormData = z.infer<typeof courseFormSchema>;
@@ -1073,7 +1073,8 @@ function AdminCoursesContent() {
         throw new Error(`Course "${course.title}" is missing category information. This is a data integrity issue that needs to be resolved.`);
       }
       
-      if (!course.institution || !course.institution.id) {
+      // For platform courses, institution can be null
+      if (!course.isPlatformCourse && (!course.institution || !course.institution.id)) {
         throw new Error(`Course "${course.title}" is missing institution information. This is a data integrity issue that needs to be resolved.`);
       }
       
@@ -1100,7 +1101,7 @@ function AdminCoursesContent() {
         endDate: new Date(course.endDate).toISOString().split('T')[0],
         maxStudents: course.maxStudents.toString(),
         duration: course.duration.toString(),
-        institutionId: course.institution.id,
+        institutionId: course.isPlatformCourse ? '' : course.institution?.id || '',
         priority: (course.priority || 0).toString(),
         isFeatured: course.isFeatured || false,
         isSponsored: course.isSponsored || false,

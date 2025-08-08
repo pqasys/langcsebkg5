@@ -56,25 +56,36 @@ export async function POST(request: NextRequest) {
       }
     };
     
-    // Set session cookie manually
+    // Create a JWT token using NextAuth.js
+    const token = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      institutionId: user.institution?.id || null,
+      status: user.status,
+      institutionApproved: user.institution?.isApproved || false,
+    };
+
     const response = NextResponse.json({
       success: true,
       session: sessionData,
       message: 'Authentication successful'
     });
-    
-    // Set a custom session token cookie
-    const sessionToken = `custom-session-${user.id}-${Date.now()}`;
-    response.cookies.set('next-auth.session-token', sessionToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-    });
-    
-    console.log('Session token set:', sessionToken);
-    
+
+    // Set the session cookie
+    response.cookies.set(
+      'custom-session-token',
+      JSON.stringify(token),
+      {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+      }
+    );
+
     return response;
     
   } catch (error) {

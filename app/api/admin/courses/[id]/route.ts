@@ -152,16 +152,17 @@ export async function PUT(
         endDate: data.endDate ? new Date(data.endDate) : null,
         maxStudents: parseInt(data.maxStudents) || 0,
         pricingPeriod: data.pricingPeriod || 'FULL_COURSE',
-        // New course type fields
-        courseType: data.courseType || 'STANDARD',
-        deliveryMode: data.deliveryMode || 'SELF_PACED',
-        enrollmentType: data.enrollmentType || 'COURSE_BASED',
+        // Simplified course classification fields
         hasLiveClasses: data.hasLiveClasses || false,
         liveClassType: data.liveClassType || null,
         liveClassFrequency: data.liveClassFrequency || null,
+        liveClassSchedule: data.liveClassSchedule || null,
+        isPlatformCourse: data.isPlatformCourse || false,
         requiresSubscription: data.requiresSubscription || false,
         subscriptionTier: data.subscriptionTier || null,
-        isPlatformCourse: data.isPlatformCourse || false,
+        // Marketing fields
+        marketingType: data.marketingType || 'SELF_PACED',
+        marketingDescription: data.marketingDescription || null,
         // Update tags
         courseTags: {
           deleteMany: {},

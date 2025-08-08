@@ -13,83 +13,142 @@ export async function GET() {
 
     // Get subscription counts
     const totalSubscriptions = await prisma.institutionSubscription.count();
-    const activeSubscriptions = await prisma.institutionSubscription.count({
+    const activeSubscriptionCount = await prisma.institutionSubscription.count({
       where: { status: 'ACTIVE' }
     });
 
+    // Get all active subscriptions
+    const activeSubscriptionList = await prisma.institutionSubscription.findMany({
+      where: { status: 'ACTIVE' }
+    });
+
+    // Get commission tiers for active subscriptions
+    const commissionTierIds = [...new Set(activeSubscriptionList.map(s => s.commissionTierId))];
+    const activeTiers = await prisma.commissionTier.findMany({
+      where: { id: { in: commissionTierIds } }
+    });
+
+    // Create lookup map
+    const commissionTierMap = new Map(activeTiers.map(tier => [tier.id, tier]));
+
     // Calculate monthly and annual revenue
-    const monthlySubscriptions = await prisma.institutionSubscription.findMany({
-      where: {
-        status: 'ACTIVE',
-        commissionTier: {
-          billingCycle: 'MONTHLY'
-        }
-      },
-      include: {
-        commissionTier: true
-      }
+    const monthlySubscriptions = activeSubscriptionList.filter(sub => {
+      const tier = commissionTierMap.get(sub.commissionTierId);
+      return tier?.billingCycle === 'MONTHLY';
     });
 
-    const annualSubscriptions = await prisma.institutionSubscription.findMany({
-      where: {
-        status: 'ACTIVE',
-        commissionTier: {
-          billingCycle: 'ANNUAL'
-        }
-      },
-      include: {
-        commissionTier: true
-      }
+    const annualSubscriptions = activeSubscriptionList.filter(sub => {
+      const tier = commissionTierMap.get(sub.commissionTierId);
+      return tier?.billingCycle === 'ANNUAL';
     });
 
-    const monthlyRevenue = monthlySubscriptions.reduce((sum, sub) => sum + sub.commissionTier.price, 0);
-    const annualRevenue = annualSubscriptions.reduce((sum, sub) => sum + sub.commissionTier.price, 0);
+    const monthlyRevenue = monthlySubscriptions.reduce((sum, sub) => {
+      const tier = commissionTierMap.get(sub.commissionTierId);
+      return sum + (tier?.price || 0);
+    }, 0);
+    const annualRevenue = annualSubscriptions.reduce((sum, sub) => {
+      const tier = commissionTierMap.get(sub.commissionTierId);
+      return sum + (tier?.price || 0);
+    }, 0);
 
     // Calculate average commission rate
-    const commissionTiers = await prisma.commissionTier.findMany({
+    const allCommissionTiers = await prisma.commissionTier.findMany({
       where: { isActive: true }
     });
 
-    const averageCommissionRate = commissionTiers.length > 0 
-      ? commissionTiers.reduce((sum, tier) => sum + tier.commissionRate, 0) / commissionTiers.length
+    const averageCommissionRate = allCommissionTiers.length > 0 
+      ? allCommissionTiers.reduce((sum, tier) => sum + tier.commissionRate, 0) / allCommissionTiers.length
       : 0;
 
     // Get top performing institutions
-    const topPerformingInstitutions = await prisma.institution.findMany({
-      include: {
-        subscription: {
-          include: {
-            commissionTier: true
-          }
-        },
-        courses: {
-          include: {
-            enrollments: {
-              include: {
-                payments: {
-                  where: { status: 'COMPLETED' }
-                }
-              }
-            }
-          }
-        }
+    const institutions = await prisma.institution.findMany({
+      select: {
+        id: true,
+        name: true
       }
     });
 
-    const institutionsWithRevenue = topPerformingInstitutions
+    // Get subscriptions for institutions
+    const institutionSubscriptions = await prisma.institutionSubscription.findMany({
+      where: {
+        institutionId: { in: institutions.map(inst => inst.id) }
+      }
+    });
+
+    // Get courses for institutions
+    const institutionCourses = await prisma.course.findMany({
+      where: {
+        institutionId: { in: institutions.map(inst => inst.id) }
+      },
+      select: {
+        id: true,
+        institutionId: true
+      }
+    });
+
+    // Get enrollments for courses
+    const courseIds = institutionCourses.map(course => course.id);
+    const enrollments = courseIds.length > 0 ? await prisma.studentCourseEnrollment.findMany({
+      where: {
+        courseId: { in: courseIds }
+      },
+      select: {
+        id: true,
+        courseId: true
+      }
+    }) : [];
+
+    // Get payments for enrollments
+    const enrollmentIds = enrollments.map(enrollment => enrollment.id);
+    const payments = enrollmentIds.length > 0 ? await prisma.payment.findMany({
+      where: {
+        enrollmentId: { in: enrollmentIds },
+        status: 'COMPLETED'
+      },
+      select: {
+        amount: true,
+        enrollmentId: true
+      }
+    }) : [];
+
+    // Create lookup maps
+    const subscriptionMap = new Map(institutionSubscriptions.map(sub => [sub.institutionId, sub]));
+    const courseMap = new Map(institutionCourses.map(course => [course.id, course]));
+    const enrollmentMap = new Map(enrollments.map(enrollment => [enrollment.id, enrollment]));
+    const paymentMap = new Map();
+    payments.forEach(payment => {
+      if (!paymentMap.has(payment.enrollmentId)) {
+        paymentMap.set(payment.enrollmentId, []);
+      }
+      paymentMap.get(payment.enrollmentId).push(payment);
+    });
+
+    const institutionsWithRevenue = institutions
       .map(institution => {
-        const totalRevenue = institution.courses.reduce((sum, course) => {
-          return sum + course.enrollments.reduce((enrollmentSum, enrollment) => {
-            return enrollmentSum + enrollment.payments.reduce((paymentSum, payment) => {
-              return paymentSum + payment.amount;
-            }, 0);
-          }, 0);
+        // Get courses for this institution
+        const institutionCourseIds = institutionCourses
+          .filter(course => course.institutionId === institution.id)
+          .map(course => course.id);
+
+        // Get enrollments for these courses
+        const courseEnrollmentIds = enrollments
+          .filter(enrollment => institutionCourseIds.includes(enrollment.courseId))
+          .map(enrollment => enrollment.id);
+
+        // Calculate total revenue
+        const totalRevenue = courseEnrollmentIds.reduce((sum, enrollmentId) => {
+          const enrollmentPayments = paymentMap.get(enrollmentId) || [];
+          return sum + enrollmentPayments.reduce((paymentSum, payment) => paymentSum + payment.amount, 0);
         }, 0);
+
+        // Get subscription commission rate
+        const subscription = subscriptionMap.get(institution.id);
+        const commissionRate = subscription ? commissionTierMap.get(subscription.commissionTierId)?.commissionRate || 0 : 0;
 
         return {
           name: institution.name,
           revenue: totalRevenue,
-          commissionRate: institution.subscription?.commissionTier?.commissionRate || 0
+          commissionRate
         };
       })
       .filter(inst => inst.revenue > 0)
@@ -98,7 +157,7 @@ export async function GET() {
 
     return NextResponse.json({
       totalSubscriptions,
-      activeSubscriptions,
+      activeSubscriptions: activeSubscriptionCount,
       monthlyRevenue,
       annualRevenue,
       averageCommissionRate: Math.round(averageCommissionRate * 100) / 100,

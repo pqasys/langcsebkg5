@@ -32,16 +32,21 @@ interface CourseFormData {
   weeklyPrices?: unknown[];
   monthlyPrices?: unknown[];
   price?: string;
-  // New course type fields
-  courseType: 'STANDARD' | 'LIVE_ONLY' | 'BLENDED' | 'PLATFORM_WIDE';
-  deliveryMode: 'SELF_PACED' | 'LIVE_ONLY' | 'BLENDED';
-  enrollmentType: 'COURSE_BASED' | 'SUBSCRIPTION_BASED' | 'PLATFORM_WIDE';
+  // Simplified course classification fields
   hasLiveClasses: boolean;
   liveClassType: string;
   liveClassFrequency: string;
+  liveClassSchedule?: {
+    dayOfWeek?: string;
+    time?: string;
+    timezone?: string;
+  };
+  isPlatformCourse: boolean;
   requiresSubscription: boolean;
   subscriptionTier: string;
-  isPlatformCourse: boolean;
+  // Marketing fields
+  marketingType: 'IN_PERSON' | 'LIVE_ONLINE' | 'SELF_PACED' | 'BLENDED';
+  marketingDescription?: string;
 }
 
 interface CourseFormProps {
@@ -147,16 +152,17 @@ export function CourseForm({
     pricingPeriod: 'FULL_COURSE',
     duration: '',
     tags: [],
-    // New course type fields
-    courseType: 'STANDARD',
-    deliveryMode: 'SELF_PACED',
-    enrollmentType: 'COURSE_BASED',
+    // Simplified course classification fields
     hasLiveClasses: false,
     liveClassType: '',
     liveClassFrequency: '',
+    liveClassSchedule: undefined,
+    isPlatformCourse: false,
     requiresSubscription: false,
     subscriptionTier: '',
-    isPlatformCourse: false
+    // Marketing fields
+    marketingType: 'IN_PERSON',
+    marketingDescription: undefined
   };
 
   const getFrameworkLevels = (framework: string) => {
@@ -316,7 +322,7 @@ export function CourseForm({
           setHasUnsavedChanges(false);
           onUnsavedChangesChange?.(false);
         } catch (submitError) {
-          toast.error(`Failed to in onSubmit:. Please try again or contact support if the problem persists.`));
+          toast.error(`Failed to submit form. Please try again or contact support if the problem persists.`);
           throw submitError;
         }
       } else {
@@ -324,8 +330,8 @@ export function CourseForm({
         toast.error('Form submission failed: Invalid submit handler');
       }
     } catch (error) {
-    console.error('Error occurred:', error);
-      toast.error(`Failed to submitting form:. Please try again or contact support if the problem persists.`));
+      console.error('Error occurred:', error);
+      toast.error(`Failed to submit form. Please try again or contact support if the problem persists.`);
       toast.error(error instanceof Error ? error.message : 'Failed to submit form');
     } finally {
       setIsSubmitting(false);
@@ -376,64 +382,27 @@ export function CourseForm({
             </div>
           </div>
 
-          {/* New Course Classification Fields */}
+          {/* Simplified Course Classification Fields */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="courseType">Course Type *</Label>
+              <Label htmlFor="marketingType">Marketing Type *</Label>
               <Select
-                value={formData.courseType}
-                onValueChange={(value) => handleFormChange('courseType', value)}
+                value={formData.marketingType}
+                onValueChange={(value) => handleFormChange('marketingType', value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select course type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="STANDARD">Standard Course</SelectItem>
-                  <SelectItem value="LIVE_ONLY">Live-Only Course</SelectItem>
-                  <SelectItem value="BLENDED">Blended Learning</SelectItem>
-                  <SelectItem value="PLATFORM_WIDE">Platform-Wide Course</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500">Defines the primary delivery method and scope</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="deliveryMode">Delivery Mode *</Label>
-              <Select
-                value={formData.deliveryMode}
-                onValueChange={(value) => handleFormChange('deliveryMode', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select delivery mode" />
+                  <SelectValue placeholder="Select marketing type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="SELF_PACED">Self-Paced</SelectItem>
-                  <SelectItem value="LIVE_ONLY">Live-Only</SelectItem>
+                  <SelectItem value="LIVE_ONLINE">Live Online</SelectItem>
+                  <SelectItem value="IN_PERSON">In-Person</SelectItem>
                   <SelectItem value="BLENDED">Blended</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-gray-500">How the course is marketed to students</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="enrollmentType">Enrollment Type *</Label>
-              <Select
-                value={formData.enrollmentType}
-                onValueChange={(value) => handleFormChange('enrollmentType', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select enrollment type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="COURSE_BASED">Course-Based</SelectItem>
-                  <SelectItem value="SUBSCRIPTION_BASED">Subscription-Based</SelectItem>
-                  <SelectItem value="PLATFORM_WIDE">Platform-Wide</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500">How students can enroll in this course</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="hasLiveClasses">Has Live Classes</Label>
               <Select
@@ -461,9 +430,10 @@ export function CourseForm({
                     <SelectValue placeholder="Select live class type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="INSTITUTION_ONLY">Institution-Only</SelectItem>
-                    <SelectItem value="BLENDED">Blended</SelectItem>
-                    <SelectItem value="PLATFORM_WIDE">Platform-Wide</SelectItem>
+                    <SelectItem value="CONVERSATION">Conversation Practice</SelectItem>
+                    <SelectItem value="COMPREHENSIVE">Comprehensive Learning</SelectItem>
+                    <SelectItem value="WORKSHOP">Workshop</SelectItem>
+                    <SelectItem value="TUTORIAL">Tutorial</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -554,6 +524,20 @@ export function CourseForm({
               required
               className="min-h-[100px]"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="marketingDescription">Marketing Description</Label>
+            <Textarea
+              id="marketingDescription"
+              value={formData.marketingDescription || ''}
+              onChange={(e) => handleFormChange('marketingDescription', e.target.value)}
+              placeholder="Optional marketing description for the course"
+              className="min-h-[80px]"
+            />
+            <p className="text-xs text-gray-500">
+              Additional marketing text to describe the course to potential students
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

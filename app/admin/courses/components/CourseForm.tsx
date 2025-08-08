@@ -82,16 +82,21 @@ const courseFormSchema = z.object({
   }),
   isFeatured: z.boolean().default(false),
   isSponsored: z.boolean().default(false),
-  // New course type fields
-  courseType: z.enum(['STANDARD', 'LIVE_ONLY', 'BLENDED', 'PLATFORM_LIVE']).default('STANDARD'),
-  deliveryMode: z.enum(['SELF_PACED', 'LIVE_ONLY', 'BLENDED', 'PLATFORM_LIVE']).default('SELF_PACED'),
-  enrollmentType: z.enum(['COURSE_BASED', 'SUBSCRIPTION_BASED']).default('COURSE_BASED'),
+  // Simplified course classification fields
   hasLiveClasses: z.boolean().default(false),
   liveClassType: z.string().optional(),
   liveClassFrequency: z.string().optional(),
+  liveClassSchedule: z.object({
+    dayOfWeek: z.string().optional(),
+    time: z.string().optional(),
+    timezone: z.string().optional()
+  }).optional(),
+  isPlatformCourse: z.boolean().default(false),
   requiresSubscription: z.boolean().default(false),
   subscriptionTier: z.string().optional(),
-  isPlatformCourse: z.boolean().default(false)
+  // Marketing fields
+  marketingType: z.enum(['IN_PERSON', 'LIVE_ONLINE', 'SELF_PACED', 'BLENDED']).default('SELF_PACED'),
+  marketingDescription: z.string().optional()
 });
 
 type CourseFormData = Omit<z.infer<typeof courseFormSchema>, 'tags'> & { tags: Tag[] };
@@ -145,16 +150,6 @@ export function AdminCourseForm({
     if (!data.categoryId) {
       errors.categoryId = 'Category is required';
     }
-    if (!data.courseType) {
-      errors.courseType = 'Course type is required';
-    }
-    if (!data.deliveryMode) {
-      errors.deliveryMode = 'Delivery mode is required';
-    }
-    if (!data.enrollmentType) {
-      errors.enrollmentType = 'Enrollment type is required';
-    }
-    // Institution is optional for platform-wide courses
     if (!data.base_price || isNaN(Number(data.base_price)) || Number(data.base_price) < 0) {
       errors.base_price = 'Valid base price is required';
     }
@@ -172,6 +167,26 @@ export function AdminCourseForm({
     }
     if (new Date(data.startDate) >= new Date(data.endDate)) {
       errors.endDate = 'End date must be after start date';
+    }
+    
+    // Live class validation
+    if (data.hasLiveClasses) {
+      if (!data.liveClassType) {
+        errors.liveClassType = 'Live class type is required when live classes are enabled';
+      }
+      if (!data.liveClassFrequency) {
+        errors.liveClassFrequency = 'Live class frequency is required when live classes are enabled';
+      }
+    }
+    
+    // Platform course validation
+    if (data.isPlatformCourse && !data.requiresSubscription) {
+      errors.requiresSubscription = 'Platform courses must require subscription';
+    }
+    
+    // Subscription validation
+    if (data.requiresSubscription && !data.subscriptionTier) {
+      errors.subscriptionTier = 'Subscription tier is required when subscription is required';
     }
 
     setErrors(errors);
@@ -334,75 +349,28 @@ export function AdminCourseForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="courseType" className="text-sm font-medium">Course Type *</Label>
+          <Label htmlFor="marketingType" className="text-sm font-medium">Marketing Type *</Label>
           <Select
-            value={formData.courseType}
-            onValueChange={(value) => handleFormChange('courseType', value)}
+            value={formData.marketingType}
+            onValueChange={(value) => handleFormChange('marketingType', value)}
             required
           >
-            <SelectTrigger id="courseType" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-              errors.courseType ? 'border-red-500' : ''
+            <SelectTrigger id="marketingType" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+              errors.marketingType ? 'border-red-500' : ''
             }`}>
-              <SelectValue placeholder="Select course type" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem value="STANDARD">Standard Course</SelectItem>
-              <SelectItem value="LIVE_ONLY">Live-Only Course</SelectItem>
-              <SelectItem value="BLENDED">Blended Course</SelectItem>
-              <SelectItem value="PLATFORM_LIVE">Platform Live Course</SelectItem>
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-gray-500">
-            STANDARD: Traditional self-paced courses | LIVE_ONLY: Live classes only | BLENDED: Mix of self-paced and live | PLATFORM_LIVE: Platform-wide live courses
-          </p>
-          <ErrorMessage field="courseType" />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="deliveryMode" className="text-sm font-medium">Delivery Mode *</Label>
-          <Select
-            value={formData.deliveryMode}
-            onValueChange={(value) => handleFormChange('deliveryMode', value)}
-            required
-          >
-            <SelectTrigger id="deliveryMode" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-              errors.deliveryMode ? 'border-red-500' : ''
-            }`}>
-              <SelectValue placeholder="Select delivery mode" />
+              <SelectValue placeholder="Select marketing type" />
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="SELF_PACED">Self-Paced</SelectItem>
-              <SelectItem value="LIVE_ONLY">Live-Only</SelectItem>
+              <SelectItem value="LIVE_ONLINE">Live Online</SelectItem>
+              <SelectItem value="IN_PERSON">In-Person</SelectItem>
               <SelectItem value="BLENDED">Blended</SelectItem>
-              <SelectItem value="PLATFORM_LIVE">Platform Live</SelectItem>
-            </SelectContent>
-          </Select>
-          <ErrorMessage field="deliveryMode" />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="enrollmentType" className="text-sm font-medium">Enrollment Type *</Label>
-          <Select
-            value={formData.enrollmentType}
-            onValueChange={(value) => handleFormChange('enrollmentType', value)}
-            required
-          >
-            <SelectTrigger id="enrollmentType" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
-              errors.enrollmentType ? 'border-red-500' : ''
-            }`}>
-              <SelectValue placeholder="Select enrollment type" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem value="COURSE_BASED">Course-Based</SelectItem>
-              <SelectItem value="SUBSCRIPTION_BASED">Subscription-Based</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-gray-500">
-            COURSE_BASED: One-time purchase | SUBSCRIPTION_BASED: Requires active subscription
+            How the course is marketed to students (independent of technical implementation)
           </p>
-          <ErrorMessage field="enrollmentType" />
+          <ErrorMessage field="marketingType" />
         </div>
       </div>
 
@@ -423,6 +391,9 @@ export function AdminCourseForm({
               <SelectItem value="false">No</SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-xs text-gray-500">
+            Enable live class functionality for this course
+          </p>
           <ErrorMessage field="hasLiveClasses" />
         </div>
 
@@ -435,19 +406,21 @@ export function AdminCourseForm({
             <SelectTrigger id="isPlatformCourse" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
               errors.isPlatformCourse ? 'border-red-500' : ''
             }`}>
-              <SelectValue placeholder="Select if course is platform-wide" />
+              <SelectValue placeholder="Select if this is a platform course" />
             </SelectTrigger>
             <SelectContent className="bg-white">
-              <SelectItem value="true">Yes</SelectItem>
-              <SelectItem value="false">No</SelectItem>
+              <SelectItem value="true">Yes (Platform-wide)</SelectItem>
+              <SelectItem value="false">No (Institution-specific)</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-gray-500">
-            Platform courses are available to all users with appropriate subscription
+            Platform courses are available to all subscribers, institution courses are institution-specific
           </p>
           <ErrorMessage field="isPlatformCourse" />
         </div>
       </div>
+
+
 
       {formData.hasLiveClasses && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -463,9 +436,10 @@ export function AdminCourseForm({
                 <SelectValue placeholder="Select live class type" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="LIVE_ONLY">Live-Only</SelectItem>
-                <SelectItem value="BLENDED">Blended</SelectItem>
-                <SelectItem value="PLATFORM_LIVE">Platform Live</SelectItem>
+                <SelectItem value="CONVERSATION">Conversation Practice</SelectItem>
+                <SelectItem value="COMPREHENSIVE">Comprehensive Learning</SelectItem>
+                <SelectItem value="WORKSHOP">Workshop</SelectItem>
+                <SelectItem value="TUTORIAL">Tutorial</SelectItem>
               </SelectContent>
             </Select>
             <ErrorMessage field="liveClassType" />
@@ -535,6 +509,24 @@ export function AdminCourseForm({
             <ErrorMessage field="subscriptionTier" />
           </div>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="marketingDescription" className="text-sm font-medium">Marketing Description</Label>
+        <Textarea
+          id="marketingDescription"
+          value={formData.marketingDescription || ''}
+          onChange={(e) => handleFormChange('marketingDescription', e.target.value)}
+          className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+            errors.marketingDescription ? 'border-red-500' : ''
+          }`}
+          rows={3}
+          placeholder="Optional marketing description for the course"
+        />
+        <p className="text-xs text-gray-500">
+          Additional marketing text to describe the course to potential students
+        </p>
+        <ErrorMessage field="marketingDescription" />
       </div>
 
       <div className="space-y-2">

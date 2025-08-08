@@ -20,19 +20,6 @@ export async function GET(
     const liveClass = await prisma.videoSession.findUnique({
       where: { id },
       include: {
-        instructor: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        institution: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
         course: {
           select: {
             id: true,
@@ -50,7 +37,26 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(liveClass);
+    // Fetch instructor and institution details separately
+    const [instructorDetails, institutionDetails] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: liveClass.instructorId },
+        select: { id: true, name: true, email: true },
+      }),
+      liveClass.institutionId ? prisma.institution.findUnique({
+        where: { id: liveClass.institutionId },
+        select: { id: true, name: true },
+      }) : null
+    ]);
+
+    // Combine the data
+    const liveClassWithDetails = {
+      ...liveClass,
+      instructor: instructorDetails,
+      institution: institutionDetails,
+    };
+
+    return NextResponse.json(liveClassWithDetails);
   } catch (error) {
     console.error('Error fetching live class:', error);
     return NextResponse.json(
@@ -163,19 +169,6 @@ export async function PUT(
         isCancelled: body.isCancelled,
       },
       include: {
-        instructor: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        institution: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
         course: {
           select: {
             id: true,
@@ -185,7 +178,26 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(updatedLiveClass);
+    // Fetch instructor and institution details separately
+    const [instructorDetails, institutionDetails] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: updatedLiveClass.instructorId },
+        select: { id: true, name: true, email: true },
+      }),
+      updatedLiveClass.institutionId ? prisma.institution.findUnique({
+        where: { id: updatedLiveClass.institutionId },
+        select: { id: true, name: true },
+      }) : null
+    ]);
+
+    // Combine the data
+    const updatedLiveClassWithDetails = {
+      ...updatedLiveClass,
+      instructor: instructorDetails,
+      institution: institutionDetails,
+    };
+
+    return NextResponse.json(updatedLiveClassWithDetails);
   } catch (error) {
     console.error('Error updating live class:', error);
     return NextResponse.json(

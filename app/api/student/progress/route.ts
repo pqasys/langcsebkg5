@@ -41,7 +41,7 @@ export async function GET() {
     });
 
     // Get institution data for all courses
-    const institutionIds = [...new Set(enrollments.map(e => e.course.institutionId))];
+    const institutionIds = [...new Set(enrollments.map(e => e.course.institutionId).filter(Boolean))];
     const institutions = await prisma.institution.findMany({
       where: {
         id: {

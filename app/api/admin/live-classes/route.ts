@@ -40,23 +40,10 @@ export async function GET(request: NextRequest) {
     // Get total count
     const total = await prisma.videoSession.count({ where });
 
-    // Get live classes with instructor and institution details
+    // Get live classes with basic details first
     const liveClasses = await prisma.videoSession.findMany({
       where,
       include: {
-        instructor: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        institution: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
         course: {
           select: {
             id: true,
@@ -79,8 +66,34 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
+    // Fetch instructor and institution details separately
+    const instructorIds = [...new Set(liveClasses.map(session => session.instructorId))];
+    const institutionIds = [...new Set(liveClasses.map(session => session.institutionId).filter(Boolean))];
+
+    const [instructors, institutions] = await Promise.all([
+      prisma.user.findMany({
+        where: { id: { in: instructorIds } },
+        select: { id: true, name: true, email: true },
+      }),
+      institutionIds.length > 0 ? prisma.institution.findMany({
+        where: { id: { in: institutionIds } },
+        select: { id: true, name: true },
+      }) : []
+    ]);
+
+    // Create lookup maps
+    const instructorMap = new Map(instructors.map(instructor => [instructor.id, instructor]));
+    const institutionMap = new Map(institutions.map(institution => [institution.id, institution]));
+
+    // Combine the data
+    const liveClassesWithDetails = liveClasses.map(session => ({
+      ...session,
+      instructor: instructorMap.get(session.instructorId),
+      institution: session.institutionId ? institutionMap.get(session.institutionId) : null,
+    }));
+
     return NextResponse.json({
-      liveClasses,
+      liveClasses: liveClassesWithDetails,
       pagination: {
         page,
         limit,
@@ -209,19 +222,6 @@ export async function POST(request: NextRequest) {
         materials: materials ? JSON.parse(JSON.stringify(materials)) : null,
       },
       include: {
-        instructor: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        institution: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
         course: {
           select: {
             id: true,
@@ -231,7 +231,26 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(liveClass, { status: 201 });
+    // Fetch instructor and institution details separately
+    const [instructorDetails, institutionDetails] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: instructorId },
+        select: { id: true, name: true, email: true },
+      }),
+      institutionId ? prisma.institution.findUnique({
+        where: { id: institutionId },
+        select: { id: true, name: true },
+      }) : null
+    ]);
+
+    // Combine the data
+    const liveClassWithDetails = {
+      ...liveClass,
+      instructor: instructorDetails,
+      institution: institutionDetails,
+    };
+
+    return NextResponse.json(liveClassWithDetails, { status: 201 });
   } catch (error) {
     console.error('Error creating live class:', error);
     return NextResponse.json(

@@ -3,16 +3,34 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    // Check NextAuth.js session
     const session = await getServerSession(authOptions);
     
-    if (!session?.user) {
+    // Check custom session token
+    const customSessionToken = request.cookies.get('custom-session-token')?.value;
+    let customSession = null;
+    
+    if (customSessionToken) {
+      try {
+        customSession = JSON.parse(customSessionToken);
+      } catch (e) {
+        // Invalid token format
+      }
+    }
+    
+    // Check if either session is valid and has admin role
+    const user = session?.user || customSession;
+    if (!user || user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get all subscriptions with institution details and performance metrics
+    // Get all subscriptions with relations
     const subscriptions = await prisma.institutionSubscription.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
       include: {
         institution: {
           select: {
@@ -23,26 +41,16 @@ export async function GET() {
           }
         },
         commissionTier: true
-      },
-      orderBy: {
-        createdAt: 'desc'
       }
-    });
+    }).then(subs => subs.filter(sub => sub.institution !== null));
 
     // Enhance with performance data
     const enhancedSubscriptions = await Promise.all(
       subscriptions.map(async (subscription) => {
-        // Commission rate is already available from the include
-        const commissionTier = subscription.commissionTier;
-
         // Get revenue generated from payments
         const revenueGenerated = await prisma.payment.aggregate({
           where: {
-            enrollment: {
-              course: {
-                institutionId: subscription.institutionId
-              }
-            },
+            institutionId: subscription.institutionId,
             status: 'COMPLETED'
           },
           _sum: {
@@ -71,7 +79,7 @@ export async function GET() {
 
         return {
           ...subscription,
-          commissionRate: commissionTier?.commissionRate || 0,
+          commissionRate: subscription.commissionTier?.commissionRate || 0,
           revenueGenerated: revenueGenerated._sum.amount || 0,
           activeStudents,
           totalCourses

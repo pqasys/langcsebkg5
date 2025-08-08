@@ -45,6 +45,7 @@ model Institution {
   // Relations
   users user[]
   courses Course[]
+  subscriptions InstitutionSubscription[]
 
   @@map("institution")
 }
@@ -120,6 +121,7 @@ model user {
 
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  videoSessions VideoSession[]
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -358,6 +360,10 @@ model InstitutionSubscription {
   cancelledAt        DateTime?
   commissionTierId   String
 
+  // Relations
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commissionTier CommissionTier @relation(fields: [commissionTierId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
   @@index([institutionId])
   @@index([status])
   @@index([endDate])
@@ -381,6 +387,9 @@ model CommissionTier {
   maxStudents    Int      @default(10)
   maxCourses     Int      @default(5)
   maxTeachers    Int      @default(2)
+
+  // Relations
+  institutionSubscriptions InstitutionSubscription[]
 
   @@map("commission_tiers")
 }
@@ -612,6 +621,7 @@ model VideoSession {
   sessionNumber      Int?
 
   // Relations
+  instructor user @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   participants VideoSessionParticipant[]
 

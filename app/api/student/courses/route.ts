@@ -31,7 +31,7 @@ export async function GET() {
     });
 
     // Get institution data separately
-    const institutionIds = [...new Set(publishedCourses.map(course => course.institutionId))];
+    const institutionIds = [...new Set(publishedCourses.map(course => course.institutionId).filter(Boolean))];
     const institutions = await prisma.institution.findMany({
       where: {
         id: { in: institutionIds }
