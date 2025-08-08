@@ -19,16 +19,15 @@ export async function POST(
     const { status, paymentDetails } = await request.json();
     const { paymentId } = params;
 
-    // Get the payment with related data
+    // Get the payment with basic data
     const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
-      include: {
-        enrollment: {
-          include: {
-            course: true,
-            student: true
-          }
-        }
+      select: {
+        id: true,
+        amount: true,
+        status: true,
+        enrollmentId: true,
+        metadata: true
       }
     });
 
@@ -36,45 +35,46 @@ export async function POST(
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
     }
 
+    // Get enrollment data separately
+    const enrollment = await prisma.studentCourseEnrollment.findUnique({
+      where: { id: payment.enrollmentId },
+      include: {
+        course: true,
+        student: true
+      }
+    });
+
+    if (!enrollment) {
+      return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
+    }
+
     // Validate payment ownership
-    if (payment.enrollment.studentId !== session.user.id) {
+    if (enrollment.studentId !== session.user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Process the payment update in a transaction
+    // Get booking data if it exists
+    const bookingId = (payment.metadata as any)?.bookingId;
+    let booking = null;
+    if (bookingId) {
+      booking = await prisma.booking.findUnique({
+        where: { id: bookingId }
+      });
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       // Update payment status
-      const updatedPayment = await EnrollmentStateManager.updatePaymentState(
-        paymentId,
-        status === 'SUCCESS' ? PAYMENT_STATES.PAID : PAYMENT_STATES.FAILED,
-        {
+      const updatedPayment = await tx.payment.update({
+        where: { id: paymentId },
+        data: {
+          status: status === 'SUCCESS' ? 'COMPLETED' : 'FAILED',
           paidAt: status === 'SUCCESS' ? new Date() : null,
           metadata: {
             ...payment.metadata,
-            paymentDetails: {
-              method: paymentDetails.method,
-              reference: paymentDetails.reference,
-              timestamp: paymentDetails.timestamp,
-              status: status === 'SUCCESS' ? 'COMPLETED' : 'FAILED',
-              completedAt: new Date().toISOString(),
-            }
-          }
-        }
-      );
-
-      // Get the booking - be more flexible with status matching
-      const booking = await tx.booking.findFirst({
-        where: {
-          courseId: payment.enrollment.courseId,
-          studentId: payment.enrollment.studentId,
-          // Look for bookings that are not already completed or failed
-          status: {
-            notIn: [BOOKING_STATES.COMPLETED, BOOKING_STATES.FAILED]
-          }
+            paymentDetails,
+            processedAt: new Date().toISOString(),
+          },
         },
-        orderBy: {
-          createdAt: 'desc'
-        }
       });
 
       if (status === 'SUCCESS') {
@@ -104,12 +104,14 @@ export async function POST(
         }
 
         // Create institution payout record
-        await tx.institutionPayout.create({
+        await tx.institution_payouts.create({
           data: {
-            institutionId: payment.enrollment.course.institutionId,
+            id: `payout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            institutionId: enrollment.course.institutionId,
             enrollmentId: payment.enrollmentId,
-            amount: payment.metadata?.institutionAmount || (payment.amount - (payment.amount * payment.enrollment.course.institution.commissionRate / 100)),
+            amount: payment.metadata?.institutionAmount || (payment.amount - (payment.amount * enrollment.course.institution.commissionRate / 100)),
             status: 'PENDING',
+            updatedAt: new Date(),
             metadata: {
               paymentId: paymentDetails.reference,
               paymentMethod: paymentDetails.method,
@@ -121,71 +123,15 @@ export async function POST(
         return { payment: updatedPayment, enrollment: updatedEnrollment, booking };
       }
 
-      // If payment failed, update enrollment and booking status
-      if (status === 'FAILED') {
-        const updatedEnrollment = await EnrollmentStateManager.updateEnrollmentState(
-          payment.enrollmentId,
-          ENROLLMENT_STATES.FAILED,
-          {
-            paymentStatus: 'FAILED',
-          }
-        );
-
-        if (booking) {
-          await EnrollmentStateManager.updateBookingState(
-            booking.id,
-            BOOKING_STATES.FAILED,
-            {
-              updatedAt: new Date(),
-            }
-          );
-        } else {
-          console.warn(`No booking found for failed payment ${paymentId} - enrollment ${payment.enrollmentId}`);
-        }
-
-        return { payment: updatedPayment, enrollment: updatedEnrollment, booking };
-      }
-
-      return { payment: updatedPayment, enrollment: payment.enrollment, booking };
+      return { payment: updatedPayment, enrollment, booking };
     });
 
-    // Validate the result to ensure consistency
-    if (result.booking) {
-      const validation = await BookingPaymentValidator.validateBooking(result.booking.id);
-      if (!validation.isValid) {
-        console.warn(`Booking-payment inconsistency detected after processing:`, validation.issues);
-      }
-    }
-
-    return NextResponse.json({
-      status: 'success',
-      message: status === 'SUCCESS' ? 'Payment completed successfully' : 'Payment failed',
-      payment: {
-        id: result.payment.id,
-        status: result.payment.status,
-        amount: result.payment.amount,
-        paidAt: result.payment.paidAt,
-      },
-      enrollment: {
-        id: result.enrollment.id,
-        status: result.enrollment.status,
-        paymentStatus: result.enrollment.paymentStatus,
-        paymentDate: result.enrollment.paymentDate,
-      },
-      booking: result.booking ? {
-        id: result.booking.id,
-        status: result.booking.status,
-        updatedAt: result.booking.updatedAt,
-      } : null,
-    });
+    return NextResponse.json(result);
   } catch (error) {
-    console.error('Error processing payment:');
+    console.error('Error processing payment:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to process payment',
-        details: error.message || 'An unexpected error occurred',
-      },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { error: 'Failed to process payment' },
+      { status: 500 }
     );
   }
 } 

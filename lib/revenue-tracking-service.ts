@@ -55,7 +55,7 @@ export class RevenueTrackingService {
    */
   static async getRevenueMetrics(startDate: Date, endDate: Date): Promise<RevenueMetrics> {
     try {
-      // Get payments in the date range
+      // Get payments in the date range with basic data
       const payments = await prisma.payment.findMany({
         where: {
           createdAt: {
@@ -64,18 +64,32 @@ export class RevenueTrackingService {
           },
           status: 'COMPLETED',
         },
-        include: {
-          enrollment: {
-            include: {
-              course: {
-                include: {
-                  institution: true,
-                },
-              },
-            },
-          },
-        },
+        select: {
+          id: true,
+          amount: true,
+          commissionAmount: true,
+          enrollmentId: true,
+          createdAt: true
+        }
       });
+
+      // Get enrollment data separately using a map for efficient lookup
+      const enrollmentIds = [...new Set(payments.map(p => p.enrollmentId).filter(Boolean))];
+      const enrollments = await prisma.studentCourseEnrollment.findMany({
+        where: {
+          id: { in: enrollmentIds }
+        },
+        include: {
+          course: {
+            include: {
+              institution: true
+            }
+          }
+        }
+      });
+
+      // Create enrollment lookup map
+      const enrollmentMap = new Map(enrollments.map(e => [e.id, e]));
 
       // Get subscription revenue from institution billing history
       const institutionSubscriptions = await prisma.institutionBillingHistory.findMany({
@@ -86,15 +100,28 @@ export class RevenueTrackingService {
           },
           status: 'PAID',
         },
+        select: {
+          id: true,
+          amount: true,
+          subscriptionId: true,
+          billingDate: true
+        }
+      });
+
+      // Get institution subscription data separately
+      const subscriptionIds = [...new Set(institutionSubscriptions.map(b => b.subscriptionId).filter(Boolean))];
+      const subscriptions = await prisma.institutionSubscription.findMany({
+        where: {
+          id: { in: subscriptionIds }
+        },
         include: {
-          subscription: {
-            include: {
-              institution: true,
-              commissionTier: true,
-            },
-          },
+          institution: true,
+          commissionTier: true,
         },
       });
+
+      // Create subscription lookup map
+      const subscriptionMap = new Map(subscriptions.map(s => [s.id, s]));
 
       // Get student subscription revenue
       const studentSubscriptions = await prisma.studentBillingHistory.findMany({
@@ -105,21 +132,33 @@ export class RevenueTrackingService {
           },
           status: 'PAID',
         },
+        select: {
+          id: true,
+          amount: true,
+          subscriptionId: true,
+          billingDate: true
+        }
+      });
+
+      // Get student subscription data separately
+      const studentSubscriptionIds = [...new Set(studentSubscriptions.map(b => b.subscriptionId).filter(Boolean))];
+      const studentSubscriptionsData = await prisma.studentSubscription.findMany({
+        where: {
+          id: { in: studentSubscriptionIds }
+        },
         include: {
-          subscription: {
-            include: {
-              student: true,
-              studentTier: true,
-            },
-          },
+          studentTier: true,
         },
       });
+
+      // Create student subscription lookup map
+      const studentSubscriptionMap = new Map(studentSubscriptionsData.map(s => [s.id, s]));
 
       // Calculate total revenue from payments
       const totalRevenue = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
       // Calculate commission revenue from payments
-      const commissionRevenue = payments.reduce((sum, payment) => sum + payment.commissionAmount, 0);
+      const commissionRevenue = payments.reduce((sum, payment) => sum + (payment.commissionAmount || 0), 0);
 
       // Calculate subscription revenue from institution subscriptions
       const subscriptionRevenue = institutionSubscriptions.reduce((sum, billing) => sum + billing.amount, 0);
@@ -143,6 +182,9 @@ export class RevenueTrackingService {
           },
           status: 'COMPLETED',
         },
+        select: {
+          amount: true
+        }
       });
 
       const previousRevenue = previousPayments.reduce((sum, payment) => sum + payment.amount, 0);
@@ -151,7 +193,10 @@ export class RevenueTrackingService {
       // Calculate top revenue sources by institution
       const revenueByInstitution = new Map<string, number>();
       payments.forEach(payment => {
-        const institutionName = payment.enrollment.course.institution.name;
+        const enrollment = enrollmentMap.get(payment.enrollmentId);
+        if (!enrollment) return; // Skip if enrollment not found
+
+        const institutionName = enrollment.course.institution.name;
         const current = revenueByInstitution.get(institutionName) || 0;
         revenueByInstitution.set(institutionName, current + payment.amount);
       });
@@ -174,8 +219,8 @@ export class RevenueTrackingService {
         topRevenueSources,
       };
     } catch (error) {
-      console.error('Error calculating revenue metrics:', error);
-      throw new Error(`Failed to calculate revenue metrics - Context: throw new Error('Failed to calculate revenue metri...);
+      console.error('Error getting revenue metrics:', error);
+      throw error;
     }
   }
 
@@ -184,7 +229,7 @@ export class RevenueTrackingService {
    */
   static async getRevenueBreakdown(startDate: Date, endDate: Date): Promise<RevenueBreakdown> {
     try {
-      // Get payments with enrollment and course data
+      // Get payments with basic data (without enrollment relation)
       const payments = await prisma.payment.findMany({
         where: {
           createdAt: {
@@ -193,18 +238,33 @@ export class RevenueTrackingService {
           },
           status: 'COMPLETED',
         },
-        include: {
-          enrollment: {
-            include: {
-              course: {
-                include: {
-                  institution: true,
-                },
-              },
-            },
-          },
-        },
+        select: {
+          id: true,
+          amount: true,
+          commissionAmount: true,
+          enrollmentId: true,
+          institutionId: true,
+          createdAt: true
+        }
       });
+
+      // Get enrollment data separately using a map for efficient lookup
+      const enrollmentIds = [...new Set(payments.map(p => p.enrollmentId).filter(Boolean))];
+      const enrollments = await prisma.studentCourseEnrollment.findMany({
+        where: {
+          id: { in: enrollmentIds }
+        },
+        include: {
+          course: {
+            include: {
+              institution: true
+            }
+          }
+        }
+      });
+
+      // Create enrollment lookup map
+      const enrollmentMap = new Map(enrollments.map(e => [e.id, e]));
 
       // Get institution subscriptions
       const institutionSubscriptions = await prisma.institutionBillingHistory.findMany({
@@ -215,15 +275,28 @@ export class RevenueTrackingService {
           },
           status: 'PAID',
         },
+        select: {
+          id: true,
+          amount: true,
+          subscriptionId: true,
+          billingDate: true
+        }
+      });
+
+      // Get institution subscription data separately
+      const subscriptionIds = [...new Set(institutionSubscriptions.map(b => b.subscriptionId).filter(Boolean))];
+      const subscriptions = await prisma.institutionSubscription.findMany({
+        where: {
+          id: { in: subscriptionIds }
+        },
         include: {
-          subscription: {
-            include: {
-              institution: true,
-              commissionTier: true,
-            },
-          },
+          institution: true,
+          commissionTier: true,
         },
       });
+
+      // Create subscription lookup map
+      const subscriptionMap = new Map(subscriptions.map(s => [s.id, s]));
 
       // Calculate breakdown by institution
       const institutionMap = new Map<string, {
@@ -238,8 +311,11 @@ export class RevenueTrackingService {
 
       // Process payments for commission revenue
       payments.forEach(payment => {
-        const institutionId = payment.enrollment.course.institutionId;
-        const institutionName = payment.enrollment.course.institution.name;
+        const enrollment = enrollmentMap.get(payment.enrollmentId);
+        if (!enrollment) return; // Skip if enrollment not found
+
+        const institutionId = enrollment.course.institutionId;
+        const institutionName = enrollment.course.institution.name;
         
         if (!institutionMap.has(institutionId)) {
           institutionMap.set(institutionId, {
@@ -254,14 +330,17 @@ export class RevenueTrackingService {
         }
 
         const institution = institutionMap.get(institutionId)!;
-        institution.commissionRevenue += payment.commissionAmount;
+        institution.commissionRevenue += payment.commissionAmount || 0;
         institution.totalRevenue += payment.amount;
       });
 
       // Process institution subscriptions for subscription revenue
       institutionSubscriptions.forEach(billing => {
-        const institutionId = billing.subscription.institutionId;
-        const institutionName = billing.subscription.institution.name;
+        const subscription = subscriptionMap.get(billing.subscriptionId);
+        if (!subscription) return; // Skip if subscription not found
+
+        const institutionId = subscription.institutionId;
+        const institutionName = subscription.institution.name;
         
         if (!institutionMap.has(institutionId)) {
           institutionMap.set(institutionId, {
@@ -315,14 +394,17 @@ export class RevenueTrackingService {
       }>();
 
       institutionSubscriptions.forEach(billing => {
-        const planType = billing.subscription.commissionTier.planType;
+        const subscription = subscriptionMap.get(billing.subscriptionId);
+        if (!subscription) return; // Skip if subscription not found
+
+        const planType = subscription.commissionTier.planType;
         
         if (!planMap.has(planType)) {
           planMap.set(planType, {
             planType,
             subscriptionCount: 0,
             subscriptionRevenue: 0,
-            commissionRate: billing.subscription.commissionTier.commissionRate,
+            commissionRate: subscription.commissionTier.commissionRate,
             totalCommission: 0,
           });
         }
@@ -330,7 +412,7 @@ export class RevenueTrackingService {
         const plan = planMap.get(planType)!;
         plan.subscriptionCount += 1;
         plan.subscriptionRevenue += billing.amount;
-        plan.totalCommission += billing.amount * (billing.subscription.commissionTier.commissionRate / 100);
+        plan.totalCommission += billing.amount * (subscription.commissionTier.commissionRate / 100);
       });
 
       const byPlan = Array.from(planMap.values())
@@ -350,40 +432,23 @@ export class RevenueTrackingService {
         periodEnd.setDate(0);
         periodEnd.setHours(23, 59, 59, 999);
 
-        const periodPayments = await prisma.payment.findMany({
-          where: {
-            createdAt: {
-              gte: periodStart,
-              lte: periodEnd,
-            },
-            status: 'COMPLETED',
-          },
-        });
+        const periodRevenue = payments
+          .filter(payment => payment.createdAt >= periodStart && payment.createdAt <= periodEnd)
+          .reduce((sum, payment) => sum + payment.amount, 0);
 
-        const periodRevenue = periodPayments.reduce((sum, payment) => sum + payment.amount, 0);
-        
-        // Calculate growth compared to previous month
-        let growth = 0;
-        if (i < 11) {
-          const previousPeriodStart = new Date(periodStart);
-          previousPeriodStart.setMonth(previousPeriodStart.getMonth() - 1);
-          
-          const previousPeriodEnd = new Date(periodEnd);
-          previousPeriodEnd.setMonth(previousPeriodEnd.getMonth() - 1);
+        const previousPeriodStart = new Date(periodStart);
+        previousPeriodStart.setMonth(previousPeriodStart.getMonth() - 1);
+        const previousPeriodEnd = new Date(periodStart);
+        previousPeriodEnd.setDate(0);
+        previousPeriodEnd.setHours(23, 59, 59, 999);
 
-          const previousPeriodPayments = await prisma.payment.findMany({
-            where: {
-              createdAt: {
-                gte: previousPeriodStart,
-                lte: previousPeriodEnd,
-              },
-              status: 'COMPLETED',
-            },
-          });
+        const previousPeriodRevenue = payments
+          .filter(payment => payment.createdAt >= previousPeriodStart && payment.createdAt <= previousPeriodEnd)
+          .reduce((sum, payment) => sum + payment.amount, 0);
 
-          const previousPeriodRevenue = previousPeriodPayments.reduce((sum, payment) => sum + payment.amount, 0);
-          growth = previousPeriodRevenue > 0 ? ((periodRevenue - previousPeriodRevenue) / previousPeriodRevenue) * 100 : 0;
-        }
+        const growth = previousPeriodRevenue > 0 
+          ? ((periodRevenue - previousPeriodRevenue) / previousPeriodRevenue) * 100 
+          : 0;
 
         byTimeframe.push({
           period: periodStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
@@ -398,8 +463,8 @@ export class RevenueTrackingService {
         byTimeframe,
       };
     } catch (error) {
-      console.error('Error calculating revenue breakdown:', error);
-      throw new Error(Failed to calculate revenue breakdown - Context: console.error('Error calculating revenue breakdown...`);
+      console.error('Error getting revenue breakdown:', error);
+      throw error;
     }
   }
 

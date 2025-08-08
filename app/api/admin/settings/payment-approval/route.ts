@@ -55,26 +55,45 @@ export async function GET() {
     });
 
     // Get pending payments that would be affected by disabling institution approval
-    const affectedPendingPayments = await prisma.payment.findMany({
+    // Query payments and their related enrollment data separately
+    const pendingPayments = await prisma.payment.findMany({
       where: {
         status: { in: ['PENDING', 'PROCESSING'] }
       },
+      select: {
+        id: true,
+        amount: true,
+        status: true,
+        paymentMethod: true,
+        enrollmentId: true,
+        institutionId: true
+      }
+    });
+
+    // Get enrollment data for these payments
+    const enrollmentIds = pendingPayments.map(p => p.enrollmentId);
+    const enrollments = await prisma.studentCourseEnrollment.findMany({
+      where: {
+        id: { in: enrollmentIds }
+      },
       include: {
-        enrollment: {
+        course: {
           include: {
-            course: {
-              include: {
-                institution: true
-              }
-            }
+            institution: true
           }
         }
       }
     });
 
+    // Create a map for quick lookup
+    const enrollmentMap = new Map(enrollments.map(e => [e.id, e]));
+
     // Calculate how many payments would be affected by current settings
-    const affectedPaymentsCount = affectedPendingPayments.filter(payment => {
-      const institution = payment.enrollment.course.institution;
+    const affectedPaymentsCount = pendingPayments.filter(payment => {
+      const enrollment = enrollmentMap.get(payment.enrollmentId);
+      if (!enrollment) return false;
+      
+      const institution = enrollment.course.institution;
       const isExempted = settings.institutionPaymentApprovalExemptions.includes(institution.id);
       const canApprove = settings.allowInstitutionPaymentApproval && 
                         !isExempted && 
@@ -101,10 +120,10 @@ export async function GET() {
       }
     });
   } catch (error) {
-    console.error('Error fetching payment approval settings:');
+    console.error('Error fetching payment approval settings:', error);
     return NextResponse.json(
-      { message: 'Failed to fetch settings' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { error: 'Failed to fetch payment approval settings' },
+      { status: 500 }
     );
   }
 }
@@ -131,45 +150,71 @@ export async function PUT(request: NextRequest) {
       fileUploadMaxSizeMB
     } = body;
 
-    // Get current settings to detect changes
+    // Validate required fields
+    if (typeof allowInstitutionPaymentApproval !== 'boolean' ||
+        typeof showInstitutionApprovalButtons !== 'boolean' ||
+        !defaultPaymentStatus ||
+        !Array.isArray(institutionApprovableMethods) ||
+        !Array.isArray(adminOnlyMethods) ||
+        !Array.isArray(institutionPaymentApprovalExemptions) ||
+        typeof fileUploadMaxSizeMB !== 'number') {
+      return NextResponse.json(
+        { error: 'Invalid request data' },
+        { status: 400 }
+      );
+    }
+
+    // Check if we're disabling institution approval or adding exemptions
     const currentSettings = await prisma.adminSettings.findFirst({
       where: { id: '1' }
     });
 
-    // Check if institution approval is being disabled or restricted
-    const isDisablingInstitutionApproval = currentSettings && 
-      (currentSettings.allowInstitutionPaymentApproval && !allowInstitutionPaymentApproval);
+    const isDisablingInstitutionApproval = currentSettings?.allowInstitutionPaymentApproval && !allowInstitutionPaymentApproval;
+    const isAddingExemptions = currentSettings?.institutionPaymentApprovalExemptions.length < institutionPaymentApprovalExemptions.length;
+    const isRestrictingMethods = currentSettings?.institutionApprovableMethods.length > institutionApprovableMethods.length;
 
-    const isAddingExemptions = currentSettings && 
-      institutionPaymentApprovalExemptions.length > currentSettings.institutionPaymentApprovalExemptions.length;
-
-    const isRestrictingMethods = currentSettings && 
-      institutionApprovableMethods.length < currentSettings.institutionApprovableMethods.length;
-
-    // Get pending payments that would be affected by these changes
+    let affectedPayments: any[] = [];
     let affectedPaymentsCount = 0;
-    let affectedPayments = [];
     
     if (isDisablingInstitutionApproval || isAddingExemptions || isRestrictingMethods) {
+      // Query payments and their related enrollment data separately
       const pendingPayments = await prisma.payment.findMany({
         where: {
           status: { in: ['PENDING', 'PROCESSING'] }
         },
+        select: {
+          id: true,
+          amount: true,
+          status: true,
+          paymentMethod: true,
+          enrollmentId: true,
+          institutionId: true
+        }
+      });
+
+      // Get enrollment data for these payments
+      const enrollmentIds = pendingPayments.map(p => p.enrollmentId);
+      const enrollments = await prisma.studentCourseEnrollment.findMany({
+        where: {
+          id: { in: enrollmentIds }
+        },
         include: {
-          enrollment: {
+          course: {
             include: {
-              course: {
-                include: {
-                  institution: true
-                }
-              }
+              institution: true
             }
           }
         }
       });
 
+      // Create a map for quick lookup
+      const enrollmentMap = new Map(enrollments.map(e => [e.id, e]));
+
       affectedPayments = pendingPayments.filter(payment => {
-        const institution = payment.enrollment.course.institution;
+        const enrollment = enrollmentMap.get(payment.enrollmentId);
+        if (!enrollment) return false;
+        
+        const institution = enrollment.course.institution;
         const isExempted = institutionPaymentApprovalExemptions.includes(institution.id);
         const canApprove = allowInstitutionPaymentApproval && 
                           !isExempted && 
@@ -208,8 +253,7 @@ export async function PUT(request: NextRequest) {
     // Clear the payment settings cache to ensure changes take effect immediately
     clearPaymentSettingsCache();
 
-    // Prepare response with impact information
-    const response: unknown = {
+    return NextResponse.json({
       message: 'Payment approval settings updated successfully',
       settings: {
         allowInstitutionPaymentApproval: settings.allowInstitutionPaymentApproval,
@@ -219,24 +263,17 @@ export async function PUT(request: NextRequest) {
         adminOnlyMethods: settings.adminOnlyMethods,
         institutionPaymentApprovalExemptions: settings.institutionPaymentApprovalExemptions,
         fileUploadMaxSizeMB: settings.fileUploadMaxSizeMB
-      }
-    };
-
-    // Add impact information if there are affected payments
-    if (affectedPaymentsCount > 0) {
-      response.impact = {
+      },
+      impact: {
         affectedPaymentsCount,
-        message: `⚠️ ${affectedPaymentsCount} pending payment(s) will now require admin approval. These payments remain fully approvable by administrators.`,
-        affectedPaymentIds: affectedPayments.map(p => p.id)
-      };
-    }
-
-    return NextResponse.json(response);
+        affectedPayments: affectedPayments.slice(0, 10) // Return first 10 for preview
+      }
+    });
   } catch (error) {
-    console.error('Error updating payment approval settings:');
+    console.error('Error updating payment approval settings:', error);
     return NextResponse.json(
-      { message: 'Failed to update settings' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { error: 'Failed to update payment approval settings' },
+      { status: 500 }
     );
   }
 } 

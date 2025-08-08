@@ -32,16 +32,10 @@ export async function POST(
       where: {
         id: params.paymentId,
       },
-      include: {
-        enrollment: {
-          include: {
-            course: {
-              include: {
-                institution: true
-              }
-            }
-          }
-        }
+      select: {
+        id: true,
+        status: true,
+        metadata: true
       }
     });
 
@@ -76,42 +70,16 @@ export async function POST(
       },
     });
 
-    // Update the enrollment status
-    await prisma.studentCourseEnrollment.update({
-      where: {
-        id: payment.enrollmentId,
-      },
-      data: {
-        status: 'PENDING',
-        paymentStatus: 'FAILED',
-      },
-    });
-
-    // Update the booking status if it exists
-    const bookingId = (payment.metadata as any)?.bookingId;
-    if (bookingId) {
-      await prisma.booking.update({
-        where: {
-          id: bookingId,
-        },
-        data: {
-          status: 'FAILED',
-          updatedAt: new Date(),
-        },
-      });
-    }
-
     return NextResponse.json({
       success: true,
       payment: updatedPayment,
-      message: 'Payment disapproved successfully by administrator',
-      pendingCountUpdated: true
+      message: 'Payment disapproved successfully by administrator'
     });
   } catch (error) {
-    console.error('Error disapproving payment:');
+    console.error('Error disapproving payment:', error);
     return NextResponse.json(
       { error: 'Failed to disapprove payment' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500 }
     );
   }
 } 

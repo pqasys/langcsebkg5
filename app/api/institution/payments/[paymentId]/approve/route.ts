@@ -39,22 +39,41 @@ export async function POST(
         id: params.paymentId,
         institutionId: institutionUser.institutionId!,
       },
-      include: {
-        enrollment: {
-          include: {
-            course: {
-              include: {
-                institution: true
-              }
-            }
-          }
-        }
+      select: {
+        id: true,
+        amount: true,
+        status: true,
+        paymentMethod: true,
+        enrollmentId: true,
+        institutionId: true,
+        metadata: true
       }
     });
 
     if (!payment) {
       return NextResponse.json(
         { error: 'Payment not found' },
+        { status: 404 }
+      );
+    }
+
+    // Get enrollment data separately
+    const enrollment = await prisma.studentCourseEnrollment.findUnique({
+      where: {
+        id: payment.enrollmentId
+      },
+      include: {
+        course: {
+          include: {
+            institution: true
+          }
+        }
+      }
+    });
+
+    if (!enrollment) {
+      return NextResponse.json(
+        { error: 'Enrollment not found' },
         { status: 404 }
       );
     }
@@ -73,7 +92,7 @@ export async function POST(
     }
 
     // Calculate commission and institution amount
-    const commissionRate = payment.enrollment.course.institution.commissionRate;
+    const commissionRate = enrollment.course.institution.commissionRate;
     const commissionAmount = (payment.amount * commissionRate) / 100;
     const institutionAmount = payment.amount - commissionAmount;
 
@@ -114,12 +133,14 @@ export async function POST(
     });
 
     // Create institution payout record
-    await prisma.institutionPayout.create({
+    await prisma.institution_payouts.create({
       data: {
-        institutionId: payment.enrollment.course.institutionId,
+        id: `payout_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        institutionId: enrollment.course.institutionId,
         enrollmentId: payment.enrollmentId,
         amount: institutionAmount,
         status: 'PENDING',
+        updatedAt: new Date(),
         metadata: {
           paymentId: `MANUAL_${Date.now()}`,
           paymentMethod: 'MANUAL',
@@ -131,10 +152,10 @@ export async function POST(
 
     return NextResponse.json(updatedPayment);
   } catch (error) {
-    console.error('Error approving payment:');
+    console.error('Error approving payment:', error);
     return NextResponse.json(
       { error: 'Failed to approve payment' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500 }
     );
   }
 } 

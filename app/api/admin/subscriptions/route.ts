@@ -26,8 +26,19 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get all subscriptions with relations
+    // First, get all valid institution IDs
+    const validInstitutions = await prisma.institution.findMany({
+      select: { id: true }
+    });
+    const validInstitutionIds = validInstitutions.map(inst => inst.id);
+
+    // Get all subscriptions with relations, filtering for valid institutions only
     const subscriptions = await prisma.institutionSubscription.findMany({
+      where: {
+        institutionId: {
+          in: validInstitutionIds
+        }
+      },
       orderBy: {
         createdAt: 'desc'
       },
@@ -42,7 +53,7 @@ export async function GET(request: Request) {
         },
         commissionTier: true
       }
-    }).then(subs => subs.filter(sub => sub.institution !== null));
+    });
 
     // Enhance with performance data
     const enhancedSubscriptions = await Promise.all(
@@ -89,10 +100,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(enhancedSubscriptions);
   } catch (error) {
-    console.error('Error fetching subscriptions:');
+    console.error('Error fetching subscriptions:', error);
     return NextResponse.json(
       { error: 'Failed to fetch subscriptions' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500 }
     );
   }
 } 
