@@ -53,73 +53,88 @@ export async function GET(
       where.paymentStatus = paymentStatus;
     }
 
-    // Get enrollments with student and payment details
+    // Get enrollments (basic records only)
     const enrollments = await prisma.studentCourseEnrollment.findMany({
       where,
-      include: {
-        student: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            status: true,
-            created_at: true,
-            last_active: true
-          }
-        },
-        payments: {
-          select: {
-            id: true,
-            amount: true,
-            status: true,
-            createdAt: true,
-            paymentMethod: true,
-            currency: true
-          },
-          orderBy: {
-            createdAt: 'desc'
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' }
     });
 
-    // Filter out enrollments with null students (orphaned enrollments)
-    const validEnrollments = enrollments.filter(enrollment => enrollment.student !== null);
+    // Hydrate related data manually (no direct relations in schema)
+    const studentIds = Array.from(new Set(enrollments.map(e => e.studentId)));
+    const enrollmentIds = enrollments.map(e => e.id);
 
-    // Get total count of valid enrollments
-    const total = validEnrollments.length;
+    const [students, payments] = await Promise.all([
+      prisma.student.findMany({
+        where: { id: { in: studentIds } },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          status: true,
+          created_at: true,
+          last_active: true
+        }
+      }),
+      prisma.payment.findMany({
+        where: { enrollmentId: { in: enrollmentIds } },
+        select: {
+          id: true,
+          amount: true,
+          status: true,
+          createdAt: true,
+          paymentMethod: true,
+          currency: true,
+          enrollmentId: true
+        },
+        orderBy: { createdAt: 'desc' }
+      })
+    ]);
 
-    // Apply pagination to valid enrollments
-    const paginatedEnrollments = validEnrollments.slice(skip, skip + limit);
+    const studentMap = students.reduce((acc, s) => {
+      acc[s.id] = s;
+      return acc;
+    }, {} as Record<string, typeof students[number]>);
 
-    // Filter by search term if provided
-    let filteredEnrollments = paginatedEnrollments;
+    const paymentsByEnrollment: Record<string, typeof payments> = {};
+    for (const p of payments) {
+      if (!paymentsByEnrollment[p.enrollmentId]) paymentsByEnrollment[p.enrollmentId] = [] as any;
+      paymentsByEnrollment[p.enrollmentId].push(p);
+    }
+
+    // Attach student and payments, filter orphaned students
+    let enriched = enrollments
+      .map((e) => {
+        const student = studentMap[e.studentId] || null;
+        const enrollmentPayments = paymentsByEnrollment[e.id] || [];
+        return {
+          ...e,
+          student,
+          payments: enrollmentPayments
+        } as any;
+      })
+      .filter((e) => e.student !== null);
+
+    // Filter by search term if provided (on hydrated data)
     if (search) {
-      filteredEnrollments = paginatedEnrollments.filter(enrollment =>
-        enrollment.student!.name.toLowerCase().includes(search.toLowerCase()) ||
-        enrollment.student!.email.toLowerCase().includes(search.toLowerCase())
+      const q = search.toLowerCase();
+      enriched = enriched.filter((e) =>
+        e.student.name.toLowerCase().includes(q) || e.student.email.toLowerCase().includes(q)
       );
     }
 
-    // Calculate additional data for each enrollment
-    const enrollmentsWithDetails = filteredEnrollments.map(enrollment => {
-      const totalPaid = enrollment.payments
-        .filter(payment => payment.status === 'COMPLETED')
-        .reduce((sum, payment) => sum + payment.amount, 0);
+    const total = enriched.length;
+    const paginatedEnrollments = enriched.slice(skip, skip + limit);
 
-      const latestPayment = enrollment.payments[0];
-      
+    const enrollmentsWithDetails = paginatedEnrollments.map((enrollment) => {
+      const completedPayments = enrollment.payments.filter((p: any) => p.status === 'COMPLETED' || p.status === 'PAID');
+      const totalPaid = completedPayments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
+      const latestPayment = enrollment.payments[0] || null;
       return {
         ...enrollment,
         totalPaid,
         latestPayment,
-        daysSinceEnrollment: Math.floor(
-          (Date.now() - new Date(enrollment.createdAt).getTime()) / (1000 * 60 * 60 * 24)
-        )
+        daysSinceEnrollment: Math.floor((Date.now() - new Date(enrollment.createdAt).getTime()) / (1000 * 60 * 60 * 24))
       };
     });
 
@@ -135,7 +150,7 @@ export async function GET(
     });
   } catch (error) {
     console.error('Error fetching course enrollments:', error);
-    return new NextResponse('Internal Server Error', { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' });
+    return new NextResponse('Internal Server Error', { status: 500, statusText: 'Internal Server Error' });
   }
 }
 
@@ -198,13 +213,13 @@ export async function PATCH(
       }
     });
 
-    // Log the admin action
+    // Log the admin action (use schema fields: resource/resourceId)
     await prisma.auditLog.create({
       data: {
         action: 'ENROLLMENT_STATUS_UPDATE',
         userId: session.user.id,
-        targetType: 'ENROLLMENT',
-        targetId: enrollmentId,
+        resource: 'ENROLLMENT',
+        resourceId: enrollmentId,
         details: {
           courseId: params.id,
           oldStatus: enrollment.status,
@@ -220,6 +235,6 @@ export async function PATCH(
     return NextResponse.json(updatedEnrollment);
   } catch (error) {
     console.error('Error updating enrollment:', error);
-    return new NextResponse('Internal Server Error', { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' });
+    return new NextResponse('Internal Server Error', { status: 500, statusText: 'Internal Server Error' });
   }
 } 

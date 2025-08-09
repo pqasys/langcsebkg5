@@ -36,27 +36,38 @@ export async function GET(request: NextRequest) {
           select: {
             id: true
           }
-        },
-        bookings: {
-          where: {
-            status: 'COMPLETED'
-          },
-          select: {
-            id: true,
-            amount: true,
-            createdAt: true
-          }
         }
       }
     });
 
+    // Aggregate payments once for all institutions
+    const institutionIds = institutions.map((inst) => inst.id);
+    const paymentAggregates = institutionIds.length
+      ? await prisma.payment.groupBy({
+          by: ['institutionId'],
+          where: {
+            institutionId: { in: institutionIds },
+            status: { in: ['COMPLETED', 'PAID', 'SUCCEEDED'] }
+          },
+          _sum: { amount: true, commissionAmount: true },
+          _count: { _all: true }
+        })
+      : [];
+
+    const paymentMap = paymentAggregates.reduce((acc, agg) => {
+      acc[agg.institutionId] = {
+        totalAmount: agg._sum.amount || 0,
+        totalCommission: (agg._sum as any).commissionAmount || 0,
+        count: agg._count._all || 0
+      };
+      return acc;
+    }, {} as Record<string, { totalAmount: number; totalCommission: number; count: number }>);
+
     // Calculate analytics for each institution
     const institutionsWithAnalytics = await Promise.all(
       institutions.map(async (institution) => {
-        // Calculate revenue generated from completed bookings
-        const totalRevenue = institution.bookings.reduce((sum, booking) => {
-          return sum + (booking.amount || 0);
-        }, 0);
+        const paymentStats = paymentMap[institution.id] || { totalAmount: 0, totalCommission: 0, count: 0 };
+        const totalRevenue = paymentStats.totalAmount;
 
         // Calculate priority score
         let priorityScore = 0;
@@ -78,7 +89,7 @@ export async function GET(request: NextRequest) {
           commissionRate: institution.commissionRate,
           courseCount: institution.courses.length,
           studentCount: institution.users.length,
-          bookingCount: institution.bookings.length,
+          bookingCount: paymentStats.count,
           priorityScore,
           revenueGenerated: totalRevenue,
           leadStats: {

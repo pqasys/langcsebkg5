@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { LiveClassesService, VideoProviderConfig } from '@/lib/live-classes';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(
   request: NextRequest,
@@ -26,8 +27,29 @@ export async function POST(
 
     const videoService = LiveClassesService.getInstance(config);
 
-    // Join video session
+    // Trial short-circuit: allow join if user has active TRIAL with quota
+    const subscription = await prisma.studentSubscription.findUnique({ where: { studentId: session.user.id } });
+    const now = new Date();
+    const isTrialActive = !!subscription && (subscription.planType || '').toUpperCase() === 'TRIAL' && subscription.status === 'ACTIVE' && subscription.endDate > now && (subscription.attendanceQuota || 0) > 0;
+
+    // Join video session (service handles capacity/seat logic)
     const result = await videoService.joinLiveClass(sessionId, session.user.id);
+
+    // If trial, consume seat after successful join
+    if (isTrialActive) {
+      try {
+        await prisma.studentSubscription.update({
+          where: { studentId: session.user.id },
+          data: {
+            attendanceQuota: Math.max(0, (subscription.attendanceQuota || 0) - 1),
+            ...(Math.max(0, (subscription.attendanceQuota || 0) - 1) === 0 ? { status: 'CANCELLED' } : {})
+          }
+        });
+      } catch (e) {
+        // Non-fatal: user already joined; log and continue
+        console.error('Failed to consume trial after join:', e);
+      }
+    }
 
     return NextResponse.json({
       success: true,

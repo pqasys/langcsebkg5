@@ -35,6 +35,11 @@ interface Course {
   startDate?: string;
   endDate?: string;
   base_price: number;
+  duration?: number;
+  level?: string;
+  framework?: string;
+  marketingType?: string;
+  hasLiveClasses?: boolean;
   hasOutstandingPayment?: boolean;
   payment?: {
     id: string;
@@ -203,6 +208,21 @@ export default function StudentCoursesPage() {
                 <p className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-grow">
                   {course.description}
                 </p>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-4">
+                  <div>
+                    <span className="font-semibold">Type:</span> {course.marketingType || (course.hasLiveClasses ? 'Live' : 'Self-paced')}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Pricing:</span> {course.pricingPeriod || 'FULL_COURSE'}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Level:</span> {course.level || 'N/A'}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Duration:</span> {course.duration ? `${course.duration} weeks` : 'Flexible'}
+                  </div>
+                </div>
 
                 {needsPayment && (
                   <Alert variant="warning" className="mb-4">

@@ -19,37 +19,21 @@ export async function GET() {
       highCommissionInstitutions,
       courseStats
     ] = await Promise.all([
-      // Total revenue from course enrollments
-      prisma.booking.aggregate({
+      // Total revenue from payments that have been completed/paid
+      prisma.payment.aggregate({
         where: {
-          status: 'COMPLETED',
-          payment: {
-            status: 'COMPLETED'
-          }
+          status: { in: ['COMPLETED', 'PAID', 'SUCCEEDED'] }
         },
-        _sum: {
-          amount: true
-        }
+        _sum: { amount: true }
       }),
       
-      // Commission revenue
-      prisma.booking.aggregate({
+      // Commission revenue (use explicit commissionAmount when available)
+      prisma.payment.aggregate({
         where: {
-          status: 'COMPLETED',
-          payment: {
-            status: 'COMPLETED'
-          },
-          course: {
-            institution: {
-              commissionRate: {
-                gt: 0
-              }
-            }
-          }
+          status: { in: ['COMPLETED', 'PAID', 'SUCCEEDED'] },
+          commissionAmount: { gt: 0 }
         },
-        _sum: {
-          amount: true
-        }
+        _sum: { commissionAmount: true }
       }),
       
       // Featured institutions count
@@ -96,7 +80,7 @@ export async function GET() {
       })
     ]);
 
-    // Get top performing courses by revenue
+    // Get top performing courses by enrollment activity (proxy for performance)
     const topCourses = await prisma.course.findMany({
       where: {
         institution: {
@@ -113,20 +97,10 @@ export async function GET() {
             isFeatured: true
           }
         },
-        _count: {
-          select: {
-            bookings: {
-              where: {
-                status: 'COMPLETED'
-              }
-            }
-          }
-        }
+        _count: { select: { enrollments: true } }
       },
       orderBy: {
-        bookings: {
-          _count: 'desc'
-        }
+        enrollments: { _count: 'desc' }
       },
       take: 10
     });
@@ -145,11 +119,12 @@ export async function GET() {
       };
       priorityScore += planBonus[course.institution.subscriptionPlan as keyof typeof planBonus] || 0;
       
+      const enrollmentCount = course._count.enrollments || 0;
       return {
         ...course,
         priorityScore,
-        estimatedRevenue: (course._count.bookings * course.base_price) || 0,
-        commissionRevenue: (course._count.bookings * course.base_price * (course.institution.commissionRate || 0) / 100) || 0
+        estimatedRevenue: (enrollmentCount * course.base_price) || 0,
+        commissionRevenue: (enrollmentCount * course.base_price * (course.institution.commissionRate || 0) / 100) || 0
       };
     });
 
@@ -187,9 +162,10 @@ export async function GET() {
     return NextResponse.json({
       revenue: {
         total: totalRevenue._sum.amount || 0,
-        commission: commissionRevenue._sum.amount || 0,
-        commissionPercentage: totalRevenue._sum.amount ? 
-          ((commissionRevenue._sum.amount || 0) / totalRevenue._sum.amount * 100) : 0
+        commission: commissionRevenue._sum.commissionAmount || 0,
+        commissionPercentage: totalRevenue._sum.amount
+          ? (((commissionRevenue._sum.commissionAmount || 0) / totalRevenue._sum.amount) * 100)
+          : 0
       },
       institutions: {
         featured: featuredInstitutions,
@@ -241,10 +217,10 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error fetching advertising data:');
+    console.error('Error fetching advertising data:', error);
     return NextResponse.json(
       { error: 'Failed to fetch advertising data' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500, statusText: 'Internal Server Error' }
     );
   }
 }
@@ -290,10 +266,10 @@ export async function POST(request: Request) {
     }
 
   } catch (error) {
-    console.error('Error updating advertising data:');
+    console.error('Error updating advertising data:', error);
     return NextResponse.json(
       { error: 'Failed to update advertising data' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500, statusText: 'Internal Server Error' }
     );
   }
 } 

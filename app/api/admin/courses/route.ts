@@ -67,6 +67,11 @@ export async function GET(request: Request) {
             startTime: true,
             endTime: true
           }
+        },
+        _count: {
+          select: {
+            enrollments: true
+          }
         }
       },
       orderBy: { createdAt: 'desc' },

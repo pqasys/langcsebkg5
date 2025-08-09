@@ -10,7 +10,8 @@ import {
   Settings,
   Mail,
   CreditCard,
-  Activity
+  Activity,
+  Megaphone
 } from 'lucide-react';
 
 const menuItems = [
@@ -43,6 +44,11 @@ const menuItems = [
     title: 'Performance Dashboard',
     href: '/admin/performance',
     icon: Activity
+  },
+  {
+    title: 'Advertising',
+    href: '/admin/advertising',
+    icon: Megaphone
   },
   {
     title: 'Settings',

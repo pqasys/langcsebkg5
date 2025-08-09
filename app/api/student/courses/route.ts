@@ -26,7 +26,12 @@ export async function GET() {
         status: true,
         base_price: true,
         pricingPeriod: true,
-        institutionId: true
+        institutionId: true,
+        duration: true,
+        level: true,
+        framework: true,
+        marketingType: true,
+        hasLiveClasses: true
       }
     });
 

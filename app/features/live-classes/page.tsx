@@ -219,11 +219,9 @@ export default function VideoConferencingFeaturePage() {
   };
 
   const handleStartFreeTrial = () => {
-    if (session?.user) {
-      window.location.href = "/subscription/trial";
-    } else {
-      window.location.href = "/auth/signin?redirect=/subscription/trial";
-    }
+    // Always allow reaching the trial page without immediate sign-in.
+    // Sign-in will be requested on the trial page when attempting to start.
+    window.location.href = "/subscription/trial";
   };
 
   const handleStartPremium = () => {
