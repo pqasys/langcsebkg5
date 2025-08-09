@@ -30,14 +30,13 @@ export async function GET(
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    // Get institution information
-    const institution = await prisma.institution.findUnique({
-      where: { id: course.institutionId },
-      select: {
-        id: true,
-        name: true,
-      }
-    });
+    // Get institution information (only if present)
+    const institution = course.institutionId
+      ? await prisma.institution.findUnique({
+          where: { id: course.institutionId },
+          select: { id: true, name: true },
+        })
+      : null;
 
     // Get modules for the course
     const modules = await prisma.modules.findMany({

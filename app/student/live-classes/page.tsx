@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Calendar, Users, DollarSign, Clock, BookOpen, Bookmark, Video, MessageCircle, Share2, User } from 'lucide-react';
 import { format } from 'date-fns';
+import VideoConferencingCTA from '@/components/VideoConferencingCTA'
 
 interface LiveClass {
   id: string;
@@ -365,6 +366,9 @@ export default function StudentLiveClassesPage() {
                       Upgrade to Premium or enroll in an institution to access live classes.
                     </p>
                   )}
+                  <div className="mt-6">
+                    <VideoConferencingCTA variant="compact" />
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

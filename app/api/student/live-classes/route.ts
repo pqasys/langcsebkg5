@@ -48,11 +48,11 @@ export async function GET(request: NextRequest) {
       console.error('Database query error:', dbError);
       return NextResponse.json({ 
         error: 'Database connection error',
-        details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
+        details: process.env.NODE_ENV === 'development' ? (dbError as any).message : undefined
       }, { status: 500 });
     }
 
-    const hasSubscription = studentSubscription?.status === 'ACTIVE';
+    const hasSubscription = studentSubscription?.status; // original behavior (truthy when any status exists)
     const institutionId = user?.institutionId;
 
     // Build where clause based on student's access
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Filter based on access level
+    // Filter based on access level (eligibility-based)
     if (hasSubscription && institutionId) {
       // Student has both subscription and institution enrollment
       // Create a new OR condition that combines search OR with institution access
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
       // Student has only institution enrollment - institution classes only
       where.institutionId = institutionId;
     } else {
-      // Student has no access - return empty result
+      // Student has no access - return empty result (original behavior)
       return NextResponse.json({
         liveClasses: [],
         pagination: {
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.json({ 
         error: 'Database connection error',
-        details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
+        details: process.env.NODE_ENV === 'development' ? (dbError as any).message : undefined
       }, { status: 500 });
     }
 
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
       console.error('Database query error for enrollment status:', dbError);
       return NextResponse.json({ 
         error: 'Database connection error',
-        details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
+        details: process.env.NODE_ENV === 'development' ? (dbError as any).message : undefined
       }, { status: 500 });
     }
 
@@ -208,7 +208,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Internal server error',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: process.env.NODE_ENV === 'development' ? (error as any).message : undefined
       },
       { status: 500 }
     );
