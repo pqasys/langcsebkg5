@@ -13,7 +13,7 @@ export async function GET() {
     const coursesByCountry = await prisma.course.groupBy({
       by: ['institutionId'],
       where: {
-        status: 'published',
+        status: 'PUBLISHED',
       },
       _count: {
         id: true,

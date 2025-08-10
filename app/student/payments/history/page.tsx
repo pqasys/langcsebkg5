@@ -14,32 +14,51 @@ export default async function PaymentHistoryPage() {
     redirect('/auth/signin');
   }
 
-  const payments = await prisma.payment.findMany({
+  // First, get the student's enrollments
+  const enrollments = await prisma.studentCourseEnrollment.findMany({
     where: {
-      enrollment: {
-        studentId: session.user.id
-      }
+      studentId: session.user.id
     },
-    orderBy: {
-      createdAt: 'desc'
-    },
-    include: {
-      enrollment: {
+    select: {
+      id: true,
+      course: {
         select: {
-          course: {
+          title: true,
+          institution: {
             select: {
-              title: true,
-              institution: {
-                select: {
-                  name: true
-                }
-              }
+              name: true
             }
           }
         }
       }
     }
   });
+
+  const enrollmentIds = enrollments.map(e => e.id);
+
+  // Then get payments for those enrollments
+  const payments = await prisma.payment.findMany({
+    where: {
+      enrollmentId: {
+        in: enrollmentIds
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  // Create a map for quick lookup
+  const enrollmentMap = enrollments.reduce((acc, enrollment) => {
+    acc[enrollment.id] = enrollment;
+    return acc;
+  }, {} as Record<string, typeof enrollments[0]>);
+
+  // Combine the data
+  const paymentsWithEnrollmentData = payments.map(payment => ({
+    ...payment,
+    enrollment: enrollmentMap[payment.enrollmentId]
+  }));
 
   return (
     <div className="space-y-6">
@@ -48,7 +67,7 @@ export default async function PaymentHistoryPage() {
       </div>
 
       <div className="grid gap-6">
-        {payments.map((payment) => (
+        {paymentsWithEnrollmentData.map((payment) => (
           <Card key={payment.id}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -114,7 +133,7 @@ export default async function PaymentHistoryPage() {
             </CardContent>
           </Card>
         ))}
-        {payments.length === 0 && (
+        {paymentsWithEnrollmentData.length === 0 && (
           <p className="text-center text-muted-foreground">
             No payment history found
           </p>

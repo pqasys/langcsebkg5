@@ -79,6 +79,9 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
       setIsLoading(true);
       try {
         await onEnroll(course.id);
+      } catch (error) {
+        // Error is already handled by the parent component
+        console.error('Enrollment error:', error);
       } finally {
         setIsLoading(false);
       }

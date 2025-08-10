@@ -326,8 +326,26 @@ export default function EnrollmentModal({
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to enroll in course');
+        const errorData = await response.json();
+        
+        // Handle subscription requirement
+        if (response.status === 402 && errorData.error === 'Subscription required') {
+          console.log('Subscription required for this course');
+          toast.error('This course requires an active subscription to enroll.');
+          
+          // Close the modal
+          onClose();
+          
+          // Redirect to subscription page
+          if (errorData.redirectUrl) {
+            router.push(errorData.redirectUrl);
+          } else {
+            router.push('/subscription-signup');
+          }
+          return;
+        }
+        
+        throw new Error(errorData.error || errorData.message || 'Failed to enroll in course');
       }
 
       const data = await response.json();
@@ -335,6 +353,13 @@ export default function EnrollmentModal({
 
       // Close the modal
       onClose();
+
+      // Show appropriate success message based on enrollment type
+      if (data.enrollment?.isSubscriptionBased) {
+        toast.success('Enrollment successful! You have immediate access to the course content.');
+      } else {
+        toast.success('Enrollment successful! Please complete payment to access course content.');
+      }
 
       // Revalidate courses data
       await revalidateCourses();
@@ -358,6 +383,15 @@ export default function EnrollmentModal({
 
   const getPricingModelDescription = () => {
     if (!course) return '';
+    
+    // Check if this is a subscription-based course
+    const isSubscriptionBasedCourse = course.requiresSubscription || 
+      course.marketingType === 'LIVE_ONLINE' || 
+      course.marketingType === 'BLENDED';
+    
+    if (isSubscriptionBasedCourse) {
+      return 'This course is included in your subscription. You will have immediate access to all course content without additional payment.';
+    }
     
     const pricingPeriod = enrollmentDetails?.pricingPeriod || course.pricingPeriod;
     switch (pricingPeriod) {
@@ -399,6 +433,11 @@ export default function EnrollmentModal({
     }
   };
 
+  // Check if this is a subscription-based course
+  const isSubscriptionBasedCourse = course?.requiresSubscription || 
+    course?.marketingType === 'LIVE_ONLINE' || 
+    course?.marketingType === 'BLENDED';
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -413,7 +452,10 @@ export default function EnrollmentModal({
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              After payment, you'll have access to all course materials and can track your progress.
+              {isSubscriptionBasedCourse 
+                ? 'You have immediate access to all course materials and can track your progress.'
+                : 'After payment, you\'ll have access to all course materials and can track your progress.'
+              }
             </AlertDescription>
           </Alert>
 
@@ -514,12 +556,13 @@ export default function EnrollmentModal({
                   <p><strong>Course:</strong> {course.title}</p>
                   <p><strong>Institution:</strong> {course.institution?.name || 'Not assigned'}</p>
                   <p><strong>Description:</strong> {course.description}</p>
-                  <p><strong>Pricing Model:</strong> {(enrollmentDetails?.pricingPeriod || course.pricingPeriod || 'FULL_COURSE').replace('_', ' ')}</p>
+                  <p><strong>Pricing Model:</strong> {isSubscriptionBasedCourse ? 'Subscription-based' : (enrollmentDetails?.pricingPeriod || course.pricingPeriod || 'FULL_COURSE').replace('_', ' ')}</p>
                   <p><strong>Course Period:</strong> {formatDate(course.startDate)} - {formatDate(course.endDate)}</p>
                 </div>
               </div>
 
-              {course.pricingPeriod !== 'FULL_COURSE' && (
+              {/* Only show date selection for non-subscription-based courses */}
+              {!isSubscriptionBasedCourse && course.pricingPeriod !== 'FULL_COURSE' && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -548,7 +591,28 @@ export default function EnrollmentModal({
                 </div>
               )}
 
-              {enrollmentDetails && (
+              {/* Show subscription-based course enrollment details */}
+              {isSubscriptionBasedCourse && (
+                <div className="space-y-2">
+                  <h4 className="font-medium">Subscription Enrollment</h4>
+                  <div className="text-sm text-muted-foreground">
+                    <p className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <strong>Access Period:</strong> Full course duration
+                    </p>
+                    <p className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <strong>Course Period:</strong> {formatDate(course.startDate)} - {formatDate(course.endDate)}
+                    </p>
+                    <p className="text-lg font-bold mt-2 text-green-600">
+                      <strong>Cost:</strong> Included in your subscription
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Show regular enrollment details for non-subscription courses */}
+              {!isSubscriptionBasedCourse && enrollmentDetails && (
                 <div className="space-y-2">
                   <h4 className="font-medium">Enrollment Period</h4>
                   <div className="text-sm text-muted-foreground">
@@ -600,7 +664,7 @@ export default function EnrollmentModal({
                 </Button>
                 <Button
                   onClick={handleConfirm}
-                  disabled={isLoading || !termsAccepted || !enrollmentDetails}
+                  disabled={isLoading || !termsAccepted || (!isSubscriptionBasedCourse && !enrollmentDetails)}
                 >
                   {isLoading ? (
                     <>

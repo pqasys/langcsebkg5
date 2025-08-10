@@ -44,7 +44,8 @@ const API_CACHE_PATTERNS = {
     '/api/student/progress',
     '/api/bookings',
     '/api/stats',
-    '/api/courses/by-country'
+    '/api/courses/by-country',
+    '/api/student/courses'
   ],
   // Stale-while-revalidate APIs (balance between fresh and fast)
   staleWhileRevalidate: [
@@ -200,7 +201,8 @@ async function handleCacheFirst(request) {
 async function handleNetworkFirst(request) {
   try {
     const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
+    // Accept 402 (Payment Required) as a valid response for subscription checks
+    if (networkResponse.ok || networkResponse.status === 402) {
       const cache = await caches.open(API_CACHE);
       cache.put(request, networkResponse.clone());
       return networkResponse;

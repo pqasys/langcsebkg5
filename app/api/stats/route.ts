@@ -28,7 +28,7 @@ async function getStatsWithRetry(maxRetries = 3, delay = 1000) {
         }),
         prisma.course.count({
           where: { 
-            status: 'published'
+            status: 'PUBLISHED'
           }
         }),
         // Count unique frameworks from courses (since there's no language field)

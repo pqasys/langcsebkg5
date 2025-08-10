@@ -129,7 +129,7 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
     }
   }, [course])
 
-  const handleEnrollment = () => {
+  const handleEnrollment = async () => {
     if (!course) return
     
     if (!isAuthenticated) {
@@ -142,8 +142,38 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
       return
     }
     
-    // User is authenticated, open enrollment modal
-    setIsEnrollmentModalOpen(true)
+    try {
+      // Check enrollment eligibility before opening modal
+      const response = await fetch(`/api/student/courses/${course.id}/check-enrollment-eligibility`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        // Handle subscription requirement
+        if (response.status === 402 && errorData.error === 'Subscription required') {
+          console.log('Subscription required for this course');
+          toast.error('This course requires an active subscription to enroll.');
+          
+          // Redirect to subscription page
+          if (errorData.redirectUrl) {
+            router.push(errorData.redirectUrl);
+          } else {
+            router.push('/subscription-signup');
+          }
+          return;
+        }
+        
+        // Handle other errors
+        toast.error(errorData.details || errorData.error || 'Unable to check enrollment eligibility');
+        return;
+      }
+
+      // User is eligible, open enrollment modal
+      setIsEnrollmentModalOpen(true);
+    } catch (error) {
+      console.error('Error checking enrollment eligibility:', error);
+      toast.error('Failed to check enrollment eligibility. Please try again.');
+    }
   }
 
   const handleEnrollmentComplete = () => {

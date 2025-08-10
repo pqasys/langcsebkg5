@@ -30,15 +30,9 @@ export async function GET(request: Request) {
     });
 
     // Build the where clause
-    const whereClause: unknown = {
-      status: 'published',
-      startDate: {
-        gte: new Date(new Date().setHours(0, 0, 0, 0) - 30 * 24 * 60 * 60 * 1000) // Show courses starting from 30 days ago
-      },
-      institution: {
-        isApproved: true,
-        status: 'ACTIVE'
-      }
+    const whereClause: any = {
+      status: 'PUBLISHED',
+      startDate: { gte: new Date() }
     };
 
     if (query) {

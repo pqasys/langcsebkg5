@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { notificationService } from '@/lib/notification';
+import { SubscriptionCommissionService } from '@/lib/subscription-commission-service';
 
 // Ensure this is a dynamic route
 export const dynamic = 'force-dynamic';
@@ -34,7 +35,9 @@ export async function POST(
       },
       select: {
         id: true,
-        status: true
+        status: true,
+        marketingType: true,
+        requiresSubscription: true
       }
     });
 
@@ -44,8 +47,40 @@ export async function POST(
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    if (courseCheck.status !== 'published') {
+    if (courseCheck.status !== 'PUBLISHED') {
       return NextResponse.json({ error: 'Course is not available for enrollment' }, { status: 400 });
+    }
+
+    // Check if course requires subscription
+    const requiresSubscription = courseCheck.requiresSubscription || 
+      courseCheck.marketingType === 'LIVE_ONLINE' || 
+      courseCheck.marketingType === 'BLENDED';
+
+    let subscriptionStatus = null;
+    if (requiresSubscription) {
+      console.log('Course requires subscription, checking user subscription status...');
+      try {
+        const subscriptionStatus = await SubscriptionCommissionService.getUserSubscriptionStatus(session.user.id);
+        if (!subscriptionStatus.hasActiveSubscription) {
+          console.log('User does not have active subscription for subscription-required course');
+          return NextResponse.json({ 
+            error: 'Subscription required',
+            details: 'This course requires an active subscription to enroll.',
+            redirectUrl: '/subscription-signup',
+            courseType: courseCheck.marketingType,
+            requiresSubscription: true
+          }, { status: 402 }); // 402 Payment Required
+        }
+        console.log('User has active subscription:', subscriptionStatus.currentPlan);
+        subscriptionStatus = subscriptionStatus; // Store for later use
+      } catch (subscriptionError) {
+        console.error('Error checking subscription status:', subscriptionError);
+        return NextResponse.json({ 
+          error: 'Subscription verification failed',
+          details: 'Unable to verify subscription status. Please try again or contact support.',
+          redirectUrl: '/subscription-signup'
+        }, { status: 500 });
+      }
     }
 
     // Get course details with enrollment count
@@ -198,6 +233,9 @@ export async function POST(
         institutionId: course.institutionId
       });
 
+      // Determine if this is a subscription-based enrollment (no additional payment required)
+      const isSubscriptionBasedEnrollment = requiresSubscription && subscriptionStatus?.hasActiveSubscription;
+
       // Use a transaction to ensure both enrollment and payment are created atomically
       const result = await prisma.$transaction(async (tx) => {
         // Create enrollment with payment tracking
@@ -205,39 +243,47 @@ export async function POST(
           data: {
             studentId: session.user.id,
             courseId: params.id,
-            status: 'PENDING_PAYMENT',
-            startDate,
-            endDate: new Date(course.endDate),
-            paymentStatus: 'PENDING',
+            status: isSubscriptionBasedEnrollment ? 'ENROLLED' : 'PENDING_PAYMENT',
+            paymentStatus: isSubscriptionBasedEnrollment ? 'PAID' : 'PENDING',
             progress: 0,
-          }
+            startDate,
+            endDate: course.endDate,
+            price: course.base_price,
+            institutionId: course.institutionId,
+            // For subscription-based enrollments, mark payment as completed
+            ...(isSubscriptionBasedEnrollment && {
+              paymentDate: new Date(),
+              paymentMethod: 'SUBSCRIPTION',
+              paymentId: `SUB_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+            })
+          },
         });
 
-        console.log('Enrollment created:', enrollment.id);
-
-        // Create payment record
-        const calculatedPrice = course.base_price;
-        const idempotencyKey = `course-enrollment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
+        // Create payment record with appropriate status
         const payment = await tx.payment.create({
           data: {
-            amount: calculatedPrice,
-            status: 'PENDING',
+            amount: course.base_price,
+            status: isSubscriptionBasedEnrollment ? 'COMPLETED' : 'PENDING',
             institutionId: course.institutionId,
             enrollmentId: enrollment.id,
             commissionAmount: 0,
-            institutionAmount: calculatedPrice,
-            currency: 'usd',
-            idempotencyKey,
+            institutionAmount: course.base_price,
+            currency: 'USD',
+            // For subscription-based payments, mark as paid immediately
+            ...(isSubscriptionBasedEnrollment && {
+              paidAt: new Date(),
+              paymentMethod: 'SUBSCRIPTION',
+              paymentId: `SUB_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+            }),
             metadata: {
               type: 'COURSE_ENROLLMENT',
               courseTitle: course.title,
-              institutionName: institution.name
+              institutionName: institution.name,
+              isSubscriptionBased: isSubscriptionBasedEnrollment,
+              subscriptionPlan: subscriptionStatus?.currentPlan
             }
           }
         });
-
-        console.log('Payment record created:', payment.id);
 
         return { enrollment, payment };
       });
@@ -263,7 +309,7 @@ export async function POST(
             enrollmentId: result.enrollment.id,
             courseId: course.id,
             institutionId: institution.id,
-            paymentAmount: calculatedPrice
+            paymentAmount: course.base_price
           },
           'SYSTEM'
         );
@@ -315,21 +361,25 @@ export async function POST(
       revalidatePath('/student/courses');
       revalidatePath('/institution/courses');
 
+      // Return appropriate message based on enrollment type
+      const message = isSubscriptionBasedEnrollment 
+        ? 'Course enrollment successful! You have immediate access to the course content.'
+        : 'Course enrollment successful. Payment required for content access.';
+
       return NextResponse.json({ 
-        message: 'Course enrollment successful. Payment required for content access.',
+        message,
         enrollment: {
           id: result.enrollment.id,
           status: result.enrollment.status,
           paymentStatus: result.enrollment.paymentStatus,
           startDate: result.enrollment.startDate,
           endDate: result.enrollment.endDate,
-          paymentDetails: {
-            amount: calculatedPrice,
-            invoiceNumber,
-            institutionName: institution.name,
-            courseTitle: course.title,
-            contentAccess: 'Restricted until payment is completed'
-          }
+          isSubscriptionBased: isSubscriptionBasedEnrollment
+        },
+        payment: {
+          id: result.payment.id,
+          status: result.payment.status,
+          amount: result.payment.amount
         }
       });
     } catch (createError) {

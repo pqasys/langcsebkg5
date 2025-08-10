@@ -17,28 +17,19 @@ export default async function StudentPaymentsPage() {
     redirect('/auth/signin');
   }
 
-  // Get recent payments (last 5)
-  const recentPayments = await prisma.payment.findMany({
+  // First, get the student's enrollments
+  const enrollments = await prisma.studentCourseEnrollment.findMany({
     where: {
-      enrollment: {
-        studentId: session.user.id
-      }
+      studentId: session.user.id
     },
-    orderBy: {
-      createdAt: 'desc'
-    },
-    take: 5,
-    include: {
-      enrollment: {
+    select: {
+      id: true,
+      course: {
         select: {
-          course: {
+          title: true,
+          institution: {
             select: {
-              title: true,
-              institution: {
-                select: {
-                  name: true
-                }
-              }
+              name: true
             }
           }
         }
@@ -46,11 +37,38 @@ export default async function StudentPaymentsPage() {
     }
   });
 
+  const enrollmentIds = enrollments.map(e => e.id);
+
+  // Get recent payments (last 5)
+  const recentPayments = await prisma.payment.findMany({
+    where: {
+      enrollmentId: {
+        in: enrollmentIds
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    },
+    take: 5
+  });
+
+  // Create a map for quick lookup
+  const enrollmentMap = enrollments.reduce((acc, enrollment) => {
+    acc[enrollment.id] = enrollment;
+    return acc;
+  }, {} as Record<string, typeof enrollments[0]>);
+
+  // Combine the data
+  const paymentsWithEnrollmentData = recentPayments.map(payment => ({
+    ...payment,
+    enrollment: enrollmentMap[payment.enrollmentId]
+  }));
+
   // Get payment statistics
   const paymentStats = await prisma.payment.aggregate({
     where: {
-      enrollment: {
-        studentId: session.user.id
+      enrollmentId: {
+        in: enrollmentIds
       }
     },
     _sum: {
@@ -92,7 +110,7 @@ export default async function StudentPaymentsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              {recentPayments.length > 0 ? formatCurrency(recentPayments[0].amount) : formatCurrency(0)}
+              {paymentsWithEnrollmentData.length > 0 ? formatCurrency(paymentsWithEnrollmentData[0].amount) : formatCurrency(0)}
             </p>
             <p className="text-sm text-muted-foreground">
               Latest payment
@@ -113,7 +131,7 @@ export default async function StudentPaymentsPage() {
           </Button>
         </div>
         <div className="grid gap-4">
-          {recentPayments.map((payment) => (
+          {paymentsWithEnrollmentData.map((payment) => (
             <Card key={payment.id}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -165,7 +183,7 @@ export default async function StudentPaymentsPage() {
               </CardContent>
             </Card>
           ))}
-          {recentPayments.length === 0 && (
+          {paymentsWithEnrollmentData.length === 0 && (
             <p className="text-center text-muted-foreground">
               No recent payments found
             </p>

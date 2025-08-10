@@ -17,7 +17,7 @@ export async function GET() {
     // Get all published courses
     const publishedCourses = await prisma.course.findMany({
       where: {
-        status: 'published'
+        status: 'PUBLISHED'
       },
       select: {
         id: true,

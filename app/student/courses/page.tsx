@@ -111,9 +111,40 @@ export default function StudentCoursesPage() {
     setFilteredCourses(filtered);
   }, [searchTerm, statusFilter, courses]);
 
-  const handleEnroll = (courseId: string) => {
-    setSelectedCourseId(courseId);
-    setShowEnrollmentModal(true);
+  const handleEnroll = async (courseId: string) => {
+    try {
+      // Check enrollment eligibility before opening modal
+      const response = await fetch(`/api/student/courses/${courseId}/check-enrollment-eligibility`);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        // Handle subscription requirement
+        if (response.status === 402 && errorData.error === 'Subscription required') {
+          console.log('Subscription required for this course');
+          toast.error('This course requires an active subscription to enroll.');
+          
+          // Redirect to subscription page
+          if (errorData.redirectUrl) {
+            router.push(errorData.redirectUrl);
+          } else {
+            router.push('/subscription-signup');
+          }
+          return;
+        }
+        
+        // Handle other errors
+        toast.error(errorData.details || errorData.error || 'Unable to check enrollment eligibility');
+        return;
+      }
+
+      // User is eligible, open enrollment modal
+      setSelectedCourseId(courseId);
+      setShowEnrollmentModal(true);
+    } catch (error) {
+      console.error('Error checking enrollment eligibility:', error);
+      toast.error('Failed to check enrollment eligibility. Please try again.');
+    }
   };
 
   const handleEnrollmentComplete = () => {
