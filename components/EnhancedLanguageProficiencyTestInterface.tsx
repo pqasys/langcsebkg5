@@ -127,6 +127,20 @@ export function EnhancedLanguageProficiencyTestInterface({
             category: q.category,
             difficulty: q.difficulty
           }));
+        } else if (language === 'es') {
+          // Use Spanish questions
+          const { getBalancedQuestionSet } = await import('@/lib/data/spanish-proficiency-questions');
+          const spanishQuestions = getBalancedQuestionSet(80);
+          staticQuestions = spanishQuestions.map(q => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation,
+            level: q.level,
+            category: q.category,
+            difficulty: q.difficulty
+          }));
         } else {
           // Default to English questions
           const { getBalancedQuestionSet } = await import('@/lib/data/english-proficiency-questions');

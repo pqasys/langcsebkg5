@@ -1,2 +1,4 @@
 How to include metadata on pages without causing 'use client' directive errors
 I can see that the Course model doesn't have a metadata field
+
+Please can you generate a Spanish proficiency test:160 level-appropriate multiple-choice questions (A1 → C2) balanced between Gramática & Vocabulario in each level. Written in neutral, international Spanish for the Spanish Proficiency Test?
