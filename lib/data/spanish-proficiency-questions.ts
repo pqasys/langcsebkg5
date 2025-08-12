@@ -310,2103 +310,611 @@ export const SPANISH_PROFICIENCY_QUESTIONS: TestQuestion[] = [
     "category": "vocabulary",
     "difficulty": "medium"
   },
-  {
-    "id": "B1-G-1",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 1: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-2",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 2: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-3",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 3: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-4",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 4: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-5",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 5: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-6",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 6: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-7",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 7: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-8",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 8: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-9",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 9: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-10",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 10: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-11",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 11: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-12",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 12: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-13",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 13: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-14",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 14: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-G-15",
-    "level": "B1",
-    "question": "Pregunta B1 Gramática 15: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
-    "category": "grammar",
-    "difficulty": "medium"
-  },
+  // Additional B1 Grammar Questions
   {
     "id": "B1-G-16",
     "level": "B1",
-    "question": "Pregunta B1 Gramática 16: ¿Cuál es la forma correcta?",
+    "question": "Cuando era niño, ___ al parque todos los domingos.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "fui",
+      "iré",
+      "he ido",
+      "iba"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
+    "correctAnswer": "iba",
+    "explanation": "Se usa el imperfecto 'iba' para expresar una acción habitual en el pasado.",
     "category": "grammar",
     "difficulty": "medium"
   },
   {
     "id": "B1-G-17",
     "level": "B1",
-    "question": "Pregunta B1 Gramática 17: ¿Cuál es la forma correcta?",
+    "question": "Este regalo es ___ ti.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "por",
+      "para",
+      "hacia",
+      "a"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
+    "correctAnswer": "para",
+    "explanation": "Se usa 'para' para indicar destinatario o finalidad.",
     "category": "grammar",
     "difficulty": "medium"
   },
   {
     "id": "B1-G-18",
     "level": "B1",
-    "question": "Pregunta B1 Gramática 18: ¿Cuál es la forma correcta?",
+    "question": "Es importante que ustedes ___ temprano.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "llegan",
+      "llegarán",
+      "lleguen",
+      "llegando"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Gramática.",
+    "correctAnswer": "lleguen",
+    "explanation": "Se usa el subjuntivo 'lleguen' después de 'es importante que'.",
     "category": "grammar",
     "difficulty": "medium"
   },
   {
-    "id": "B1-V-1",
+    "id": "B1-G-19",
     "level": "B1",
-    "question": "Pregunta B1 Vocabulario 1: ¿Qué significa?",
+    "question": "Voy a ___ mañana.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "te llamo",
+      "llamarte",
+      "llamándote",
+      "llamar te"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
+    "correctAnswer": "llamarte",
+    "explanation": "Se usa el infinitivo 'llamarte' después de 'voy a'.",
+    "category": "grammar",
     "difficulty": "medium"
   },
   {
-    "id": "B1-V-2",
+    "id": "B1-G-20",
     "level": "B1",
-    "question": "Pregunta B1 Vocabulario 2: ¿Qué significa?",
+    "question": "En España ___ tarde.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "cenan",
+      "se cena",
+      "se cenan",
+      "se cene"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
+    "correctAnswer": "se cena",
+    "explanation": "Se usa la forma impersonal 'se cena' para expresar costumbre general.",
+    "category": "grammar",
     "difficulty": "medium"
   },
-  {
-    "id": "B1-V-3",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 3: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-4",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 4: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-5",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 5: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-6",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 6: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-7",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 7: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-8",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 8: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-9",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 9: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-10",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 10: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-11",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 11: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-12",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 12: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-13",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 13: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-14",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 14: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
-  {
-    "id": "B1-V-15",
-    "level": "B1",
-    "question": "Pregunta B1 Vocabulario 15: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "medium"
-  },
+  // Additional B1 Vocabulary Questions
   {
     "id": "B1-V-16",
     "level": "B1",
-    "question": "Pregunta B1 Vocabulario 16: ¿Qué significa?",
+    "question": "¿Cuál es un sinónimo de 'empleo'?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "viaje",
+      "noticia",
+      "trabajo",
+      "cuenta"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
+    "correctAnswer": "trabajo",
+    "explanation": "'Trabajo' es sinónimo de 'empleo'.",
     "category": "vocabulary",
     "difficulty": "medium"
   },
   {
     "id": "B1-V-17",
     "level": "B1",
-    "question": "Pregunta B1 Vocabulario 17: ¿Qué significa?",
+    "question": "¿Qué expresión es correcta para preparar un viaje?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "Tomar la maleta",
+      "Poner la maleta",
+      "Coger la maleta",
+      "Hacer la maleta"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B1 Vocabulario.",
+    "correctAnswer": "Hacer la maleta",
+    "explanation": "'Hacer la maleta' es la expresión correcta para preparar equipaje.",
     "category": "vocabulary",
     "difficulty": "medium"
   },
   {
-    "id": "B2-G-1",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 1: ¿Cuál es la forma correcta?",
+    "id": "B1-V-18",
+    "level": "B1",
+    "question": "Me duele la ___.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "coche",
+      "mesa",
+      "mano",
+      "cabeza"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
+    "correctAnswer": "cabeza",
+    "explanation": "Se dice 'me duele la cabeza' para expresar dolor de cabeza.",
+    "category": "vocabulary",
+    "difficulty": "medium"
   },
   {
-    "id": "B2-G-2",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 2: ¿Cuál es la forma correcta?",
+    "id": "B1-V-19",
+    "level": "B1",
+    "question": "___, llegamos tarde por el tráfico.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "Aunque",
+      "Por eso",
+      "Además",
+      "Sin embargo"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
+    "correctAnswer": "Por eso",
+    "explanation": "'Por eso' indica consecuencia: llegamos tarde como resultado del tráfico.",
+    "category": "vocabulary",
+    "difficulty": "medium"
   },
   {
-    "id": "B2-G-3",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 3: ¿Cuál es la forma correcta?",
+    "id": "B1-V-20",
+    "level": "B1",
+    "question": "¿Qué significa 'actualmente'?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "en la actualidad",
+      "en realidad",
+      "de hecho",
+      "exactamente"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
+    "correctAnswer": "en la actualidad",
+    "explanation": "'Actualmente' significa 'en la actualidad' o 'en el presente'.",
+    "category": "vocabulary",
+    "difficulty": "medium"
   },
-  {
-    "id": "B2-G-4",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 4: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-5",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 5: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-6",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 6: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-7",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 7: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-8",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 8: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-9",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 9: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-10",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 10: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-11",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 11: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-12",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 12: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-13",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 13: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-14",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 14: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-G-15",
-    "level": "B2",
-    "question": "Pregunta B2 Gramática 15: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
+  // Additional B2 Grammar Questions
   {
     "id": "B2-G-16",
     "level": "B2",
-    "question": "Pregunta B2 Gramática 16: ¿Cuál es la forma correcta?",
+    "question": "Busco a alguien que ___ francés.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "habla",
+      "habló",
+      "hablará",
+      "hable"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
+    "correctAnswer": "hable",
+    "explanation": "Se usa el subjuntivo 'hable' después de 'busco a alguien que'.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
     "id": "B2-G-17",
     "level": "B2",
-    "question": "Pregunta B2 Gramática 17: ¿Cuál es la forma correcta?",
+    "question": "Si tuviera más tiempo, ___ más.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "viajo",
+      "viajaré",
+      "viajaría",
+      "haya viajado"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
+    "correctAnswer": "viajaría",
+    "explanation": "Se usa el condicional 'viajaría' en la apódosis de una oración condicional irreal.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
     "id": "B2-G-18",
     "level": "B2",
-    "question": "Pregunta B2 Gramática 18: ¿Cuál es la forma correcta?",
+    "question": "La novela ___ por García Márquez.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "fue escrita",
+      "fue escribir",
+      "era escrita",
+      "ha escrito"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Gramática.",
+    "correctAnswer": "fue escrita",
+    "explanation": "Se usa la voz pasiva 'fue escrita' para indicar que García Márquez escribió la novela.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
-    "id": "B2-V-1",
+    "id": "B2-G-19",
     "level": "B2",
-    "question": "Pregunta B2 Vocabulario 1: ¿Qué significa?",
+    "question": "La ciudad en ___ nací es pequeña.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "qué",
+      "cual",
+      "que",
+      "donde"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
+    "correctAnswer": "donde",
+    "explanation": "Se usa 'donde' para referirse al lugar donde ocurrió algo.",
+    "category": "grammar",
     "difficulty": "hard"
   },
   {
-    "id": "B2-V-2",
+    "id": "B2-G-20",
     "level": "B2",
-    "question": "Pregunta B2 Vocabulario 2: ¿Qué significa?",
+    "question": "A María le gustaron las flores que le ___.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "envié",
+      "enviaron",
+      "enviaba",
+      "envío"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
+    "correctAnswer": "envié",
+    "explanation": "Se usa el pretérito 'envié' para indicar una acción completada en el pasado.",
+    "category": "grammar",
     "difficulty": "hard"
   },
-  {
-    "id": "B2-V-3",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 3: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-4",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 4: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-5",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 5: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-6",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 6: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-7",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 7: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-8",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 8: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-9",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 9: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-10",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 10: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-11",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 11: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-12",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 12: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-13",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 13: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-14",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 14: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "B2-V-15",
-    "level": "B2",
-    "question": "Pregunta B2 Vocabulario 15: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
+  // Additional B2 Vocabulary Questions
   {
     "id": "B2-V-16",
     "level": "B2",
-    "question": "Pregunta B2 Vocabulario 16: ¿Qué significa?",
+    "question": "¿Qué conector expresa contraste en registro formal?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "por consiguiente",
+      "por lo tanto",
+      "asimismo",
+      "no obstante"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
+    "correctAnswer": "no obstante",
+    "explanation": "'No obstante' es un conector formal que expresa contraste o oposición.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
     "id": "B2-V-17",
     "level": "B2",
-    "question": "Pregunta B2 Vocabulario 17: ¿Qué significa?",
+    "question": "'Abarcar' se acerca más a:",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "incluir",
+      "evitar",
+      "revelar",
+      "descartar"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta B2 Vocabulario.",
+    "correctAnswer": "incluir",
+    "explanation": "'Abarcar' significa 'incluir' o 'comprender' algo en su totalidad.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C1-G-1",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 1: ¿Cuál es la forma correcta?",
+    "id": "B2-V-18",
+    "level": "B2",
+    "question": "¿Qué colocación es correcta?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "levantar un problema",
+      "plantear un problema",
+      "sembrar un problema",
+      "cosechar un problema"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
+    "correctAnswer": "plantear un problema",
+    "explanation": "'Plantear un problema' es la colocación correcta para presentar o exponer un problema.",
+    "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C1-G-2",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 2: ¿Cuál es la forma correcta?",
+    "id": "B2-V-19",
+    "level": "B2",
+    "question": "¿Cuál es más formal que 'pedir'?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "rogar",
+      "exigir",
+      "solicitar",
+      "preguntar"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
+    "correctAnswer": "solicitar",
+    "explanation": "'Solicitar' es más formal que 'pedir' y se usa en contextos oficiales.",
+    "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C1-G-3",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 3: ¿Cuál es la forma correcta?",
+    "id": "B2-V-20",
+    "level": "B2",
+    "question": "¿Qué expresión significa iniciar un proyecto?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "dar en el clavo",
+      "echar de menos",
+      "andar con ojo",
+      "poner en marcha"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
+    "correctAnswer": "poner en marcha",
+    "explanation": "'Poner en marcha' significa 'iniciar' o 'comenzar' un proyecto.",
+    "category": "vocabulary",
     "difficulty": "hard"
   },
-  {
-    "id": "C1-G-4",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 4: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-5",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 5: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-6",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 6: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-7",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 7: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-8",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 8: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-9",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 9: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-10",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 10: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-11",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 11: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-12",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 12: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-13",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 13: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-14",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 14: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-G-15",
-    "level": "C1",
-    "question": "Pregunta C1 Gramática 15: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
+  // Additional C1 Grammar Questions
   {
     "id": "C1-G-16",
     "level": "C1",
-    "question": "Pregunta C1 Gramática 16: ¿Cuál es la forma correcta?",
+    "question": "Aunque ___ caro, lo compraré.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "es",
+      "será",
+      "sea",
+      "haya sido"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
+    "correctAnswer": "sea",
+    "explanation": "Se usa el subjuntivo 'sea' después de 'aunque' para expresar concesión.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
     "id": "C1-G-17",
     "level": "C1",
-    "question": "Pregunta C1 Gramática 17: ¿Cuál es la forma correcta?",
+    "question": "Se me ___ las llaves.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "perdí",
+      "fueron perdidas",
+      "perdieron",
+      "perdieronse"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
+    "correctAnswer": "perdieron",
+    "explanation": "Se usa 'se me perdieron' para expresar pérdida accidental con 'se' impersonal.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
     "id": "C1-G-18",
     "level": "C1",
-    "question": "Pregunta C1 Gramática 18: ¿Cuál es la forma correcta?",
+    "question": "Lo ___ difícil fue empezar.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "más",
+      "muy",
+      "tan",
+      "tanto"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Gramática.",
+    "correctAnswer": "más",
+    "explanation": "Se usa 'más' para formar el superlativo: 'lo más difícil'.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
-    "id": "C1-V-1",
+    "id": "C1-G-19",
     "level": "C1",
-    "question": "Pregunta C1 Vocabulario 1: ¿Qué significa?",
+    "question": "Llevo dos años ___ español.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "estudiar",
+      "estudiado",
+      "estudiando",
+      "a estudiar"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
+    "correctAnswer": "estudiando",
+    "explanation": "Se usa el gerundio 'estudiando' después de 'llevar + tiempo'.",
+    "category": "grammar",
     "difficulty": "hard"
   },
   {
-    "id": "C1-V-2",
+    "id": "C1-G-20",
     "level": "C1",
-    "question": "Pregunta C1 Vocabulario 2: ¿Qué significa?",
+    "question": "No hay nadie que ___ de acuerdo.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "está",
+      "estaría",
+      "estuviera",
+      "esté"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
+    "correctAnswer": "esté",
+    "explanation": "Se usa el subjuntivo 'esté' después de 'no hay nadie que'.",
+    "category": "grammar",
     "difficulty": "hard"
   },
-  {
-    "id": "C1-V-3",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 3: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-4",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 4: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-5",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 5: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-6",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 6: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-7",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 7: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-8",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 8: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-9",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 9: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-10",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 10: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-11",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 11: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-12",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 12: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-13",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 13: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-14",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 14: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C1-V-15",
-    "level": "C1",
-    "question": "Pregunta C1 Vocabulario 15: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
+  // Additional C1 Vocabulary Questions
   {
     "id": "C1-V-16",
     "level": "C1",
-    "question": "Pregunta C1 Vocabulario 16: ¿Qué significa?",
+    "question": "'Por ende' equivale a:",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "sin embargo",
+      "a pesar de",
+      "en cambio",
+      "por lo tanto"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
+    "correctAnswer": "por lo tanto",
+    "explanation": "'Por ende' es un conector formal que significa 'por lo tanto' o 'en consecuencia'.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
     "id": "C1-V-17",
     "level": "C1",
-    "question": "Pregunta C1 Vocabulario 17: ¿Qué significa?",
+    "question": "¿Qué expresión es correcta?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "montar una conversación",
+      "armar una conversación",
+      "entablar una conversación",
+      "fabricar una conversación"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C1 Vocabulario.",
+    "correctAnswer": "entablar una conversación",
+    "explanation": "'Entablar una conversación' es la expresión correcta para iniciar una conversación.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C2-G-1",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 1: ¿Cuál es la forma correcta?",
+    "id": "C1-V-18",
+    "level": "C1",
+    "question": "'A grandes rasgos' significa:",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "con detalle",
+      "sin razón",
+      "de manera general",
+      "a regañadientes"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
+    "correctAnswer": "de manera general",
+    "explanation": "'A grandes rasgos' significa 'de manera general' o 'sin entrar en detalles'.",
+    "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C2-G-2",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 2: ¿Cuál es la forma correcta?",
+    "id": "C1-V-19",
+    "level": "C1",
+    "question": "¿Cuál es el término más preciso para 'malo para la salud'?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "fastidioso",
+      "molesto",
+      "leve",
+      "perjudicial"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
+    "correctAnswer": "perjudicial",
+    "explanation": "'Perjudicial' es el término más preciso para expresar que algo es malo para la salud.",
+    "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C2-G-3",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 3: ¿Cuál es la forma correcta?",
+    "id": "C1-V-20",
+    "level": "C1",
+    "question": "'Dar por sentado' significa:",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "explicar con detalle",
+      "negar rotundamente",
+      "celebrar un logro",
+      "suponer como cierto"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
+    "correctAnswer": "suponer como cierto",
+    "explanation": "'Dar por sentado' significa 'suponer como cierto' o 'dar por hecho'.",
+    "category": "vocabulary",
     "difficulty": "hard"
   },
-  {
-    "id": "C2-G-4",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 4: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-5",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 5: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-6",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 6: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-7",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 7: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-8",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 8: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-9",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 9: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-10",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 10: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-11",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 11: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-12",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 12: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-13",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 13: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-14",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 14: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-G-15",
-    "level": "C2",
-    "question": "Pregunta C2 Gramática 15: ¿Cuál es la forma correcta?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
-    "category": "grammar",
-    "difficulty": "hard"
-  },
+  // Additional C2 Grammar Questions
   {
     "id": "C2-G-16",
     "level": "C2",
-    "question": "Pregunta C2 Gramática 16: ¿Cuál es la forma correcta?",
+    "question": "Si lo hubiera sabido, no ___.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "iría",
+      "fui",
+      "habría ido",
+      "hubiera ido"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
+    "correctAnswer": "habría ido",
+    "explanation": "Se usa el condicional compuesto 'habría ido' en la apódosis de una oración condicional irreal del pasado.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
     "id": "C2-G-17",
     "level": "C2",
-    "question": "Pregunta C2 Gramática 17: ¿Cuál es la forma correcta?",
+    "question": "Ojalá ___ más tiempo.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "tenga",
+      "tuviera",
+      "tendría",
+      "hubo tenido"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
+    "correctAnswer": "tuviera",
+    "explanation": "Se usa el imperfecto de subjuntivo 'tuviera' después de 'ojalá' para expresar deseo.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
     "id": "C2-G-18",
     "level": "C2",
-    "question": "Pregunta C2 Gramática 18: ¿Cuál es la forma correcta?",
+    "question": "Por mucho que ___, no cambiará de opinión.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "insistes",
+      "insististe",
+      "insistieras",
+      "insistas"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Gramática.",
+    "correctAnswer": "insistas",
+    "explanation": "Se usa el presente de subjuntivo 'insistas' después de 'por mucho que'.",
     "category": "grammar",
     "difficulty": "hard"
   },
   {
-    "id": "C2-V-1",
+    "id": "C2-G-19",
     "level": "C2",
-    "question": "Pregunta C2 Vocabulario 1: ¿Qué significa?",
+    "question": "La autora, cuyos libros ___ premiados, asistirá al acto.",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "han sido",
+      "son sido",
+      "fueron sido",
+      "han estado"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
+    "correctAnswer": "han sido",
+    "explanation": "Se usa 'han sido' para expresar una acción pasada con relevancia en el presente.",
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  {
+    "id": "C2-G-20",
+    "level": "C2",
+    "question": "'Viene a costar cien euros' expresa:",
+    "options": [
+      "exactitud",
+      "obligación",
+      "aproximación",
+      "sorpresa"
+    ],
+    "correctAnswer": "aproximación",
+    "explanation": "'Viene a costar' expresa aproximación o estimación de un precio.",
+    "category": "grammar",
+    "difficulty": "hard"
+  },
+  // Additional C2 Vocabulary Questions
+  {
+    "id": "C2-V-18",
+    "level": "C2",
+    "question": "¿Qué expresión equivale a 'sin perjuicio de'?",
+    "options": [
+      "sin embargo",
+      "a falta de",
+      "por el contrario",
+      "sin menoscabo de"
+    ],
+    "correctAnswer": "sin menoscabo de",
+    "explanation": "'Sin menoscabo de' es equivalente formal a 'sin perjuicio de'.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C2-V-2",
+    "id": "C2-V-19",
     "level": "C2",
-    "question": "Pregunta C2 Vocabulario 2: ¿Qué significa?",
+    "question": "'Proclive a' significa:",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "inclinado a",
+      "contrario a",
+      "reacio a",
+      "ajeno a"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
+    "correctAnswer": "inclinado a",
+    "explanation": "'Proclive a' significa 'inclinado a' o 'tendente a' algo.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C2-V-3",
+    "id": "C2-V-20",
     "level": "C2",
-    "question": "Pregunta C2 Vocabulario 3: ¿Qué significa?",
+    "question": "'Cuando menos' significa:",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "a duras penas",
+      "como mínimo",
+      "por lo visto",
+      "sin remedio"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
+    "correctAnswer": "como mínimo",
+    "explanation": "'Cuando menos' significa 'como mínimo' o 'al menos'.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C2-V-4",
+    "id": "C2-V-21",
     "level": "C2",
-    "question": "Pregunta C2 Vocabulario 4: ¿Qué significa?",
+    "question": "¿Qué frase mantiene el registro y significado de 'El contrato quedará sin efecto'?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "El contrato se deshace",
+      "El contrato se borra",
+      "El contrato se cae",
+      "El contrato se anulará"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
+    "correctAnswer": "El contrato se anulará",
+    "explanation": "'El contrato se anulará' mantiene el registro formal y el significado de 'quedará sin efecto'.",
     "category": "vocabulary",
     "difficulty": "hard"
   },
   {
-    "id": "C2-V-5",
+    "id": "C2-V-22",
     "level": "C2",
-    "question": "Pregunta C2 Vocabulario 5: ¿Qué significa?",
+    "question": "¿Cuál es la combinación más precisa?",
     "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
+      "reparar de daños",
+      "compensar en daños",
+      "subsanar a los daños",
+      "resarcir los daños"
     ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-6",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 6: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-7",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 7: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-8",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 8: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-9",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 9: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-10",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 10: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-11",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 11: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-12",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 12: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-13",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 13: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-14",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 14: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-15",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 15: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-16",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 16: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
-    "category": "vocabulary",
-    "difficulty": "hard"
-  },
-  {
-    "id": "C2-V-17",
-    "level": "C2",
-    "question": "Pregunta C2 Vocabulario 17: ¿Qué significa?",
-    "options": [
-      "Opción A",
-      "Opción B",
-      "Opción C",
-      "Opción D"
-    ],
-    "correctAnswer": "Opción A",
-    "explanation": "Explicación para pregunta C2 Vocabulario.",
+    "correctAnswer": "resarcir los daños",
+    "explanation": "'Resarcir los daños' es la combinación más precisa y formal para compensar daños.",
     "category": "vocabulary",
     "difficulty": "hard"
   }

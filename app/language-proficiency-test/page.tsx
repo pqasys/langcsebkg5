@@ -71,7 +71,7 @@ const AVAILABLE_LANGUAGES: Language[] = [
     code: 'es',
     name: 'Spanish',
     flag: '🇪🇸',
-    status: 'coming-soon',
+    status: 'available',
     description: 'Proficiency Test'
   },
   {

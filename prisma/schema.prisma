@@ -1628,3 +1628,62 @@ enum student_institutions_status {
   ALUMNI
   MEMBER
 }
+
+// Language Proficiency Test Models
+model LanguageProficiencyQuestionBank {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  languageCode   String   @unique @db.VarChar(10)
+  name           String   @db.VarChar(255)
+  description    String?  @db.Text
+  totalQuestions Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+
+  questions LanguageProficiencyQuestion[]
+
+  @@map("language_proficiency_question_banks")
+}
+
+model LanguageProficiencyQuestion {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  bankId         String   @db.VarChar(36)
+  level          String   @db.VarChar(10)
+  category       String?  @db.VarChar(50)
+  difficulty     String   @default("medium") @db.VarChar(20)
+  question       String   @db.Text
+  options        Json
+  correctAnswer  String   @db.Text
+  explanation    String?  @db.Text
+  usageCount     Int      @default(0)
+  successRate    Float    @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+
+  bank LanguageProficiencyQuestionBank @relation(fields: [bankId], references: [id], onDelete: Cascade)
+
+  @@index([bankId])
+  @@index([level])
+  @@index([category])
+  @@index([difficulty])
+  @@index([isActive])
+  @@map("language_proficiency_questions")
+}
+
+model LanguageProficiencyTestAttempt {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  userId       String   @db.VarChar(36)
+  languageCode String   @db.VarChar(10)
+  score        Int
+  level        String   @db.VarChar(10)
+  answers      Json
+  timeSpent    Int      @default(0)
+  completedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([languageCode])
+  @@index([completedAt])
+  @@map("language_proficiency_test_attempts")
+}

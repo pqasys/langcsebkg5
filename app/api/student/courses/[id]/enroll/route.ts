@@ -60,8 +60,8 @@ export async function POST(
     if (requiresSubscription) {
       console.log('Course requires subscription, checking user subscription status...');
       try {
-        const subscriptionStatus = await SubscriptionCommissionService.getUserSubscriptionStatus(session.user.id);
-        if (!subscriptionStatus.hasActiveSubscription) {
+        const userSubscriptionStatus = await SubscriptionCommissionService.getUserSubscriptionStatus(session.user.id);
+        if (!userSubscriptionStatus.hasActiveSubscription) {
           console.log('User does not have active subscription for subscription-required course');
           return NextResponse.json({ 
             error: 'Subscription required',
@@ -71,8 +71,8 @@ export async function POST(
             requiresSubscription: true
           }, { status: 402 }); // 402 Payment Required
         }
-        console.log('User has active subscription:', subscriptionStatus.currentPlan);
-        subscriptionStatus = subscriptionStatus; // Store for later use
+        console.log('User has active subscription:', userSubscriptionStatus.currentPlan);
+        subscriptionStatus = userSubscriptionStatus; // Store for later use
       } catch (subscriptionError) {
         console.error('Error checking subscription status:', subscriptionError);
         return NextResponse.json({ 
