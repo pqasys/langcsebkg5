@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 12, 2025 at 06:29 PM
+-- Generation Time: Aug 13, 2025 at 05:37 PM
 -- Server version: 8.0.31
 -- PHP Version: 8.1.13
 
@@ -2989,7 +2989,10 @@ INSERT INTO `student_billing_history` (`id`, `subscriptionId`, `billingDate`, `a
 ('f6d3da3c-a705-4692-8b6d-7643c32e66db', '0b370e62-e185-4337-b025-2148ae36bbce', '2025-07-14 13:58:54.417', 24.99, 'USD', 'PAID', 'CREDIT_CARD', 'txn_98b29635900d4ffd85f7ef53a7450933', 'INV-1752501534417', 'Monthly subscription for Premium Plan', NULL, '2025-07-14 13:58:54.419'),
 ('cmdgrmrfv0005li90zs52igk7', 'cmckkosgt0009cb32hkzlxg54', '2025-07-24 02:20:50.909', 12.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1753323650923', 'Initial payment for BASIC plan', NULL, '2025-07-24 02:20:50.924'),
 ('cmdgrp6he000bli90blk8mqne', 'cmckkosgt0009cb32hkzlxg54', '2025-07-24 02:22:43.721', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1753323763728', 'Initial payment for PREMIUM plan', NULL, '2025-07-24 02:22:43.730'),
-('cmdw7ud9c000254pr51hjy8a5', 'cmckkosgt0009cb32hkzlxg54', '2025-08-03 21:51:12.265', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1754257872287', 'Initial payment for PREMIUM plan', NULL, '2025-08-03 21:51:12.288');
+('cmdw7ud9c000254pr51hjy8a5', 'cmckkosgt0009cb32hkzlxg54', '2025-08-03 21:51:12.265', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1754257872287', 'Initial payment for PREMIUM plan', NULL, '2025-08-03 21:51:12.288'),
+('cmea3fqgj0003pl5iqrw7km4u', 'cmea3fq7g0001pl5ibe9w523c', '2025-08-13 14:56:37.176', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755096997554', 'Trial subscription for PREMIUM plan', NULL, '2025-08-13 14:56:37.555'),
+('cmea83nuw0003lbe617xm925o', 'cmea83ntw0001lbe6wmct4vrq', '2025-08-13 17:07:12.353', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755104832391', 'Trial subscription for PREMIUM plan', NULL, '2025-08-13 17:07:12.393'),
+('cmea8v3l90003r2ssvjj32yev', 'cmea8v3l10001r2sse5nbhf3e', '2025-08-13 17:28:32.481', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755106112491', 'Trial subscription for PREMIUM plan', NULL, '2025-08-13 17:28:32.493');
 
 -- --------------------------------------------------------
 
@@ -3217,7 +3220,8 @@ INSERT INTO `student_subscriptions` (`id`, `studentId`, `status`, `startDate`, `
 ('cmd0r7t5x000jp73dpf3kdduh', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 'ACTIVE', '2025-07-12 21:24:54.498', '2026-07-14 13:58:54.390', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:24:54.498Z\"}', '2025-07-12 21:24:54.501', '2025-08-05 16:23:06.135', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
 ('cmd0rq6de000qp73dn3b3o498', 'c98a0b89-011b-482f-843e-a5522de40b1e', 'ACTIVE', '2025-07-12 21:39:11.423', '2026-07-14 13:58:54.404', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:39:11.423Z\"}', '2025-07-12 21:39:11.427', '2025-08-05 16:23:06.150', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
 ('0c20dc4a-afa5-4c40-a041-5fa049fc6725', 'bdcbbab6-9436-43d1-80e6-b9543b48dd06', 'ACTIVE', '2025-07-14 13:58:54.344', '2026-07-14 13:58:54.344', 1, NULL, NULL, NULL, '2025-07-14 13:58:54.346', '2025-08-05 16:23:06.166', 'premium-tier', 30, 0, 0, 0, 0, 10, 1, 10, 0, 0, 'BASIC'),
-('cme4ibr7d0001amw562sdz8d0', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'ACTIVE', '2025-08-09 17:06:48.992', '2025-08-16 17:06:48.992', 0, NULL, NULL, NULL, '2025-08-09 17:06:49.010', '2025-08-09 17:06:49.010', 'basic-tier', 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 'TRIAL');
+('cme4ibr7d0001amw562sdz8d0', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'ACTIVE', '2025-08-09 17:06:48.992', '2025-08-16 17:06:48.992', 0, NULL, NULL, NULL, '2025-08-09 17:06:49.010', '2025-08-09 17:06:49.010', 'basic-tier', 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 'TRIAL'),
+('cmea8v3l10001r2sse5nbhf3e', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'TRIAL', '2025-08-13 17:28:32.481', '2025-08-20 17:28:32.481', 1, NULL, NULL, '{\"isTrial\": true, \"trialEndDate\": \"2025-08-20T17:28:32.481Z\"}', '2025-08-13 17:28:32.485', '2025-08-13 17:34:51.188', 'premium-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'PREMIUM');
 
 -- --------------------------------------------------------
 
@@ -3300,7 +3304,10 @@ INSERT INTO `subscription_logs` (`id`, `subscriptionId`, `action`, `oldPlan`, `n
 ('cmd0rq6dq000up73dno46dlih', 'cmd0rq6de000qp73dn3b3o498', 'CREATE', NULL, 'PREMIUM', NULL, 24.99, NULL, 'MONTHLY', 'c98a0b89-011b-482f-843e-a5522de40b1e', 'New subscription created during registration', NULL, '2025-07-12 21:39:11.438'),
 ('cmdgrmrfr0003li90rh5ald4z', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', 'PRO', 'BASIC', 49.99, 12.99, 'MONTHLY', 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-07-24 02:20:50.920'),
 ('cmdgrp6ha0009li90gmli39l9', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', 'BASIC', 'PREMIUM', 12.99, 24.99, 'MONTHLY', 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-07-24 02:22:43.727'),
-('cmdw7ud98000154prgz1eujct', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', NULL, 'PREMIUM', NULL, 24.99, NULL, 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-08-03 21:51:12.284');
+('cmdw7ud98000154prgz1eujct', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', NULL, 'PREMIUM', NULL, 24.99, NULL, 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-08-03 21:51:12.284'),
+('cmea3fqet0002pl5iznrtw4jt', 'cmea3fq7g0001pl5ibe9w523c', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-13 14:56:37.494'),
+('cmea83nu00002lbe645dliwhc', 'cmea83ntw0001lbe6wmct4vrq', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-13 17:07:12.361'),
+('cmea8v3l50002r2ssrx4hy5su', 'cmea8v3l10001r2sse5nbhf3e', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-13 17:28:32.490');
 
 -- --------------------------------------------------------
 

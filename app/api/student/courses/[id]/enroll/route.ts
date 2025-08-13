@@ -66,7 +66,7 @@ export async function POST(
           return NextResponse.json({ 
             error: 'Subscription required',
             details: 'This course requires an active subscription to enroll.',
-            redirectUrl: '/subscription-signup',
+            redirectUrl: `/subscription-signup?courseId=${params.id}&fromEnrollment=true`,
             courseType: courseCheck.marketingType,
             requiresSubscription: true
           }, { status: 402 }); // 402 Payment Required
@@ -235,8 +235,18 @@ export async function POST(
 
       // Determine if this is a subscription-based enrollment (no additional payment required)
       const isSubscriptionBasedEnrollment = requiresSubscription && subscriptionStatus?.hasActiveSubscription;
+      
+      console.log('🔍 Enrollment decision:', {
+        requiresSubscription,
+        subscriptionStatus: subscriptionStatus ? {
+          hasActiveSubscription: subscriptionStatus.hasActiveSubscription,
+          currentPlan: subscriptionStatus.currentPlan
+        } : 'No subscription status',
+        isSubscriptionBasedEnrollment
+      });
 
       // Use a transaction to ensure both enrollment and payment are created atomically
+      console.log('🔄 Starting enrollment transaction...');
       const result = await prisma.$transaction(async (tx) => {
         // Create enrollment with payment tracking
         const enrollment = await tx.studentCourseEnrollment.create({
@@ -285,7 +295,50 @@ export async function POST(
           }
         });
 
-        return { enrollment, payment };
+        // Enroll student in associated live classes for this course
+        const associatedLiveClasses = await tx.videoSession.findMany({
+          where: {
+            courseId: course.id,
+            status: 'SCHEDULED',
+            startTime: { gt: new Date() } // Only future classes
+          },
+          select: {
+            id: true,
+            title: true,
+            startTime: true
+          }
+        });
+        
+        console.log(`Found ${associatedLiveClasses.length} associated live classes`);
+        
+        // Create video session participants for each live class
+        for (const liveClass of associatedLiveClasses) {
+          await tx.videoSessionParticipant.upsert({
+            where: {
+              sessionId_userId: {
+                sessionId: liveClass.id,
+                userId: session.user.id
+              }
+            },
+            update: {
+              role: 'STUDENT',
+              isActive: true,
+              joinedAt: new Date(),
+              updatedAt: new Date()
+            },
+            create: {
+              sessionId: liveClass.id,
+              userId: session.user.id,
+              role: 'STUDENT',
+              isActive: true,
+              joinedAt: new Date(),
+              updatedAt: new Date()
+            }
+          });
+        }
+
+        console.log('✅ Transaction completed successfully');
+        return { enrollment, payment, liveClassesEnrolled: associatedLiveClasses.length };
       });
 
       // Send enrollment notification
@@ -380,10 +433,11 @@ export async function POST(
           id: result.payment.id,
           status: result.payment.status,
           amount: result.payment.amount
-        }
+        },
+        liveClassesEnrolled: result.liveClassesEnrolled
       });
     } catch (createError) {
-      console.error('Error in enrollment transaction:');
+      console.error('❌ Error in enrollment transaction:', createError);
       return NextResponse.json(
         { error: 'Failed to create enrollment. Please try again.' },
         { status: 500 }

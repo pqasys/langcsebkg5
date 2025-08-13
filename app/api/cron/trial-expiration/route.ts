@@ -46,50 +46,111 @@ export async function POST(request: NextRequest) {
       try {
         // Check if trial has actually expired
         if (trial.endDate <= now) {
-          // Trial has expired, convert to active subscription
-          await prisma.institutionSubscription.update({
-            where: { id: trial.id },
-            data: {
-              status: 'ACTIVE',
-              metadata: {
-                ...trial.metadata,
-                trialEnded: true,
-                trialEndedAt: now.toISOString()
+          // HYBRID APPROACH: Check if institution has a payment method
+          const institution = await prisma.institution.findUnique({
+            where: { id: trial.institutionId },
+            include: { user: true }
+          });
+
+          if (institution?.stripeCustomerId) {
+            // Institution has payment method, convert to active subscription
+            await prisma.institutionSubscription.update({
+              where: { id: trial.id },
+              data: {
+                status: 'ACTIVE',
+                metadata: {
+                  ...trial.metadata,
+                  trialEnded: true,
+                  trialEndedAt: now.toISOString(),
+                  paymentMethodAvailable: true
+                }
+              }
+            });
+
+            // Create billing history entry for the first payment
+            await prisma.institutionBillingHistory.create({
+              data: {
+                subscriptionId: trial.id,
+                billingDate: now,
+                amount: trial.amount,
+                currency: trial.currency,
+                status: 'PENDING', // Will be marked as PAID when payment is processed
+                paymentMethod: 'AUTO_BILL',
+                invoiceNumber: `INV-${Date.now()}-${trial.id}`,
+                description: `First billing after trial for ${trial.planType} plan`
+              }
+            });
+
+            // Log the trial expiration
+            await prisma.institutionSubscriptionLog.create({
+              data: {
+                subscriptionId: trial.id,
+                action: 'TRIAL_EXPIRED',
+                oldPlan: trial.planType,
+                newPlan: trial.planType,
+                oldAmount: trial.amount,
+                newAmount: trial.amount,
+                oldBillingCycle: trial.billingCycle,
+                newBillingCycle: trial.billingCycle,
+                userId: 'SYSTEM',
+                reason: 'Trial period expired, subscription activated with payment method'
+              }
+            });
+
+            console.log(` Converted institution trial ${trial.id} to active subscription (payment method available)`);
+          } else {
+            // HYBRID APPROACH: No payment method, require payment collection
+            await prisma.institutionSubscription.update({
+              where: { id: trial.id },
+              data: {
+                status: 'PAYMENT_REQUIRED',
+                metadata: {
+                  ...trial.metadata,
+                  trialEnded: true,
+                  trialEndedAt: now.toISOString(),
+                  paymentMethodAvailable: false,
+                  paymentCollectionStarted: now.toISOString()
+                }
+              }
+            });
+
+            // Log the trial expiration with payment required
+            await prisma.institutionSubscriptionLog.create({
+              data: {
+                subscriptionId: trial.id,
+                action: 'TRIAL_EXPIRED_PAYMENT_REQUIRED',
+                oldPlan: trial.planType,
+                newPlan: trial.planType,
+                oldAmount: trial.amount,
+                newAmount: trial.amount,
+                oldBillingCycle: trial.billingCycle,
+                newBillingCycle: trial.billingCycle,
+                userId: 'SYSTEM',
+                reason: 'Trial period expired, payment required to continue'
+              }
+            });
+
+            // Send payment required notification
+            if (institution?.user?.id) {
+              try {
+                const { notificationService } = await import('@/lib/notification');
+                await notificationService.sendNotification(institution.user.id, {
+                  type: 'TRIAL_EXPIRED_PAYMENT_REQUIRED',
+                  title: 'Trial Expired - Payment Required',
+                  message: 'Your trial has expired. Please add a payment method to continue your subscription.',
+                  metadata: {
+                    subscriptionId: trial.id,
+                    planType: trial.planType,
+                    amount: trial.amount
+                  }
+                });
+              } catch (error) {
+                console.error('Error sending payment required notification:', error);
               }
             }
-          });
 
-          // Create billing history entry for the first payment
-          await prisma.institutionBillingHistory.create({
-            data: {
-              subscriptionId: trial.id,
-              billingDate: now,
-              amount: trial.amount,
-              currency: trial.currency,
-              status: 'PENDING', // Will be marked as PAID when payment is processed
-              paymentMethod: 'AUTO_BILL',
-              invoiceNumber: `INV-${Date.now()}-${trial.id}`,
-              description: `First billing after trial for ${trial.planType} plan`
-            }
-          });
-
-          // Log the trial expiration
-          await prisma.institutionSubscriptionLog.create({
-            data: {
-              subscriptionId: trial.id,
-              action: 'TRIAL_EXPIRED',
-              oldPlan: trial.planType,
-              newPlan: trial.planType,
-              oldAmount: trial.amount,
-              newAmount: trial.amount,
-              oldBillingCycle: trial.billingCycle,
-              newBillingCycle: trial.billingCycle,
-              userId: 'SYSTEM',
-              reason: 'Trial period expired, subscription activated'
-            }
-          });
-
-          console.log(` Converted institution trial ${trial.id} to active subscription`);
+            console.log(` Institution trial ${trial.id} expired, payment required`);
+          }
         }
       } catch (error) {
         console.error('❌ Error processing institution trial ${trial.id}:');
@@ -116,50 +177,111 @@ export async function POST(request: NextRequest) {
       try {
         // Check if trial has actually expired
         if (trial.endDate <= now) {
-          // Trial has expired, convert to active subscription
-          await prisma.studentSubscription.update({
-            where: { id: trial.id },
-            data: {
-              status: 'ACTIVE',
-              metadata: {
-                ...trial.metadata,
-                trialEnded: true,
-                trialEndedAt: now.toISOString()
+          // HYBRID APPROACH: Check if user has a payment method
+          const student = await prisma.student.findUnique({
+            where: { id: trial.studentId },
+            include: { user: true }
+          });
+
+          if (student?.stripeCustomerId) {
+            // User has payment method, convert to active subscription
+            await prisma.studentSubscription.update({
+              where: { id: trial.id },
+              data: {
+                status: 'ACTIVE',
+                metadata: {
+                  ...trial.metadata,
+                  trialEnded: true,
+                  trialEndedAt: now.toISOString(),
+                  paymentMethodAvailable: true
+                }
+              }
+            });
+
+            // Create billing history entry for the first payment
+            await prisma.studentBillingHistory.create({
+              data: {
+                subscriptionId: trial.id,
+                billingDate: now,
+                amount: trial.amount,
+                currency: trial.currency,
+                status: 'PENDING', // Will be marked as PAID when payment is processed
+                paymentMethod: 'AUTO_BILL',
+                invoiceNumber: `STU-INV-${Date.now()}-${trial.id}`,
+                description: `First billing after trial for ${trial.planType} plan`
+              }
+            });
+
+            // Log the trial expiration
+            await prisma.subscriptionLog.create({
+              data: {
+                subscriptionId: trial.id,
+                action: 'TRIAL_EXPIRED',
+                oldPlan: trial.planType,
+                newPlan: trial.planType,
+                oldAmount: trial.amount,
+                newAmount: trial.amount,
+                oldBillingCycle: trial.billingCycle,
+                newBillingCycle: trial.billingCycle,
+                userId: 'SYSTEM',
+                reason: 'Trial period expired, subscription activated with payment method'
+              }
+            });
+
+            console.log(` Converted student trial ${trial.id} to active subscription (payment method available)`);
+          } else {
+            // HYBRID APPROACH: No payment method, require payment collection
+            await prisma.studentSubscription.update({
+              where: { id: trial.id },
+              data: {
+                status: 'PAYMENT_REQUIRED',
+                metadata: {
+                  ...trial.metadata,
+                  trialEnded: true,
+                  trialEndedAt: now.toISOString(),
+                  paymentMethodAvailable: false,
+                  paymentCollectionStarted: now.toISOString()
+                }
+              }
+            });
+
+            // Log the trial expiration with payment required
+            await prisma.subscriptionLog.create({
+              data: {
+                subscriptionId: trial.id,
+                action: 'TRIAL_EXPIRED_PAYMENT_REQUIRED',
+                oldPlan: trial.planType,
+                newPlan: trial.planType,
+                oldAmount: trial.amount,
+                newAmount: trial.amount,
+                oldBillingCycle: trial.billingCycle,
+                newBillingCycle: trial.billingCycle,
+                userId: 'SYSTEM',
+                reason: 'Trial period expired, payment required to continue'
+              }
+            });
+
+            // Send payment required notification
+            if (student?.user?.id) {
+              try {
+                const { notificationService } = await import('@/lib/notification');
+                await notificationService.sendNotification(student.user.id, {
+                  type: 'TRIAL_EXPIRED_PAYMENT_REQUIRED',
+                  title: 'Trial Expired - Payment Required',
+                  message: 'Your trial has expired. Please add a payment method to continue your subscription.',
+                  metadata: {
+                    subscriptionId: trial.id,
+                    planType: trial.planType,
+                    amount: trial.amount
+                  }
+                });
+              } catch (error) {
+                console.error('Error sending payment required notification:', error);
               }
             }
-          });
 
-          // Create billing history entry for the first payment
-          await prisma.studentBillingHistory.create({
-            data: {
-              subscriptionId: trial.id,
-              billingDate: now,
-              amount: trial.amount,
-              currency: trial.currency,
-              status: 'PENDING', // Will be marked as PAID when payment is processed
-              paymentMethod: 'AUTO_BILL',
-              invoiceNumber: `STU-INV-${Date.now()}-${trial.id}`,
-              description: `First billing after trial for ${trial.planType} plan`
-            }
-          });
-
-          // Log the trial expiration
-          await prisma.subscriptionLog.create({
-            data: {
-              subscriptionId: trial.id,
-              action: 'TRIAL_EXPIRED',
-              oldPlan: trial.planType,
-              newPlan: trial.planType,
-              oldAmount: trial.amount,
-              newAmount: trial.amount,
-              oldBillingCycle: trial.billingCycle,
-              newBillingCycle: trial.billingCycle,
-              userId: 'SYSTEM',
-              reason: 'Trial period expired, subscription activated'
-            }
-          });
-
-          console.log(` Converted student trial ${trial.id} to active subscription`);
+            console.log(` Student trial ${trial.id} expired, payment required`);
+          }
         }
       } catch (error) {
         console.error('❌ Error processing student trial ${trial.id}:');

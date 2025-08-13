@@ -45,6 +45,7 @@ export async function GET(
         status: true,
         marketingType: true,
         requiresSubscription: true,
+        subscriptionTier: true,
         maxStudents: true,
         base_price: true,
         startDate: true,
@@ -52,7 +53,10 @@ export async function GET(
       }
     });
 
-    console.log('📋 Course details:', course);
+    console.log('📋 Course details:', {
+      ...course,
+      subscriptionTier: course.subscriptionTier || 'None specified'
+    });
 
     if (!course) {
       console.log('❌ Course not found');
@@ -90,6 +94,12 @@ export async function GET(
         const subscriptionStatus = await SubscriptionCommissionService.getUserSubscriptionStatus(session.user.id);
         console.log('💳 Subscription status:', subscriptionStatus);
         
+        // Debug: Check raw subscription data
+        const rawSubscription = await prisma.studentSubscription.findUnique({
+          where: { studentId: session.user.id }
+        });
+        console.log('🔍 Raw subscription data:', rawSubscription);
+        
         if (!subscriptionStatus.hasActiveSubscription) {
           console.log('❌ User does not have active subscription for subscription-required course');
           return NextResponse.json({ 
@@ -100,6 +110,40 @@ export async function GET(
             requiresSubscription: true,
             courseTitle: course.title
           }, { status: 402 }); // 402 Payment Required
+        }
+
+        // Check if user's subscription tier meets the course requirement
+        if (course.subscriptionTier && subscriptionStatus.currentPlan) {
+          const tierHierarchy = {
+            'BASIC': 1,
+            'PREMIUM': 2,
+            'PRO': 3
+          };
+          
+          const userTierLevel = tierHierarchy[subscriptionStatus.currentPlan as keyof typeof tierHierarchy] || 0;
+          const requiredTierLevel = tierHierarchy[course.subscriptionTier as keyof typeof tierHierarchy] || 0;
+          
+          console.log('🔍 Tier check:', {
+            userTier: subscriptionStatus.currentPlan,
+            userTierLevel,
+            requiredTier: course.subscriptionTier,
+            requiredTierLevel,
+            hasAccess: userTierLevel >= requiredTierLevel
+          });
+          
+          if (userTierLevel < requiredTierLevel) {
+            console.log('❌ User subscription tier does not meet course requirement');
+            return NextResponse.json({ 
+              error: 'Subscription tier required',
+              details: `This course requires a ${course.subscriptionTier} subscription or higher. Your current plan is ${subscriptionStatus.currentPlan}.`,
+              redirectUrl: '/subscription-signup',
+              courseType: course.marketingType,
+              requiresSubscription: true,
+              courseTitle: course.title,
+              requiredTier: course.subscriptionTier,
+              currentTier: subscriptionStatus.currentPlan
+            }, { status: 402 }); // 402 Payment Required
+          }
         }
 
         console.log('✅ User has active subscription:', subscriptionStatus.currentPlan);
@@ -134,10 +178,12 @@ export async function GET(
       
       if (existingEnrollment.status === 'PENDING_PAYMENT') {
         errorMessage = 'You have a pending enrollment for this course. Please complete the payment to access the content.';
-      } else if (existingEnrollment.status === 'ACTIVE') {
+      } else if (existingEnrollment.status === 'ACTIVE' || existingEnrollment.status === 'ENROLLED') {
         errorMessage = 'You are already enrolled and have access to this course.';
       } else if (existingEnrollment.status === 'COMPLETED') {
         errorMessage = 'You have already completed this course.';
+      } else if (existingEnrollment.status === 'IN_PROGRESS') {
+        errorMessage = 'You are currently enrolled and making progress in this course.';
       }
 
       console.log('❌ User already enrolled, status:', existingEnrollment.status);
@@ -154,7 +200,9 @@ export async function GET(
     const enrolledCount = await prisma.studentCourseEnrollment.count({
       where: {
         courseId: params.id,
-        status: 'IN_PROGRESS',
+        status: {
+          in: ['PENDING_PAYMENT', 'ACTIVE', 'IN_PROGRESS', 'ENROLLED']
+        },
       },
     });
 

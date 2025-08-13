@@ -76,7 +76,7 @@ export const STUDENT_TIERS: Record<string, StudentTier> = {
       'Premium certificates',
       'Cultural content',
       'Study reminders',
-      'Video conferencing (limited)'
+      'Live Classes (limited)'
     ],
     limits: {
       maxCourses: 20,
@@ -102,7 +102,7 @@ export const STUDENT_TIERS: Record<string, StudentTier> = {
       'Career guidance',
       '24/7 support',
       'Exclusive content',
-      'Video conferencing (unlimited)'
+      'Live Classes (unlimited)'
     ],
     limits: {
       maxCourses: -1, // Unlimited
@@ -157,7 +157,7 @@ export const INSTITUTION_TIERS: Record<string, InstitutionTier> = {
       'Advanced certificates',
       'Student management tools',
       'Revenue tracking',
-      'Video conferencing (module integration)'
+      'Live Classes (module integration)'
     ],
     limits: {
       maxStudents: 200,
@@ -185,7 +185,7 @@ export const INSTITUTION_TIERS: Record<string, InstitutionTier> = {
       'Multi-location support',
       'Custom reporting',
       '24/7 priority support',
-      'Video conferencing (unlimited)'
+      'Live Classes (unlimited)'
     ],
     limits: {
       maxStudents: 1000,
@@ -232,7 +232,7 @@ export const hasFeature = (planType: string, feature: string, userType: 'STUDENT
   return tier.features.some(f => f.toLowerCase().includes(feature.toLowerCase()));
 };
 
-// Video conferencing specific helpers
+// Live Classes specific helpers
 export const getVideoConferencingAccess = (planType: string, userType: 'STUDENT' | 'INSTITUTION'): 'none' | 'limited' | 'unlimited' => {
   if (userType === 'STUDENT') {
     switch (planType) {

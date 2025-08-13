@@ -388,6 +388,7 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
         where: { studentId },
         update: {
           studentTierId: studentTier.id,
+          planType: studentTier.planType, // Set planType to match the tier
           status: startTrial ? 'TRIAL' : 'ACTIVE',
           endDate,
           autoRenew: true,
@@ -397,6 +398,7 @@ static async getUserSubscriptionStatus(userId: string): Promise<StudentSubscript
         create: {
           studentId,
           studentTierId: studentTier.id,
+          planType: studentTier.planType, // Set planType to match the tier
           status: startTrial ? 'TRIAL' : 'ACTIVE',
           startDate,
           endDate,
