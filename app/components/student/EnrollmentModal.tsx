@@ -34,9 +34,13 @@ export default function EnrollmentModal({
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
 
   // Check if this is a subscription-based course
-  const isSubscriptionBasedCourse = course.requiresSubscription || 
+  // UPDATED RULE: Only platform courses (institutionId = null) can be subscription-based
+  // Institution courses (institutionId != null) are never subscription-based, regardless of marketing type
+  const isSubscriptionBasedCourse = course.institutionId === null && (
+    course.requiresSubscription || 
     course.marketingType === 'LIVE_ONLINE' || 
-    course.marketingType === 'BLENDED';
+    course.marketingType === 'BLENDED'
+  );
 
   // Calculate price when dates change (only for non-subscription courses)
   useEffect(() => {

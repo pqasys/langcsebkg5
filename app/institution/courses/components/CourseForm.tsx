@@ -158,6 +158,7 @@ export function CourseForm({
     liveClassFrequency: '',
     liveClassSchedule: undefined,
     isPlatformCourse: false,
+    // Institution courses cannot be subscription-based - only platform courses (institutionId = null) can be
     requiresSubscription: false,
     subscriptionTier: '',
     // Marketing fields
@@ -461,40 +462,42 @@ export function CourseForm({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Subscription fields disabled for institutions - only platform courses can be subscription-based */}
             <div className="space-y-2">
-              <Label htmlFor="requiresSubscription">Requires Subscription</Label>
+              <Label htmlFor="requiresSubscription" className="text-gray-500">Requires Subscription</Label>
               <Select
-                value={formData.requiresSubscription ? 'true' : 'false'}
-                onValueChange={(value) => handleFormChange('requiresSubscription', value === 'true')}
+                value="false"
+                disabled
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select option" />
+                <SelectTrigger className="bg-gray-100">
+                  <SelectValue placeholder="Disabled for institutions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="true">Yes</SelectItem>
-                  <SelectItem value="false">No</SelectItem>
+                  <SelectItem value="false">No (Institution courses)</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-gray-500">
+                Subscription-based courses are only available for platform-wide courses (institutionId = null)
+              </p>
             </div>
 
-            {formData.requiresSubscription && (
-              <div className="space-y-2">
-                <Label htmlFor="subscriptionTier">Subscription Tier</Label>
-                <Select
-                  value={formData.subscriptionTier}
-                  onValueChange={(value) => handleFormChange('subscriptionTier', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select subscription tier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="BASIC">Basic</SelectItem>
-                    <SelectItem value="PREMIUM">Premium</SelectItem>
-                    <SelectItem value="ENTERPRISE">Enterprise</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label htmlFor="subscriptionTier" className="text-gray-500">Subscription Tier</Label>
+              <Select
+                value=""
+                disabled
+              >
+                <SelectTrigger className="bg-gray-100">
+                  <SelectValue placeholder="Not applicable" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">N/A</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">
+                Only platform courses can specify subscription tiers
+              </p>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="isPlatformCourse">Is Platform Course</Label>

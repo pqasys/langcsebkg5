@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Users, Building2, BookOpen, DollarSign, TrendingUp, AlertCircle, Settings, UserCheck, GraduationCap } from 'lucide-react';
+import { Loader2, Users, Building2, BookOpen, DollarSign, TrendingUp, AlertCircle, Settings, UserCheck, GraduationCap, Palette } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
 interface AdminStats {
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
@@ -385,6 +385,29 @@ export default function AdminDashboard() {
                 aria-label="Navigate to system settings page"
               >
                 Go to Settings
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                <Palette className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                Design Toolkit
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-300">
+                Customize promotional designs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={() => router.push('/admin/design-configs')}
+                variant="outline"
+                size="mobile-lg"
+                className="w-full"
+                aria-label="Navigate to design toolkit page"
+              >
+                Open Design Toolkit
               </Button>
             </CardContent>
           </Card>

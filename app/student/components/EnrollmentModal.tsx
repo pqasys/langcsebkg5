@@ -392,9 +392,13 @@ export default function EnrollmentModal({
     if (!course) return '';
     
     // Check if this is a subscription-based course
-    const isSubscriptionBasedCourse = course.requiresSubscription || 
+    // UPDATED RULE: Only platform courses (institutionId = null) can be subscription-based
+    // Institution courses (institutionId != null) are never subscription-based, regardless of marketing type
+    const isSubscriptionBasedCourse = course.institutionId === null && (
+      course.requiresSubscription || 
       course.marketingType === 'LIVE_ONLINE' || 
-      course.marketingType === 'BLENDED';
+      course.marketingType === 'BLENDED'
+    );
     
     if (isSubscriptionBasedCourse) {
       return 'This course is included in your subscription. You will have immediate access to all course content without additional payment.';
@@ -441,9 +445,13 @@ export default function EnrollmentModal({
   };
 
   // Check if this is a subscription-based course
-  const isSubscriptionBasedCourse = course?.requiresSubscription || 
+  // UPDATED RULE: Only platform courses (institutionId = null) can be subscription-based
+  // Institution courses (institutionId != null) are never subscription-based, regardless of marketing type
+  const isSubscriptionBasedCourse = course?.institutionId === null && (
+    course?.requiresSubscription || 
     course?.marketingType === 'LIVE_ONLINE' || 
-    course?.marketingType === 'BLENDED';
+    course?.marketingType === 'BLENDED'
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

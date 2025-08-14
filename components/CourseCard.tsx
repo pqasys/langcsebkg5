@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Users, Clock, Star, Tag } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { getStudentTier } from '@/lib/subscription-pricing';
 
 interface CourseTag {
   id: string;
@@ -47,6 +48,11 @@ interface Course {
   institution: Institution;
   category: Category;
   courseTags: CourseTag[];
+  // Subscription fields
+  requiresSubscription?: boolean;
+  subscriptionTier?: string;
+  isPlatformCourse?: boolean;
+  marketingType?: string;
 }
 
 interface CourseCardProps {
@@ -63,15 +69,32 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
   const [isLoading, setIsLoading] = useState(false);
 
   // Memoize expensive calculations
-  const courseData = useMemo(() => ({
-    formattedPrice: formatCurrency(course.base_price),
-            formattedDuration: `${course.duration} weeks`,
-    startDate: new Date(course.startDate).toLocaleDateString(),
-    endDate: new Date(course.endDate).toLocaleDateString(),
-    levelDisplay: course.level.replace('CEFR_', ''),
-    tags: course.courseTags.slice(0, 3), // Limit to 3 tags for performance
-    hasMoreTags: course.courseTags.length > 3
-  }), [course]);
+  const courseData = useMemo(() => {
+    // Check if this is a subscription-based course
+    const isSubscriptionBased = course.institutionId === null && (
+      course.requiresSubscription || 
+      course.marketingType === 'LIVE_ONLINE' || 
+      course.marketingType === 'BLENDED'
+    );
+
+    // Get subscription tier info if applicable
+    let subscriptionInfo = null;
+    if (isSubscriptionBased && course.subscriptionTier) {
+      subscriptionInfo = getStudentTier(course.subscriptionTier);
+    }
+
+    return {
+      formattedPrice: formatCurrency(course.base_price),
+      formattedDuration: `${course.duration} weeks`,
+      startDate: new Date(course.startDate).toLocaleDateString(),
+      endDate: new Date(course.endDate).toLocaleDateString(),
+      levelDisplay: course.level.replace('CEFR_', ''),
+      tags: course.courseTags.slice(0, 3), // Limit to 3 tags for performance
+      hasMoreTags: course.courseTags.length > 3,
+      isSubscriptionBased,
+      subscriptionInfo
+    };
+  }, [course]);
 
   // Simple handlers without debounce
   const handleEnroll = useCallback(async () => {
@@ -104,8 +127,8 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+          <div className="flex-1 min-w-0 pr-2">
+            <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors break-words">
               {course.title}
             </CardTitle>
             <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
@@ -115,7 +138,7 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
           </div>
           <Badge 
             variant="secondary" 
-            className="ml-2 flex-shrink-0"
+            className="ml-2 flex-shrink-0 whitespace-nowrap"
           >
             {courseData.levelDisplay}
           </Badge>
@@ -172,13 +195,31 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
           </div>
         )}
 
-        {/* Price and Actions */}
+        {/* Price/Subscription and Actions */}
         <div className="flex items-center justify-between pt-2 border-t">
-          <div className="text-lg font-bold text-green-600">
-            {courseData.formattedPrice}
-            <span className="text-sm text-gray-500 font-normal">
-              /{course.pricingPeriod.toLowerCase()}
-            </span>
+          <div className="flex-1">
+            {courseData.isSubscriptionBased && courseData.subscriptionInfo ? (
+              <div className="space-y-1">
+                <div className="flex items-center gap-1 flex-wrap">
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200 text-xs whitespace-nowrap">
+                    Subscription Required
+                  </Badge>
+                  <Badge variant="outline" className="text-xs whitespace-nowrap">
+                    {courseData.subscriptionInfo.name}
+                  </Badge>
+                </div>
+                <div className="text-sm text-gray-600">
+                  From ${courseData.subscriptionInfo.price}/month
+                </div>
+              </div>
+            ) : (
+              <div className="text-lg font-bold text-green-600">
+                {courseData.formattedPrice}
+                <span className="text-sm text-gray-500 font-normal">
+                  /{course.pricingPeriod.toLowerCase()}
+                </span>
+              </div>
+            )}
           </div>
           <div className="flex gap-2">
             <Button
@@ -193,9 +234,13 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
               size="sm"
               onClick={handleEnroll}
               disabled={isLoading}
-              className="bg-blue-600 hover:bg-blue-700"
+              className={`${
+                courseData.isSubscriptionBased 
+                  ? 'bg-blue-600 hover:bg-blue-700' 
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
-              {isLoading ? 'Enrolling...' : 'Enroll'}
+              {isLoading ? 'Enrolling...' : courseData.isSubscriptionBased ? 'Subscribe' : 'Enroll'}
             </Button>
           </div>
         </div>

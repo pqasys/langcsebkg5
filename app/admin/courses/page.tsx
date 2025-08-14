@@ -38,6 +38,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { debounce } from 'lodash';
+import { getStudentTier } from '@/lib/subscription-pricing';
 
 interface Course {
   id: string;
@@ -84,6 +85,12 @@ interface Course {
     date: string;
     price: number;
   }[];
+  // Subscription fields
+  requiresSubscription?: boolean;
+  subscriptionTier?: string;
+  isPlatformCourse?: boolean;
+  marketingType?: string;
+  institutionId?: string;
 }
 
 interface Institution {
@@ -1375,7 +1382,24 @@ function AdminCoursesContent() {
                         <h3 className="font-medium">{course.title}</h3>
                         <p className="text-sm text-gray-500 mt-1">{course.description}</p>
                         <div className="mt-2 flex gap-4 text-sm text-gray-500">
-                          <span>${course.base_price}</span>
+                          {(() => {
+                            const isSubscriptionBased = course.institutionId === null && (
+                              course.requiresSubscription || 
+                              course.marketingType === 'LIVE_ONLINE' || 
+                              course.marketingType === 'BLENDED'
+                            );
+                            
+                            if (isSubscriptionBased && course.subscriptionTier) {
+                              const subscriptionInfo = getStudentTier(course.subscriptionTier);
+                              return (
+                                <span className="text-blue-600 font-medium">
+                                  {subscriptionInfo ? `${subscriptionInfo.name} ($${subscriptionInfo.price}/month)` : 'Subscription Required'}
+                                </span>
+                              );
+                            } else {
+                              return <span>${course.base_price}</span>;
+                            }
+                          })()}
                           <span>{course.duration} weeks</span>
                           <span className="capitalize">{course.level}</span>
                           <span className="capitalize">{course.status}</span>
@@ -1465,7 +1489,24 @@ function AdminCoursesContent() {
                     
                     {/* Course Details */}
                     <div className="mb-4 flex flex-wrap gap-2 text-sm text-gray-500">
-                      <span className="font-medium text-green-600">${course.base_price}</span>
+                      {(() => {
+                        const isSubscriptionBased = course.institutionId === null && (
+                          course.requiresSubscription || 
+                          course.marketingType === 'LIVE_ONLINE' || 
+                          course.marketingType === 'BLENDED'
+                        );
+                        
+                        if (isSubscriptionBased && course.subscriptionTier) {
+                          const subscriptionInfo = getStudentTier(course.subscriptionTier);
+                          return (
+                            <span className="font-medium text-blue-600">
+                              {subscriptionInfo ? `${subscriptionInfo.name} ($${subscriptionInfo.price}/month)` : 'Subscription Required'}
+                            </span>
+                          );
+                        } else {
+                          return <span className="font-medium text-green-600">${course.base_price}</span>;
+                        }
+                      })()}
                       <span>{course.duration} weeks</span>
                       <span className="capitalize">{course.level}</span>
                       <span className="capitalize">{course.status}</span>

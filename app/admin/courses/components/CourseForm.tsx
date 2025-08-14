@@ -150,8 +150,11 @@ export function AdminCourseForm({
     if (!data.categoryId) {
       errors.categoryId = 'Category is required';
     }
-    if (!data.base_price || isNaN(Number(data.base_price)) || Number(data.base_price) < 0) {
-      errors.base_price = 'Valid base price is required';
+    // Skip base price validation for platform subscription courses
+    if (!(data.isPlatformCourse && data.requiresSubscription)) {
+      if (!data.base_price || isNaN(Number(data.base_price)) || Number(data.base_price) < 0) {
+        errors.base_price = 'Valid base price is required';
+      }
     }
     if (!data.duration || isNaN(Number(data.duration)) || Number(data.duration) <= 0) {
       errors.duration = 'Valid duration is required';
@@ -181,7 +184,7 @@ export function AdminCourseForm({
     
     // Platform course validation
     if (data.isPlatformCourse && !data.requiresSubscription) {
-      errors.requiresSubscription = 'Platform courses must require subscription';
+      errors.requiresSubscription = 'Platform courses (institutionId = null) must require subscription';
     }
     
     // Subscription validation
@@ -230,6 +233,17 @@ export function AdminCourseForm({
       }
     } else {
       newFormData = { ...formData, [field]: value };
+    }
+
+    // Handle platform subscription course logic
+    if (field === 'isPlatformCourse' || field === 'requiresSubscription') {
+      const isPlatformSubscription = newFormData.isPlatformCourse && newFormData.requiresSubscription;
+      
+      // If this is now a platform subscription course, set pricing defaults
+      if (isPlatformSubscription) {
+        newFormData.base_price = '0'; // Set to 0 for subscription courses
+        newFormData.pricingPeriod = 'FULL_COURSE'; // Set to full course for subscription courses
+      }
     }
 
     // Update form data through parent
@@ -591,18 +605,33 @@ export function AdminCourseForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="base_price" className="text-sm font-medium">Base Price *</Label>
+          <Label htmlFor="base_price" className={`text-sm font-medium ${formData.isPlatformCourse && formData.requiresSubscription ? 'text-gray-500' : ''}`}>
+            Base Price *
+            {formData.isPlatformCourse && formData.requiresSubscription && (
+              <span className="text-xs text-gray-500 ml-2">(Disabled for subscription courses)</span>
+            )}
+          </Label>
           <Input
             id="base_price"
             type="number"
             value={formData.base_price}
             onChange={(e) => handleFormChange('base_price', e.target.value)}
-            required
-            className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+            required={!(formData.isPlatformCourse && formData.requiresSubscription)}
+            disabled={formData.isPlatformCourse && formData.requiresSubscription}
+            className={`${
+              formData.isPlatformCourse && formData.requiresSubscription 
+                ? 'bg-gray-100 cursor-not-allowed border-gray-300' 
+                : 'bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+            } ${
               errors.base_price ? 'border-red-500' : ''
             }`}
-            aria-required="true"
+            aria-required={!(formData.isPlatformCourse && formData.requiresSubscription)}
           />
+          {formData.isPlatformCourse && formData.requiresSubscription && (
+            <p className="text-xs text-gray-500">
+              Pricing is determined by subscription tiers for platform-wide subscription courses
+            </p>
+          )}
           <ErrorMessage field="base_price" />
         </div>
       </div>
@@ -740,16 +769,30 @@ export function AdminCourseForm({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="pricingPeriod" className="text-sm font-medium">Pricing Period *</Label>
+          <Label htmlFor="pricingPeriod" className={`text-sm font-medium ${formData.isPlatformCourse && formData.requiresSubscription ? 'text-gray-500' : ''}`}>
+            Pricing Period *
+            {formData.isPlatformCourse && formData.requiresSubscription && (
+              <span className="text-xs text-gray-500 ml-2">(Disabled for subscription courses)</span>
+            )}
+          </Label>
           <Select
             value={formData.pricingPeriod}
             onValueChange={(value) => handleFormChange('pricingPeriod', value)}
-            required
+            required={!(formData.isPlatformCourse && formData.requiresSubscription)}
+            disabled={formData.isPlatformCourse && formData.requiresSubscription}
           >
-            <SelectTrigger id="pricingPeriod" className={`bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${
+            <SelectTrigger id="pricingPeriod" className={`${
+              formData.isPlatformCourse && formData.requiresSubscription 
+                ? 'bg-gray-100 cursor-not-allowed border-gray-300' 
+                : 'bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+            } ${
               errors.pricingPeriod ? 'border-red-500' : ''
             }`}>
-              <SelectValue placeholder="Select pricing period" />
+              <SelectValue placeholder={
+                formData.isPlatformCourse && formData.requiresSubscription 
+                  ? "N/A for subscription courses" 
+                  : "Select pricing period"
+              } />
             </SelectTrigger>
             <SelectContent className="bg-white">
               <SelectItem value="FULL_COURSE">Full Course</SelectItem>
@@ -757,6 +800,11 @@ export function AdminCourseForm({
               <SelectItem value="MONTHLY">Monthly</SelectItem>
             </SelectContent>
           </Select>
+          {formData.isPlatformCourse && formData.requiresSubscription && (
+            <p className="text-xs text-gray-500">
+              Pricing period is not applicable for platform-wide subscription courses
+            </p>
+          )}
           <ErrorMessage field="pricingPeriod" />
         </div>
 
@@ -839,7 +887,7 @@ export function AdminCourseForm({
         </div>
       </div>
 
-      {formData.pricingPeriod === 'WEEKLY' && (
+      {formData.pricingPeriod === 'WEEKLY' && !(formData.isPlatformCourse && formData.requiresSubscription) && (
         <div className="grid grid-cols-1 gap-6">
           <Button
             type="button"
@@ -854,7 +902,7 @@ export function AdminCourseForm({
         </div>
       )}
 
-      {formData.pricingPeriod === 'MONTHLY' && (
+      {formData.pricingPeriod === 'MONTHLY' && !(formData.isPlatformCourse && formData.requiresSubscription) && (
         <div className="grid grid-cols-1 gap-6">
           <Button
             type="button"
@@ -866,6 +914,22 @@ export function AdminCourseForm({
           >
             Manage Monthly Pricing
           </Button>
+        </div>
+      )}
+
+      {formData.isPlatformCourse && formData.requiresSubscription && (
+        <div className="grid grid-cols-1 gap-6">
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="flex items-center gap-2 text-sm text-blue-700">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">Platform Subscription Course</span>
+            </div>
+            <p className="text-xs text-blue-600 mt-1">
+              Pricing is managed through subscription tiers. Individual course pricing controls are disabled.
+            </p>
+          </div>
         </div>
       )}
 

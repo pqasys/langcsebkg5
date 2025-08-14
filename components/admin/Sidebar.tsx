@@ -32,7 +32,8 @@ import {
   ChevronRight,
   Activity,
   LogOut,
-  Video
+  Video,
+  Palette
 } from 'lucide-react';
 // import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -163,6 +164,8 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
   const isPerformancePage = pathname.startsWith('/admin/performance');
   // Check if we're on live classes page
   const isLiveClassesPage = pathname.startsWith('/admin/live-classes');
+  // Check if we're on design configs page
+  const isDesignConfigsPage = pathname.startsWith('/admin/design-configs');
 
   return (
     <div className="flex h-full flex-col bg-gray-900">
@@ -255,18 +258,29 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
                   Tag Management
                 </a>
 
-                <Link
-                  href="/admin/live-classes"
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
-                    isLiveClassesPage ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
-                  )}
-                >
-                  <Video className="h-4 w-4" />
-                  Live Classes
-                </Link>
+                                  <Link
+                    href="/admin/live-classes"
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                      isLiveClassesPage ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                    )}
+                  >
+                    <Video className="h-4 w-4" />
+                    Live Classes
+                  </Link>
+
+                  <Link
+                    href="/admin/design-configs"
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                      isDesignConfigsPage ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                    )}
+                  >
+                    <Palette className="h-4 w-4" />
+                    Design Toolkit
+                  </Link>
+                </div>
               </div>
-            </div>
 
             {/* Financial Management */}
             <div className="pt-2">

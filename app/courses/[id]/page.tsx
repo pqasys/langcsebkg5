@@ -192,7 +192,8 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
       }
 
       // User is eligible - check if this is a subscription-based course
-      if (course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED' || course.requiresSubscription) {
+      // UPDATED RULE: Only platform courses (institutionId = null) can be subscription-based
+      if (course.institutionId === null && (course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED' || course.requiresSubscription)) {
         // For subscription-based courses, enroll directly
         await handleDirectEnrollment();
       } else {

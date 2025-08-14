@@ -17,6 +17,7 @@ import {
   Zap,
   Target
 } from 'lucide-react';
+import { getStudentTier } from '@/lib/subscription-pricing';
 
 interface EnhancedCourseCardProps {
   course: {
@@ -33,6 +34,12 @@ interface EnhancedCourseCardProps {
     isPremiumPlacement?: boolean;
     isFeaturedPlacement?: boolean;
     isHighCommission?: boolean;
+    // Subscription fields
+    requiresSubscription?: boolean;
+    subscriptionTier?: string;
+    isPlatformCourse?: boolean;
+    marketingType?: string;
+    institutionId?: string;
 
     institution: {
       id?: string;
@@ -75,6 +82,18 @@ export function EnhancedCourseCard({
   showAdvertising = true
 }: EnhancedCourseCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Check if this is a subscription-based course
+  const isSubscriptionBased = course.institutionId === null && (
+    course.requiresSubscription || 
+    course.marketingType === 'LIVE_ONLINE' || 
+    course.marketingType === 'BLENDED'
+  );
+
+  // Get subscription tier info if applicable
+  const subscriptionInfo = isSubscriptionBased && course.subscriptionTier 
+    ? getStudentTier(course.subscriptionTier) 
+    : null;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -173,13 +192,6 @@ export function EnhancedCourseCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Priority Badge */}
-      {showPriorityIndicators && getPriorityBadge() && (
-        <div className="absolute top-2 left-2 z-20 sm:top-3 sm:left-3">
-          {getPriorityBadge()}
-        </div>
-      )}
-
       {/* Premium/Featured Background Gradient */}
       {(course.isPremiumPlacement || course.isFeaturedPlacement) && (
         <div className={`absolute inset-0 bg-gradient-to-br ${
@@ -189,42 +201,75 @@ export function EnhancedCourseCard({
         } opacity-50`} />
       )}
 
-      <CardHeader className="relative pb-3 pt-10 sm:pt-12">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 leading-tight mb-2">
-              {course.title}
-            </h3>
-            
-            {course.description && (
-              <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                {course.description}
-              </p>
-            )}
+      {/* Dedicated Title Area - Most Important Marketing Element */}
+      <div className="px-6 pt-6 pb-4 border-b border-gray-100">
+        <h3 className="font-bold text-xl text-gray-900 line-clamp-2 leading-tight break-words">
+          {course.title}
+        </h3>
+      </div>
 
-            {/* Institution Info */}
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-              <MapPin className="w-4 h-4" />
-              <span className="font-medium">{course.institution?.name}</span>
-              {course.institution?.city && (
-                <span>• {course.institution.city}</span>
-              )}
+      <CardHeader className="relative pb-3 pt-4">
+        <div className="space-y-4">
+          {/* Priority Badge - Now in a separate row below title */}
+          {showPriorityIndicators && getPriorityBadge() && (
+            <div>
+              {getPriorityBadge()}
             </div>
+          )}
+          
+          {course.description && (
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {course.description}
+            </p>
+          )}
 
-            {/* Priority Score */}
-            {getRatingDisplay()}
+          {/* Institution Info and Rating - Better spacing */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-gray-500 flex-1 min-w-0">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <div className="truncate">
+                <span className="font-medium">{course.institution?.name}</span>
+                {course.institution?.city && (
+                  <span className="text-gray-400"> • {course.institution.city}</span>
+                )}
+              </div>
+            </div>
+            
+            {/* Priority Score - Moved to right side */}
+            <div className="ml-4 flex-shrink-0">
+              {getRatingDisplay()}
+            </div>
           </div>
 
-          {/* Price */}
-          <div className="text-right ml-4">
-            <div className="text-2xl font-bold text-green-600">
-              {formatPrice(course.base_price)}
+          {/* Price/Subscription - Full width for better space utilization */}
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div className="text-sm text-gray-500">
+              {course.duration && (
+                <span>{course.duration} weeks</span>
+              )}
             </div>
-            {course.duration && (
-              <div className="text-sm text-gray-500">
-                {course.duration} weeks
-              </div>
-            )}
+            
+            <div className="text-right">
+              {isSubscriptionBased && subscriptionInfo ? (
+                <div className="space-y-1">
+                                     <div className="flex items-center justify-end gap-1">
+                     <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200 text-xs whitespace-nowrap">
+                       Subscription
+                     </Badge>
+                    <Badge variant="outline" className="text-xs whitespace-nowrap">
+                      {subscriptionInfo.name}
+                    </Badge>
+                  </div>
+                  <div className="text-lg font-bold text-blue-600">
+                    From ${subscriptionInfo.price}/month
+                  </div>
+                </div>
+              ) : (
+                <div className="text-2xl font-bold text-green-600">
+                  {formatPrice(course.base_price)}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -300,7 +345,10 @@ export function EnhancedCourseCard({
                 : 'bg-blue-600 hover:bg-blue-700'
             } text-white`}
           >
-            {isAuthenticated && userRole === 'STUDENT' ? 'Enroll Now' : 'Learn More'}
+            {isAuthenticated && userRole === 'STUDENT' 
+              ? (isSubscriptionBased ? 'Subscribe Now' : 'Enroll Now') 
+              : 'Learn More'
+            }
           </Button>
         </div>
 

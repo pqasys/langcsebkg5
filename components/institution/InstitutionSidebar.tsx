@@ -29,7 +29,8 @@ import {
   Clock,
   Database,
   Share2,
-  BarChart3
+  BarChart3,
+  Palette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'next-auth/react';
@@ -154,6 +155,12 @@ export default function InstitutionSidebar({ onNavigate }: InstitutionSidebarPro
       href: '/institution/settings',
       icon: Settings,
       description: 'Manage institution settings'
+    },
+    {
+      title: 'Design Toolkit',
+      href: '/admin/design-configs',
+      icon: Palette,
+      description: 'Customize promotional and advertising designs'
     }
   ];
 

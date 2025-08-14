@@ -19,7 +19,7 @@ import { FaSpinner } from 'react-icons/fa';
 import { Search, Filter, Star, Crown, TrendingUp, Tag } from 'lucide-react';
 import { EnhancedCourseCard } from '@/components/EnhancedCourseCard';
 import { AdvertisingBanner, PremiumCourseBanner, FeaturedInstitutionBanner, PromotionalBanner } from '@/components/AdvertisingBanner';
-import { PromotionalSidebar } from '@/components/PromotionalSidebar';
+import { EnhancedPromotionalSidebar } from '@/components/design/EnhancedPromotionalSidebar';
 import { TagFilter } from '@/components/TagFilter';
 import EnrollmentModal from '../app/student/components/EnrollmentModal';
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -441,9 +441,11 @@ export default function CoursesPageClient() {
 
         {/* Promotional Sidebar */}
         <div className="hidden xl:block">
-          <PromotionalSidebar 
+          <EnhancedPromotionalSidebar 
             maxItems={4}
             showSponsored={showAdvertising}
+            showDesignToolkit={true}
+            userRole={session?.user?.role}
           />
         </div>
       </div>

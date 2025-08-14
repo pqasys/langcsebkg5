@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { 
   Star, 
   Crown, 
@@ -14,28 +16,14 @@ import {
   ExternalLink,
   ChevronRight,
   Award,
-  BookOpen
+  BookOpen,
+  Palette,
+  Settings,
+  Eye,
+  EyeOff
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
-// import { toast } from 'sonner';
-
-interface PromotionalItem {
-  id: string;
-  type: 'institution' | 'course' | 'third-party';
-  title: string;
-  description: string;
-  imageUrl?: string;
-  ctaText: string;
-  ctaLink: string;
-  badge?: string;
-  stats?: {
-    students?: number;
-    courses?: number;
-    rating?: number;
-  };
-  priority?: number;
-  isSponsored?: boolean;
-}
+import { DesignToolkit, DesignConfig } from './DesignToolkit';
+import { DesignablePromotionalCard, PromotionalItem } from './DesignablePromotionalCard';
 
 interface InstitutionPromotion {
   id: string;
@@ -64,25 +52,82 @@ interface CoursePromotion {
     commissionRate: number;
     isFeatured?: boolean;
   } | null;
-  priorityScore?: number; // Optional - not available from public API
+  priorityScore?: number;
   isPremiumPlacement?: boolean;
   isFeaturedPlacement?: boolean;
   isHighCommission?: boolean;
 }
 
-interface PromotionalSidebarProps {
+interface EnhancedPromotionalSidebarProps {
   className?: string;
   maxItems?: number;
   showSponsored?: boolean;
+  showDesignToolkit?: boolean;
+  userRole?: 'ADMIN' | 'INSTITUTION_STAFF' | 'STUDENT' | 'USER';
 }
 
-export function PromotionalSidebar({ 
+const DEFAULT_DESIGN_CONFIG: DesignConfig = {
+  // Background
+  backgroundType: 'solid',
+  backgroundColor: '#ffffff',
+  backgroundGradient: {
+    from: '#667eea',
+    to: '#764ba2',
+    direction: 'to-r'
+  },
+  backgroundImage: '',
+  backgroundPattern: 'none',
+  backgroundOpacity: 100,
+  
+  // Typography
+  titleFont: 'inter',
+  titleSize: 16,
+  titleWeight: 'semibold',
+  titleColor: '#1f2937',
+  titleAlignment: 'left',
+  titleShadow: false,
+  titleShadowColor: '#000000',
+  
+  descriptionFont: 'inter',
+  descriptionSize: 14,
+  descriptionColor: '#6b7280',
+  descriptionAlignment: 'left',
+  
+  // Layout
+  padding: 16,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#e5e7eb',
+  borderStyle: 'solid',
+  
+  // Effects
+  shadow: true,
+  shadowColor: 'rgba(0, 0, 0, 0.1)',
+  shadowBlur: 10,
+  shadowOffset: 4,
+  
+  // Animation
+  hoverEffect: 'scale',
+  animationDuration: 300,
+  
+  // Custom CSS
+  customCSS: '',
+};
+
+export function EnhancedPromotionalSidebar({ 
   className = '', 
   maxItems = 4,
-  showSponsored = true 
-}: PromotionalSidebarProps) {
+  showSponsored = true,
+  showDesignToolkit = false,
+  userRole = 'USER'
+}: EnhancedPromotionalSidebarProps) {
   const [promotionalItems, setPromotionalItems] = useState<PromotionalItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAds, setShowAds] = useState(true);
+  const [designConfig, setDesignConfig] = useState<DesignConfig>(DEFAULT_DESIGN_CONFIG);
+  const [showDesignPanel, setShowDesignPanel] = useState(false);
+
+  const canEditDesign = userRole === 'ADMIN' || userRole === 'INSTITUTION_STAFF';
 
   useEffect(() => {
     const fetchPromotionalContent = async () => {
@@ -149,7 +194,7 @@ export function PromotionalSidebar({
         });
         
         // Add third-party promotions (static for now)
-        if (showSponsored) {
+        if (showSponsored && showAds) {
           items.push({
             id: 'lang-tools',
             type: 'third-party',
@@ -240,35 +285,21 @@ export function PromotionalSidebar({
     };
 
     fetchPromotionalContent();
-  }, [maxItems, showSponsored]);
+  }, [maxItems, showSponsored, showAds]);
 
-  const getBadgeVariant = (badge?: string) => {
-    switch (badge?.toLowerCase()) {
-      case 'featured':
-      case 'premium':
-        return 'default';
-      case 'sponsored':
-        return 'secondary';
-      case 'free':
-        return 'outline';
-      default:
-        return 'secondary';
-    }
+  const handleSaveDesign = () => {
+    // Save design configuration to localStorage or API
+    localStorage.setItem('promotionalDesignConfig', JSON.stringify(designConfig));
+    console.log('Design configuration saved:', designConfig);
   };
 
-  const getBadgeIcon = (badge?: string) => {
-    switch (badge?.toLowerCase()) {
-      case 'featured':
-        return <Star className="w-3 h-3" />;
-      case 'premium':
-        return <Crown className="w-3 h-3" />;
-      case 'sponsored':
-        return <TrendingUp className="w-3 h-3" />;
-      case 'free':
-        return <Award className="w-3 h-3" />;
-      default:
-        return null;
-    }
+  const handleResetDesign = () => {
+    setDesignConfig(DEFAULT_DESIGN_CONFIG);
+    localStorage.removeItem('promotionalDesignConfig');
+  };
+
+  const handleDesignToggle = () => {
+    setShowDesignPanel(!showDesignPanel);
   };
 
   if (loading) {
@@ -289,81 +320,66 @@ export function PromotionalSidebar({
 
   return (
     <div className={`w-80 space-y-4 ${className}`}>
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Featured & Promotions</h3>
-        <Badge variant="outline" className="text-xs">
-          <TrendingUp className="w-3 h-3 mr-1" />
-          Curated
-        </Badge>
-      </div>
-
-      {promotionalItems.map((item) => (
-        <Card 
-          key={item.id} 
-          className={`group transition-all duration-300 hover:shadow-md hover:scale-[1.02] ${
-            item.isSponsored ? 'ring-1 ring-purple-200' : ''
-          }`}
-        >
-          <CardContent className="p-4">
-            {/* Header with badge */}
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                  {item.title}
-                </h4>
-              </div>
-              {item.badge && (
-                <Badge 
-                  variant={getBadgeVariant(item.badge)} 
-                  className="ml-2 flex-shrink-0 text-xs"
-                >
-                  {getBadgeIcon(item.badge)}
-                  <span className="ml-1">{item.badge}</span>
-                </Badge>
-              )}
-            </div>
-
-            {/* Description */}
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-              {item.description}
-            </p>
-
-            {/* Stats (if available) */}
-            {item.stats && (
-              <div className="flex items-center gap-4 mb-3 text-xs text-gray-500">
-                {item.stats.students && (
-                  <div className="flex items-center gap-1">
-                    <Users className="w-3 h-3" />
-                    <span>{item.stats.students.toLocaleString()}</span>
-                  </div>
-                )}
-                {item.stats.courses && (
-                  <div className="flex items-center gap-1">
-                    <BookOpen className="w-3 h-3" />
-                    <span>{item.stats.courses}</span>
-                  </div>
-                )}
-                {item.stats.rating && (
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    <span>{item.stats.rating}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* CTA Button */}
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900">Featured & Promotions</h3>
+          <Badge variant="outline" className="text-xs">
+            <TrendingUp className="w-3 h-3 mr-1" />
+            Curated
+          </Badge>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Show/Hide Ads Toggle */}
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={showAds}
+              onCheckedChange={setShowAds}
+              id="show-ads"
+            />
+            <Label htmlFor="show-ads" className="text-xs">Ads</Label>
+          </div>
+          
+          {/* Design Toolkit Toggle (Admin/Institution only) */}
+          {canEditDesign && (
             <Button
               variant="outline"
               size="sm"
-              className="w-full group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors"
-              onClick={() => { if (typeof window !== 'undefined') window.open(item.ctaLink, '_blank'); }}
+              onClick={handleDesignToggle}
             >
-              {item.ctaText}
-              <ChevronRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
+              {showDesignPanel ? <EyeOff className="w-4 h-4" /> : <Palette className="w-4 h-4" />}
             </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Design Toolkit Panel */}
+      {showDesignPanel && canEditDesign && (
+        <Card className="border-2 border-blue-200">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Design Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <DesignToolkit
+              config={designConfig}
+              onConfigChange={setDesignConfig}
+              onSave={handleSaveDesign}
+              onReset={handleResetDesign}
+            />
           </CardContent>
         </Card>
+      )}
+
+      {/* Promotional Items */}
+      {promotionalItems.map((item) => (
+        <DesignablePromotionalCard
+          key={item.id}
+          item={item}
+          designConfig={designConfig}
+        />
       ))}
 
       {/* Footer */}
@@ -371,7 +387,12 @@ export function PromotionalSidebar({
         <p className="text-xs text-gray-500">
           Promotional content helps support our platform
         </p>
+        {canEditDesign && (
+          <p className="text-xs text-blue-500 mt-1">
+            Design settings available for admins
+          </p>
+        )}
       </div>
     </div>
   );
-} 
+}

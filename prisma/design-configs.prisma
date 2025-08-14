@@ -1,0 +1,157 @@
+// Design Configuration Models for Promotional and Advertising Items
+
+model DesignConfig {
+  id          String   @id @default(cuid())
+  name        String   // Human-readable name for the design
+  description String?  // Optional description
+  
+  // Background settings
+  backgroundType       String   @default("solid") // solid, gradient, image, pattern
+  backgroundColor      String   @default("#ffffff")
+  backgroundGradientFrom String @default("#667eea")
+  backgroundGradientTo   String @default("#764ba2")
+  backgroundGradientDirection String @default("to-r")
+  backgroundImage      String?  // URL to background image
+  backgroundPattern    String   @default("none")
+  backgroundOpacity    Int      @default(100)
+  
+  // Typography settings
+  titleFont           String   @default("inter")
+  titleSize           Int      @default(16)
+  titleWeight         String   @default("semibold")
+  titleColor          String   @default("#1f2937")
+  titleAlignment      String   @default("left")
+  titleShadow         Boolean  @default(false)
+  titleShadowColor    String   @default("#000000")
+  
+  descriptionFont     String   @default("inter")
+  descriptionSize     Int      @default(14)
+  descriptionColor    String   @default("#6b7280")
+  descriptionAlignment String  @default("left")
+  
+  // Layout settings
+  padding             Int      @default(16)
+  borderRadius        Int      @default(8)
+  borderWidth         Int      @default(1)
+  borderColor         String   @default("#e5e7eb")
+  borderStyle         String   @default("solid")
+  
+  // Effects settings
+  shadow              Boolean  @default(true)
+  shadowColor         String   @default("rgba(0, 0, 0, 0.1)")
+  shadowBlur          Int      @default(10)
+  shadowOffset        Int      @default(4)
+  
+  // Animation settings
+  hoverEffect         String   @default("scale") // none, scale, glow, slide, bounce
+  animationDuration   Int      @default(300)
+  
+  // Custom CSS
+  customCSS           String?  @db.Text
+  
+  // Metadata
+  isActive            Boolean  @default(true)
+  isDefault           Boolean  @default(false)
+  createdBy           String?  // User ID who created this config
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  // Relationships
+  promotionalItems    PromotionalItem[]
+  advertisingItems    AdvertisingItem[]
+  
+  @@map("design_configs")
+}
+
+model PromotionalItem {
+  id          String   @id @default(cuid())
+  type        String   // institution, course, third-party
+  title       String
+  description String
+  imageUrl    String?
+  ctaText     String
+  ctaLink     String
+  badge       String?
+  
+  // Stats
+  students    Int?
+  courses     Int?
+  rating      Float?
+  
+  priority    Int      @default(0)
+  isSponsored Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  
+  // Design configuration
+  designConfigId String?
+  designConfig   DesignConfig? @relation(fields: [designConfigId], references: [id])
+  
+  // Metadata
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("promotional_items")
+}
+
+model AdvertisingItem {
+  id          String   @id @default(cuid())
+  type        String   // banner, sidebar, popup, interstitial
+  title       String
+  description String
+  imageUrl    String?
+  ctaText     String
+  ctaLink     String
+  
+  // Targeting
+  targetAudience String? // student, institution, all
+  targetLocation String? // courses, dashboard, sidebar
+  targetDevice  String? // desktop, mobile, all
+  
+  // Display settings
+  startDate   DateTime?
+  endDate     DateTime?
+  maxImpressions Int?
+  currentImpressions Int @default(0)
+  maxClicks   Int?
+  currentClicks Int @default(0)
+  
+  // Design configuration
+  designConfigId String?
+  designConfig   DesignConfig? @relation(fields: [designConfigId], references: [id])
+  
+  // Status
+  isActive    Boolean  @default(true)
+  isApproved  Boolean  @default(false)
+  
+  // Metadata
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("advertising_items")
+}
+
+model DesignTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String   // promotional, advertising, general
+  
+  // Template configuration (JSON)
+  config      Json     // Serialized DesignConfig
+  
+  // Preview
+  previewImage String?
+  
+  // Usage stats
+  usageCount  Int      @default(0)
+  isPublic    Boolean  @default(false)
+  
+  // Metadata
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("design_templates")
+}

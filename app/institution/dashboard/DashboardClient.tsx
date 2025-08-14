@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { FaSpinner } from 'react-icons/fa';
 import { SubscriptionOverviewCard } from '@/components/SubscriptionOverviewCard';
 import { Badge } from '@/components/ui/badge';
+import { useRouter } from 'next/navigation';
+import { Palette, BookOpen, Users, Settings } from 'lucide-react';
 
 interface Payment {
   id: string;
@@ -67,6 +69,7 @@ export function DashboardClient({
   recentStudentsWithEnrollments
 }: DashboardClientProps) {
   const { data: session } = useSession();
+  const router = useRouter();
   const [paymentSettings, setPaymentSettings] = useState<PaymentSettings | null>(null);
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
   const [localPendingPayments, setLocalPendingPayments] = useState<Payment[]>(validPendingPayments);
@@ -254,6 +257,81 @@ export function DashboardClient({
             <div className="text-xl sm:text-2xl font-bold text-green-600">
               ${totalRevenue.toLocaleString()}
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-blue-600" />
+              Manage Courses
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => router.push('/institution/courses')}
+              variant="outline"
+              className="w-full"
+            >
+              Go to Courses
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Users className="h-5 w-5 text-green-600" />
+              Manage Students
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => router.push('/institution/students')}
+              variant="outline"
+              className="w-full"
+            >
+              Go to Students
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Settings className="h-5 w-5 text-gray-600" />
+              Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => router.push('/institution/settings')}
+              variant="outline"
+              className="w-full"
+            >
+              Go to Settings
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Palette className="h-5 w-5 text-pink-600" />
+              Design Toolkit
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => router.push('/admin/design-configs')}
+              variant="outline"
+              className="w-full"
+            >
+              Open Design Toolkit
+            </Button>
           </CardContent>
         </Card>
       </div>

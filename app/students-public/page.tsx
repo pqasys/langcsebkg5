@@ -154,7 +154,7 @@ export default function StudentsPublicPage() {
             <Link href="/courses">
               <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg font-semibold">
                 <FaPlay className="w-5 h-5 mr-2" />
-                Start Learning
+                Available Courses
               </Button>
             </Link>
             <Link href="/auth/signup">

@@ -7,14 +7,34 @@ export async function GET() {
     // Get all approved courses with enhanced prioritization
     const courses = await prisma.course.findMany({
       where: {
-        startDate: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0) - 30 * 24 * 60 * 60 * 1000) // Show courses starting from 30 days ago
-        },
-        status: 'PUBLISHED', // Only show published courses
-        institution: {
-          isApproved: true,
-          status: 'ACTIVE'
-        }
+        OR: [
+          // Platform courses (always show these)
+          {
+            institutionId: null,
+            status: 'PUBLISHED'
+          },
+          // Institution courses with approved and active institutions
+          {
+            institution: {
+              isApproved: true,
+              status: 'ACTIVE'
+            },
+            status: 'PUBLISHED',
+            // Show courses that started within the last 6 months or start within the next 6 months
+            OR: [
+              {
+                startDate: {
+                  gte: new Date(new Date().setHours(0, 0, 0, 0) - 6 * 30 * 24 * 60 * 60 * 1000) // Started within last 6 months
+                }
+              },
+              {
+                startDate: {
+                  lte: new Date(new Date().setHours(0, 0, 0, 0) + 6 * 30 * 24 * 60 * 60 * 1000) // Starting within next 6 months
+                }
+              }
+            ]
+          }
+        ]
       },
       include: {
         institution: {
@@ -59,20 +79,20 @@ export async function GET() {
       let priorityScore = 0;
       
       // Featured institution bonus (highest priority)
-      if (course.institution.isFeatured) {
+      if (course.institution?.isFeatured) {
         priorityScore += 1000;
       }
       
       // Commission rate bonus (0-50 points based on rate)
-      priorityScore += (course.institution.commissionRate || 0) * 10;
+      priorityScore += (course.institution?.commissionRate || 0) * 10;
       
       // Subscription plan bonus - use new unified architecture when available
       let subscriptionPlan = 'BASIC'; // Default fallback
       
-      if (course.institution.subscriptions?.[0]?.status === 'ACTIVE' && course.institution.subscriptions[0].commissionTier) {
+      if (course.institution?.subscriptions?.[0]?.status === 'ACTIVE' && course.institution.subscriptions[0].commissionTier) {
         // Use new unified architecture
         subscriptionPlan = course.institution.subscriptions[0].commissionTier.planType;
-      } else if (course.institution.subscriptionPlan) {
+      } else if (course.institution?.subscriptionPlan) {
         // Fallback to legacy field for backward compatibility
         subscriptionPlan = course.institution.subscriptionPlan;
       }
@@ -94,7 +114,7 @@ export async function GET() {
       priorityScore += Math.max(0, 30 - daysUntilStart); // Up to 30 points for courses starting soon
       
       // Commission rate band categorization
-      const commissionRate = course.institution.commissionRate || 0;
+      const commissionRate = course.institution?.commissionRate || 0;
       const commissionBand = commissionRate >= 25 ? 'VERY_HIGH' : 
                             commissionRate >= 20 ? 'HIGH' : 
                             commissionRate >= 15 ? 'MEDIUM' : 'LOW';
@@ -105,7 +125,7 @@ export async function GET() {
         priorityScore,
         // Add advertising eligibility flags
         isPremiumPlacement: subscriptionPlan === 'ENTERPRISE',
-        isFeaturedPlacement: course.institution.isFeatured,
+        isFeaturedPlacement: course.institution?.isFeatured || false,
         isHighCommission: commissionRate >= 20,
         isVeryHighCommission: commissionRate >= 25,
         commissionBand,

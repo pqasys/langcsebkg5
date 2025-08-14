@@ -17,6 +17,7 @@ import {
 import { toast } from 'sonner';
 import { FaSpinner, FaStar } from 'react-icons/fa';
 import { Search } from 'lucide-react';
+import { getStudentTier } from '@/lib/subscription-pricing';
 import PayCourseButton from '@/app/student/components/PayCourseButton';
 import EnrollmentModal from '../components/EnrollmentModal';
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -49,6 +50,11 @@ interface Course {
   };
   pricingPeriod?: string;
   enrollmentDetails?: unknown;
+  // Subscription fields
+  requiresSubscription?: boolean;
+  subscriptionTier?: string;
+  isPlatformCourse?: boolean;
+  institutionId?: string;
 }
 
 export default function StudentCoursesPage() {
@@ -245,13 +251,22 @@ export default function StudentCoursesPage() {
                     <span className="font-semibold">Type:</span> {course.marketingType || (course.hasLiveClasses ? 'Live' : 'Self-paced')}
                   </div>
                   <div>
-                    <span className="font-semibold">Pricing:</span> {course.pricingPeriod || 'FULL_COURSE'}
-                  </div>
-                  <div>
                     <span className="font-semibold">Level:</span> {course.level || 'N/A'}
                   </div>
                   <div>
                     <span className="font-semibold">Duration:</span> {course.duration ? `${course.duration} weeks` : 'Flexible'}
+                  </div>
+                  <div>
+                    <span className="font-semibold">
+                      {course.institutionId === null && (course.requiresSubscription || course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED') 
+                        ? 'Subscription:' 
+                        : 'Pricing:'
+                      }
+                    </span> 
+                    {course.institutionId === null && (course.requiresSubscription || course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED') 
+                      ? (course.subscriptionTier ? getStudentTier(course.subscriptionTier)?.name || course.subscriptionTier : 'Required')
+                      : (course.pricingPeriod || 'FULL_COURSE')
+                    }
                   </div>
                 </div>
 
@@ -269,8 +284,8 @@ export default function StudentCoursesPage() {
                 <div className="space-y-2">
                   {course.status === 'AVAILABLE' ? (
                     <>
-                      {/* Show subscription requirement upfront */}
-                      {(course.requiresSubscription || course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED') && (
+                      {/* Show subscription requirement upfront - only for platform courses */}
+                      {course.institutionId === null && (course.requiresSubscription || course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED') && (
                         <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
                           <div className="flex items-center gap-2 text-sm text-blue-700">
                             <FaStar className="h-3 w-3" />

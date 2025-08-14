@@ -196,8 +196,9 @@ export async function POST(req: Request) {
           liveClassFrequency: validatedData.liveClassFrequency || null,
           liveClassSchedule: validatedData.liveClassSchedule || null,
           isPlatformCourse: validatedData.isPlatformCourse || false,
-          requiresSubscription: validatedData.requiresSubscription || false,
-          subscriptionTier: validatedData.subscriptionTier || null,
+          // Institution courses cannot be subscription-based - only platform courses (institutionId = null) can be
+          requiresSubscription: false, // Always false for institution courses
+          subscriptionTier: null, // Always null for institution courses
           // Marketing fields
           marketingType: validatedData.marketingType || 'IN_PERSON',
           marketingDescription: validatedData.marketingDescription || null

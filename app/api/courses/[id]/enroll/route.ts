@@ -44,9 +44,13 @@ export async function POST(
     }
 
     // Check if course requires subscription
-    const requiresSubscription = course.requiresSubscription || 
+    // UPDATED RULE: Only platform courses (institutionId = null) can be subscription-based
+    // Institution courses (institutionId != null) are never subscription-based, regardless of marketing type
+    const requiresSubscription = course.institutionId === null && (
+      course.requiresSubscription || 
       course.marketingType === 'LIVE_ONLINE' || 
-      course.marketingType === 'BLENDED';
+      course.marketingType === 'BLENDED'
+    );
 
     let subscriptionStatus = null;
     if (requiresSubscription) {
