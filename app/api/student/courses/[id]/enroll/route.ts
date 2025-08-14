@@ -59,8 +59,31 @@ export async function POST(
     let subscriptionStatus = null;
     if (requiresSubscription) {
       console.log('Course requires subscription, checking user subscription status...');
+      console.log('User ID:', session.user.id);
+      console.log('Course marketing type:', courseCheck.marketingType);
+      
       try {
+        // First, let's check the subscription directly in the database
+        const directSubscription = await prisma.studentSubscription.findUnique({
+          where: { studentId: session.user.id },
+          include: { studentTier: true }
+        });
+        
+        console.log('Direct subscription check:', {
+          found: !!directSubscription,
+          status: directSubscription?.status,
+          tier: directSubscription?.studentTier?.planType,
+          startDate: directSubscription?.startDate,
+          endDate: directSubscription?.endDate
+        });
+        
         const userSubscriptionStatus = await SubscriptionCommissionService.getUserSubscriptionStatus(session.user.id);
+        console.log('Service subscription status:', {
+          hasActiveSubscription: userSubscriptionStatus.hasActiveSubscription,
+          currentPlan: userSubscriptionStatus.currentPlan,
+          subscriptionEndDate: userSubscriptionStatus.subscriptionEndDate
+        });
+        
         if (!userSubscriptionStatus.hasActiveSubscription) {
           console.log('User does not have active subscription for subscription-required course');
           return NextResponse.json({ 
@@ -68,7 +91,12 @@ export async function POST(
             details: 'This course requires an active subscription to enroll.',
             redirectUrl: `/subscription-signup?courseId=${params.id}&fromEnrollment=true`,
             courseType: courseCheck.marketingType,
-            requiresSubscription: true
+            requiresSubscription: true,
+            debug: {
+              directSubscription: !!directSubscription,
+              directStatus: directSubscription?.status,
+              serviceHasActive: userSubscriptionStatus.hasActiveSubscription
+            }
           }, { status: 402 }); // 402 Payment Required
         }
         console.log('User has active subscription:', userSubscriptionStatus.currentPlan);
@@ -258,13 +286,9 @@ export async function POST(
             progress: 0,
             startDate,
             endDate: course.endDate,
-            price: course.base_price,
-            institutionId: course.institutionId,
             // For subscription-based enrollments, mark payment as completed
             ...(isSubscriptionBasedEnrollment && {
-              paymentDate: new Date(),
-              paymentMethod: 'SUBSCRIPTION',
-              paymentId: `SUB_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+              paymentDate: new Date()
             })
           },
         });

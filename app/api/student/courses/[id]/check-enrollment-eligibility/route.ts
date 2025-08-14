@@ -105,7 +105,7 @@ export async function GET(
           return NextResponse.json({ 
             error: 'Subscription required',
             details: 'This course requires an active subscription to enroll.',
-            redirectUrl: '/subscription-signup',
+            redirectUrl: `/subscription-signup?courseId=${params.id}&fromEnrollment=true`,
             courseType: course.marketingType,
             requiresSubscription: true,
             courseTitle: course.title
@@ -136,7 +136,7 @@ export async function GET(
             return NextResponse.json({ 
               error: 'Subscription tier required',
               details: `This course requires a ${course.subscriptionTier} subscription or higher. Your current plan is ${subscriptionStatus.currentPlan}.`,
-              redirectUrl: '/subscription-signup',
+              redirectUrl: `/subscription-signup?courseId=${params.id}&fromEnrollment=true`,
               courseType: course.marketingType,
               requiresSubscription: true,
               courseTitle: course.title,
@@ -152,7 +152,7 @@ export async function GET(
         return NextResponse.json({ 
           error: 'Subscription verification failed',
           details: 'Unable to verify subscription status. Please try again or contact support.',
-          redirectUrl: '/subscription-signup'
+          redirectUrl: `/subscription-signup?courseId=${params.id}&fromEnrollment=true`
         }, { status: 500 });
       }
     }

@@ -32,6 +32,7 @@ import { SubscriptionPaymentForm } from '@/components/SubscriptionPaymentForm';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { getAllStudentTiers, getAllInstitutionTiers } from '@/lib/subscription-pricing';
+import AutoEnrollmentConfirmationModal from '@/components/AutoEnrollmentConfirmationModal';
 
 interface Plan {
   id: string;
@@ -99,6 +100,8 @@ export default function SubscriptionSignupPage() {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [showEnrollmentConfirmation, setShowEnrollmentConfirmation] = useState(false);
+  const [pendingCourseData, setPendingCourseData] = useState<any>(null);
 
   // Handle URL parameters
   useEffect(() => {
@@ -124,10 +127,18 @@ export default function SubscriptionSignupPage() {
       // Store course ID and enrollment flag for later use
       if (courseId) {
         sessionStorage.setItem('pendingCourseEnrollment', courseId);
+        console.log('Stored course ID for enrollment:', courseId);
       }
       if (fromEnrollment === 'true') {
         sessionStorage.setItem('fromEnrollment', 'true');
+        console.log('Stored fromEnrollment flag');
       }
+      
+      // Debug: Check what's currently in sessionStorage
+      console.log('🔍 SessionStorage after setting:', {
+        fromEnrollment: sessionStorage.getItem('fromEnrollment'),
+        pendingCourseId: sessionStorage.getItem('pendingCourseEnrollment')
+      });
     }
   }, []);
 
@@ -262,28 +273,66 @@ export default function SubscriptionSignupPage() {
       const fromEnrollment = sessionStorage.getItem('fromEnrollment');
       const pendingCourseId = sessionStorage.getItem('pendingCourseEnrollment');
       
+      console.log('🔍 handlePaymentSuccess debug:', {
+        fromEnrollment,
+        pendingCourseId,
+        isTrial,
+        selectedPlan,
+        planName: plan?.name
+      });
+      
       if (fromEnrollment === 'true' && pendingCourseId) {
-        // Clear the stored data
+        console.log('User came from course enrollment, fetching course details...');
+        console.log('🔍 About to fetch course:', pendingCourseId);
+        
+        // Fetch course details for enrollment confirmation
+        try {
+          const courseResponse = await fetch(`/api/courses/${pendingCourseId}`);
+          console.log('🔍 Course response status:', courseResponse.status);
+          
+          if (courseResponse.ok) {
+            const courseData = await courseResponse.json();
+            console.log('✅ Course data fetched successfully:', courseData);
+            
+            // Set the course data and show enrollment confirmation modal
+            console.log('🔍 Setting pendingCourseData and showEnrollmentConfirmation to true');
+            setPendingCourseData(courseData);
+            setShowEnrollmentConfirmation(true);
+            
+            // Show success message
+            toast.success(successMessage);
+            
+            console.log('🔍 Modal should now be visible. Returning without redirect.');
+            // Don't redirect - let the modal handle the next steps
+            return;
+          } else {
+            console.error('❌ Failed to fetch course data:', courseResponse.status);
+            const errorText = await courseResponse.text();
+            console.error('❌ Error response:', errorText);
+          }
+        } catch (error) {
+          console.error('❌ Error fetching course data:', error);
+        }
+        
+        // Fallback: if course fetch fails, redirect to course page
+        console.log('Fallback: redirecting to course page');
         sessionStorage.removeItem('fromEnrollment');
         sessionStorage.removeItem('pendingCourseEnrollment');
-        
-        // Set flag to indicate user is returning from subscription signup
         sessionStorage.setItem('fromSubscriptionSignup', 'true');
-        
-        // Redirect back to course enrollment
         router.push(`/courses/${pendingCourseId}`);
         toast.success(successMessage + ' You can now enroll in the course.');
       } else {
-                       // Redirect to appropriate dashboard
-            if (isInstitution) {
-              router.push('/institution/dashboard');
-            } else {
-              router.push('/student');
-            }
-           toast.success(successMessage);
-         }
+        // User didn't come from course enrollment, redirect to dashboard
+        console.log('User did not come from course enrollment, redirecting to dashboard');
+        if (isInstitution) {
+          router.push('/institution/dashboard');
+        } else {
+          router.push('/student');
+        }
+        toast.success(successMessage);
+      }
     } catch (error) {
-    console.error('Error occurred:', error);
+      console.error('Error in handlePaymentSuccess:', error);
       toast.error('Payment success error:');
       toast.error(error instanceof Error ? error.message : 'Failed to process payment success');
     }
@@ -759,6 +808,21 @@ export default function SubscriptionSignupPage() {
           </div>
         </div>
       )}
+      
+      {/* Auto-Enrollment Confirmation Modal */}
+      <AutoEnrollmentConfirmationModal
+        isOpen={showEnrollmentConfirmation}
+        onClose={() => {
+          setShowEnrollmentConfirmation(false);
+          setPendingCourseData(null);
+          // Clear stored data when modal is closed
+          sessionStorage.removeItem('fromEnrollment');
+          sessionStorage.removeItem('pendingCourseEnrollment');
+        }}
+        course={pendingCourseData}
+        subscriptionPlan={getSelectedPlan()?.name || 'Premium'}
+        trialDays={getSelectedPlan()?.trialDays || 7}
+      />
     </div>
   );
 } 

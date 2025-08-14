@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 13, 2025 at 05:37 PM
--- Server version: 8.0.31
--- PHP Version: 8.1.13
+-- Generation Time: Aug 14, 2025 at 02:57 AM
+-- Server version: 9.1.0
+-- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -325,7 +325,7 @@ INSERT INTO `course` (`id`, `title`, `description`, `duration`, `level`, `status
 ('7e806add-bd45-43f6-a28f-fb736707653c', 'Conversation & Pronunciation', 'Our Conversation and Pronunciation classes take place in small groups to allow as much speaking time as possible.', 10, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 17:12:21.300', '2025-08-07 17:47:51.655', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 100, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'Conversation & Pronunciation - Self-paced learning', 'SELF_PACED'),
 ('6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'General French', 'Learn French in the heart of London on this lively interactive course for beginners. The course will be taught in French, with an emphasis on developing your speaking and listening skills.', 12, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-07-26 15:47:30.135', '2025-08-07 17:47:51.903', '2025-09-01 00:00:00.000', '2025-11-21 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'General French - Self-paced learning', 'SELF_PACED'),
 ('21058bb2-c9f3-4af1-90fc-235b350f5718', 'Advanced Spanish Conversation - Live Classes', 'Master Spanish conversation through interactive live sessions with native speakers. This intensive course features real-time practice, immediate feedback, and cultural immersion.', 12, 'ADVANCED', 'ACTIVE', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.203', '2025-08-07 17:47:51.917', '2024-02-01 00:00:00.000', '2024-04-30 00:00:00.000', 15, 299.99, 'WEEKLY', 'CEFR', 0, 0, 0, 0, 'WEEKLY', '{\"time\": \"19:00\", \"duration\": 90, \"timezone\": \"UTC-5\", \"dayOfWeek\": \"Wednesday\"}', 0, NULL, 1, 'CONVERSATION', 'Advanced Spanish Conversation - Live Classes - Interactive live conversation practice', 'LIVE_ONLINE'),
-('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'CEFR_B1', 'PUBLISHED', NULL, 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-07 22:31:55.140', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 0, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', 'null', 1, 'PREMIUM', 1, 'COMPREHENSIVE', NULL, 'LIVE_ONLINE');
+('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'CEFR_B1', 'PUBLISHED', 'f3346c7f-1b4a-4a11-8eeb-5e943c98c9ea', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-14 02:10:49.134', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 99.99, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', 'null', 1, 'PREMIUM', 1, 'COMPREHENSIVE', NULL, 'LIVE_ONLINE');
 
 -- --------------------------------------------------------
 
@@ -1107,15 +1107,15 @@ INSERT INTO `institution_subscription_logs` (`id`, `subscriptionId`, `action`, `
 
 DROP TABLE IF EXISTS `language_proficiency_questions`;
 CREATE TABLE IF NOT EXISTS `language_proficiency_questions` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `bankId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `level` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `category` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `difficulty` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'medium',
-  `question` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bankId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `difficulty` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'medium',
+  `question` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `options` json NOT NULL,
-  `correctAnswer` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `explanation` text COLLATE utf8mb4_unicode_ci,
+  `correctAnswer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `explanation` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `usageCount` int NOT NULL DEFAULT '0',
   `successRate` double NOT NULL DEFAULT '0',
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
@@ -1304,10 +1304,10 @@ INSERT INTO `language_proficiency_questions` (`id`, `bankId`, `level`, `category
 
 DROP TABLE IF EXISTS `language_proficiency_question_banks`;
 CREATE TABLE IF NOT EXISTS `language_proficiency_question_banks` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `languageCode` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `languageCode` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `totalQuestions` int NOT NULL DEFAULT '0',
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -1331,11 +1331,11 @@ INSERT INTO `language_proficiency_question_banks` (`id`, `languageCode`, `name`,
 
 DROP TABLE IF EXISTS `language_proficiency_test_attempts`;
 CREATE TABLE IF NOT EXISTS `language_proficiency_test_attempts` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `languageCode` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `languageCode` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `score` int NOT NULL,
-  `level` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `answers` json NOT NULL,
   `timeSpent` int NOT NULL DEFAULT '0',
   `completedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -2222,7 +2222,10 @@ INSERT INTO `notification_logs` (`id`, `templateId`, `recipientId`, `recipientEm
 ('330e1c6e-4c28-4b13-9937-d35c46638b0e', '14696092-53da-4d43-a3c4-d4b4d713e7b3', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 'patrickmorgan002@gmail.com', 'Patrick Morgan Test', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Patrick Morgan Test,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'sent', NULL, '2025-07-12 21:24:57.205', NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": true, \"registrationType\": \"student\", \"subscriptionPlan\": \"BASIC\"}', '2025-07-12 21:24:54.541', 'SYSTEM'),
 ('bdcaba93-5711-440f-8526-7c987baf78ab', '4073a636-6f37-4061-bbeb-a589e780427b', '5b5fbd13-8776-4f96-ada9-091973974873', 'patrickmorgan001@gmail.com', 'Student One', 'email', 'Course Enrollment Confirmation', 'Course Enrollment Confirmation', '\n          <h1>Course Enrollment Confirmation</h1>\n          <p>Dear Student One,</p>\n          <p>You have been successfully enrolled in the course: <strong>Conversation & Pronunciation</strong></p>\n          <p>Course details:</p>\n          <ul>\n            <li>Institution: XYZ Language School</li>\n            <li>Duration: {{duration}}</li>\n            <li>Start Date: 23/07/2025</li>\n          </ul>\n          <p>You can now access your course materials and begin learning!</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'Invalid login: 535 Authentication credentials invalid', NULL, NULL, '{\"amount\": 740, \"courseName\": \"Conversation & Pronunciation\", \"enrollmentId\": \"cmdfxzczf0007b4ejk2ggjy0u\"}', '2025-07-23 12:30:50.324', 'SYSTEM'),
 ('93a38dc7-2ad3-4580-8cf6-8527cb45fdbd', '4073a636-6f37-4061-bbeb-a589e780427b', '5b5fbd13-8776-4f96-ada9-091973974873', 'patrickmorgan001@gmail.com', 'Student One', 'email', 'Course Enrollment Confirmation', 'Course Enrollment Confirmation', '\n          <h1>Course Enrollment Confirmation</h1>\n          <p>Dear Student One,</p>\n          <p>You have been successfully enrolled in the course: <strong>General English</strong></p>\n          <p>Course details:</p>\n          <ul>\n            <li>Institution: ABC Shool of English</li>\n            <li>Duration: {{duration}}</li>\n            <li>Start Date: 23/07/2025</li>\n          </ul>\n          <p>You can now access your course materials and begin learning!</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'Invalid login: 535 Authentication credentials invalid', NULL, NULL, '{\"amount\": 1360, \"courseName\": \"General English\", \"enrollmentId\": \"cmdg69uuh00029kkxm7wbnam0\"}', '2025-07-23 16:22:57.328', 'SYSTEM'),
-('acf9fe0a-4cf2-4a44-8e12-6a6e03d3da3c', '14696092-53da-4d43-a3c4-d4b4d713e7b3', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'live@test.com', 'Live Tester', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Live Tester,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": false, \"registrationType\": \"student\", \"subscriptionPlan\": \"none\"}', '2025-08-09 17:14:07.805', 'SYSTEM');
+('acf9fe0a-4cf2-4a44-8e12-6a6e03d3da3c', '14696092-53da-4d43-a3c4-d4b4d713e7b3', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'live@test.com', 'Live Tester', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Live Tester,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": false, \"registrationType\": \"student\", \"subscriptionPlan\": \"none\"}', '2025-08-09 17:14:07.805', 'SYSTEM'),
+('bd5b28e1-129a-4349-803d-7235a86432bf', '4073a636-6f37-4061-bbeb-a589e780427b', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'live@test.com', 'Live Tester', 'email', 'Course Enrollment Confirmation', 'Course Enrollment Confirmation', '\n          <h1>Course Enrollment Confirmation</h1>\n          <p>Dear Live Tester,</p>\n          <p>You have been successfully enrolled in the course: <strong>Global English Mastery - Live Platform Course</strong></p>\n          <p>Course details:</p>\n          <ul>\n            <li>Institution: Test Language Institute</li>\n            <li>Duration: 9 weeks</li>\n            <li>Start Date: 01/02/2024</li>\n          </ul>\n          <p>You can now access your course materials and begin learning!</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"courseId\": \"c35b2490-a08e-4c29-9d28-30735f91bd1f\", \"enrollmentId\": \"cmeascn27000r49m9wt4jyg8k\", \"institutionId\": \"f3346c7f-1b4a-4a11-8eeb-5e943c98c9ea\", \"paymentAmount\": 99.99}', '2025-08-14 02:34:03.673', 'SYSTEM'),
+('86b0a281-93c9-417a-9cea-3923c0900e5b', '14696092-53da-4d43-a3c4-d4b4d713e7b3', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'live2@test.com', 'Live2 Tester', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Live2 Tester,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": false, \"registrationType\": \"student\", \"subscriptionPlan\": \"none\"}', '2025-08-14 02:37:19.945', 'SYSTEM'),
+('2e251522-438a-48f7-96ff-bd76a1a94507', '4073a636-6f37-4061-bbeb-a589e780427b', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'live2@test.com', 'Live2 Tester', 'email', 'Course Enrollment Confirmation', 'Course Enrollment Confirmation', '\n          <h1>Course Enrollment Confirmation</h1>\n          <p>Dear Live2 Tester,</p>\n          <p>You have been successfully enrolled in the course: <strong>Global English Mastery - Live Platform Course</strong></p>\n          <p>Course details:</p>\n          <ul>\n            <li>Institution: Test Language Institute</li>\n            <li>Duration: 9 weeks</li>\n            <li>Start Date: 01/02/2024</li>\n          </ul>\n          <p>You can now access your course materials and begin learning!</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"courseId\": \"c35b2490-a08e-4c29-9d28-30735f91bd1f\", \"enrollmentId\": \"cmeat1fb7001849m9xatoysda\", \"institutionId\": \"f3346c7f-1b4a-4a11-8eeb-5e943c98c9ea\", \"paymentAmount\": 99.99}', '2025-08-14 02:53:19.950', 'SYSTEM');
 
 -- --------------------------------------------------------
 
@@ -2340,7 +2343,9 @@ INSERT INTO `payments` (`id`, `amount`, `status`, `paidAt`, `createdAt`, `update
 ('cmcd9i1to0004wifrjv8g1pio', 2750, 'COMPLETED', '2025-06-26 10:57:39.178', '2025-06-26 10:50:17.148', '2025-06-26 10:57:39.181', '{\"type\": \"COURSE_ENROLLMENT\", \"bookingId\": \"a5badc1a-bd86-47e8-ab57-21242c846c9b\", \"updatedAt\": \"2025-06-26T10:53:37.877Z\", \"approvedAt\": \"2025-06-26T10:57:39.178Z\", \"approvedBy\": \"0e971fe1-d22a-446e-9fb9-f52149e29df3\", \"courseTitle\": \"Business English\", \"paymentMethod\": \"OFFLINE\", \"commissionRate\": 20, \"approvedByAdmin\": true, \"institutionName\": \"XYZ Language School\", \"commissionAmount\": 550, \"institutionAmount\": 2200}', '42308252-a934-4eef-b663-37a7076bb177', 'cmcd9i1td0002wifriuxiimz4', 550, 2200, NULL, 'OFFLINE', NULL, NULL, '3d0001e4-772a-42e6-a06d-2a3f81986d95', 1, 1, 'USD', NULL, NULL, NULL),
 ('cmdfxjuwy0004b4ejpngmhslp', 3500, 'COMPLETED', '2025-08-08 16:56:10.935', '2025-07-23 12:18:46.978', '2025-08-08 16:56:10.937', '{\"type\": \"COURSE_ENROLLMENT\", \"bookingId\": \"dec75da4-2aa7-491e-ae5d-4b82a107cc3c\", \"approvedAt\": \"2025-08-08T16:56:10.935Z\", \"approvedBy\": \"0e971fe1-d22a-446e-9fb9-f52149e29df3\", \"courseTitle\": \"One-to-One English\", \"commissionRate\": 20, \"approvedByAdmin\": true, \"institutionName\": \"XYZ Language School\", \"commissionAmount\": 700, \"institutionAmount\": 2800}', '42308252-a934-4eef-b663-37a7076bb177', 'cmdfxjuwr0002b4ejo5suxfwp', 700, 2800, NULL, NULL, NULL, NULL, '2a0f4ea8-6e96-4b75-8cff-7481d0e5bfe9', 1, 1, 'USD', NULL, NULL, NULL),
 ('cmdfxzd0r0009b4ej9zqv3gem', 740, 'PROCESSING', NULL, '2025-07-23 12:30:50.284', '2025-07-23 23:50:33.388', '{\"type\": \"COURSE_ENROLLMENT\", \"bookingId\": \"e7dd0f1c-5f9a-4992-8303-0f1498d7a6cc\", \"updatedAt\": \"2025-07-23T23:50:33.387Z\", \"courseTitle\": \"Conversation & Pronunciation\", \"paymentMethod\": \"CREDIT_CARD\", \"institutionName\": \"XYZ Language School\"}', '42308252-a934-4eef-b663-37a7076bb177', 'cmdfxzczf0007b4ejk2ggjy0u', 0, 740, NULL, 'CREDIT_CARD', NULL, NULL, '4b7a7dc1-a182-4466-8abd-9ffe244d3df7', 1, 1, 'USD', NULL, NULL, NULL),
-('cmdg69v5q00049kkx923r1o0a', 1360, 'COMPLETED', '2025-08-08 16:14:55.096', '2025-07-23 16:22:57.278', '2025-08-08 16:14:55.135', '{\"type\": \"COURSE_ENROLLMENT\", \"bookingId\": \"895800ac-ede6-452c-b28c-da240c405b2f\", \"approvedAt\": \"2025-08-08T16:14:55.096Z\", \"approvedBy\": \"0e971fe1-d22a-446e-9fb9-f52149e29df3\", \"courseTitle\": \"General English\", \"commissionRate\": 18, \"approvedByAdmin\": true, \"institutionName\": \"ABC Shool of English\", \"commissionAmount\": 244.8, \"institutionAmount\": 1115.2}', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', 'cmdg69uuh00029kkxm7wbnam0', 244.8, 1115.2, NULL, NULL, NULL, NULL, 'cfaf5e48-90e9-4174-bd5d-7f41a914f039', 1, 1, 'USD', NULL, NULL, NULL);
+('cmdg69v5q00049kkx923r1o0a', 1360, 'COMPLETED', '2025-08-08 16:14:55.096', '2025-07-23 16:22:57.278', '2025-08-08 16:14:55.135', '{\"type\": \"COURSE_ENROLLMENT\", \"bookingId\": \"895800ac-ede6-452c-b28c-da240c405b2f\", \"approvedAt\": \"2025-08-08T16:14:55.096Z\", \"approvedBy\": \"0e971fe1-d22a-446e-9fb9-f52149e29df3\", \"courseTitle\": \"General English\", \"commissionRate\": 18, \"approvedByAdmin\": true, \"institutionName\": \"ABC Shool of English\", \"commissionAmount\": 244.8, \"institutionAmount\": 1115.2}', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', 'cmdg69uuh00029kkxm7wbnam0', 244.8, 1115.2, NULL, NULL, NULL, NULL, 'cfaf5e48-90e9-4174-bd5d-7f41a914f039', 1, 1, 'USD', NULL, NULL, NULL),
+('cmeascn2a000s49m9ctpt9r9f', 99.99, 'COMPLETED', '2025-08-14 02:34:03.585', '2025-08-14 02:34:03.586', '2025-08-14 02:34:03.586', '{\"type\": \"COURSE_ENROLLMENT\", \"courseTitle\": \"Global English Mastery - Live Platform Course\", \"institutionName\": \"Test Language Institute\", \"subscriptionPlan\": \"PREMIUM\", \"isSubscriptionBased\": true}', 'f3346c7f-1b4a-4a11-8eeb-5e943c98c9ea', 'cmeascn27000r49m9wt4jyg8k', 0, 99.99, NULL, 'SUBSCRIPTION', NULL, NULL, NULL, 1, 1, 'USD', 'SUB_1755138843585_yqq7c1upc', NULL, NULL),
+('cmeat1fb9001949m9q69gy7ro', 99.99, 'COMPLETED', '2025-08-14 02:53:19.940', '2025-08-14 02:53:19.942', '2025-08-14 02:53:19.942', '{\"type\": \"COURSE_ENROLLMENT\", \"courseTitle\": \"Global English Mastery - Live Platform Course\", \"institutionName\": \"Test Language Institute\", \"subscriptionPlan\": \"PREMIUM\", \"isSubscriptionBased\": true}', 'f3346c7f-1b4a-4a11-8eeb-5e943c98c9ea', 'cmeat1fb7001849m9xatoysda', 0, 99.99, NULL, 'SUBSCRIPTION', NULL, NULL, NULL, 1, 1, 'USD', 'SUB_1755139999940_j8vy9jg2k', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2921,7 +2926,8 @@ INSERT INTO `students` (`id`, `name`, `email`, `phone`, `address`, `bio`, `statu
 ('2e09fa89-ce41-47f4-9e50-28776cd92141', 'Test Student', 'test.student@example.com', NULL, NULL, NULL, 'active', '2025-07-23 22:48:24', '2025-07-23 22:48:37', '2025-07-23 22:48:24', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
 ('ee72dab2-1301-44b5-a701-0dc96801133d', 'Student One', 'student1@test.com', '+44 20 1234 5678', '789 Student Lane, London', 'Learning English for work', 'active', '2025-07-25 16:49:05', '2025-07-25 16:49:05', '2025-07-25 16:49:05', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
 ('e0712c36-0a17-425c-8a6d-83f2440ef7da', 'Student Two', 'student2@test.com', '+44 20 8765 4321', '101 Student Road, Manchester', 'Learning English for travel', 'active', '2025-07-25 16:49:05', '2025-07-25 16:49:05', '2025-07-25 16:49:05', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
-('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, NULL, 'active', '2025-08-09 16:14:08', '2025-08-10 17:03:22', '2025-08-10 17:03:22', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL);
+('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, NULL, 'active', '2025-08-09 16:14:08', '2025-08-10 17:03:22', '2025-08-10 17:03:22', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
+('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', NULL, NULL, NULL, 'active', '2025-08-14 01:37:20', '2025-08-14 01:37:20', '2025-08-14 01:37:20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2992,7 +2998,14 @@ INSERT INTO `student_billing_history` (`id`, `subscriptionId`, `billingDate`, `a
 ('cmdw7ud9c000254pr51hjy8a5', 'cmckkosgt0009cb32hkzlxg54', '2025-08-03 21:51:12.265', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1754257872287', 'Initial payment for PREMIUM plan', NULL, '2025-08-03 21:51:12.288'),
 ('cmea3fqgj0003pl5iqrw7km4u', 'cmea3fq7g0001pl5ibe9w523c', '2025-08-13 14:56:37.176', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755096997554', 'Trial subscription for PREMIUM plan', NULL, '2025-08-13 14:56:37.555'),
 ('cmea83nuw0003lbe617xm925o', 'cmea83ntw0001lbe6wmct4vrq', '2025-08-13 17:07:12.353', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755104832391', 'Trial subscription for PREMIUM plan', NULL, '2025-08-13 17:07:12.393'),
-('cmea8v3l90003r2ssvjj32yev', 'cmea8v3l10001r2sse5nbhf3e', '2025-08-13 17:28:32.481', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755106112491', 'Trial subscription for PREMIUM plan', NULL, '2025-08-13 17:28:32.493');
+('cmea8v3l90003r2ssvjj32yev', 'cmea8v3l10001r2sse5nbhf3e', '2025-08-13 17:28:32.481', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755106112491', 'Trial subscription for PREMIUM plan', NULL, '2025-08-13 17:28:32.493'),
+('cmeap394000037wv9wmnwgig1', 'cmeap393t00017wv95vi0xhv1', '2025-08-14 01:02:46.743', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755133366752', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 01:02:46.753'),
+('cmeapofm30003110gmwzcnxmo', 'cmeapofly0001110grc5p93iw', '2025-08-14 01:19:14.947', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755134354955', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 01:19:14.956'),
+('cmeaq26mg000380y64f65byn2', 'cmeaq26m9000180y6tpgs2yx6', '2025-08-14 01:29:56.479', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755134996487', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 01:29:56.488'),
+('cmearlqa4000349m9tq7nfb67', 'cmearlq9x000149m9k2ki9u2g', '2025-08-14 02:13:08.035', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755137588044', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 02:13:08.045'),
+('cmeasi401000x49m9cn3v16dr', 'cmeasi3zv000v49m9oy6kkqjf', '2025-08-14 02:38:18.809', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755139098817', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 02:38:18.818'),
+('cmeaswfxc001149m9qk00wwql', 'cmeaswfx2000z49m981oqmynv', '2025-08-14 02:49:27.444', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755139767455', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 02:49:27.456'),
+('cmeat16ou001549m9xt8b1die', 'cmeat16op001349m9b8vhe604', '2025-08-14 02:53:08.758', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755139988765', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 02:53:08.767');
 
 -- --------------------------------------------------------
 
@@ -3067,7 +3080,9 @@ INSERT INTO `student_course_enrollments` (`id`, `studentId`, `courseId`, `status
 ('cmcjfsy7x0002hfzgyyaxhx3y', '5b5fbd13-8776-4f96-ada9-091973974873', 'c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'ENROLLED', 0, '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 'PAID', '2025-07-14 01:54:44.089', '2025-06-30 18:33:20.445', '2025-08-05 16:23:06.794', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
 ('cmdfxzczf0007b4ejk2ggjy0u', '5b5fbd13-8776-4f96-ada9-091973974873', '7e806add-bd45-43f6-a28f-fb736707653c', 'PENDING_PAYMENT', 0, '2025-07-23 12:30:15.839', '2025-09-12 00:00:00.000', 'PENDING', NULL, '2025-07-23 12:30:50.236', '2025-08-05 16:23:06.800', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
 ('cmdfxjuwr0002b4ejo5suxfwp', '5b5fbd13-8776-4f96-ada9-091973974873', '78bfbb28-7f43-423d-9454-1910b1fdabcf', 'ENROLLED', 0, '2025-07-23 12:18:19.570', '2025-08-29 00:00:00.000', 'PAID', '2025-08-08 16:56:10.940', '2025-07-23 12:18:46.971', '2025-08-08 16:56:10.941', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
-('cmdg69uuh00029kkxm7wbnam0', '5b5fbd13-8776-4f96-ada9-091973974873', '5002bdce-b66b-4be2-95b7-a1d08d8c0981', 'ENROLLED', 0, '2025-07-23 15:46:54.128', '2025-09-05 00:00:00.000', 'PAID', '2025-08-08 16:14:55.237', '2025-07-23 16:22:56.186', '2025-08-08 16:14:55.239', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL);
+('cmdg69uuh00029kkxm7wbnam0', '5b5fbd13-8776-4f96-ada9-091973974873', '5002bdce-b66b-4be2-95b7-a1d08d8c0981', 'ENROLLED', 0, '2025-07-23 15:46:54.128', '2025-09-05 00:00:00.000', 'PAID', '2025-08-08 16:14:55.237', '2025-07-23 16:22:56.186', '2025-08-08 16:14:55.239', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
+('cmeascn27000r49m9wt4jyg8k', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'ENROLLED', 0, '2025-08-14 02:34:03.580', '2024-03-31 00:00:00.000', 'PAID', '2025-08-14 02:34:03.582', '2025-08-14 02:34:03.583', '2025-08-14 02:34:03.583', 1, 1, NULL, 'DIRECT', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
+('cmeat1fb7001849m9xatoysda', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'ENROLLED', 0, '2025-08-14 02:53:19.937', '2024-03-31 00:00:00.000', 'PAID', '2025-08-14 02:53:19.938', '2025-08-14 02:53:19.940', '2025-08-14 02:53:19.940', 1, 1, NULL, 'DIRECT', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3136,7 +3151,8 @@ INSERT INTO `student_notification_preferences` (`id`, `student_id`, `email_notif
 ('f4291130-275b-45af-9c70-c1bb1dcfb487', '5b5fbd13-8776-4f96-ada9-091973974873', 1, 1, 0, 1, 1, 1, '2025-06-24 15:59:32', '2025-06-24 15:59:32', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
 ('4086f729-ff70-4341-b821-775564cef97b', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 1, 1, 0, 1, 1, 1, '2025-07-12 20:25:00', '2025-07-12 20:25:00', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
 ('313b2d5e-12fc-4505-9c1f-9768a3b267aa', 'c98a0b89-011b-482f-843e-a5522de40b1e', 1, 1, 0, 1, 1, 1, '2025-07-12 20:40:40', '2025-07-12 20:40:40', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
-('ee0e0fe9-12eb-437c-8407-5d47598e36e8', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 1, 1, 0, 1, 1, 1, '2025-08-09 16:14:08', '2025-08-09 16:14:08', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1);
+('ee0e0fe9-12eb-437c-8407-5d47598e36e8', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 1, 1, 0, 1, 1, 1, '2025-08-09 16:14:08', '2025-08-09 16:14:08', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
+('33a7fa3c-2a47-414d-a434-26f603a67662', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 1, 1, 0, 1, 1, 1, '2025-08-14 01:37:20', '2025-08-14 01:37:20', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -3220,8 +3236,8 @@ INSERT INTO `student_subscriptions` (`id`, `studentId`, `status`, `startDate`, `
 ('cmd0r7t5x000jp73dpf3kdduh', 'bcd7ab98-0a9f-414f-b4f3-3307de06219e', 'ACTIVE', '2025-07-12 21:24:54.498', '2026-07-14 13:58:54.390', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:24:54.498Z\"}', '2025-07-12 21:24:54.501', '2025-08-05 16:23:06.135', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
 ('cmd0rq6de000qp73dn3b3o498', 'c98a0b89-011b-482f-843e-a5522de40b1e', 'ACTIVE', '2025-07-12 21:39:11.423', '2026-07-14 13:58:54.404', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:39:11.423Z\"}', '2025-07-12 21:39:11.427', '2025-08-05 16:23:06.150', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
 ('0c20dc4a-afa5-4c40-a041-5fa049fc6725', 'bdcbbab6-9436-43d1-80e6-b9543b48dd06', 'ACTIVE', '2025-07-14 13:58:54.344', '2026-07-14 13:58:54.344', 1, NULL, NULL, NULL, '2025-07-14 13:58:54.346', '2025-08-05 16:23:06.166', 'premium-tier', 30, 0, 0, 0, 0, 10, 1, 10, 0, 0, 'BASIC'),
-('cme4ibr7d0001amw562sdz8d0', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'ACTIVE', '2025-08-09 17:06:48.992', '2025-08-16 17:06:48.992', 0, NULL, NULL, NULL, '2025-08-09 17:06:49.010', '2025-08-09 17:06:49.010', 'basic-tier', 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 'TRIAL'),
-('cmea8v3l10001r2sse5nbhf3e', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'TRIAL', '2025-08-13 17:28:32.481', '2025-08-20 17:28:32.481', 1, NULL, NULL, '{\"isTrial\": true, \"trialEndDate\": \"2025-08-20T17:28:32.481Z\"}', '2025-08-13 17:28:32.485', '2025-08-13 17:34:51.188', 'premium-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'PREMIUM');
+('cmearlq9x000149m9k2ki9u2g', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'TRIAL', '2025-08-14 02:13:08.035', '2025-08-21 02:13:08.035', 1, NULL, NULL, '{\"isTrial\": true, \"trialEndDate\": \"2025-08-21T02:13:08.035Z\"}', '2025-08-14 02:13:08.037', '2025-08-14 02:13:08.037', 'premium-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'PREMIUM'),
+('cmeat16op001349m9b8vhe604', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'TRIAL', '2025-08-14 02:53:08.758', '2025-08-21 02:53:08.758', 1, NULL, NULL, '{\"isTrial\": true, \"trialEndDate\": \"2025-08-21T02:53:08.758Z\"}', '2025-08-14 02:53:08.761', '2025-08-14 02:53:08.761', 'premium-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'PREMIUM');
 
 -- --------------------------------------------------------
 
@@ -3307,7 +3323,14 @@ INSERT INTO `subscription_logs` (`id`, `subscriptionId`, `action`, `oldPlan`, `n
 ('cmdw7ud98000154prgz1eujct', 'cmckkosgt0009cb32hkzlxg54', 'UPGRADE', NULL, 'PREMIUM', NULL, 24.99, NULL, 'MONTHLY', '5b5fbd13-8776-4f96-ada9-091973974873', 'Plan upgrade', NULL, '2025-08-03 21:51:12.284'),
 ('cmea3fqet0002pl5iznrtw4jt', 'cmea3fq7g0001pl5ibe9w523c', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-13 14:56:37.494'),
 ('cmea83nu00002lbe645dliwhc', 'cmea83ntw0001lbe6wmct4vrq', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-13 17:07:12.361'),
-('cmea8v3l50002r2ssrx4hy5su', 'cmea8v3l10001r2sse5nbhf3e', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-13 17:28:32.490');
+('cmea8v3l50002r2ssrx4hy5su', 'cmea8v3l10001r2sse5nbhf3e', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-13 17:28:32.490'),
+('cmeap393y00027wv9uibi3um1', 'cmeap393t00017wv95vi0xhv1', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-14 01:02:46.751'),
+('cmeapofm10002110gixiv5bb0', 'cmeapofly0001110grc5p93iw', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-14 01:19:14.953'),
+('cmeaq26mc000280y630k4nlz5', 'cmeaq26m9000180y6tpgs2yx6', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-14 01:29:56.485'),
+('cmearlqa2000249m9ahu9yu9e', 'cmearlq9x000149m9k2ki9u2g', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Trial subscription created', NULL, '2025-08-14 02:13:08.042'),
+('cmeasi3zy000w49m93u4rrcmc', 'cmeasi3zv000v49m9oy6kkqjf', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'Trial subscription created', NULL, '2025-08-14 02:38:18.815'),
+('cmeaswfx6001049m91cajxccc', 'cmeaswfx2000z49m981oqmynv', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'Trial subscription created', NULL, '2025-08-14 02:49:27.451'),
+('cmeat16os001449m9xc0p5mgv', 'cmeat16op001349m9b8vhe604', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'Trial subscription created', NULL, '2025-08-14 02:53:08.765');
 
 -- --------------------------------------------------------
 
@@ -3457,7 +3480,8 @@ INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`,
 ('16fbfb4b-3854-4091-bbbe-5355e5ec2b3c', 'Test Admin', 'integration.test.admin@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'ADMIN', NULL, '2025-08-08 00:09:00.359', '2025-08-08 00:09:00.359', 'ACTIVE', 0),
 ('be41ba5f-4ebf-4f8e-9344-009646ab3283', 'Test Student', 'integration.test.student@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.366', '2025-08-08 00:09:00.366', 'ACTIVE', 0),
 ('5b56f446-0ec4-415d-b8b1-c2dd86ba0958', 'Test Institution', 'test@institution.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'INSTITUTION', NULL, '2025-08-08 00:09:00.368', '2025-08-08 00:09:00.368', 'ACTIVE', 0),
-('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, '$2b$10$ry/cwlk4lG.xN4tdojVYn.6SUPHeqrj8IkWqMVXLc.DskM7.h1g22', 'STUDENT', NULL, '2025-08-09 17:14:07.747', '2025-08-10 18:03:21.914', 'ACTIVE', 0);
+('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, '$2b$10$ry/cwlk4lG.xN4tdojVYn.6SUPHeqrj8IkWqMVXLc.DskM7.h1g22', 'STUDENT', NULL, '2025-08-09 17:14:07.747', '2025-08-10 18:03:21.914', 'ACTIVE', 0),
+('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', NULL, NULL, '$2b$10$UffTVPwN9KxKPEWNBGaMKO9Arz9cuQD9kbKR.yelgtHLPlF7kMW0i', 'STUDENT', NULL, '2025-08-14 02:37:19.933', '2025-08-14 02:37:19.933', 'ACTIVE', 0);
 
 -- --------------------------------------------------------
 
