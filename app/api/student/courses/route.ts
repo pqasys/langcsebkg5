@@ -65,12 +65,17 @@ export async function GET() {
       }
     });
 
+    console.log('📚 Student enrollments found:', studentEnrollments.length);
+    studentEnrollments.forEach(enrollment => {
+      console.log('  - Course ID:', enrollment.courseId, 'Status:', enrollment.status);
+    });
+
     // Get payments separately
     const enrollmentIds = studentEnrollments.map(enrollment => enrollment.id);
     const payments = await prisma.payment.findMany({
       where: {
         enrollmentId: { in: enrollmentIds },
-        status: { in: ['PENDING', 'PROCESSING', 'INITIATED'] }
+        status: { in: ['PENDING', 'PROCESSING', 'INITIATED', 'COMPLETED'] }
       },
       select: {
         id: true,
@@ -122,6 +127,14 @@ export async function GET() {
       const enrollment = course.enrollments[0];
       const payment = paymentsMap[enrollment?.id];
       const booking = bookingsMap[course.id];
+      
+      console.log(`🔍 Course ${course.id} (${course.title}):`, {
+        hasEnrollment: !!enrollment,
+        enrollmentStatus: enrollment?.status,
+        enrollmentId: enrollment?.id,
+        hasPayment: !!payment,
+        paymentStatus: payment?.[0]?.status
+      });
       
       const transformedCourse = {
         ...course,

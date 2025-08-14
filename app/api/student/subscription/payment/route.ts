@@ -12,10 +12,17 @@ export async function POST(request: NextRequest) {
     }
     
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: { student: true }
+      where: { id: session.user.id }
     });
-    if (!user?.student) {
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    
+    // Check if student record exists
+    const student = await prisma.student.findUnique({
+      where: { id: session.user.id }
+    });
+    if (!student) {
       return NextResponse.json({ error: 'Student account required' }, { status: 403 });
     }
     
@@ -39,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // Create payment intent
     const paymentResult = await SubscriptionPaymentService.createStudentSubscriptionPayment({
-      studentId: user.student.id,
+      studentId: student.id,
       userId: session.user.id,
       planType,
       billingCycle,
@@ -55,7 +62,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       clientSecret: paymentResult.clientSecret,
       paymentIntentId: paymentResult.paymentIntentId,
-      customerId: paymentResult.customerId
+      customerId: paymentResult.customerId,
+      isTrial: paymentResult.isTrial || false,
+      subscriptionId: paymentResult.subscriptionId
     });
   } catch (error) {
     console.error('Error creating student subscription payment:');

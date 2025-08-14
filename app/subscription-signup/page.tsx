@@ -107,6 +107,8 @@ export default function SubscriptionSignupPage() {
       const type = urlParams.get('type');
       const plan = urlParams.get('plan');
       const billing = urlParams.get('billing');
+      const courseId = urlParams.get('courseId');
+      const fromEnrollment = urlParams.get('fromEnrollment');
 
       if (type === 'institution') {
         setIsInstitution(true);
@@ -118,8 +120,31 @@ export default function SubscriptionSignupPage() {
         setSelectedPlan(plan);
         setShowPaymentForm(true);
       }
+      
+      // Store course ID and enrollment flag for later use
+      if (courseId) {
+        sessionStorage.setItem('pendingCourseEnrollment', courseId);
+      }
+      if (fromEnrollment === 'true') {
+        sessionStorage.setItem('fromEnrollment', 'true');
+      }
     }
   }, []);
+
+  // Auto-scroll to payment section when payment form is shown
+  useEffect(() => {
+    if (showPaymentForm && selectedPlan) {
+      setTimeout(() => {
+        const paymentSection = document.getElementById('complete-subscription-section');
+        if (paymentSection) {
+          paymentSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 100);
+    }
+  }, [showPaymentForm, selectedPlan]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -133,6 +158,17 @@ export default function SubscriptionSignupPage() {
   const handlePlanSelection = (planId: string) => {
     setSelectedPlan(planId);
     setShowPaymentForm(true);
+    
+    // Scroll to the payment section after a short delay to ensure the section is rendered
+    setTimeout(() => {
+      const paymentSection = document.getElementById('complete-subscription-section');
+      if (paymentSection) {
+        paymentSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 100);
   };
 
   const handleSubscribe = async () => {
@@ -151,7 +187,7 @@ export default function SubscriptionSignupPage() {
       const billingCycle = isAnnual ? 'ANNUAL' : 'MONTHLY';
       const amount = isAnnual ? plan.annualPrice : plan.price;
 
-      // Create payment intent
+      // Create payment intent or trial subscription
       const response = await fetch(`/api/${isInstitution ? 'institution' : 'student'}/subscription/payment`, {
         method: 'POST',
         headers: {
@@ -166,16 +202,42 @@ export default function SubscriptionSignupPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to create payment intent');
+        throw new Error(error.error || 'Failed to create subscription');
       }
 
-      const { clientSecret } = await response.json();
-      setClientSecret(clientSecret);
-      setShowPaymentModal(true);
+      const result = await response.json();
+      console.log('Subscription payment result:', result);
+      
+      // Check if this is a trial subscription (no payment required)
+      if (result.isTrial) {
+        console.log('Trial subscription created successfully:', result);
+        // Handle trial success directly without showing payment form
+        await handlePaymentSuccess(result);
+        return;
+      }
+
+      // For paid subscriptions, show payment modal
+      if (result.clientSecret) {
+        setClientSecret(result.clientSecret);
+        setShowPaymentModal(true);
+      } else {
+        throw new Error('Client secret is required for paid subscriptions');
+      }
     } catch (error) {
-    console.error('Error occurred:', error);
-      toast.error('Payment intent error:');
-      toast.error(error instanceof Error ? error.message : 'Failed to create payment intent');
+      console.error('Error occurred:', error);
+      
+      // Handle different types of errors
+      if (error instanceof Error) {
+        if (error.message.includes('Client secret is required')) {
+          toast.error('Invalid subscription configuration. Please try again or contact support.');
+        } else if (error.message.includes('Failed to fetch')) {
+          toast.error('Network error. Please check your connection and try again.');
+        } else {
+          toast.error(`Error: ${error.message}`);
+        }
+      } else {
+        toast.error('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -190,12 +252,36 @@ export default function SubscriptionSignupPage() {
 
       setShowPaymentModal(false);
       
-      // Redirect to appropriate dashboard
-      if (isInstitution) {
-        router.push('/institution/dashboard');
+      // Check if this was a trial subscription
+      const isTrial = (paymentIntent as any)?.isTrial || false;
+      const successMessage = isTrial 
+        ? `Your ${plan.trialDays}-day free trial has started!` 
+        : 'Payment successful! Your subscription is now active.';
+      
+      // Check if user came from course enrollment
+      const fromEnrollment = sessionStorage.getItem('fromEnrollment');
+      const pendingCourseId = sessionStorage.getItem('pendingCourseEnrollment');
+      
+      if (fromEnrollment === 'true' && pendingCourseId) {
+        // Clear the stored data
+        sessionStorage.removeItem('fromEnrollment');
+        sessionStorage.removeItem('pendingCourseEnrollment');
+        
+        // Set flag to indicate user is returning from subscription signup
+        sessionStorage.setItem('fromSubscriptionSignup', 'true');
+        
+        // Redirect back to course enrollment
+        router.push(`/courses/${pendingCourseId}`);
+        toast.success(successMessage + ' You can now enroll in the course.');
       } else {
-        router.push('/student/dashboard');
-      }
+                       // Redirect to appropriate dashboard
+            if (isInstitution) {
+              router.push('/institution/dashboard');
+            } else {
+              router.push('/student');
+            }
+           toast.success(successMessage);
+         }
     } catch (error) {
     console.error('Error occurred:', error);
       toast.error('Payment success error:');
@@ -224,10 +310,45 @@ export default function SubscriptionSignupPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      {/* Back to Course Button */}
+      {typeof window !== 'undefined' && sessionStorage.getItem('fromEnrollment') === 'true' && (
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <button
+              onClick={() => {
+                const courseId = sessionStorage.getItem('pendingCourseEnrollment');
+                if (courseId) {
+                  router.push(`/courses/${courseId}`);
+                } else {
+                  router.push('/student/courses');
+                }
+              }}
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+            >
+              <FaArrowRight className="w-4 h-4 rotate-180" />
+              Back to Course
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 text-white py-16">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Course Context Banner */}
+          {typeof window !== 'undefined' && sessionStorage.getItem('fromEnrollment') === 'true' && (
+            <div className="mb-6 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 max-w-2xl mx-auto">
+              <div className="flex items-center justify-center gap-3">
+                <FaGraduationCap className="h-5 w-5" />
+                <div>
+                  <p className="text-lg font-semibold">Complete Your Course Enrollment</p>
+                  <p className="text-sm opacity-90">Get a subscription to access this course and many more</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <h1 className="text-4xl lg:text-5xl font-bold mb-6">
             Choose Your Perfect Plan
           </h1>
@@ -396,9 +517,47 @@ export default function SubscriptionSignupPage() {
         </div>
       </section>
 
+      {/* Trial Benefits Section */}
+      {showPaymentForm && selectedPlan && (
+        <section className="py-12 bg-gradient-to-r from-green-50 to-blue-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Start Your Free Trial Today!</h2>
+              <p className="text-lg text-gray-600">No credit card required • Cancel anytime • Full access to all features</p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaClock className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">{getSelectedPlan()?.trialDays} Days Free</h3>
+                <p className="text-sm text-gray-600">Full access to all premium features with no commitment</p>
+              </div>
+              
+              <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaGraduationCap className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Unlimited Courses</h3>
+                <p className="text-sm text-gray-600">Access to all live classes and premium content</p>
+              </div>
+              
+              <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaUsers className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2">Expert Instructors</h3>
+                <p className="text-sm text-gray-600">Learn from certified language experts</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Payment Section */}
       {showPaymentForm && selectedPlan && (
-        <section className="py-16 bg-gray-50">
+        <section id="complete-subscription-section" className="py-16 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card className="shadow-lg">
               <CardHeader>
@@ -552,7 +711,7 @@ export default function SubscriptionSignupPage() {
       </section>
 
       {/* Payment Modal */}
-      {showPaymentModal && getSelectedPlan() && (
+      {showPaymentModal && getSelectedPlan() && clientSecret && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">

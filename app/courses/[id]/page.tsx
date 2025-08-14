@@ -70,6 +70,7 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
   const [isEnrollmentModalOpen, setIsEnrollmentModalOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [hasCompletedEnrollment, setHasCompletedEnrollment] = useState(false)
+  const [showAutoEnrollmentPrompt, setShowAutoEnrollmentPrompt] = useState(false)
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -114,6 +115,28 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
             // Clean up the URL by removing all query parameters
             const cleanUrl = window.location.pathname;
             window.history.replaceState({}, document.title, cleanUrl)
+          }
+          
+          // Check if user just returned from subscription signup
+          const fromSubscription = sessionStorage.getItem('fromSubscriptionSignup')
+          if (fromSubscription === 'true' && course && !hasCompletedEnrollment) {
+            // Clear the flag
+            sessionStorage.removeItem('fromSubscriptionSignup')
+            
+            // Check if user now has an active subscription
+            const subscriptionResponse = await fetch('/api/student/subscription/current')
+            if (subscriptionResponse.ok) {
+              const subscriptionData = await subscriptionResponse.json()
+              
+              if (subscriptionData.subscription && 
+                  ['ACTIVE', 'TRIAL'].includes(subscriptionData.subscription.status)) {
+                // User has active subscription, show enrollment prompt
+                toast.success('Great! You now have an active subscription.')
+                
+                // Show auto-enrollment prompt modal
+                setShowAutoEnrollmentPrompt(true)
+              }
+            }
           }
         } else {
           setIsAuthenticated(false)
@@ -168,11 +191,49 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
         return;
       }
 
-      // User is eligible, open enrollment modal
-      setIsEnrollmentModalOpen(true);
+      // User is eligible - check if this is a subscription-based course
+      if (course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED' || course.requiresSubscription) {
+        // For subscription-based courses, enroll directly
+        await handleDirectEnrollment();
+      } else {
+        // For non-subscription courses, open enrollment modal
+        setIsEnrollmentModalOpen(true);
+      }
     } catch (error) {
       console.error('Error checking enrollment eligibility:', error);
       toast.error('Failed to check enrollment eligibility. Please try again.');
+    }
+  }
+
+  const handleDirectEnrollment = async () => {
+    if (!course) return
+    
+    try {
+      // Direct enrollment without opening modal
+      const response = await fetch(`/api/student/courses/${course.id}/enroll`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to enroll in course')
+        return
+      }
+
+      // Enrollment successful
+      toast.success('Successfully enrolled in course!')
+      setHasCompletedEnrollment(true)
+      
+      // Redirect to student dashboard after successful enrollment
+      setTimeout(() => {
+        router.push('/student')
+      }, 1000)
+    } catch (error) {
+      console.error('Error during direct enrollment:', error)
+      toast.error('Failed to enroll in course. Please try again.')
     }
   }
 
@@ -486,6 +547,42 @@ export default function CourseDetail({ params }: { params: { id: string } }) {
         courseId={course?.id || null}
         onEnrollmentComplete={handleEnrollmentComplete}
       />
+      
+      {/* Auto-Enrollment Prompt Modal */}
+      {showAutoEnrollmentPrompt && course && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GraduationCap className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Ready to Enroll?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Great! You now have an active subscription. Would you like to enroll in <strong>"{course.title}"</strong> now?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowAutoEnrollmentPrompt(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Maybe Later
+                </button>
+                <button
+                  onClick={async () => {
+                    setShowAutoEnrollmentPrompt(false)
+                    await handleDirectEnrollment()
+                  }}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Enroll Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 

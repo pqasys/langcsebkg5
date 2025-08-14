@@ -8,7 +8,7 @@ import { Loader2, CheckCircle, XCircle, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SubscriptionPaymentFormProps {
-  clientSecret: string;
+  clientSecret: string | null;
   amount: number;
   currency: string;
   planName: string;
@@ -39,7 +39,17 @@ export function SubscriptionPaymentForm({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!stripe || !elements) {
+    // For trials without payment, handle success directly
+    if (isTrial && !clientSecret) {
+      setSuccess(true);
+      onSuccess({ isTrial: true, subscriptionId: 'trial' });
+      toast.success(`Successfully subscribed to ${planName}! Starting ${trialDays}-day free trial.`);
+      return;
+    }
+
+    if (!stripe || !elements || !clientSecret) {
+      setError('Payment processing is not available');
+      onError('Payment processing is not available');
       return;
     }
 
@@ -128,50 +138,95 @@ export function SubscriptionPaymentForm({
           </Alert>
         )}
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <CreditCard className="w-5 h-5 text-gray-500" />
-            <span className="font-medium">Payment Information</span>
+        {/* For trials without payment, show a simple confirmation */}
+        {isTrial && !clientSecret ? (
+          <div className="space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="font-medium text-green-800">No Payment Required</span>
+              </div>
+              <p className="text-sm text-green-700">
+                Your {trialDays}-day free trial will start immediately. No payment information is required.
+              </p>
+            </div>
+            
+            <div className="flex space-x-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => { if (typeof window !== 'undefined') window.history.back(); }}
+                disabled={isProcessing || isLoading}
+                className="flex-1"
+              >
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={isProcessing || isLoading}
+                className="flex-1"
+              >
+                {isProcessing || isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    Start Free Trial
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-          <PaymentElement />
-        </div>
+        ) : (
+          <>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <CreditCard className="w-5 h-5 text-gray-500" />
+                <span className="font-medium">Payment Information</span>
+              </div>
+              <PaymentElement />
+            </div>
 
-        <div className="flex space-x-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => { if (typeof window !== 'undefined') window.history.back(); }}
-            disabled={isProcessing || isLoading}
-            className="flex-1"
-          >
-            Back
-          </Button>
-          <Button
-            type="submit"
-            disabled={!stripe || isProcessing || isLoading}
-            className="flex-1"
-          >
-            {isProcessing || isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                {isTrial ? 'Start Free Trial' : 'Subscribe Now'}
-              </>
-            )}
-          </Button>
-        </div>
+            <div className="flex space-x-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => { if (typeof window !== 'undefined') window.history.back(); }}
+                disabled={isProcessing || isLoading}
+                className="flex-1"
+              >
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={!stripe || isProcessing || isLoading}
+                className="flex-1"
+              >
+                {isProcessing || isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    {isTrial ? 'Start Free Trial' : 'Subscribe Now'}
+                  </>
+                )}
+              </Button>
+            </div>
 
-        <div className="text-xs text-muted-foreground text-center space-y-1">
-          <p>Your payment is secured by Stripe. We never store your payment information.</p>
-          {isTrial && (
-            <p className="text-blue-600">
-              Your card will be authorized but not charged until after your {trialDays}-day free trial ends.
-            </p>
-          )}
-        </div>
+            <div className="text-xs text-muted-foreground text-center space-y-1">
+              <p>Your payment is secured by Stripe. We never store your payment information.</p>
+              {isTrial && (
+                <p className="text-blue-600">
+                  Your card will be authorized but not charged until after your {trialDays}-day free trial ends.
+                </p>
+              )}
+            </div>
+          </>
+        )}
       </form>
     </div>
   );

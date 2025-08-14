@@ -55,7 +55,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       clientSecret: paymentResult.clientSecret,
       paymentIntentId: paymentResult.paymentIntentId,
-      customerId: paymentResult.customerId
+      customerId: paymentResult.customerId,
+      isTrial: paymentResult.isTrial || false,
+      subscriptionId: paymentResult.subscriptionId
     });
   } catch (error) {
     console.error('Error creating institution subscription payment:');

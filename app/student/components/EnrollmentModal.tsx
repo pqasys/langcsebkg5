@@ -331,16 +331,23 @@ export default function EnrollmentModal({
         // Handle subscription requirement
         if (response.status === 402 && errorData.error === 'Subscription required') {
           console.log('Subscription required for this course');
-          toast.error('This course requires an active subscription to enroll.');
+          
+          // Show more helpful error message
+          toast.error('This course requires a subscription. Starting your free trial now...');
           
           // Close the modal
           onClose();
           
-          // Redirect to subscription page
+          // Redirect to subscription page with better UX
           if (errorData.redirectUrl) {
-            router.push(errorData.redirectUrl);
+            // Add a small delay to show the toast message
+            setTimeout(() => {
+              router.push(errorData.redirectUrl);
+            }, 1500);
           } else {
-            router.push('/subscription-signup');
+            setTimeout(() => {
+              router.push('/subscription-signup');
+            }, 1500);
           }
           return;
         }

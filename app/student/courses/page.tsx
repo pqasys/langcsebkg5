@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from 'sonner';
-import { FaSpinner } from 'react-icons/fa';
+import { FaSpinner, FaStar } from 'react-icons/fa';
 import { Search } from 'lucide-react';
 import PayCourseButton from '@/app/student/components/PayCourseButton';
 import EnrollmentModal from '../components/EnrollmentModal';
@@ -268,12 +268,27 @@ export default function StudentCoursesPage() {
 
                 <div className="space-y-2">
                   {course.status === 'AVAILABLE' ? (
-                    <Button
-                      onClick={() => handleEnroll(course.id)}
-                      className="w-full h-12 text-base"
-                    >
-                      Enroll Now
-                    </Button>
+                    <>
+                      {/* Show subscription requirement upfront */}
+                      {(course.requiresSubscription || course.marketingType === 'LIVE_ONLINE' || course.marketingType === 'BLENDED') && (
+                        <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                          <div className="flex items-center gap-2 text-sm text-blue-700">
+                            <FaStar className="h-3 w-3" />
+                            <span className="font-medium">Subscription Required</span>
+                          </div>
+                          <p className="text-xs text-blue-600 mt-1">
+                            This course requires an active subscription. Start with a free trial!
+                          </p>
+                        </div>
+                      )}
+                      
+                      <Button
+                        onClick={() => handleEnroll(course.id)}
+                        className="w-full h-12 text-base"
+                      >
+                        Enroll Now
+                      </Button>
+                    </>
                   ) : isCompleted ? (
                     <Button
                       variant="outline"

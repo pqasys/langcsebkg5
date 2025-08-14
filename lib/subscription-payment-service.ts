@@ -4,13 +4,15 @@ import { SubscriptionCommissionService } from '@/lib/subscription-commission-ser
 import { notificationService } from '@/lib/notification';
 import { logger } from './logger';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error(`STRIPE_SECRET_KEY is not set - Context: throw new Error('STRIPE_SECRET_KEY is not set');...`);
+// Initialize Stripe only if secret key is available
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2023-10-16',
+  });
+} else {
+  console.warn('STRIPE_SECRET_KEY is not set. Payment processing will be simulated.');
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
-});
 
 export interface SubscriptionPaymentData {
   planType: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE' | 'BASIC' | 'PREMIUM' | 'PRO';
@@ -50,6 +52,35 @@ export class SubscriptionPaymentService {
 
       if (!institution) {
         throw new Error(`Institution not found - Context: include: { users: true }...`);
+      }
+
+      // For free trials, create subscription directly without payment processing
+      if (startTrial) {
+        console.log('Creating free trial subscription for institution without payment processing');
+        
+        // Create the subscription directly using the commission service
+        const subscription = await SubscriptionCommissionService.createSubscription(
+          institutionId,
+          planType,
+          billingCycle,
+          institutionId, // Use the institution's own ID as the acting user for trial subscriptions
+          true, // startTrial
+          amount
+        );
+
+        // Return a trial result without client secret (no payment processing needed)
+        return {
+          paymentIntentId: `trial_inst_${subscription.id}`,
+          clientSecret: null, // No client secret needed for trials
+          customerId: institution.stripeCustomerId || `trial_customer_inst_${institutionId}`,
+          isTrial: true,
+          subscriptionId: subscription.id
+        };
+      }
+
+      // For paid subscriptions, require Stripe
+      if (!stripe) {
+        throw new Error('Stripe is required for paid subscriptions. Please configure STRIPE_SECRET_KEY.');
       }
 
       // Create or get Stripe customer
@@ -110,15 +141,65 @@ export class SubscriptionPaymentService {
     data: StudentSubscriptionPaymentData
   ) {
     try {
+      console.log('Creating student subscription payment with data:', data);
       const { studentId, planType, billingCycle, amount, currency, startTrial = false, metadata = {} } = data;
 
       // Get student details
-      const student = await prisma.student.findUnique({
+      let student = await prisma.student.findUnique({
         where: { id: studentId }
       });
 
+      // If student doesn't exist, try to create it from user data
       if (!student) {
-        throw new Error(`Student not found - Context: where: { id: studentId },...`);
+        const user = await prisma.user.findUnique({
+          where: { id: studentId }
+        });
+
+        if (!user) {
+          throw new Error(`User not found: ${studentId}`);
+        }
+
+        // Create student record
+        student = await prisma.student.create({
+          data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            status: 'active',
+            created_at: user.createdAt,
+            updated_at: user.updatedAt,
+            last_active: new Date()
+          }
+        });
+      }
+
+      // For free trials, create subscription directly without payment processing
+      if (startTrial) {
+        console.log('Creating free trial subscription without payment processing');
+        
+        // Create the subscription directly using the commission service
+        const subscription = await SubscriptionCommissionService.createStudentSubscription(
+          studentId,
+          planType,
+          billingCycle,
+          studentId, // Use the student's own ID as the acting user for trial subscriptions
+          true, // startTrial
+          amount
+        );
+
+        // Return a trial result without client secret (no payment processing needed)
+        return {
+          paymentIntentId: `trial_${subscription.id}`,
+          clientSecret: null, // No client secret needed for trials
+          customerId: student.stripeCustomerId || `trial_customer_${studentId}`,
+          isTrial: true,
+          subscriptionId: subscription.id
+        };
+      }
+
+      // For paid subscriptions, require Stripe
+      if (!stripe) {
+        throw new Error('Stripe is required for paid subscriptions. Please configure STRIPE_SECRET_KEY.');
       }
 
       // Create or get Stripe customer
@@ -167,7 +248,8 @@ export class SubscriptionPaymentService {
         customerId
       };
     } catch (error) {
-      logger.error('Error creating student subscription payment:');
+      logger.error('Error creating student subscription payment:', error);
+      console.error('Error creating student subscription payment:', error);
       throw error;
     }
   }
@@ -231,7 +313,7 @@ export class SubscriptionPaymentService {
         institutionId,
         planType,
         billingCycle,
-        'SYSTEM', // System user for payment-initiated subscriptions
+        institutionId, // Use institution ID as acting user for payment-initiated subscriptions
         startTrial,
         amount
       );
@@ -307,54 +389,27 @@ export class SubscriptionPaymentService {
     startTrial: boolean
   ) {
     await prisma.$transaction(async (tx) => {
-      // Get plan details
-      const subscriptionPlans = SubscriptionCommissionService.getStudentSubscriptionPlans();
-      const plan = subscriptionPlans.find(p => p.planType === planType);
+             // Create subscription using the proper service method
+       const subscription = await SubscriptionCommissionService.createStudentSubscription(
+         studentId,
+         planType,
+         billingCycle,
+         studentId, // Use student ID as acting user for payment-initiated subscriptions
+         startTrial,
+         amount
+       );
 
-      if (!plan) {
-        throw new Error(`Invalid plan type: ${planType} - Context: const subscriptionPlans = SubscriptionCommissionSe...`);
-      }
-
-      const calculatedAmount = billingCycle === 'ANNUAL' ? plan.annualPrice : plan.monthlyPrice;
-      const startDate = new Date();
-      const endDate = new Date();
-      
-      // Set trial period or regular billing period
-      if (startTrial) {
-        endDate.setDate(endDate.getDate() + 7); // 7-day trial for students
-      } else {
-        endDate.setMonth(endDate.getMonth() + (billingCycle === 'ANNUAL' ? 12 : 1));
-      }
-
-      // Create subscription
-      const subscription = await tx.studentSubscription.create({
-        data: {
-          studentId,
-          planType,
-          status: startTrial ? 'TRIAL' : 'ACTIVE',
-          startDate,
-          endDate,
-          billingCycle,
-          amount: calculatedAmount,
-          currency: 'USD',
-          features: plan.features,
-          autoRenew: true,
-          metadata: startTrial ? { isTrial: true, trialEndDate: endDate.toISOString() } : {}
-        }
-      });
-
-      // Create billing history entry
-      await tx.studentBillingHistory.create({
-        data: {
+      // Update billing history with payment details
+      await tx.studentBillingHistory.updateMany({
+        where: {
           subscriptionId: subscription.id,
-          billingDate: startDate,
-          amount: calculatedAmount,
-          currency: 'USD',
+          status: startTrial ? 'TRIAL' : 'PAID'
+        },
+        data: {
           status: 'PAID',
           paymentMethod: 'STRIPE',
           transactionId: paymentIntentId,
-          invoiceNumber: `STU-INV-${Date.now()}`,
-          description: startTrial ? `Trial subscription for ${planType} plan` : `Initial payment for ${planType} plan`
+          paidAt: new Date()
         }
       });
 
@@ -385,18 +440,25 @@ export class SubscriptionPaymentService {
       });
 
       if (student) {
-        await notificationService.sendSubscriptionStatusNotification(
-          student.id,
-          subscription.id,
-          {
-            oldStatus: 'PENDING',
-            newStatus: startTrial ? 'TRIAL' : 'ACTIVE',
-            planName: `${planType} Plan`,
-            reason: startTrial ? 'Trial started' : 'Payment successful',
-            effectiveDate: new Date(),
-            studentName: student.name
-          }
-        );
+        // Get the subscription that was just created
+        const subscription = await prisma.studentSubscription.findUnique({
+          where: { studentId }
+        });
+
+        if (subscription) {
+          await notificationService.sendSubscriptionStatusNotification(
+            student.id,
+            subscription.id,
+            {
+              oldStatus: 'PENDING',
+              newStatus: startTrial ? 'TRIAL' : 'ACTIVE',
+              planName: `${planType} Plan`,
+              reason: startTrial ? 'Trial started' : 'Payment successful',
+              effectiveDate: new Date(),
+              studentName: student.name
+            }
+          );
+        }
       }
     } catch (error) {
       logger.error('Failed to send student subscription notification:', error);
