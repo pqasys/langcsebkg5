@@ -121,13 +121,48 @@ export function EnhancedPromotionalSidebar({
   showDesignToolkit = false,
   userRole = 'USER'
 }: EnhancedPromotionalSidebarProps) {
+  // Safety function to prevent institution logos from being used as background images
+  const sanitizeDesignConfig = (config: DesignConfig): DesignConfig => {
+    // Only prevent background images if they appear to be institution logos
+    const isInstitutionLogo = config.backgroundImage && 
+      (config.backgroundImage.includes('logo') ||
+       config.backgroundImage.includes('institution') ||
+       config.backgroundImage.includes('uploads/logos'));
+    
+    if (isInstitutionLogo) {
+      return {
+        ...config,
+        backgroundType: 'solid',
+        backgroundImage: '',
+      };
+    }
+    
+    // Allow legitimate background images for advertising
+    return config;
+  };
+
   const [promotionalItems, setPromotionalItems] = useState<PromotionalItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAds, setShowAds] = useState(true);
-  const [designConfig, setDesignConfig] = useState<DesignConfig>(DEFAULT_DESIGN_CONFIG);
+  const [designConfig, setDesignConfig] = useState<DesignConfig>(sanitizeDesignConfig(DEFAULT_DESIGN_CONFIG));
   const [showDesignPanel, setShowDesignPanel] = useState(false);
 
   const canEditDesign = userRole === 'ADMIN' || userRole === 'INSTITUTION_STAFF';
+
+  // Load and sanitize saved design configuration
+  useEffect(() => {
+    try {
+      const savedConfig = localStorage.getItem('promotionalDesignConfig');
+      if (savedConfig) {
+        const parsedConfig = JSON.parse(savedConfig);
+        setDesignConfig(sanitizeDesignConfig(parsedConfig));
+      }
+    } catch (error) {
+      console.error('Error loading saved design config:', error);
+      // Fall back to default sanitized config
+      setDesignConfig(sanitizeDesignConfig(DEFAULT_DESIGN_CONFIG));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPromotionalContent = async () => {
@@ -153,7 +188,7 @@ export function EnhancedPromotionalSidebar({
             type: 'institution',
             title: inst.name,
             description: `${inst.city}, ${inst.country} • ${inst.courseCount} courses`,
-            imageUrl: inst.logoUrl,
+            imageUrl: inst.logoUrl, // Use logo for proper display, not background
             ctaText: 'View Institution',
             ctaLink: `/institutions/${inst.id}`,
             badge: inst.isFeatured ? 'Featured' : inst.subscriptionPlan,
@@ -294,7 +329,7 @@ export function EnhancedPromotionalSidebar({
   };
 
   const handleResetDesign = () => {
-    setDesignConfig(DEFAULT_DESIGN_CONFIG);
+    setDesignConfig(sanitizeDesignConfig(DEFAULT_DESIGN_CONFIG));
     localStorage.removeItem('promotionalDesignConfig');
   };
 
@@ -363,12 +398,12 @@ export function EnhancedPromotionalSidebar({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <DesignToolkit
-              config={designConfig}
-              onConfigChange={setDesignConfig}
-              onSave={handleSaveDesign}
-              onReset={handleResetDesign}
-            />
+                         <DesignToolkit
+               config={designConfig}
+               onConfigChange={(config) => setDesignConfig(sanitizeDesignConfig(config))}
+               onSave={handleSaveDesign}
+               onReset={handleResetDesign}
+             />
           </CardContent>
         </Card>
       )}

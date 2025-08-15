@@ -88,9 +88,22 @@ export function DesignablePromotionalCard({
     } else if (designConfig.backgroundType === 'gradient') {
       styles.background = `linear-gradient(${designConfig.backgroundGradient.direction}, ${designConfig.backgroundGradient.from}, ${designConfig.backgroundGradient.to})`;
     } else if (designConfig.backgroundType === 'image' && designConfig.backgroundImage) {
-      styles.backgroundImage = `url('${designConfig.backgroundImage}')`;
-      styles.backgroundSize = 'cover';
-      styles.backgroundPosition = 'center';
+      // Safety check: Don't use institution logos as background images
+      const isInstitutionLogo = item.type === 'institution' && item.imageUrl && 
+        (designConfig.backgroundImage === item.imageUrl || 
+         designConfig.backgroundImage.includes('logo') ||
+         designConfig.backgroundImage.includes('institution') ||
+         designConfig.backgroundImage.includes('uploads/logos'));
+      
+      if (isInstitutionLogo) {
+        // Fall back to solid background if trying to use institution logo
+        styles.backgroundColor = designConfig.backgroundColor || '#ffffff';
+      } else {
+        // Allow legitimate background images for advertising
+        styles.backgroundImage = `url('${designConfig.backgroundImage}')`;
+        styles.backgroundSize = 'cover';
+        styles.backgroundPosition = 'center';
+      }
     }
 
     // Layout
@@ -152,18 +165,24 @@ export function DesignablePromotionalCard({
       onClick={onClick}
     >
       <CardContent className="p-0">
-        {/* Background Image Overlay */}
-        {item.imageUrl && (
-          <div 
-            className="absolute inset-0 bg-cover bg-center rounded-t-lg opacity-20"
-            style={{ backgroundImage: `url('${item.imageUrl}')` }}
-          />
-        )}
-
         <div className="relative p-4">
-          {/* Header with badge */}
+          {/* Header with badge and optional logo */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1 min-w-0">
+              {/* Institution logo for institution type items */}
+              {item.type === 'institution' && item.imageUrl && (
+                <div className="mb-2">
+                  <img 
+                    src={item.imageUrl} 
+                    alt={`${item.title} logo`}
+                    className="h-8 w-auto object-contain"
+                    onError={(e) => {
+                      // Hide logo if it fails to load
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
               <h4 
                 className="font-medium line-clamp-2 group-hover:text-blue-600 transition-colors"
                 style={generateTitleStyles()}

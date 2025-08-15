@@ -42,6 +42,11 @@ model Institution {
   isFeatured         Boolean  @default(false)
   isActive           Boolean  @default(true)
 
+  // Relations
+  users user[]
+  courses Course[]
+  subscriptions InstitutionSubscription[]
+
   @@map("institution")
 }
 
@@ -65,6 +70,7 @@ model Course {
   isFeatured           Boolean          @default(false)
   isSponsored          Boolean          @default(false)
   priority             Int              @default(0)
+  // Simplified course classification
   hasLiveClasses       Boolean          @default(false)
   liveClassType        String?
   liveClassFrequency   String?
@@ -72,8 +78,17 @@ model Course {
   isPlatformCourse     Boolean          @default(false)
   requiresSubscription Boolean          @default(false)
   subscriptionTier     String?
+  
+  // Marketing fields
   marketingType        String           @default("SELF_PACED") @db.VarChar(50)
   marketingDescription String?          @db.Text
+
+  // Relations
+  institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  category category @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  courseTags CourseTag[]
+  videoSessions VideoSession[]
+  enrollments StudentCourseEnrollment[]
 
   @@unique([title, institutionId], map: "Course_title_institutionId_key")
   @@index([categoryId], map: "Course_categoryId_fkey")
@@ -103,6 +118,10 @@ model user {
   updatedAt          DateTime  @default(now()) @updatedAt
   status             String    @default("ACTIVE") @db.VarChar(20)
   forcePasswordReset Boolean   @default(false)
+
+  // Relations
+  institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  videoSessions VideoSession[]
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -151,6 +170,9 @@ model category {
   updatedAt   DateTime @default(now()) @updatedAt
   slug        String   @unique @db.VarChar(50)
 
+  // Relations
+  courses Course[]
+
   @@map("category")
 }
 
@@ -160,6 +182,10 @@ model CourseTag {
   tagId     String   @db.VarChar(36)
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  // Relations
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([courseId, tagId])
   @@index([courseId])
@@ -182,6 +208,9 @@ model Tag {
   icon        String?  @db.VarChar(50)
   featured    Boolean  @default(false)
   priority    Int      @default(0)
+
+  // Relations
+  courseTags CourseTag[]
 
   @@index([categoryId])
   @@index([parentId])
@@ -245,6 +274,9 @@ model StudentCourseEnrollment {
   liveClassAccessExpiry DateTime?
   subscriptionId        String?
   subscriptionTier      String?
+
+  // Relations
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([courseId])
@@ -328,6 +360,10 @@ model InstitutionSubscription {
   cancelledAt        DateTime?
   commissionTierId   String
 
+  // Relations
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commissionTier CommissionTier @relation(fields: [commissionTierId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
   @@index([institutionId])
   @@index([status])
   @@index([endDate])
@@ -351,6 +387,9 @@ model CommissionTier {
   maxStudents    Int      @default(10)
   maxCourses     Int      @default(5)
   maxTeachers    Int      @default(2)
+
+  // Relations
+  institutionSubscriptions InstitutionSubscription[]
 
   @@map("commission_tiers")
 }
@@ -397,24 +436,34 @@ model InstitutionBillingHistory {
 }
 
 model StudentTier {
-  id              String   @id @default(cuid())
-  planType        String   @unique
-  name            String
-  description     String   @db.Text
-  price           Float
-  currency        String   @default("USD") @db.VarChar(3)
-  billingCycle    String   @default("MONTHLY") @db.VarChar(20)
-  maxCourses      Int      @default(5)
-  maxLiveClasses  Int      @default(10)
-  maxStudents     Int      @default(1)
-  maxInstructors  Int      @default(1)
-  features        Json
-  enrollmentQuota Int      @default(5)
-  attendanceQuota Int      @default(20)
-  gracePeriodDays Int      @default(7)
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(cuid())
+  planType     String   @unique // BASIC, PREMIUM, ENTERPRISE
+  name         String
+  description  String   @db.Text
+  price        Float
+  currency     String   @default("USD") @db.VarChar(3)
+  billingCycle String   @default("MONTHLY") @db.VarChar(20)
+  
+  // Flexible limits
+  maxCourses   Int      @default(5)
+  maxLiveClasses Int    @default(10)
+  maxStudents  Int      @default(1) // For instructors
+  maxInstructors Int    @default(1) // For institutions
+  
+  // Features
+  features     Json     // { "hdVideo": true, "recordings": true, "analytics": true }
+  
+  // Governance
+  enrollmentQuota Int   @default(5)
+  attendanceQuota Int   @default(20)
+  gracePeriodDays Int   @default(7)
+  
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  subscriptions StudentSubscription[]
 
   @@map("student_tiers")
 }
@@ -457,6 +506,9 @@ model StudentSubscription {
   monthlyAttendance    Int       @default(0)
   monthlyEnrollments   Int       @default(0)
   planType             String    @default("BASIC")
+
+  // Relations
+  studentTier StudentTier @relation(fields: [studentTierId], references: [id])
 
   @@index([studentId])
   @@index([status])
@@ -568,6 +620,11 @@ model VideoSession {
   recurringPatternId String?
   sessionNumber      Int?
 
+  // Relations
+  instructor user @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  participants VideoSessionParticipant[]
+
   @@index([instructorId])
   @@index([courseId])
   @@index([institutionId])
@@ -623,6 +680,9 @@ model VideoSessionParticipant {
   attendanceType    String    @default("REGULAR")
   quotaUsed         Boolean   @default(false)
   subscriptionId    String?
+
+  // Relations
+  session VideoSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([sessionId, userId])
   @@index([sessionId])
@@ -1467,176 +1527,6 @@ model video_session_recordings {
   @@index([status])
 }
 
-model LanguageProficiencyQuestionBank {
-  id             String   @id @default(uuid()) @db.VarChar(36)
-  languageCode   String   @unique @db.VarChar(10)
-  name           String   @db.VarChar(255)
-  description    String?  @db.Text
-  totalQuestions Int      @default(0)
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now()) @updatedAt
-
-  @@map("language_proficiency_question_banks")
-}
-
-model LanguageProficiencyQuestion {
-  id            String   @id @default(uuid()) @db.VarChar(36)
-  bankId        String   @db.VarChar(36)
-  level         String   @db.VarChar(10)
-  category      String?  @db.VarChar(50)
-  difficulty    String   @default("medium") @db.VarChar(20)
-  question      String   @db.Text
-  options       Json
-  correctAnswer String   @db.Text
-  explanation   String?  @db.Text
-  usageCount    Int      @default(0)
-  successRate   Float    @default(0)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now()) @updatedAt
-
-  @@index([bankId])
-  @@index([level])
-  @@index([category])
-  @@index([difficulty])
-  @@index([isActive])
-  @@map("language_proficiency_questions")
-}
-
-model LanguageProficiencyTestAttempt {
-  id           String   @id @default(uuid()) @db.VarChar(36)
-  userId       String   @db.VarChar(36)
-  languageCode String   @db.VarChar(10)
-  score        Int
-  level        String   @db.VarChar(10)
-  answers      Json
-  timeSpent    Int      @default(0)
-  completedAt  DateTime @default(now())
-  createdAt    DateTime @default(now())
-
-  @@index([userId])
-  @@index([languageCode])
-  @@index([completedAt])
-  @@map("language_proficiency_test_attempts")
-}
-
-model DesignConfig {
-  id                          String   @id @default(cuid())
-  name                        String
-  description                 String?
-  backgroundType              String   @default("solid")
-  backgroundColor             String   @default("#ffffff")
-  backgroundGradientFrom      String   @default("#667eea")
-  backgroundGradientTo        String   @default("#764ba2")
-  backgroundGradientDirection String   @default("to-r")
-  backgroundImage             String?
-  backgroundPattern           String   @default("none")
-  backgroundOpacity           Int      @default(100)
-  titleFont                   String   @default("inter")
-  titleSize                   Int      @default(16)
-  titleWeight                 String   @default("semibold")
-  titleColor                  String   @default("#1f2937")
-  titleAlignment              String   @default("left")
-  titleShadow                 Boolean  @default(false)
-  titleShadowColor            String   @default("#000000")
-  descriptionFont             String   @default("inter")
-  descriptionSize             Int      @default(14)
-  descriptionColor            String   @default("#6b7280")
-  descriptionAlignment        String   @default("left")
-  padding                     Int      @default(16)
-  borderRadius                Int      @default(8)
-  borderWidth                 Int      @default(1)
-  borderColor                 String   @default("#e5e7eb")
-  borderStyle                 String   @default("solid")
-  shadow                      Boolean  @default(true)
-  shadowColor                 String   @default("rgba(0, 0, 0, 0.1)")
-  shadowBlur                  Int      @default(10)
-  shadowOffset                Int      @default(4)
-  hoverEffect                 String   @default("scale")
-  animationDuration           Int      @default(300)
-  customCSS                   String?  @db.Text
-  isActive                    Boolean  @default(true)
-  isDefault                   Boolean  @default(false)
-  createdBy                   String?
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
-  promotionalItems            PromotionalItem[]
-  advertisingItems            AdvertisingItem[]
-
-  @@map("design_configs")
-}
-
-model PromotionalItem {
-  id             String   @id @default(cuid())
-  type           String
-  title          String
-  description    String
-  imageUrl       String?
-  ctaText        String
-  ctaLink        String
-  badge          String?
-  students       Int?
-  courses        Int?
-  rating         Float?
-  priority       Int      @default(0)
-  isSponsored    Boolean  @default(false)
-  isActive       Boolean  @default(true)
-  designConfigId String?
-  designConfig   DesignConfig? @relation(fields: [designConfigId], references: [id])
-  createdBy      String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@index([designConfigId], map: "promotional_items_designConfigId_fkey")
-  @@map("promotional_items")
-}
-
-model AdvertisingItem {
-  id                 String    @id @default(cuid())
-  type               String
-  title              String
-  description        String
-  imageUrl           String?
-  ctaText            String
-  ctaLink            String
-  targetAudience     String?
-  targetLocation     String?
-  targetDevice       String?
-  startDate          DateTime?
-  endDate            DateTime?
-  maxImpressions     Int?
-  currentImpressions Int       @default(0)
-  maxClicks          Int?
-  currentClicks      Int       @default(0)
-  designConfigId     String?
-  designConfig       DesignConfig? @relation(fields: [designConfigId], references: [id])
-  isActive           Boolean   @default(true)
-  isApproved         Boolean   @default(false)
-  createdBy          String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-
-  @@index([designConfigId], map: "advertising_items_designConfigId_fkey")
-  @@map("advertising_items")
-}
-
-model DesignTemplate {
-  id           String   @id @default(cuid())
-  name         String
-  description  String?
-  category     String
-  config       Json
-  previewImage String?
-  usageCount   Int      @default(0)
-  isPublic     Boolean  @default(false)
-  createdBy    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("design_templates")
-}
-
 enum course_framework {
   CEFR
   ACTFL
@@ -1737,4 +1627,220 @@ enum student_institutions_status {
   ENROLLED
   ALUMNI
   MEMBER
+}
+
+// Language Proficiency Test Models
+model LanguageProficiencyQuestionBank {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  languageCode   String   @unique @db.VarChar(10)
+  name           String   @db.VarChar(255)
+  description    String?  @db.Text
+  totalQuestions Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+
+  questions LanguageProficiencyQuestion[]
+
+  @@map("language_proficiency_question_banks")
+}
+
+model LanguageProficiencyQuestion {
+  id             String   @id @default(uuid()) @db.VarChar(36)
+  bankId         String   @db.VarChar(36)
+  level          String   @db.VarChar(10)
+  category       String?  @db.VarChar(50)
+  difficulty     String   @default("medium") @db.VarChar(20)
+  question       String   @db.Text
+  options        Json
+  correctAnswer  String   @db.Text
+  explanation    String?  @db.Text
+  usageCount     Int      @default(0)
+  successRate    Float    @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+
+  bank LanguageProficiencyQuestionBank @relation(fields: [bankId], references: [id], onDelete: Cascade)
+
+  @@index([bankId])
+  @@index([level])
+  @@index([category])
+  @@index([difficulty])
+  @@index([isActive])
+  @@map("language_proficiency_questions")
+}
+
+model LanguageProficiencyTestAttempt {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  userId       String   @db.VarChar(36)
+  languageCode String   @db.VarChar(10)
+  score        Int
+  level        String   @db.VarChar(10)
+  answers      Json
+  timeSpent    Int      @default(0)
+  completedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([languageCode])
+  @@index([completedAt])
+  @@map("language_proficiency_test_attempts")
+}
+
+// Design Configuration Models for Promotional and Advertising Items
+model DesignConfig {
+  id          String   @id @default(cuid())
+  name        String   // Human-readable name for the design
+  description String?  // Optional description
+  
+  // Background settings
+  backgroundType       String   @default("solid") // solid, gradient, image, pattern
+  backgroundColor      String   @default("#ffffff")
+  backgroundGradientFrom String @default("#667eea")
+  backgroundGradientTo   String @default("#764ba2")
+  backgroundGradientDirection String @default("to-r")
+  backgroundImage      String?  // URL to background image
+  backgroundPattern    String   @default("none")
+  backgroundOpacity    Int      @default(100)
+  
+  // Typography settings
+  titleFont           String   @default("inter")
+  titleSize           Int      @default(16)
+  titleWeight         String   @default("semibold")
+  titleColor          String   @default("#1f2937")
+  titleAlignment      String   @default("left")
+  titleShadow         Boolean  @default(false)
+  titleShadowColor    String   @default("#000000")
+  
+  descriptionFont     String   @default("inter")
+  descriptionSize     Int      @default(14)
+  descriptionColor    String   @default("#6b7280")
+  descriptionAlignment String  @default("left")
+  
+  // Layout settings
+  padding             Int      @default(16)
+  borderRadius        Int      @default(8)
+  borderWidth         Int      @default(1)
+  borderColor         String   @default("#e5e7eb")
+  borderStyle         String   @default("solid")
+  
+  // Effects settings
+  shadow              Boolean  @default(true)
+  shadowColor         String   @default("rgba(0, 0, 0, 0.1)")
+  shadowBlur          Int      @default(10)
+  shadowOffset        Int      @default(4)
+  
+  // Animation settings
+  hoverEffect         String   @default("scale") // none, scale, glow, slide, bounce
+  animationDuration   Int      @default(300)
+  
+  // Custom CSS
+  customCSS           String?  @db.Text
+  
+  // Metadata
+  isActive            Boolean  @default(true)
+  isDefault           Boolean  @default(false)
+  createdBy           String?  // User ID who created this config
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  // Relationships
+  promotionalItems    PromotionalItem[]
+  advertisingItems    AdvertisingItem[]
+  
+  @@map("design_configs")
+}
+
+model PromotionalItem {
+  id          String   @id @default(cuid())
+  type        String   // institution, course, third-party
+  title       String
+  description String
+  imageUrl    String?
+  ctaText     String
+  ctaLink     String
+  badge       String?
+  
+  // Stats
+  students    Int?
+  courses     Int?
+  rating      Float?
+  
+  priority    Int      @default(0)
+  isSponsored Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  
+  // Design configuration
+  designConfigId String?
+  designConfig   DesignConfig? @relation(fields: [designConfigId], references: [id])
+  
+  // Metadata
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("promotional_items")
+}
+
+model AdvertisingItem {
+  id          String   @id @default(cuid())
+  type        String   // banner, sidebar, popup, interstitial
+  title       String
+  description String
+  imageUrl    String?
+  ctaText     String
+  ctaLink     String
+  
+  // Targeting
+  targetAudience String? // student, institution, all
+  targetLocation String? // courses, dashboard, sidebar
+  targetDevice  String? // desktop, mobile, all
+  
+  // Display settings
+  startDate   DateTime?
+  endDate     DateTime?
+  maxImpressions Int?
+  currentImpressions Int @default(0)
+  maxClicks   Int?
+  currentClicks Int @default(0)
+  
+  // Design configuration
+  designConfigId String?
+  designConfig   DesignConfig? @relation(fields: [designConfigId], references: [id])
+  
+  // Status
+  isActive    Boolean  @default(true)
+  isApproved  Boolean  @default(false)
+  
+  // Metadata
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("advertising_items")
+}
+
+model DesignTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String   // promotional, advertising, general
+  
+  // Template configuration (JSON)
+  config      Json     // Serialized DesignConfig
+  
+  // Preview
+  previewImage String?
+  
+  // Usage stats
+  usageCount  Int      @default(0)
+  isPublic    Boolean  @default(false)
+  
+  // Metadata
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("design_templates")
 }

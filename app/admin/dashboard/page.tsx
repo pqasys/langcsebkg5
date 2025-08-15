@@ -296,120 +296,131 @@ export default function AdminDashboard() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                Manage Institutions
-              </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                View and manage all institutions
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => router.push('/admin/institutions')}
-                variant="primary-high"
-                size="mobile-lg"
-                className="w-full"
-                aria-label="Navigate to institutions management page"
-              >
-                Go to Institutions
-              </Button>
-            </CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+                     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+             <CardHeader className="p-2 sm:p-4 md:p-6">
+               <CardTitle className="text-base sm:text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                 <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                 <span className="truncate">Manage Institutions</span>
+               </CardTitle>
+               <CardDescription className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
+                 View and manage all institutions
+               </CardDescription>
+             </CardHeader>
+                         <CardContent className="p-2 sm:p-4 md:p-6">
+                               <Button 
+                  onClick={() => router.push('/admin/institutions')}
+                  variant="primary-high"
+                  size="mobile-lg"
+                  className="w-full text-xs sm:text-sm md:text-base font-medium leading-tight whitespace-nowrap h-10 sm:h-12 md:h-14"
+                  aria-label="Navigate to institutions management page"
+                >
+                  <span className="hidden lg:inline">Go to Institutions</span>
+                  <span className="hidden sm:inline lg:hidden">Institutions</span>
+                  <span className="sm:hidden">Inst.</span>
+                </Button>
+             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                <UserCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
-                Manage Users
-              </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                View and manage all users
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => router.push('/admin/users')}
-                variant="success-high"
-                size="mobile-lg"
-                className="w-full"
-                aria-label="Navigate to users management page"
-              >
-                Go to Users
-              </Button>
-            </CardContent>
+                     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+             <CardHeader className="p-2 sm:p-4 md:p-6">
+               <CardTitle className="text-base sm:text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                 <UserCheck className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                 <span className="truncate">Manage Users</span>
+               </CardTitle>
+               <CardDescription className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
+                 View and manage all users
+               </CardDescription>
+             </CardHeader>
+                         <CardContent className="p-2 sm:p-4 md:p-6">
+                               <Button 
+                  onClick={() => router.push('/admin/users')}
+                  variant="success-high"
+                  size="mobile-lg"
+                  className="w-full text-xs sm:text-sm md:text-base font-medium leading-tight whitespace-nowrap h-10 sm:h-12 md:h-14"
+                  aria-label="Navigate to users management page"
+                >
+                  <span className="hidden lg:inline">Go to Users</span>
+                  <span className="hidden sm:inline lg:hidden">Users</span>
+                  <span className="sm:hidden">Users</span>
+                </Button>
+             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                <GraduationCap className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                Manage Courses
-              </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                View and manage all courses
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => router.push('/admin/courses')}
-                variant="pricing"
-                size="mobile-lg"
-                className="w-full"
-                aria-label="Navigate to courses management page"
-              >
-                Go to Courses
-              </Button>
-            </CardContent>
+                     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+             <CardHeader className="p-2 sm:p-4 md:p-6">
+               <CardTitle className="text-base sm:text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                 <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                 <span className="truncate">Manage Courses</span>
+               </CardTitle>
+               <CardDescription className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
+                 View and manage all courses
+               </CardDescription>
+             </CardHeader>
+                         <CardContent className="p-2 sm:p-4 md:p-6">
+                               <Button 
+                  onClick={() => router.push('/admin/courses')}
+                  variant="pricing"
+                  size="mobile-lg"
+                  className="w-full text-xs sm:text-sm md:text-base font-medium leading-tight whitespace-nowrap h-10 sm:h-12 md:h-14"
+                  aria-label="Navigate to courses management page"
+                >
+                  <span className="hidden lg:inline">Go to Courses</span>
+                  <span className="hidden sm:inline lg:hidden">Courses</span>
+                  <span className="sm:hidden">Courses</span>
+                </Button>
+             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                <Settings className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                Settings
-              </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Manage system settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => router.push('/admin/settings')}
-                variant="secondary"
-                size="mobile-lg"
-                className="w-full"
-                aria-label="Navigate to system settings page"
-              >
-                Go to Settings
-              </Button>
-            </CardContent>
+                     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+             <CardHeader className="p-2 sm:p-4 md:p-6">
+               <CardTitle className="text-base sm:text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                 <Settings className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
+                 <span className="truncate">Settings</span>
+               </CardTitle>
+               <CardDescription className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
+                 Manage system settings
+               </CardDescription>
+             </CardHeader>
+                         <CardContent className="p-2 sm:p-4 md:p-6">
+                               <Button 
+                  onClick={() => router.push('/admin/settings')}
+                  variant="secondary"
+                  size="mobile-lg"
+                  className="w-full text-xs sm:text-sm md:text-base font-medium leading-tight whitespace-nowrap h-10 sm:h-12 md:h-14"
+                  aria-label="Navigate to system settings page"
+                >
+                  <span className="hidden lg:inline">Go to Settings</span>
+                  <span className="hidden sm:inline lg:hidden">Settings</span>
+                  <span className="sm:hidden">Settings</span>
+                </Button>
+             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                <Palette className="h-5 w-5 text-pink-600 dark:text-pink-400" />
-                Design Toolkit
-              </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Customize promotional designs
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => router.push('/admin/design-configs')}
-                variant="outline"
-                size="mobile-lg"
-                className="w-full"
-                aria-label="Navigate to design toolkit page"
-              >
-                Open Design Toolkit
-              </Button>
-            </CardContent>
+                     <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+             <CardHeader className="p-2 sm:p-4 md:p-6">
+               <CardTitle className="text-base sm:text-lg text-gray-900 dark:text-white flex items-center gap-2">
+                 <Palette className="h-4 w-4 sm:h-5 sm:w-5 text-pink-600 dark:text-pink-400 flex-shrink-0" />
+                 <span className="truncate">Design Toolkit</span>
+               </CardTitle>
+               <CardDescription className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
+                 Customize promotional designs
+               </CardDescription>
+             </CardHeader>
+                         <CardContent className="p-2 sm:p-4 md:p-6">
+               <Button 
+                 onClick={() => router.push('/admin/design-configs')}
+                 variant="outline"
+                 size="mobile-lg"
+                 className="w-full text-xs sm:text-sm md:text-base font-medium leading-tight whitespace-nowrap h-10 sm:h-12 md:h-14"
+                 aria-label="Navigate to design toolkit page"
+               >
+                 <span className="hidden lg:inline">Open Design Toolkit</span>
+                 <span className="hidden md:inline lg:hidden">Design Toolkit</span>
+                 <span className="hidden sm:inline md:hidden">Design</span>
+                 <span className="sm:hidden">Design</span>
+               </Button>
+             </CardContent>
           </Card>
         </div>
       </div>
