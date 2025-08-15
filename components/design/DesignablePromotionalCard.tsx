@@ -95,6 +95,47 @@ export function DesignablePromotionalCard({
   // Ensure we always have a valid design config
   const config = designConfig || DEFAULT_CONFIG;
   
+  // Unified pattern generation function
+  const generatePatternStyles = (pattern: string, patternColor: string, backgroundColor: string) => {
+    const styles: React.CSSProperties = {};
+    
+    switch (pattern) {
+      case 'dots':
+        styles.background = `radial-gradient(circle at 1px 1px, ${patternColor} 1px, transparent 0)`;
+        styles.backgroundSize = '20px 20px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'lines':
+        styles.background = `repeating-linear-gradient(45deg, transparent, transparent 5px, ${patternColor} 5px, ${patternColor} 10px)`;
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'grid':
+        styles.background = `linear-gradient(${patternColor} 1px, transparent 1px), linear-gradient(90deg, ${patternColor} 1px, transparent 1px)`;
+        styles.backgroundSize = '20px 20px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'hexagons':
+        styles.background = `radial-gradient(circle at 50% 50%, ${patternColor} 2px, transparent 2px)`;
+        styles.backgroundSize = '30px 30px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'waves':
+        styles.background = `repeating-linear-gradient(45deg, transparent, transparent 10px, ${patternColor} 10px, ${patternColor} 20px)`;
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'stars':
+        styles.background = `radial-gradient(circle at 25% 25%, ${patternColor} 1px, transparent 1px), radial-gradient(circle at 75% 75%, ${patternColor} 1px, transparent 1px)`;
+        styles.backgroundSize = '50px 50px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      default:
+        styles.backgroundColor = backgroundColor;
+        break;
+    }
+    
+    return styles;
+  };
+
   // Debug logging for image issues
   if (config?.backgroundType === 'image' && config?.backgroundImage) {
     console.log('🖼️ DesignablePromotionalCard received config:', {
@@ -140,11 +181,10 @@ export function DesignablePromotionalCard({
       transition: `all ${config?.animationDuration || 300}ms ease`,
     };
 
-    // Handle different background types for all items
-    const bgType = config?.backgroundType || 'solid';
-    
-    // Use complete background shorthand to avoid conflicts
+    // Background
     styles.background = (() => {
+      const bgType = config?.backgroundType || 'solid';
+      
       switch (bgType) {
         case 'solid':
           return config?.backgroundColor || '#ffffff';
@@ -171,39 +211,26 @@ export function DesignablePromotionalCard({
           
         case 'image':
           if (config?.backgroundImage) {
-            const imageUrl = `url('${config.backgroundImage}') center / cover no-repeat, ${config?.backgroundColor || '#ffffff'}`;
-            console.log('🖼️ Image background string:', imageUrl);
-            console.log('🖼️ Original image URL:', config.backgroundImage);
-            return imageUrl;
+            return `url('${config.backgroundImage}') center / cover no-repeat`;
           }
           return config?.backgroundColor || '#ffffff';
           
         case 'pattern':
           const pattern = config?.backgroundPattern || 'none';
           const patternColor = config?.backgroundColor || '#e0e0e0';
+          const backgroundColor = '#ffffff'; // Use white background for patterns
           
           console.log('🎨 DesignablePromotionalCard pattern debug:', {
             pattern,
             patternColor,
-            backgroundColor: config?.backgroundColor
+            backgroundColor
           });
           
-          switch (pattern) {
-            case 'dots':
-              return `radial-gradient(circle, ${patternColor} 1px, transparent 1px), ${config?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
-            case 'lines':
-              return `repeating-linear-gradient(45deg, transparent, transparent 5px, ${patternColor} 5px, ${patternColor} 10px), ${config?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
-            case 'grid':
-              return `linear-gradient(${patternColor} 1px, transparent 1px), linear-gradient(90deg, ${patternColor} 1px, transparent 1px), ${config?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
-            case 'hexagons':
-              return `radial-gradient(circle at 50% 50%, ${patternColor} 2px, transparent 2px), ${config?.backgroundColor || '#ffffff'} / 30px 30px repeat`;
-            case 'waves':
-              return `repeating-linear-gradient(45deg, transparent, transparent 10px, ${patternColor} 10px, ${patternColor} 20px), ${config?.backgroundColor || '#ffffff'} / 40px 40px repeat`;
-            case 'stars':
-              return `radial-gradient(circle at 25% 25%, ${patternColor} 1px, transparent 1px), radial-gradient(circle at 75% 75%, ${patternColor} 1px, transparent 1px), ${config?.backgroundColor || '#ffffff'} / 50px 50px repeat`;
-            default:
-              return config?.backgroundColor || '#ffffff';
-          }
+          const patternStyles = generatePatternStyles(pattern, patternColor, backgroundColor);
+          Object.assign(styles, patternStyles);
+          
+          console.log('🎨 Pattern styles applied to card:', patternStyles);
+          return patternStyles.background || backgroundColor; // Return the background value
           
         default:
           return config?.backgroundColor || '#ffffff';
@@ -285,11 +312,11 @@ export function DesignablePromotionalCard({
       className={`group transition-all duration-300 ${getHoverClasses()} ${
         item.isSponsored ? 'ring-1 ring-purple-200' : ''
       } ${className}`}
-      style={{
-        ...generateStyles(),
-        // Ensure no default background interferes
-        background: generateStyles().background || 'transparent'
-      }}
+      style={(() => {
+        const styles = generateStyles();
+        console.log('🎨 Card styles applied:', styles);
+        return styles;
+      })()}
       onClick={onClick}
     >
       {/* Test image div for debugging */}

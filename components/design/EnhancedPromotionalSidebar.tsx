@@ -158,12 +158,8 @@ export function EnhancedPromotionalSidebar() {
       const savedConfigs = localStorage.getItem('individualDesignConfigs');
       if (savedConfigs) {
         const parsed = JSON.parse(savedConfigs);
-        // Sanitize each individual config
-        const sanitized: IndividualDesignConfig = {};
-        Object.keys(parsed).forEach(itemId => {
-          sanitized[itemId] = sanitizeDesignConfig(parsed[itemId]);
-        });
-        setIndividualDesignConfigs(sanitized);
+        // Don't sanitize when loading - just load the configs as-is
+        setIndividualDesignConfigs(parsed);
       }
     } catch (error) {
       console.error('Error loading individual design configs:', error);

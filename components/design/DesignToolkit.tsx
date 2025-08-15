@@ -300,6 +300,46 @@ export function DesignToolkit({
     }
   ] as const;
 
+  const generatePatternStyles = (pattern: string, patternColor: string, backgroundColor: string) => {
+    const styles: React.CSSProperties = {};
+    
+    switch (pattern) {
+      case 'dots':
+        styles.background = `radial-gradient(circle at 1px 1px, ${patternColor} 1px, transparent 0)`;
+        styles.backgroundSize = '20px 20px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'lines':
+        styles.background = `repeating-linear-gradient(45deg, transparent, transparent 5px, ${patternColor} 5px, ${patternColor} 10px)`;
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'grid':
+        styles.background = `linear-gradient(${patternColor} 1px, transparent 1px), linear-gradient(90deg, ${patternColor} 1px, transparent 1px)`;
+        styles.backgroundSize = '20px 20px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'hexagons':
+        styles.background = `radial-gradient(circle at 50% 50%, ${patternColor} 2px, transparent 2px)`;
+        styles.backgroundSize = '30px 30px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'waves':
+        styles.background = `repeating-linear-gradient(45deg, transparent, transparent 10px, ${patternColor} 10px, ${patternColor} 20px)`;
+        styles.backgroundColor = backgroundColor;
+        break;
+      case 'stars':
+        styles.background = `radial-gradient(circle at 25% 25%, ${patternColor} 1px, transparent 1px), radial-gradient(circle at 75% 75%, ${patternColor} 1px, transparent 1px)`;
+        styles.backgroundSize = '50px 50px';
+        styles.backgroundColor = backgroundColor;
+        break;
+      default:
+        styles.backgroundColor = backgroundColor;
+        break;
+    }
+    
+    return styles;
+  };
+
   return (
     <TooltipProvider>
       <div className={`space-y-4 ${className}`}>
@@ -561,7 +601,10 @@ export function DesignToolkit({
                     <Label className="text-sm font-medium">Pattern Type</Label>
                     <Select
                       value={localConfig?.backgroundPattern || 'none'}
-                      onValueChange={(value) => handleConfigChange({ backgroundPattern: value })}
+                      onValueChange={(value) => {
+                        console.log('🎨 Pattern type changed to:', value);
+                        handleConfigChange({ backgroundPattern: value });
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -583,12 +626,18 @@ export function DesignToolkit({
                       <Input
                         type="color"
                         value={localConfig?.backgroundColor || '#e0e0e0'}
-                        onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                        onChange={(e) => {
+                          console.log('🎨 Pattern color changed to:', e.target.value);
+                          handleConfigChange({ backgroundColor: e.target.value });
+                        }}
                         className="w-16 h-10"
                       />
                       <Input
                         value={localConfig?.backgroundColor || '#e0e0e0'}
-                        onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                        onChange={(e) => {
+                          console.log('🎨 Pattern color text changed to:', e.target.value);
+                          handleConfigChange({ backgroundColor: e.target.value });
+                        }}
                         placeholder="#e0e0e0"
                         className="flex-1"
                       />
@@ -1206,24 +1255,22 @@ export function DesignToolkit({
           <div className="mt-6">
             <Label className="text-sm font-medium mb-2 block">Live Preview</Label>
             
-            {/* Test gradient div */}
-            <div className="mb-4 p-2 border rounded">
-              <Label className="text-xs font-medium mb-1 block">Test Gradients:</Label>
-              <div className="space-y-2">
+            {/* Test pattern div for debugging */}
+            {localConfig?.backgroundType === 'pattern' && localConfig?.backgroundPattern !== 'none' && (
+              <div className="mb-4 p-2 border rounded">
+                <Label className="text-xs font-medium mb-1 block">Test Pattern:</Label>
                 <div 
                   className="h-8 rounded"
-                  style={{ background: 'linear-gradient(to right, #ff0000, #00ff00)' }}
-                ></div>
-                <div 
-                  className="h-8 rounded"
-                  style={{ background: 'linear-gradient(90deg, #ff0000, #00ff00)' }}
-                ></div>
-                <div 
-                  className="h-8 rounded"
-                  style={{ background: '-webkit-linear-gradient(left, #ff0000, #00ff00)' }}
+                  style={{
+                    ...generatePatternStyles(
+                      localConfig.backgroundPattern,
+                      localConfig.backgroundColor || '#e0e0e0',
+                      localConfig.backgroundColor || '#ffffff'
+                    )
+                  }}
                 ></div>
               </div>
-            </div>
+            )}
             
             <div className="border rounded-lg p-4">
               <div
@@ -1284,38 +1331,18 @@ export function DesignToolkit({
                     } else if (bgType === 'pattern') {
                       const pattern = localConfig?.backgroundPattern || 'none';
                       const patternColor = localConfig?.backgroundColor || '#e0e0e0';
+                      const backgroundColor = localConfig?.backgroundColor || '#ffffff';
                       
                       console.log('🎨 Pattern debug:', {
                         pattern,
                         patternColor,
-                        backgroundColor: localConfig?.backgroundColor
+                        backgroundColor
                       });
                       
-                      switch (pattern) {
-                        case 'dots':
-                          styleObj.background = `radial-gradient(circle, ${patternColor} 1px, transparent 1px), ${localConfig?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
-                          break;
-                        case 'lines':
-                          styleObj.background = `repeating-linear-gradient(45deg, transparent, transparent 5px, ${patternColor} 5px, ${patternColor} 10px), ${localConfig?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
-                          break;
-                        case 'grid':
-                          styleObj.background = `linear-gradient(${patternColor} 1px, transparent 1px), linear-gradient(90deg, ${patternColor} 1px, transparent 1px), ${localConfig?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
-                          break;
-                        case 'hexagons':
-                          styleObj.background = `radial-gradient(circle at 50% 50%, ${patternColor} 2px, transparent 2px), ${localConfig?.backgroundColor || '#ffffff'} / 30px 30px repeat`;
-                          break;
-                        case 'waves':
-                          styleObj.background = `repeating-linear-gradient(45deg, transparent, transparent 10px, ${patternColor} 10px, ${patternColor} 20px), ${localConfig?.backgroundColor || '#ffffff'} / 40px 40px repeat`;
-                          break;
-                        case 'stars':
-                          styleObj.background = `radial-gradient(circle at 25% 25%, ${patternColor} 1px, transparent 1px), radial-gradient(circle at 75% 75%, ${patternColor} 1px, transparent 1px), ${localConfig?.backgroundColor || '#ffffff'} / 50px 50px repeat`;
-                          break;
-                        default:
-                          styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
-                          break;
-                      }
+                      const patternStyles = generatePatternStyles(pattern, patternColor, backgroundColor);
+                      Object.assign(styleObj, patternStyles);
                       
-                      console.log('🎨 Pattern background string:', styleObj.background);
+                      console.log('🎨 Pattern styles applied:', patternStyles);
                     }
                     
                     console.log('🎨 Final style object:', styleObj);
