@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,9 +22,20 @@ import {
   RotateCcw,
   Download,
   Upload,
-  Copy
+  Copy,
+  Paintbrush,
+  AlignLeft,
+  Zap,
+  Code
 } from 'lucide-react';
 import { TemplateSelector } from './TemplateSelector';
+import { Separator } from '@/components/ui/separator';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export interface DesignConfig {
   // Background
@@ -44,14 +55,32 @@ export interface DesignConfig {
   titleSize: number;
   titleWeight: 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold';
   titleColor: string;
-  titleAlignment: 'left' | 'center' | 'right';
+  titleAlignment: {
+    horizontal: 'left' | 'center' | 'right' | 'justify';
+    vertical: 'top' | 'middle' | 'bottom';
+    padding: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+  };
   titleShadow: boolean;
   titleShadowColor: string;
   
   descriptionFont: string;
   descriptionSize: number;
   descriptionColor: string;
-  descriptionAlignment: 'left' | 'center' | 'right';
+  descriptionAlignment: {
+    horizontal: 'left' | 'center' | 'right' | 'justify';
+    vertical: 'top' | 'middle' | 'bottom';
+    padding: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+  };
   
   // Layout
   padding: number;
@@ -79,9 +108,71 @@ export interface DesignToolkitProps {
   onConfigChange: (config: DesignConfig) => void;
   onSave?: () => void;
   onReset?: () => void;
-  onPreview?: () => void;
   className?: string;
+  showSaveButton?: boolean;
+  showResetButton?: boolean;
+  showPreview?: boolean;
 }
+
+const DEFAULT_DESIGN_CONFIG: DesignConfig = {
+  backgroundType: 'solid',
+  backgroundColor: '#ffffff',
+  backgroundGradient: {
+    from: '#ffffff',
+    to: '#e0e0e0',
+    direction: 'to-r',
+  },
+  backgroundImage: '',
+  backgroundPattern: 'none',
+  backgroundOpacity: 100,
+  
+  titleFont: 'inter',
+  titleSize: 24,
+  titleWeight: 'bold',
+  titleColor: '#1f2937',
+  titleAlignment: {
+    horizontal: 'left',
+    vertical: 'top',
+    padding: {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+  },
+  titleShadow: false,
+  titleShadowColor: '#000000',
+  
+  descriptionFont: 'inter',
+  descriptionSize: 16,
+  descriptionColor: '#6b7280',
+  descriptionAlignment: {
+    horizontal: 'left',
+    vertical: 'top',
+    padding: {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    },
+  },
+  
+  padding: 20,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#e5e7eb',
+  borderStyle: 'solid',
+  
+  shadow: false,
+  shadowColor: 'rgba(0, 0, 0, 0.1)',
+  shadowBlur: 10,
+  shadowOffset: 5,
+  
+  hoverEffect: 'none',
+  animationDuration: 300,
+  
+  customCSS: '',
+};
 
 const FONT_OPTIONS = [
   { value: 'inter', label: 'Inter' },
@@ -120,692 +211,1171 @@ export function DesignToolkit({
   onConfigChange,
   onSave,
   onReset,
-  onPreview,
-  className = ''
+  className = '',
+  showSaveButton = false,
+  showResetButton = true,
+  showPreview = true
 }: DesignToolkitProps) {
-  const [activeTab, setActiveTab] = useState<'background' | 'typography' | 'layout' | 'effects'>('background');
-  const [showPreview, setShowPreview] = useState(false);
-  const [showTemplates, setShowTemplates] = useState(false);
+  // Ensure we always have a valid config
+  const safeConfig = config || DEFAULT_DESIGN_CONFIG;
+  const isInitialMount = useRef(true);
+  
+  const [localConfig, setLocalConfig] = useState<DesignConfig>(safeConfig);
+  const [activeTab, setActiveTab] = useState<'background' | 'typography' | 'layout' | 'effects' | 'custom'>('background');
 
-  const updateConfig = (updates: Partial<DesignConfig>) => {
-    onConfigChange({ ...config, ...updates });
+  // Update local config when prop changes
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      setLocalConfig(safeConfig);
+    }
+  }, [safeConfig]);
+
+  const handleConfigChange = (updates: Partial<DesignConfig>) => {
+    const newConfig = { ...localConfig, ...updates };
+    
+    // Ensure gradient object is properly initialized when switching to gradient type
+    if (updates.backgroundType === 'gradient' && !newConfig.backgroundGradient) {
+      newConfig.backgroundGradient = {
+        from: '#667eea',
+        to: '#764ba2',
+        direction: 'to-r'
+      };
+    }
+    
+    // Debug logging for gradient changes
+    if (updates.backgroundGradient) {
+      console.log('🎨 Gradient update:', updates.backgroundGradient);
+      console.log('🎨 New config gradient:', newConfig.backgroundGradient);
+    }
+    
+    setLocalConfig(newConfig);
+    onConfigChange(newConfig);
   };
 
-  const generateCSS = (): string => {
-    const styles: string[] = [];
-    
-    // Background
-    if (config.backgroundType === 'solid') {
-      styles.push(`background-color: ${config.backgroundColor};`);
-    } else if (config.backgroundType === 'gradient') {
-      styles.push(`background: linear-gradient(${config.backgroundGradient.direction}, ${config.backgroundGradient.from}, ${config.backgroundGradient.to});`);
-    } else if (config.backgroundType === 'image' && config.backgroundImage) {
-      styles.push(`background-image: url('${config.backgroundImage}');`);
-      styles.push('background-size: cover;');
-      styles.push('background-position: center;');
+  const handleSave = () => {
+    if (onSave) {
+      onSave();
     }
-    
-    // Typography
-    styles.push(`font-family: ${config.titleFont}, sans-serif;`);
-    styles.push(`font-size: ${config.titleSize}px;`);
-    styles.push(`font-weight: ${config.titleWeight};`);
-    styles.push(`color: ${config.titleColor};`);
-    styles.push(`text-align: ${config.titleAlignment};`);
-    
-    if (config.titleShadow) {
-      styles.push(`text-shadow: 2px 2px 4px ${config.titleShadowColor};`);
-    }
-    
-    // Layout
-    styles.push(`padding: ${config.padding}px;`);
-    styles.push(`border-radius: ${config.borderRadius}px;`);
-    styles.push(`border: ${config.borderWidth}px ${config.borderStyle} ${config.borderColor};`);
-    
-    // Effects
-    if (config.shadow) {
-      styles.push(`box-shadow: 0 ${config.shadowOffset}px ${config.shadowBlur}px ${config.shadowColor};`);
-    }
-    
-    // Animation
-    if (config.hoverEffect !== 'none') {
-      styles.push(`transition: all ${config.animationDuration}ms ease;`);
-    }
-    
-    return styles.join('\n');
   };
+
+  const handleReset = () => {
+    setLocalConfig(DEFAULT_DESIGN_CONFIG);
+    onConfigChange(DEFAULT_DESIGN_CONFIG);
+    if (onReset) {
+      onReset();
+    }
+  };
+
+  const tabs = [
+    { 
+      id: 'background', 
+      label: 'Background', 
+      icon: Paintbrush,
+      tooltip: 'Background settings (color, gradient, image)'
+    },
+    { 
+      id: 'typography', 
+      label: 'Typography', 
+      icon: Type,
+      tooltip: 'Text styling (font, size, color, alignment)'
+    },
+    { 
+      id: 'layout', 
+      label: 'Layout', 
+      icon: Layout,
+      tooltip: 'Layout settings (padding, borders, spacing)'
+    },
+    { 
+      id: 'effects', 
+      label: 'Effects', 
+      icon: Sparkles,
+      tooltip: 'Visual effects (shadows, hover, animations)'
+    },
+    { 
+      id: 'custom', 
+      label: 'Custom CSS', 
+      icon: Code,
+      tooltip: 'Custom CSS rules'
+    }
+  ] as const;
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Palette className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold">Design Toolkit</h3>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowTemplates(!showTemplates)}
-          >
-            <Copy className="w-4 h-4 mr-1" />
-            Templates
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPreview(!showPreview)}
-          >
-            {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            Preview
-          </Button>
-          {onSave && (
-            <Button size="sm" onClick={onSave}>
-              <Save className="w-4 h-4 mr-1" />
-              Save
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Preview */}
-      {showPreview && (
-        <Card className="border-2 border-dashed border-blue-200">
-          <CardContent className="p-4">
-            <div
-              className="p-4 rounded-lg"
-              style={{
-                background: config.backgroundType === 'gradient' 
-                  ? `linear-gradient(${config.backgroundGradient.direction}, ${config.backgroundGradient.from}, ${config.backgroundGradient.to})`
-                  : config.backgroundType === 'solid'
-                  ? config.backgroundColor
-                  : 'transparent',
-                fontFamily: config.titleFont,
-                fontSize: `${config.titleSize}px`,
-                fontWeight: config.titleWeight,
-                color: config.titleColor,
-                textAlign: config.titleAlignment,
-                padding: `${config.padding}px`,
-                borderRadius: `${config.borderRadius}px`,
-                border: `${config.borderWidth}px ${config.borderStyle} ${config.borderColor}`,
-                boxShadow: config.shadow ? `0 ${config.shadowOffset}px ${config.shadowBlur}px ${config.shadowColor}` : 'none',
-                textShadow: config.titleShadow ? `2px 2px 4px ${config.titleShadowColor}` : 'none',
-              }}
-            >
-              <h4 className="mb-2">Sample Title</h4>
-              <p 
-                className="text-sm"
-                style={{
-                  fontFamily: config.descriptionFont,
-                  fontSize: `${config.descriptionSize}px`,
-                  color: config.descriptionColor,
-                  textAlign: config.descriptionAlignment,
-                }}
+    <TooltipProvider>
+      <div className={`space-y-4 ${className}`}>
+        {/* Action Buttons */}
+        {(showSaveButton || showResetButton) && (
+          <div className="flex gap-2">
+            {showSaveButton && (
+              <Button
+                onClick={handleSave}
+                className="flex-1"
+                size="sm"
               >
-                This is a sample description to preview your design settings.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Templates */}
-      {showTemplates && (
-        <Card className="border-2 border-dashed border-green-200">
-          <CardContent className="p-4">
-            <TemplateSelector
-              onTemplateSelect={(templateConfig) => {
-                onConfigChange(templateConfig);
-                setShowTemplates(false);
-              }}
-              onClose={() => setShowTemplates(false)}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Tabs */}
-      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-        {[
-          { id: 'background', label: 'Background', icon: Image },
-          { id: 'typography', label: 'Typography', icon: Type },
-          { id: 'layout', label: 'Layout', icon: Layout },
-          { id: 'effects', label: 'Effects', icon: Sparkles },
-        ].map((tab) => (
-          <Button
-            key={tab.id}
-            variant={activeTab === tab.id ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab(tab.id as any)}
-            className="flex-1"
-          >
-            <tab.icon className="w-4 h-4 mr-1" />
-            {tab.label}
-          </Button>
-        ))}
-      </div>
-
-      {/* Background Tab */}
-      {activeTab === 'background' && (
-        <div className="space-y-4">
-          <div>
-            <Label>Background Type</Label>
-            <Select
-              value={config.backgroundType}
-              onValueChange={(value) => updateConfig({ backgroundType: value as any })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="solid">Solid Color</SelectItem>
-                <SelectItem value="gradient">Gradient</SelectItem>
-                <SelectItem value="image">Image</SelectItem>
-                <SelectItem value="pattern">Pattern</SelectItem>
-              </SelectContent>
-            </Select>
+                <Save className="w-4 h-4 mr-2" />
+                Save Design
+              </Button>
+            )}
+            {showResetButton && (
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                size="sm"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Reset
+              </Button>
+            )}
           </div>
+        )}
 
-          {config.backgroundType === 'solid' && (
-            <div>
-              <Label>Background Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={config.backgroundColor}
-                  onChange={(e) => updateConfig({ backgroundColor: e.target.value })}
-                  className="w-16"
-                />
-                <Input
-                  value={config.backgroundColor}
-                  onChange={(e) => updateConfig({ backgroundColor: e.target.value })}
-                  placeholder="#000000"
-                />
-              </div>
-            </div>
-          )}
+        {/* Tab Navigation - Icons Only with Tooltips */}
+        <div className="flex space-x-1 border-b">
+          {tabs.map((tab) => {
+            const IconComponent = tab.icon;
+            return (
+              <Tooltip key={tab.id}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`p-3 text-sm font-medium rounded-t-lg transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-700'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    <IconComponent className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{tab.tooltip}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
 
-          {config.backgroundType === 'gradient' && (
-            <div className="space-y-3">
+        {/* Tab Content */}
+        <div className="space-y-4">
+          {activeTab === 'background' && (
+            <div className="space-y-4">
               <div>
-                <Label>Gradient Direction</Label>
+                <Label className="text-sm font-medium">Background Type</Label>
                 <Select
-                  value={config.backgroundGradient.direction}
-                  onValueChange={(value) => updateConfig({ 
-                    backgroundGradient: { ...config.backgroundGradient, direction: value as any }
-                  })}
+                  value={localConfig?.backgroundType || 'solid'}
+                  onValueChange={(value: 'solid' | 'gradient' | 'image' | 'pattern') =>
+                    handleConfigChange({ backgroundType: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {GRADIENT_DIRECTIONS.map((dir) => (
-                      <SelectItem key={dir.value} value={dir.value}>
-                        {dir.label}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="solid">Solid Color</SelectItem>
+                    <SelectItem value="gradient">Gradient</SelectItem>
+                    <SelectItem value="image">Image</SelectItem>
+                    <SelectItem value="pattern">Pattern</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+
+              {localConfig?.backgroundType === 'solid' && (
                 <div>
-                  <Label>From Color</Label>
+                  <Label className="text-sm font-medium">Background Color</Label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
-                      value={config.backgroundGradient.from}
-                      onChange={(e) => updateConfig({ 
-                        backgroundGradient: { ...config.backgroundGradient, from: e.target.value }
-                      })}
-                      className="w-12"
+                      value={localConfig?.backgroundColor || '#ffffff'}
+                      onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                      className="w-16 h-10"
                     />
                     <Input
-                      value={config.backgroundGradient.from}
-                      onChange={(e) => updateConfig({ 
-                        backgroundGradient: { ...config.backgroundGradient, from: e.target.value }
-                      })}
+                      value={localConfig?.backgroundColor || '#ffffff'}
+                      onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                      placeholder="#ffffff"
+                      className="flex-1"
                     />
                   </div>
                 </div>
-                <div>
-                  <Label>To Color</Label>
-                  <div className="flex gap-2">
+              )}
+
+              {localConfig?.backgroundType === 'gradient' && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">Gradient Direction</Label>
+                    <Select
+                      value={localConfig?.backgroundGradient?.direction || 'to-r'}
+                      onValueChange={(value: any) => {
+                        console.log('🎨 Direction change:', value);
+                        const currentGradient = localConfig?.backgroundGradient || {
+                          from: '#667eea',
+                          to: '#764ba2',
+                          direction: 'to-r'
+                        };
+                        const updatedGradient = {
+                          ...currentGradient,
+                          direction: value
+                        };
+                        console.log('🎨 Updated gradient:', updatedGradient);
+                        handleConfigChange({
+                          backgroundGradient: updatedGradient
+                        });
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GRADIENT_DIRECTIONS.map((direction) => (
+                          <SelectItem key={direction.value} value={direction.value}>
+                            {direction.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-sm font-medium">From Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          value={localConfig?.backgroundGradient?.from || '#667eea'}
+                          onChange={(e) => {
+                            console.log('🎨 From color change:', e.target.value);
+                            const currentGradient = localConfig?.backgroundGradient || {
+                              from: '#667eea',
+                              to: '#764ba2',
+                              direction: 'to-r'
+                            };
+                            const updatedGradient = {
+                              ...currentGradient,
+                              from: e.target.value
+                            };
+                            console.log('🎨 Updated gradient:', updatedGradient);
+                            handleConfigChange({
+                              backgroundGradient: updatedGradient
+                            });
+                          }}
+                          className="w-12 h-8"
+                        />
+                        <Input
+                          value={localConfig?.backgroundGradient?.from || '#667eea'}
+                          onChange={(e) => {
+                            console.log('🎨 From color text change:', e.target.value);
+                            const currentGradient = localConfig?.backgroundGradient || {
+                              from: '#667eea',
+                              to: '#764ba2',
+                              direction: 'to-r'
+                            };
+                            const updatedGradient = {
+                              ...currentGradient,
+                              from: e.target.value
+                            };
+                            console.log('🎨 Updated gradient:', updatedGradient);
+                            handleConfigChange({
+                              backgroundGradient: updatedGradient
+                            });
+                          }}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">To Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          value={localConfig?.backgroundGradient?.to || '#764ba2'}
+                          onChange={(e) => {
+                            console.log('🎨 To color change:', e.target.value);
+                            const currentGradient = localConfig?.backgroundGradient || {
+                              from: '#667eea',
+                              to: '#764ba2',
+                              direction: 'to-r'
+                            };
+                            const updatedGradient = {
+                              ...currentGradient,
+                              to: e.target.value
+                            };
+                            console.log('🎨 Updated gradient:', updatedGradient);
+                            handleConfigChange({
+                              backgroundGradient: updatedGradient
+                            });
+                          }}
+                          className="w-12 h-8"
+                        />
+                        <Input
+                          value={localConfig?.backgroundGradient?.to || '#764ba2'}
+                          onChange={(e) => {
+                            console.log('🎨 To color text change:', e.target.value);
+                            const currentGradient = localConfig?.backgroundGradient || {
+                              from: '#667eea',
+                              to: '#764ba2',
+                              direction: 'to-r'
+                            };
+                            const updatedGradient = {
+                              ...currentGradient,
+                              to: e.target.value
+                            };
+                            console.log('🎨 Updated gradient:', updatedGradient);
+                            handleConfigChange({
+                              backgroundGradient: updatedGradient
+                            });
+                          }}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {localConfig?.backgroundType === 'image' && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">Background Image URL</Label>
                     <Input
-                      type="color"
-                      value={config.backgroundGradient.to}
-                      onChange={(e) => updateConfig({ 
-                        backgroundGradient: { ...config.backgroundGradient, to: e.target.value }
-                      })}
-                      className="w-12"
+                      value={localConfig?.backgroundImage || ''}
+                      onChange={(e) => handleConfigChange({ backgroundImage: e.target.value })}
+                      placeholder="https://example.com/image.jpg"
                     />
-                    <Input
-                      value={config.backgroundGradient.to}
-                      onChange={(e) => updateConfig({ 
-                        backgroundGradient: { ...config.backgroundGradient, to: e.target.value }
-                      })}
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
+                    <Slider
+                      value={[localConfig?.backgroundOpacity || 100]}
+                      onValueChange={([value]) => handleConfigChange({ backgroundOpacity: value })}
+                      max={100}
+                      min={0}
+                      step={1}
+                      className="w-full"
                     />
                   </div>
                 </div>
-              </div>
+              )}
+
+              {localConfig?.backgroundType === 'pattern' && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">Pattern Type</Label>
+                    <Select
+                      value={localConfig?.backgroundPattern || 'none'}
+                      onValueChange={(value) => handleConfigChange({ backgroundPattern: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="dots">Dots</SelectItem>
+                        <SelectItem value="lines">Lines</SelectItem>
+                        <SelectItem value="grid">Grid</SelectItem>
+                        <SelectItem value="hexagons">Hexagons</SelectItem>
+                        <SelectItem value="waves">Waves</SelectItem>
+                        <SelectItem value="stars">Stars</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Pattern Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={localConfig?.backgroundColor || '#e0e0e0'}
+                        onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                        className="w-16 h-10"
+                      />
+                      <Input
+                        value={localConfig?.backgroundColor || '#e0e0e0'}
+                        onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                        placeholder="#e0e0e0"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {config.backgroundType === 'image' && (
-            <div>
-              <Label>Background Image URL</Label>
-              <Input
-                value={config.backgroundImage}
-                onChange={(e) => updateConfig({ backgroundImage: e.target.value })}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-          )}
-
-          {config.backgroundType === 'pattern' && (
-            <div>
-              <Label>Pattern</Label>
-              <Select
-                value={config.backgroundPattern}
-                onValueChange={(value) => updateConfig({ backgroundPattern: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PATTERN_OPTIONS.map((pattern) => (
-                    <SelectItem key={pattern.value} value={pattern.value}>
-                      {pattern.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div>
-            <Label>Background Opacity: {config.backgroundOpacity}%</Label>
-            <Slider
-              value={[config.backgroundOpacity]}
-              onValueChange={([value]) => updateConfig({ backgroundOpacity: value })}
-              max={100}
-              min={0}
-              step={1}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Typography Tab */}
-      {activeTab === 'typography' && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Title Font</Label>
-              <Select
-                value={config.titleFont}
-                onValueChange={(value) => updateConfig({ titleFont: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_OPTIONS.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      {font.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Title Size: {config.titleSize}px</Label>
-              <Slider
-                value={[config.titleSize]}
-                onValueChange={([value]) => updateConfig({ titleSize: value })}
-                max={48}
-                min={12}
-                step={1}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Title Weight</Label>
-              <Select
-                value={config.titleWeight}
-                onValueChange={(value) => updateConfig({ titleWeight: value as any })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="semibold">Semibold</SelectItem>
-                  <SelectItem value="bold">Bold</SelectItem>
-                  <SelectItem value="extrabold">Extra Bold</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Title Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={config.titleColor}
-                  onChange={(e) => updateConfig({ titleColor: e.target.value })}
-                  className="w-16"
-                />
-                <Input
-                  value={config.titleColor}
-                  onChange={(e) => updateConfig({ titleColor: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <Label>Title Alignment</Label>
-            <Select
-              value={config.titleAlignment}
-              onValueChange={(value) => updateConfig({ titleAlignment: value as any })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="left">Left</SelectItem>
-                <SelectItem value="center">Center</SelectItem>
-                <SelectItem value="right">Right</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              checked={config.titleShadow}
-              onCheckedChange={(checked) => updateConfig({ titleShadow: checked })}
-            />
-            <Label>Title Shadow</Label>
-          </div>
-
-          {config.titleShadow && (
-            <div>
-              <Label>Shadow Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={config.titleShadowColor}
-                  onChange={(e) => updateConfig({ titleShadowColor: e.target.value })}
-                  className="w-16"
-                />
-                <Input
-                  value={config.titleShadowColor}
-                  onChange={(e) => updateConfig({ titleShadowColor: e.target.value })}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Description Font</Label>
-              <Select
-                value={config.descriptionFont}
-                onValueChange={(value) => updateConfig({ descriptionFont: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_OPTIONS.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      {font.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Description Size: {config.descriptionSize}px</Label>
-              <Slider
-                value={[config.descriptionSize]}
-                onValueChange={([value]) => updateConfig({ descriptionSize: value })}
-                max={24}
-                min={10}
-                step={1}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Description Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={config.descriptionColor}
-                  onChange={(e) => updateConfig({ descriptionColor: e.target.value })}
-                  className="w-16"
-                />
-                <Input
-                  value={config.descriptionColor}
-                  onChange={(e) => updateConfig({ descriptionColor: e.target.value })}
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Description Alignment</Label>
-              <Select
-                value={config.descriptionAlignment}
-                onValueChange={(value) => updateConfig({ descriptionAlignment: value as any })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="left">Left</SelectItem>
-                  <SelectItem value="center">Center</SelectItem>
-                  <SelectItem value="right">Right</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Layout Tab */}
-      {activeTab === 'layout' && (
-        <div className="space-y-4">
-          <div>
-            <Label>Padding: {config.padding}px</Label>
-            <Slider
-              value={[config.padding]}
-              onValueChange={([value]) => updateConfig({ padding: value })}
-              max={48}
-              min={0}
-              step={2}
-            />
-          </div>
-
-          <div>
-            <Label>Border Radius: {config.borderRadius}px</Label>
-            <Slider
-              value={[config.borderRadius]}
-              onValueChange={([value]) => updateConfig({ borderRadius: value })}
-              max={24}
-              min={0}
-              step={1}
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label>Border Width: {config.borderWidth}px</Label>
-              <Slider
-                value={[config.borderWidth]}
-                onValueChange={([value]) => updateConfig({ borderWidth: value })}
-                max={8}
-                min={0}
-                step={1}
-              />
-            </div>
-            <div>
-              <Label>Border Style</Label>
-              <Select
-                value={config.borderStyle}
-                onValueChange={(value) => updateConfig({ borderStyle: value as any })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="solid">Solid</SelectItem>
-                  <SelectItem value="dashed">Dashed</SelectItem>
-                  <SelectItem value="dotted">Dotted</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Border Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={config.borderColor}
-                  onChange={(e) => updateConfig({ borderColor: e.target.value })}
-                  className="w-12"
-                />
-                <Input
-                  value={config.borderColor}
-                  onChange={(e) => updateConfig({ borderColor: e.target.value })}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Effects Tab */}
-      {activeTab === 'effects' && (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              checked={config.shadow}
-              onCheckedChange={(checked) => updateConfig({ shadow: checked })}
-            />
-            <Label>Box Shadow</Label>
-          </div>
-
-          {config.shadow && (
-            <div className="space-y-3">
+          {activeTab === 'typography' && (
+            <div className="space-y-4">
               <div>
-                <Label>Shadow Color</Label>
+                <Label className="text-sm font-medium">Title Font</Label>
+                <Select
+                  value={localConfig?.titleFont || 'inter'}
+                  onValueChange={(value) => handleConfigChange({ titleFont: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="inter">Inter</SelectItem>
+                    <SelectItem value="roboto">Roboto</SelectItem>
+                    <SelectItem value="open-sans">Open Sans</SelectItem>
+                    <SelectItem value="poppins">Poppins</SelectItem>
+                    <SelectItem value="montserrat">Montserrat</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Title Size: {localConfig?.titleSize || 16}px</Label>
+                  <Slider
+                    value={[localConfig?.titleSize || 16]}
+                    onValueChange={([value]) => handleConfigChange({ titleSize: value })}
+                    max={32}
+                    min={12}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Title Weight</Label>
+                  <Select
+                    value={localConfig?.titleWeight || 'semibold'}
+                    onValueChange={(value: any) => handleConfigChange({ titleWeight: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="semibold">Semibold</SelectItem>
+                      <SelectItem value="bold">Bold</SelectItem>
+                      <SelectItem value="extrabold">Extra Bold</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Title Color</Label>
                 <div className="flex gap-2">
                   <Input
                     type="color"
-                    value={config.shadowColor}
-                    onChange={(e) => updateConfig({ shadowColor: e.target.value })}
-                    className="w-16"
+                    value={localConfig?.titleColor || '#1f2937'}
+                    onChange={(e) => handleConfigChange({ titleColor: e.target.value })}
+                    className="w-16 h-10"
                   />
                   <Input
-                    value={config.shadowColor}
-                    onChange={(e) => updateConfig({ shadowColor: e.target.value })}
+                    value={localConfig?.titleColor || '#1f2937'}
+                    onChange={(e) => handleConfigChange({ titleColor: e.target.value })}
+                    placeholder="#1f2937"
+                    className="flex-1"
                   />
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Title Alignment</Label>
+                  <Select
+                    value={localConfig?.titleAlignment?.horizontal || 'left'}
+                    onValueChange={(value: any) =>
+                      handleConfigChange({
+                        titleAlignment: { 
+                          ...localConfig?.titleAlignment, 
+                          horizontal: value 
+                        }
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                      <SelectItem value="justify">Justify</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Vertical Alignment</Label>
+                  <Select
+                    value={localConfig?.titleAlignment?.vertical || 'top'}
+                    onValueChange={(value: any) =>
+                      handleConfigChange({
+                        titleAlignment: { 
+                          ...localConfig?.titleAlignment, 
+                          vertical: value 
+                        }
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="top">Top</SelectItem>
+                      <SelectItem value="middle">Middle</SelectItem>
+                      <SelectItem value="bottom">Bottom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2">
+                <div>
+                  <Label className="text-sm font-medium">Top Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.titleAlignment?.padding?.top || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        titleAlignment: {
+                          ...localConfig?.titleAlignment,
+                          padding: { 
+                            ...localConfig?.titleAlignment?.padding, 
+                            top: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Bottom Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.titleAlignment?.padding?.bottom || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        titleAlignment: {
+                          ...localConfig?.titleAlignment,
+                          padding: { 
+                            ...localConfig?.titleAlignment?.padding, 
+                            bottom: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Left Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.titleAlignment?.padding?.left || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        titleAlignment: {
+                          ...localConfig?.titleAlignment,
+                          padding: { 
+                            ...localConfig?.titleAlignment?.padding, 
+                            left: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Right Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.titleAlignment?.padding?.right || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        titleAlignment: {
+                          ...localConfig?.titleAlignment,
+                          padding: { 
+                            ...localConfig?.titleAlignment?.padding, 
+                            right: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="title-shadow"
+                  checked={localConfig?.titleShadow || false}
+                  onCheckedChange={(checked) => handleConfigChange({ titleShadow: checked })}
+                />
+                <Label htmlFor="title-shadow" className="text-sm font-medium">
+                  Title Shadow
+                </Label>
+              </div>
+
+              {localConfig?.titleShadow && (
+                <div>
+                  <Label className="text-sm font-medium">Shadow Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={localConfig?.titleShadowColor || '#000000'}
+                      onChange={(e) => handleConfigChange({ titleShadowColor: e.target.value })}
+                      className="w-16 h-10"
+                    />
+                    <Input
+                      value={localConfig?.titleShadowColor || '#000000'}
+                      onChange={(e) => handleConfigChange({ titleShadowColor: e.target.value })}
+                      placeholder="#000000"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
               <div>
-                <Label>Shadow Blur: {config.shadowBlur}px</Label>
+                <Label className="text-sm font-medium">Description Font</Label>
+                <Select
+                  value={localConfig?.descriptionFont || 'inter'}
+                  onValueChange={(value) => handleConfigChange({ descriptionFont: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="inter">Inter</SelectItem>
+                    <SelectItem value="roboto">Roboto</SelectItem>
+                    <SelectItem value="open-sans">Open Sans</SelectItem>
+                    <SelectItem value="poppins">Poppins</SelectItem>
+                    <SelectItem value="montserrat">Montserrat</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Description Size: {localConfig?.descriptionSize || 14}px</Label>
+                  <Slider
+                    value={[localConfig?.descriptionSize || 14]}
+                    onValueChange={([value]) => handleConfigChange({ descriptionSize: value })}
+                    max={24}
+                    min={10}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Description Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={localConfig?.descriptionColor || '#6b7280'}
+                      onChange={(e) => handleConfigChange({ descriptionColor: e.target.value })}
+                      className="w-12 h-8"
+                    />
+                    <Input
+                      value={localConfig?.descriptionColor || '#6b7280'}
+                      onChange={(e) => handleConfigChange({ descriptionColor: e.target.value })}
+                      placeholder="#6b7280"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Description Alignment</Label>
+                  <Select
+                    value={localConfig?.descriptionAlignment?.horizontal || 'left'}
+                    onValueChange={(value: any) =>
+                      handleConfigChange({
+                        descriptionAlignment: { 
+                          ...localConfig?.descriptionAlignment, 
+                          horizontal: value 
+                        }
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                      <SelectItem value="justify">Justify</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Vertical Alignment</Label>
+                  <Select
+                    value={localConfig?.descriptionAlignment?.vertical || 'top'}
+                    onValueChange={(value: any) =>
+                      handleConfigChange({
+                        descriptionAlignment: { 
+                          ...localConfig?.descriptionAlignment, 
+                          vertical: value 
+                        }
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="top">Top</SelectItem>
+                      <SelectItem value="middle">Middle</SelectItem>
+                      <SelectItem value="bottom">Bottom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2">
+                <div>
+                  <Label className="text-sm font-medium">Top Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.descriptionAlignment?.padding?.top || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        descriptionAlignment: {
+                          ...localConfig?.descriptionAlignment,
+                          padding: { 
+                            ...localConfig?.descriptionAlignment?.padding, 
+                            top: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Bottom Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.descriptionAlignment?.padding?.bottom || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        descriptionAlignment: {
+                          ...localConfig?.descriptionAlignment,
+                          padding: { 
+                            ...localConfig?.descriptionAlignment?.padding, 
+                            bottom: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Left Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.descriptionAlignment?.padding?.left || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        descriptionAlignment: {
+                          ...localConfig?.descriptionAlignment,
+                          padding: { 
+                            ...localConfig?.descriptionAlignment?.padding, 
+                            left: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Right Padding</Label>
+                  <Input
+                    type="number"
+                    value={localConfig?.descriptionAlignment?.padding?.right || 0}
+                    onChange={(e) =>
+                      handleConfigChange({
+                        descriptionAlignment: {
+                          ...localConfig?.descriptionAlignment,
+                          padding: { 
+                            ...localConfig?.descriptionAlignment?.padding, 
+                            right: parseInt(e.target.value) || 0 
+                          }
+                        }
+                      })
+                    }
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'layout' && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Padding: {localConfig?.padding || 16}px</Label>
                 <Slider
-                  value={[config.shadowBlur]}
-                  onValueChange={([value]) => updateConfig({ shadowBlur: value })}
-                  max={50}
+                  value={[localConfig?.padding || 16]}
+                  onValueChange={([value]) => handleConfigChange({ padding: value })}
+                  max={32}
                   min={0}
                   step={1}
+                  className="w-full"
                 />
               </div>
+
               <div>
-                <Label>Shadow Offset: {config.shadowOffset}px</Label>
+                <Label className="text-sm font-medium">Border Radius: {localConfig?.borderRadius || 8}px</Label>
                 <Slider
-                  value={[config.shadowOffset]}
-                  onValueChange={([value]) => updateConfig({ shadowOffset: value })}
-                  max={20}
+                  value={[localConfig?.borderRadius || 8]}
+                  onValueChange={([value]) => handleConfigChange({ borderRadius: value })}
+                  max={24}
                   min={0}
                   step={1}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Border Width: {localConfig?.borderWidth || 1}px</Label>
+                  <Slider
+                    value={[localConfig?.borderWidth || 1]}
+                    onValueChange={([value]) => handleConfigChange({ borderWidth: value })}
+                    max={8}
+                    min={0}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Border Style</Label>
+                  <Select
+                    value={localConfig?.borderStyle || 'solid'}
+                    onValueChange={(value: any) => handleConfigChange({ borderStyle: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="solid">Solid</SelectItem>
+                      <SelectItem value="dashed">Dashed</SelectItem>
+                      <SelectItem value="dotted">Dotted</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Border Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="color"
+                    value={localConfig?.borderColor || '#e5e7eb'}
+                    onChange={(e) => handleConfigChange({ borderColor: e.target.value })}
+                    className="w-16 h-10"
+                  />
+                  <Input
+                    value={localConfig?.borderColor || '#e5e7eb'}
+                    onChange={(e) => handleConfigChange({ borderColor: e.target.value })}
+                    placeholder="#e5e7eb"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'effects' && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="shadow"
+                  checked={localConfig?.shadow || false}
+                  onCheckedChange={(checked) => handleConfigChange({ shadow: checked })}
+                />
+                <Label htmlFor="shadow" className="text-sm font-medium">
+                  Enable Shadow
+                </Label>
+              </div>
+
+              {localConfig?.shadow && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">Shadow Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={localConfig?.shadowColor || 'rgba(0, 0, 0, 0.1)'}
+                        onChange={(e) => handleConfigChange({ shadowColor: e.target.value })}
+                        className="w-16 h-10"
+                      />
+                      <Input
+                        value={localConfig?.shadowColor || 'rgba(0, 0, 0, 0.1)'}
+                        onChange={(e) => handleConfigChange({ shadowColor: e.target.value })}
+                        placeholder="rgba(0, 0, 0, 0.1)"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium">Shadow Blur: {localConfig?.shadowBlur || 10}px</Label>
+                    <Slider
+                      value={[localConfig?.shadowBlur || 10]}
+                      onValueChange={([value]) => handleConfigChange({ shadowBlur: value })}
+                      max={50}
+                      min={0}
+                      step={1}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium">Shadow Offset: {localConfig?.shadowOffset || 4}px</Label>
+                    <Slider
+                      value={[localConfig?.shadowOffset || 4]}
+                      onValueChange={([value]) => handleConfigChange({ shadowOffset: value })}
+                      max={20}
+                      min={0}
+                      step={1}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <Label className="text-sm font-medium">Hover Effect</Label>
+                <Select
+                  value={localConfig?.hoverEffect || 'none'}
+                  onValueChange={(value: any) => handleConfigChange({ hoverEffect: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="scale">Scale</SelectItem>
+                    <SelectItem value="glow">Glow</SelectItem>
+                    <SelectItem value="slide">Slide</SelectItem>
+                    <SelectItem value="bounce">Bounce</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium">Animation Duration: {localConfig?.animationDuration || 300}ms</Label>
+                <Slider
+                  value={[localConfig?.animationDuration || 300]}
+                  onValueChange={([value]) => handleConfigChange({ animationDuration: value })}
+                  max={1000}
+                  min={100}
+                  step={50}
+                  className="w-full"
                 />
               </div>
             </div>
           )}
 
-          <div>
-            <Label>Hover Effect</Label>
-            <Select
-              value={config.hoverEffect}
-              onValueChange={(value) => updateConfig({ hoverEffect: value as any })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                <SelectItem value="scale">Scale</SelectItem>
-                <SelectItem value="glow">Glow</SelectItem>
-                <SelectItem value="slide">Slide</SelectItem>
-                <SelectItem value="bounce">Bounce</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label>Animation Duration: {config.animationDuration}ms</Label>
-            <Slider
-              value={[config.animationDuration]}
-              onValueChange={([value]) => updateConfig({ animationDuration: value })}
-              max={1000}
-              min={100}
-              step={50}
-            />
-          </div>
-
-          <div>
-            <Label>Custom CSS</Label>
-            <Textarea
-              value={config.customCSS}
-              onChange={(e) => updateConfig({ customCSS: e.target.value })}
-              placeholder="Enter custom CSS rules..."
-              rows={4}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="flex items-center justify-between pt-4 border-t">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">
-            CSS Generated
-          </Badge>
-          <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-            {generateCSS().split('\n').length} rules
-          </code>
-        </div>
-        <div className="flex items-center gap-2">
-          {onReset && (
-            <Button variant="outline" size="sm" onClick={onReset}>
-              <RotateCcw className="w-4 h-4 mr-1" />
-              Reset
-            </Button>
+          {activeTab === 'custom' && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Custom CSS</Label>
+                <Textarea
+                  value={localConfig?.customCSS || ''}
+                  onChange={(e) => handleConfigChange({ customCSS: e.target.value })}
+                  placeholder="Enter custom CSS rules..."
+                  rows={6}
+                  className="font-mono text-sm"
+                />
+              </div>
+              <div className="text-xs text-gray-500">
+                <p>Enter CSS rules like: <code>transform: rotate(5deg);</code></p>
+                <p>Each rule should end with a semicolon.</p>
+              </div>
+            </div>
           )}
-          <Button variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-1" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm">
-            <Upload className="w-4 h-4 mr-1" />
-            Import
-          </Button>
         </div>
+
+        {/* Live Preview */}
+        {showPreview && (
+          <div className="mt-6">
+            <Label className="text-sm font-medium mb-2 block">Live Preview</Label>
+            
+            {/* Test gradient div */}
+            <div className="mb-4 p-2 border rounded">
+              <Label className="text-xs font-medium mb-1 block">Test Gradients:</Label>
+              <div className="space-y-2">
+                <div 
+                  className="h-8 rounded"
+                  style={{ background: 'linear-gradient(to right, #ff0000, #00ff00)' }}
+                ></div>
+                <div 
+                  className="h-8 rounded"
+                  style={{ background: 'linear-gradient(90deg, #ff0000, #00ff00)' }}
+                ></div>
+                <div 
+                  className="h-8 rounded"
+                  style={{ background: '-webkit-linear-gradient(left, #ff0000, #00ff00)' }}
+                ></div>
+              </div>
+            </div>
+            
+            <div className="border rounded-lg p-4">
+              <div
+                className="p-4 rounded-lg transition-all duration-300"
+                style={{
+                  // Debug: Log the entire style object
+                  ...(() => {
+                    const bgType = localConfig?.backgroundType || 'solid';
+                    console.log('🎨 Background type:', bgType);
+                    console.log('🎨 Local config:', localConfig);
+                    
+                    const styleObj: React.CSSProperties = {
+                      minHeight: '120px',
+                      padding: `${localConfig?.padding || 16}px`,
+                      borderRadius: `${localConfig?.borderRadius || 8}px`,
+                      border: `${localConfig?.borderWidth || 1}px ${localConfig?.borderStyle || 'solid'} ${localConfig?.borderColor || '#e5e7eb'}`,
+                      boxShadow: localConfig?.shadow 
+                        ? `0 ${localConfig?.shadowOffset || 4}px ${localConfig?.shadowBlur || 10}px ${localConfig?.shadowColor || 'rgba(0, 0, 0, 0.1)'}`
+                        : 'none',
+                    };
+                    
+                    // Handle background based on type
+                    if (bgType === 'gradient') {
+                      const gradientDirection = localConfig?.backgroundGradient?.direction || 'to-r';
+                      const gradientFrom = localConfig?.backgroundGradient?.from || '#667eea';
+                      const gradientTo = localConfig?.backgroundGradient?.to || '#764ba2';
+                      
+                      // Convert direction to proper CSS syntax
+                      let cssDirection = 'to right';
+                      switch (gradientDirection) {
+                        case 'to-r': cssDirection = 'to right'; break;
+                        case 'to-l': cssDirection = 'to left'; break;
+                        case 'to-t': cssDirection = 'to top'; break;
+                        case 'to-b': cssDirection = 'to bottom'; break;
+                        case 'to-tr': cssDirection = 'to top right'; break;
+                        case 'to-tl': cssDirection = 'to top left'; break;
+                        case 'to-br': cssDirection = 'to bottom right'; break;
+                        case 'to-bl': cssDirection = 'to bottom left'; break;
+                      }
+                      
+                      const gradientString = `linear-gradient(${cssDirection}, ${gradientFrom}, ${gradientTo})`;
+                      
+                      console.log('🎨 Gradient string:', gradientString);
+                      styleObj.background = gradientString;
+                      
+                      // Add fallback background color in case gradient fails
+                      styleObj.backgroundColor = gradientFrom;
+                      
+                    } else if (bgType === 'solid') {
+                      styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                      
+                    } else if (bgType === 'image') {
+                      if (localConfig?.backgroundImage) {
+                        styleObj.background = `url('${localConfig.backgroundImage}') center / cover no-repeat, ${localConfig?.backgroundColor || '#ffffff'}`;
+                      } else {
+                        styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                      }
+                    } else if (bgType === 'pattern') {
+                      const pattern = localConfig?.backgroundPattern || 'none';
+                      const patternColor = localConfig?.backgroundColor || '#e0e0e0';
+                      
+                      console.log('🎨 Pattern debug:', {
+                        pattern,
+                        patternColor,
+                        backgroundColor: localConfig?.backgroundColor
+                      });
+                      
+                      switch (pattern) {
+                        case 'dots':
+                          styleObj.background = `radial-gradient(circle, ${patternColor} 1px, transparent 1px), ${localConfig?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
+                          break;
+                        case 'lines':
+                          styleObj.background = `repeating-linear-gradient(45deg, transparent, transparent 5px, ${patternColor} 5px, ${patternColor} 10px), ${localConfig?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
+                          break;
+                        case 'grid':
+                          styleObj.background = `linear-gradient(${patternColor} 1px, transparent 1px), linear-gradient(90deg, ${patternColor} 1px, transparent 1px), ${localConfig?.backgroundColor || '#ffffff'} / 20px 20px repeat`;
+                          break;
+                        case 'hexagons':
+                          styleObj.background = `radial-gradient(circle at 50% 50%, ${patternColor} 2px, transparent 2px), ${localConfig?.backgroundColor || '#ffffff'} / 30px 30px repeat`;
+                          break;
+                        case 'waves':
+                          styleObj.background = `repeating-linear-gradient(45deg, transparent, transparent 10px, ${patternColor} 10px, ${patternColor} 20px), ${localConfig?.backgroundColor || '#ffffff'} / 40px 40px repeat`;
+                          break;
+                        case 'stars':
+                          styleObj.background = `radial-gradient(circle at 25% 25%, ${patternColor} 1px, transparent 1px), radial-gradient(circle at 75% 75%, ${patternColor} 1px, transparent 1px), ${localConfig?.backgroundColor || '#ffffff'} / 50px 50px repeat`;
+                          break;
+                        default:
+                          styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                          break;
+                      }
+                      
+                      console.log('🎨 Pattern background string:', styleObj.background);
+                    }
+                    
+                    console.log('🎨 Final style object:', styleObj);
+                    return styleObj;
+                  })(),
+                  ...(localConfig?.customCSS && {
+                    // Parse custom CSS but exclude background-related properties to avoid conflicts
+                    ...localConfig.customCSS
+                      .split(';')
+                      .filter(rule => rule.trim())
+                      .reduce((acc, rule) => {
+                        const [property, value] = rule.split(':').map(s => s.trim());
+                        if (property && value) {
+                          // Skip background-related properties to avoid conflicts
+                          const backgroundProps = ['background', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundRepeat', 'backgroundColor'];
+                          if (!backgroundProps.includes(property)) {
+                            acc[property] = value;
+                          }
+                        }
+                        return acc;
+                      }, {} as Record<string, string>)
+                  })
+                }}
+              >
+                <h4
+                  style={{
+                    fontFamily: localConfig?.titleFont || 'inter',
+                    fontSize: `${localConfig?.titleSize || 16}px`,
+                    fontWeight: localConfig?.titleWeight || 'semibold',
+                    color: localConfig?.titleColor || '#1f2937',
+                    textAlign: localConfig?.titleAlignment?.horizontal || 'left',
+                    textShadow: localConfig?.titleShadow ? `2px 2px 4px ${localConfig?.titleShadowColor || '#000000'}` : 'none',
+                    paddingTop: `${localConfig?.titleAlignment?.padding?.top || 0}px`,
+                    paddingBottom: `${localConfig?.titleAlignment?.padding?.bottom || 0}px`,
+                    paddingLeft: `${localConfig?.titleAlignment?.padding?.left || 0}px`,
+                    paddingRight: `${localConfig?.titleAlignment?.padding?.right || 0}px`,
+                  }}
+                  className="mb-2"
+                >
+                  Sample Title
+                </h4>
+                <p
+                  style={{
+                    fontFamily: localConfig?.descriptionFont || 'inter',
+                    fontSize: `${localConfig?.descriptionSize || 14}px`,
+                    color: localConfig?.descriptionColor || '#6b7280',
+                    textAlign: localConfig?.descriptionAlignment?.horizontal || 'left',
+                    paddingTop: `${localConfig?.descriptionAlignment?.padding?.top || 0}px`,
+                    paddingBottom: `${localConfig?.descriptionAlignment?.padding?.bottom || 0}px`,
+                    paddingLeft: `${localConfig?.descriptionAlignment?.padding?.left || 0}px`,
+                    paddingRight: `${localConfig?.descriptionAlignment?.padding?.right || 0}px`,
+                  }}
+                >
+                  This is a sample description that shows how your text will look with the current settings.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

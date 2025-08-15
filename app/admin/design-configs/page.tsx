@@ -45,13 +45,31 @@ interface DesignConfigWithMetadata {
   titleSize: number;
   titleWeight: string;
   titleColor: string;
-  titleAlignment: string;
+  titleAlignment: {
+    horizontal: string;
+    vertical: string;
+    padding: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+  };
   titleShadow: boolean;
   titleShadowColor: string;
   descriptionFont: string;
   descriptionSize: number;
   descriptionColor: string;
-  descriptionAlignment: string;
+  descriptionAlignment: {
+    horizontal: string;
+    vertical: string;
+    padding: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+  };
   padding: number;
   borderRadius: number;
   borderWidth: number;
@@ -412,13 +430,31 @@ export default function DesignConfigsPage() {
                     titleSize: 16,
                     titleWeight: 'semibold',
                     titleColor: '#1f2937',
-                    titleAlignment: 'left',
-                    titleShadow: false,
-                    titleShadowColor: '#000000',
-                    descriptionFont: 'inter',
-                    descriptionSize: 14,
-                    descriptionColor: '#6b7280',
-                    descriptionAlignment: 'left',
+                        titleAlignment: {
+      horizontal: 'left',
+      vertical: 'top',
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      }
+    },
+    titleShadow: false,
+    titleShadowColor: '#000000',
+    descriptionFont: 'inter',
+    descriptionSize: 14,
+    descriptionColor: '#6b7280',
+    descriptionAlignment: {
+      horizontal: 'left',
+      vertical: 'top',
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      }
+    },
                     padding: 16,
                     borderRadius: 8,
                     borderWidth: 1,
