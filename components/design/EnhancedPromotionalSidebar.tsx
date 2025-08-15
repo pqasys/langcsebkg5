@@ -185,6 +185,71 @@ export function EnhancedPromotionalSidebar() {
     return individualDesignConfigs[itemId] || DEFAULT_DESIGN_CONFIG;
   };
 
+  // Check if an item has a custom design (different from default)
+  const hasCustomDesign = (itemId: string): boolean => {
+    try {
+      const config = individualDesignConfigs[itemId];
+      if (!config) return false;
+      
+      // Ensure DEFAULT_DESIGN_CONFIG exists and has all properties
+      if (!DEFAULT_DESIGN_CONFIG) {
+        console.warn('DEFAULT_DESIGN_CONFIG is undefined');
+        return false;
+      }
+      
+      // Define safe default values
+      const safeDefaults = {
+        backgroundType: 'solid',
+        backgroundColor: '#ffffff',
+        backgroundImage: '',
+        backgroundPattern: 'none',
+        titleColor: '#1f2937',
+        descriptionColor: '#6b7280',
+        padding: 16,
+        borderRadius: 8
+      };
+      
+      // Ensure config has all required properties with fallbacks
+      const safeConfig = {
+        backgroundType: config.backgroundType || DEFAULT_DESIGN_CONFIG.backgroundType || safeDefaults.backgroundType,
+        backgroundColor: config.backgroundColor || DEFAULT_DESIGN_CONFIG.backgroundColor || safeDefaults.backgroundColor,
+        backgroundImage: config.backgroundImage || DEFAULT_DESIGN_CONFIG.backgroundImage || safeDefaults.backgroundImage,
+        backgroundPattern: config.backgroundPattern || DEFAULT_DESIGN_CONFIG.backgroundPattern || safeDefaults.backgroundPattern,
+        titleColor: config.titleColor || DEFAULT_DESIGN_CONFIG.titleColor || safeDefaults.titleColor,
+        descriptionColor: config.descriptionColor || DEFAULT_DESIGN_CONFIG.descriptionColor || safeDefaults.descriptionColor,
+        padding: config.padding || DEFAULT_DESIGN_CONFIG.padding || safeDefaults.padding,
+        borderRadius: config.borderRadius || DEFAULT_DESIGN_CONFIG.borderRadius || safeDefaults.borderRadius
+      };
+      
+      // Get safe default values for comparison
+      const safeDefaultConfig = {
+        backgroundType: DEFAULT_DESIGN_CONFIG.backgroundType || safeDefaults.backgroundType,
+        backgroundColor: DEFAULT_DESIGN_CONFIG.backgroundColor || safeDefaults.backgroundColor,
+        backgroundImage: DEFAULT_DESIGN_CONFIG.backgroundImage || safeDefaults.backgroundImage,
+        backgroundPattern: DEFAULT_DESIGN_CONFIG.backgroundPattern || safeDefaults.backgroundPattern,
+        titleColor: DEFAULT_DESIGN_CONFIG.titleColor || safeDefaults.titleColor,
+        descriptionColor: DEFAULT_DESIGN_CONFIG.descriptionColor || safeDefaults.descriptionColor,
+        padding: DEFAULT_DESIGN_CONFIG.padding || safeDefaults.padding,
+        borderRadius: DEFAULT_DESIGN_CONFIG.borderRadius || safeDefaults.borderRadius
+      };
+      
+      // Check if any key properties are different from default
+      return (
+        safeConfig.backgroundType !== safeDefaultConfig.backgroundType ||
+        safeConfig.backgroundColor !== safeDefaultConfig.backgroundColor ||
+        safeConfig.backgroundImage !== safeDefaultConfig.backgroundImage ||
+        safeConfig.backgroundPattern !== safeDefaultConfig.backgroundPattern ||
+        safeConfig.titleColor !== safeDefaultConfig.titleColor ||
+        safeConfig.descriptionColor !== safeDefaultConfig.descriptionColor ||
+        safeConfig.padding !== safeDefaultConfig.padding ||
+        safeConfig.borderRadius !== safeDefaultConfig.borderRadius
+      );
+    } catch (error) {
+      console.error('Error in hasCustomDesign:', error);
+      return false;
+    }
+  };
+
   // Reset design config for a specific item
   const resetItemDesign = (itemId: string) => {
     const updated = { ...individualDesignConfigs };
@@ -219,14 +284,18 @@ export function EnhancedPromotionalSidebar() {
   };
 
   const handleEditItem = (itemId: string) => {
+    console.log('🎨 Edit item clicked:', itemId);
     setEditingItemId(itemId);
     setSelectedItemId(itemId);
+    setShowDesignToolkit(true); // Ensure design toolkit is shown
   };
 
   const handleSaveItemDesign = (config: DesignConfig) => {
     if (editingItemId) {
+      console.log('🎨 Saving design config for item:', editingItemId, config);
       saveIndividualConfig(editingItemId, config);
-      // Don't clear editingItemId here - only clear it when explicitly saving
+      // Close the design toolkit after saving
+      handleCloseDesignToolkit();
     }
   };
 
@@ -297,9 +366,10 @@ export function EnhancedPromotionalSidebar() {
         </div>
 
         {/* Debug Tools - Moved below header for better accessibility */}
+        {/* Temporarily disabled - can be re-enabled if needed for debugging */}
+        {/*
         {showDesignToolkit && (
           <div className="mb-4 space-y-3">
-            {/* Debug Info */}
             <div className="p-3 bg-gray-100 rounded-lg">
               <h4 className="text-sm font-medium mb-2">Debug Info</h4>
               <div className="text-xs text-gray-600 space-y-1">
@@ -309,7 +379,6 @@ export function EnhancedPromotionalSidebar() {
               </div>
             </div>
             
-            {/* Debug Action Buttons */}
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -333,6 +402,7 @@ export function EnhancedPromotionalSidebar() {
             </div>
           </div>
         )}
+        */}
 
         {/* Design Toolkit Panel */}
         {showDesignToolkit && (
@@ -361,7 +431,7 @@ export function EnhancedPromotionalSidebar() {
               {editingItemId && (
                 <div className="space-y-2">
                   <DesignToolkit
-                    key={editingItemId} // Add key to prevent recreation
+                    key={`${editingItemId}-${JSON.stringify(getItemDesignConfig(editingItemId))}`} // Force re-render when config changes
                     config={getItemDesignConfig(editingItemId)}
                     onConfigChange={handleSaveItemDesign}
                     showSaveButton={true}
@@ -385,41 +455,48 @@ export function EnhancedPromotionalSidebar() {
         {/* Promotional Items */}
         <div className="space-y-3">
           {promotionalItems.map((item) => {
-            const itemConfig = getItemDesignConfig(item.id);
-            const hasCustomDesign = individualDesignConfigs[item.id];
+            if (!item || !item.id) return null; // Safety check
             
-            return (
-              <div key={item.id} className="relative">
-                <DesignablePromotionalCard
-                  item={item}
-                  designConfig={itemConfig}
-                  onClick={() => handleItemClick(item.id)}
-                  className="cursor-pointer"
-                />
-                
-                {/* Design Mode Controls */}
-                {showDesignToolkit && (
-                  <div className="absolute top-2 right-2 flex gap-1">
-                    {hasCustomDesign && (
-                      <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
-                        Custom
-                      </Badge>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditItem(item.id);
-                      }}
-                      className="h-6 w-6 p-0"
-                    >
-                      <Edit3 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            );
+            try {
+              const itemConfig = getItemDesignConfig(item.id);
+              const isCustom = hasCustomDesign(item.id);
+              
+              return (
+                <div key={item.id} className="relative">
+                  <DesignablePromotionalCard
+                    item={item}
+                    designConfig={itemConfig}
+                    onClick={() => handleItemClick(item.id)}
+                    className="cursor-pointer"
+                  />
+                  
+                  {/* Design Mode Controls */}
+                  {showDesignToolkit && (
+                    <div className="absolute top-2 right-2 flex gap-1 z-10">
+                      {isCustom && (
+                        <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                          Custom
+                        </Badge>
+                      )}
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditItem(item.id);
+                        }}
+                        className="h-6 w-6 p-0 hover:bg-gray-200"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            } catch (error) {
+              console.error('Error rendering promotional item:', item.id, error);
+              return null; // Skip this item if there's an error
+            }
           })}
         </div>
       </div>
