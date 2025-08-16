@@ -211,7 +211,15 @@ export function DesignablePromotionalCard({
           
         case 'image':
           if (config?.backgroundImage) {
-            return `url('${config.backgroundImage}') center / cover no-repeat`;
+            const opacity = (config?.backgroundOpacity || 100) / 100;
+            const backgroundColor = config?.backgroundColor || '#ffffff';
+            
+            // Apply opacity to the background image
+            if (opacity < 1) {
+              return `linear-gradient(rgba(255, 255, 255, ${1 - opacity}), rgba(255, 255, 255, ${1 - opacity})), url('${config.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
+            } else {
+              return `url('${config.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
+            }
           }
           return config?.backgroundColor || '#ffffff';
           

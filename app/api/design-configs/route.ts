@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const isActive = searchParams.get('isActive');
     const isDefault = searchParams.get('isDefault');
     const createdBy = searchParams.get('createdBy');
+    const itemId = searchParams.get('itemId');
 
     const where: any = {};
     
@@ -27,6 +28,10 @@ export async function GET(request: NextRequest) {
     
     if (createdBy) {
       where.createdBy = createdBy;
+    }
+    
+    if (itemId) {
+      where.itemId = itemId;
     }
 
     const configs = await prisma.designConfig.findMany({
@@ -64,6 +69,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       description,
+      itemId,
       backgroundType,
       backgroundColor,
       backgroundGradientFrom,
@@ -110,6 +116,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         description,
+        itemId,
         backgroundType,
         backgroundColor,
         backgroundGradientFrom,
@@ -150,6 +157,53 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ config }, { status: 201 });
   } catch (error) {
     console.error('Error creating design config:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const itemId = searchParams.get('itemId');
+    const createdBy = searchParams.get('createdBy');
+
+    // Build where clause
+    const where: any = {};
+    
+    if (itemId) {
+      where.itemId = itemId;
+    }
+    
+    if (createdBy) {
+      where.createdBy = createdBy;
+    } else {
+      // If no createdBy specified, only allow deletion of user's own configs
+      where.createdBy = session.user.id;
+    }
+
+    // Ensure user can only delete their own configs unless they're admin
+    if (session.user.role !== 'ADMIN') {
+      where.createdBy = session.user.id;
+    }
+
+    const deletedConfigs = await prisma.designConfig.deleteMany({
+      where
+    });
+
+    return NextResponse.json({ 
+      message: `Deleted ${deletedConfigs.count} design configuration(s)`,
+      deletedCount: deletedConfigs.count 
+    });
+  } catch (error) {
+    console.error('Error deleting design configs:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

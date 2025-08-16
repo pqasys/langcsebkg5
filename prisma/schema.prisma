@@ -1742,8 +1742,16 @@ model DesignConfig {
   isActive            Boolean  @default(true)
   isDefault           Boolean  @default(false)
   createdBy           String?  // User ID who created this config
+  itemId              String?  // ID of the promotional item this config is for
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+  
+  // Approval workflow
+  isApproved          Boolean  @default(false)
+  approvedBy          String?  // Admin ID who approved this config
+  approvedAt          DateTime?
+  approvalStatus      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  approvalNotes       String?  @db.Text // Notes from admin approval process
   
   // Relationships
   promotionalItems    PromotionalItem[]

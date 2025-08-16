@@ -444,7 +444,7 @@ export default function CoursesPageClient() {
           <EnhancedPromotionalSidebar 
             maxItems={4}
             showSponsored={showAdvertising}
-            showDesignToolkit={true}
+            showDesignToolkit={session?.user?.role === 'ADMIN' || session?.user?.role === 'INSTITUTION'}
             userRole={session?.user?.role}
           />
         </div>

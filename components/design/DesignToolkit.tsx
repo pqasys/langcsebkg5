@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -219,6 +219,7 @@ export function DesignToolkit({
   // Ensure we always have a valid config
   const safeConfig = config || DEFAULT_DESIGN_CONFIG;
   const isInitialMount = useRef(true);
+  const backgroundImageTimeoutRef = useRef<NodeJS.Timeout>();
   
   const [localConfig, setLocalConfig] = useState<DesignConfig>(safeConfig);
   const [activeTab, setActiveTab] = useState<'background' | 'typography' | 'layout' | 'effects' | 'custom'>('background');
@@ -230,6 +231,15 @@ export function DesignToolkit({
       setLocalConfig(safeConfig);
     }
   }, [safeConfig]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (backgroundImageTimeoutRef.current) {
+        clearTimeout(backgroundImageTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleConfigChange = (updates: Partial<DesignConfig>) => {
     const newConfig = { ...localConfig, ...updates };
@@ -575,11 +585,29 @@ export function DesignToolkit({
                 <div className="space-y-3">
                   <div>
                     <Label className="text-sm font-medium">Background Image URL</Label>
-                    <Input
-                      value={localConfig?.backgroundImage || ''}
-                      onChange={(e) => handleConfigChange({ backgroundImage: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
-                    />
+                                         <Input
+                       value={localConfig?.backgroundImage || ''}
+                       onChange={(e) => {
+                         const value = e.target.value;
+                         // Update local state immediately for responsive UI
+                         setLocalConfig(prev => ({ ...prev, backgroundImage: value }));
+                         
+                         // Clear existing timeout
+                         if (backgroundImageTimeoutRef.current) {
+                           clearTimeout(backgroundImageTimeoutRef.current);
+                         }
+                         
+                         // Debounce the parent callback to prevent excessive re-renders
+                         backgroundImageTimeoutRef.current = setTimeout(() => {
+                           handleConfigChange({ backgroundImage: value });
+                         }, 300);
+                       }}
+                       placeholder="https://example.com/image.jpg"
+                       className="font-mono text-sm"
+                     />
+                    <p className="text-xs text-gray-500">
+                      Enter a valid URL starting with http://, https://, or / for local paths
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
@@ -1322,12 +1350,22 @@ export function DesignToolkit({
                     } else if (bgType === 'solid') {
                       styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
                       
-                    } else if (bgType === 'image') {
-                      if (localConfig?.backgroundImage) {
-                        styleObj.background = `url('${localConfig.backgroundImage}') center / cover no-repeat, ${localConfig?.backgroundColor || '#ffffff'}`;
-                      } else {
-                        styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
-                      }
+                                         } else if (bgType === 'image') {
+                       if (localConfig?.backgroundImage) {
+                         const opacity = (localConfig?.backgroundOpacity || 100) / 100;
+                         const backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                         
+                         // Apply opacity to the background image using rgba or opacity
+                         if (opacity < 1) {
+                           styleObj.background = `url('${localConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
+                           styleObj.position = 'relative';
+                           styleObj.backgroundImage = `linear-gradient(rgba(255, 255, 255, ${1 - opacity}), rgba(255, 255, 255, ${1 - opacity})), url('${localConfig.backgroundImage}')`;
+                         } else {
+                           styleObj.background = `url('${localConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
+                         }
+                       } else {
+                         styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                       }
                     } else if (bgType === 'pattern') {
                       const pattern = localConfig?.backgroundPattern || 'none';
                       const patternColor = localConfig?.backgroundColor || '#e0e0e0';

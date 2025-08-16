@@ -35,6 +35,12 @@ export default withAuth(
       return NextResponse.next();
     }
 
+    // Handle Design Toolkit access control for /courses page
+    if (req.nextUrl.pathname === '/courses') {
+      // Allow public access to courses page, but restrict design toolkit functionality
+      return NextResponse.next();
+    }
+
     // Handle role-based access control
     if (req.nextUrl.pathname.startsWith('/admin')) {
       if (!token) {

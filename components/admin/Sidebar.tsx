@@ -52,6 +52,7 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
   const router = useRouter();
   const navigate = useNavigation();
   const [pendingPaymentsCount, setPendingPaymentsCount] = useState(0);
+  const [pendingDesignApprovalsCount, setPendingDesignApprovalsCount] = useState(0);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     content: true,
     financial: true,
@@ -79,6 +80,28 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
 
     // Set up periodic refresh every 30 seconds
     const interval = setInterval(fetchPendingCount, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch pending design approvals count
+  useEffect(() => {
+    const fetchPendingDesignApprovalsCount = async () => {
+      try {
+        const response = await fetch('/api/admin/design-configs/approve?status=PENDING');
+        if (response.ok) {
+          const data = await response.json();
+          setPendingDesignApprovalsCount(data.designConfigs?.length || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching pending design approvals count:', error);
+      }
+    };
+
+    fetchPendingDesignApprovalsCount();
+
+    // Set up periodic refresh every 30 seconds
+    const interval = setInterval(fetchPendingDesignApprovalsCount, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -278,6 +301,22 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
                   >
                     <Palette className="h-4 w-4" />
                     Design Toolkit
+                  </Link>
+
+                  <Link
+                    href="/admin/design-approvals"
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                      pathname === '/admin/design-approvals' ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                    )}
+                  >
+                    <Shield className="h-4 w-4" />
+                    Design Approvals
+                    {pendingDesignApprovalsCount > 0 && (
+                      <Badge variant="destructive" className="ml-auto text-xs">
+                        {pendingDesignApprovalsCount}
+                      </Badge>
+                    )}
                   </Link>
                 </div>
               </div>

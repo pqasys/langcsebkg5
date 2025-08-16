@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 15, 2025 at 09:58 PM
--- Server version: 8.0.31
--- PHP Version: 8.1.13
+-- Generation Time: Aug 16, 2025 at 01:45 AM
+-- Server version: 9.1.0
+-- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -57,26 +57,26 @@ INSERT INTO `admin_settings` (`id`, `createdAt`, `updatedAt`, `allowInstitutionP
 
 DROP TABLE IF EXISTS `advertising_items`;
 CREATE TABLE IF NOT EXISTS `advertising_items` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `imageUrl` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ctaText` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ctaLink` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `targetAudience` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `targetLocation` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `targetDevice` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `imageUrl` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ctaText` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ctaLink` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `targetAudience` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `targetLocation` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `targetDevice` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `startDate` datetime(3) DEFAULT NULL,
   `endDate` datetime(3) DEFAULT NULL,
   `maxImpressions` int DEFAULT NULL,
   `currentImpressions` int NOT NULL DEFAULT '0',
   `maxClicks` int DEFAULT NULL,
   `currentClicks` int NOT NULL DEFAULT '0',
-  `designConfigId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `designConfigId` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `isApproved` tinyint(1) NOT NULL DEFAULT '0',
-  `createdBy` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdBy` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
   PRIMARY KEY (`id`),
@@ -767,47 +767,63 @@ INSERT INTO `course_weekly_prices` (`id`, `courseId`, `weekNumber`, `year`, `pri
 
 DROP TABLE IF EXISTS `design_configs`;
 CREATE TABLE IF NOT EXISTS `design_configs` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `backgroundType` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solid',
-  `backgroundColor` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#ffffff',
-  `backgroundGradientFrom` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#667eea',
-  `backgroundGradientTo` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#764ba2',
-  `backgroundGradientDirection` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'to-r',
-  `backgroundImage` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `backgroundPattern` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'none',
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `backgroundType` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solid',
+  `backgroundColor` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#ffffff',
+  `backgroundGradientFrom` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#667eea',
+  `backgroundGradientTo` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#764ba2',
+  `backgroundGradientDirection` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'to-r',
+  `backgroundImage` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `backgroundPattern` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'none',
   `backgroundOpacity` int NOT NULL DEFAULT '100',
-  `titleFont` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'inter',
+  `titleFont` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'inter',
   `titleSize` int NOT NULL DEFAULT '16',
-  `titleWeight` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'semibold',
-  `titleColor` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#1f2937',
-  `titleAlignment` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'left',
+  `titleWeight` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'semibold',
+  `titleColor` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#1f2937',
+  `titleAlignment` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'left',
   `titleShadow` tinyint(1) NOT NULL DEFAULT '0',
-  `titleShadowColor` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#000000',
-  `descriptionFont` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'inter',
+  `titleShadowColor` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#000000',
+  `descriptionFont` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'inter',
   `descriptionSize` int NOT NULL DEFAULT '14',
-  `descriptionColor` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#6b7280',
-  `descriptionAlignment` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'left',
+  `descriptionColor` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#6b7280',
+  `descriptionAlignment` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'left',
   `padding` int NOT NULL DEFAULT '16',
   `borderRadius` int NOT NULL DEFAULT '8',
   `borderWidth` int NOT NULL DEFAULT '1',
-  `borderColor` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#e5e7eb',
-  `borderStyle` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solid',
+  `borderColor` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#e5e7eb',
+  `borderStyle` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'solid',
   `shadow` tinyint(1) NOT NULL DEFAULT '1',
-  `shadowColor` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'rgba(0, 0, 0, 0.1)',
+  `shadowColor` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'rgba(0, 0, 0, 0.1)',
   `shadowBlur` int NOT NULL DEFAULT '10',
   `shadowOffset` int NOT NULL DEFAULT '4',
-  `hoverEffect` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'scale',
+  `hoverEffect` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'scale',
   `animationDuration` int NOT NULL DEFAULT '300',
-  `customCSS` text COLLATE utf8mb4_unicode_ci,
+  `customCSS` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `isDefault` tinyint(1) NOT NULL DEFAULT '0',
-  `createdBy` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdBy` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
+  `approvalNotes` text COLLATE utf8mb4_unicode_ci,
+  `approvalStatus` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `approvedAt` datetime(3) DEFAULT NULL,
+  `approvedBy` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isApproved` tinyint(1) NOT NULL DEFAULT '0',
+  `itemId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `design_configs`
+--
+
+INSERT INTO `design_configs` (`id`, `name`, `description`, `backgroundType`, `backgroundColor`, `backgroundGradientFrom`, `backgroundGradientTo`, `backgroundGradientDirection`, `backgroundImage`, `backgroundPattern`, `backgroundOpacity`, `titleFont`, `titleSize`, `titleWeight`, `titleColor`, `titleAlignment`, `titleShadow`, `titleShadowColor`, `descriptionFont`, `descriptionSize`, `descriptionColor`, `descriptionAlignment`, `padding`, `borderRadius`, `borderWidth`, `borderColor`, `borderStyle`, `shadow`, `shadowColor`, `shadowBlur`, `shadowOffset`, `hoverEffect`, `animationDuration`, `customCSS`, `isActive`, `isDefault`, `createdBy`, `createdAt`, `updatedAt`, `approvalNotes`, `approvalStatus`, `approvedAt`, `approvedBy`, `isApproved`, `itemId`) VALUES
+('cmedldmod00002osifrqhqssc', 'Design for institution-1', 'Custom design configuration for promotional item: institution-1', 'image', '#ffffff', '#ffffff', '#e0e0e0', 'to-r', 'http://localhost:3000/uploads/mainimage/9f71efc3-7b31-4953-b398-29f2197af202/6f0c2c89-9c5a-4eca-83c8-1e08ba7d4d7f.jpg', 'none', 29, 'inter', 24, 'bold', '#1f2937', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 0, '#000000', 'inter', 16, '#6b7280', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 20, 8, 1, '#e5e7eb', 'solid', 0, 'rgba(0, 0, 0, 0.1)', 10, 5, 'none', 300, '', 1, 0, '0e971fe1-d22a-446e-9fb9-f52149e29df3', '2025-08-16 01:42:10.957', '2025-08-16 01:42:10.957', NULL, 'PENDING', NULL, NULL, 0, 'institution-1'),
+('cmedlf22400012osimi8uqmhj', 'Design for course-1', 'Custom design configuration for promotional item: course-1', 'gradient', '#ffffff', '#4e07f2', '#0d59f2', 'to-r', '', 'none', 100, 'inter', 24, 'bold', '#1f2937', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 0, '#000000', 'inter', 16, '#6b7280', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 20, 8, 1, '#e5e7eb', 'solid', 0, 'rgba(0, 0, 0, 0.1)', 10, 5, 'none', 300, '', 1, 0, '0e971fe1-d22a-446e-9fb9-f52149e29df3', '2025-08-16 01:43:17.548', '2025-08-16 01:43:17.548', NULL, 'PENDING', NULL, NULL, 0, 'course-1'),
+('cmedlfhrk00022osio12o9rgk', 'Design for course-1', 'Custom design configuration for promotional item: course-1', 'gradient', '#ffffff', '#4e07f2', '#0d59f2', 'to-r', '', 'none', 100, 'inter', 24, 'bold', '#ffffff', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 0, '#000000', 'inter', 16, '#6b7280', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 20, 8, 1, '#e5e7eb', 'solid', 0, 'rgba(0, 0, 0, 0.1)', 10, 5, 'none', 300, '', 1, 0, '0e971fe1-d22a-446e-9fb9-f52149e29df3', '2025-08-16 01:43:37.904', '2025-08-16 01:43:37.904', NULL, 'PENDING', NULL, NULL, 0, 'course-1'),
+('cmedlggvs00032osiv9x11bk7', 'Design for course-1', 'Custom design configuration for promotional item: course-1', 'gradient', '#ffffff', '#4e07f2', '#0d59f2', 'to-r', '', 'none', 100, 'inter', 24, 'bold', '#ffffff', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 0, '#000000', 'inter', 16, '#ffffff', '{\"horizontal\":\"left\",\"vertical\":\"top\",\"padding\":{\"top\":0,\"bottom\":0,\"left\":0,\"right\":0}}', 20, 8, 1, '#e5e7eb', 'solid', 0, 'rgba(0, 0, 0, 0.1)', 10, 5, 'none', 300, '', 1, 0, '0e971fe1-d22a-446e-9fb9-f52149e29df3', '2025-08-16 01:44:23.416', '2025-08-16 01:44:23.416', NULL, 'PENDING', NULL, NULL, 0, 'course-1');
 
 -- --------------------------------------------------------
 
@@ -817,15 +833,15 @@ CREATE TABLE IF NOT EXISTS `design_configs` (
 
 DROP TABLE IF EXISTS `design_templates`;
 CREATE TABLE IF NOT EXISTS `design_templates` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `category` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `category` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `config` json NOT NULL,
-  `previewImage` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `previewImage` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `usageCount` int NOT NULL DEFAULT '0',
   `isPublic` tinyint(1) NOT NULL DEFAULT '0',
-  `createdBy` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdBy` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
   PRIMARY KEY (`id`)
@@ -2484,24 +2500,24 @@ CREATE TABLE IF NOT EXISTS `pending_websocket_notifications` (
 
 DROP TABLE IF EXISTS `promotional_items`;
 CREATE TABLE IF NOT EXISTS `promotional_items` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `imageUrl` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ctaText` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ctaLink` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `imageUrl` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ctaText` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ctaLink` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `students` int DEFAULT NULL,
   `courses` int DEFAULT NULL,
   `rating` double DEFAULT NULL,
   `priority` int NOT NULL DEFAULT '0',
   `isSponsored` tinyint(1) NOT NULL DEFAULT '0',
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
-  `designConfigId` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `createdBy` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `designConfigId` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdBy` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
-  `badge` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `badge` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `promotional_items_designConfigId_fkey` (`designConfigId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

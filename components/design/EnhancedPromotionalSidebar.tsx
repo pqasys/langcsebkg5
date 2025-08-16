@@ -27,6 +27,97 @@ import {
 import { DesignToolkit } from './DesignToolkit';
 import { DesignablePromotionalCard, PromotionalItem } from './DesignablePromotionalCard';
 import { DesignConfig, DEFAULT_DESIGN_CONFIG } from './DesignToolkit';
+import { useSession } from 'next-auth/react';
+
+// Function to transform database data to DesignConfig format
+const transformDatabaseConfig = (dbConfig: any): DesignConfig => {
+  // Parse alignment objects from JSON strings
+  let titleAlignment = {
+    horizontal: 'left',
+    vertical: 'top',
+    padding: { top: 0, bottom: 0, left: 0, right: 0 }
+  };
+  
+  let descriptionAlignment = {
+    horizontal: 'left',
+    vertical: 'top',
+    padding: { top: 0, bottom: 0, left: 0, right: 0 }
+  };
+
+  try {
+    if (dbConfig.titleAlignment) {
+      titleAlignment = typeof dbConfig.titleAlignment === 'string' 
+        ? JSON.parse(dbConfig.titleAlignment) 
+        : dbConfig.titleAlignment;
+    }
+  } catch (error) {
+    console.warn('Error parsing titleAlignment:', error);
+  }
+
+  try {
+    if (dbConfig.descriptionAlignment) {
+      descriptionAlignment = typeof dbConfig.descriptionAlignment === 'string' 
+        ? JSON.parse(dbConfig.descriptionAlignment) 
+        : dbConfig.descriptionAlignment;
+    }
+  } catch (error) {
+    console.warn('Error parsing descriptionAlignment:', error);
+  }
+
+  return {
+    backgroundType: dbConfig.backgroundType || 'solid',
+    backgroundColor: dbConfig.backgroundColor || '#ffffff',
+    backgroundGradient: {
+      from: dbConfig.backgroundGradientFrom || '#667eea',
+      to: dbConfig.backgroundGradientTo || '#764ba2',
+      direction: dbConfig.backgroundGradientDirection || 'to-r'
+    },
+    backgroundImage: dbConfig.backgroundImage || '',
+    backgroundPattern: dbConfig.backgroundPattern || 'none',
+    backgroundOpacity: dbConfig.backgroundOpacity || 100,
+    titleFont: dbConfig.titleFont || 'inter',
+    titleSize: dbConfig.titleSize || 24,
+    titleWeight: dbConfig.titleWeight || 'bold',
+    titleColor: dbConfig.titleColor || '#1f2937',
+    titleAlignment: {
+      horizontal: titleAlignment.horizontal || 'left',
+      vertical: titleAlignment.vertical || 'top',
+      padding: {
+        top: titleAlignment.padding?.top || 0,
+        bottom: titleAlignment.padding?.bottom || 0,
+        left: titleAlignment.padding?.left || 0,
+        right: titleAlignment.padding?.right || 0
+      }
+    },
+    titleShadow: dbConfig.titleShadow || false,
+    titleShadowColor: dbConfig.titleShadowColor || '#000000',
+    descriptionFont: dbConfig.descriptionFont || 'inter',
+    descriptionSize: dbConfig.descriptionSize || 16,
+    descriptionColor: dbConfig.descriptionColor || '#6b7280',
+    descriptionAlignment: {
+      horizontal: descriptionAlignment.horizontal || 'left',
+      vertical: descriptionAlignment.vertical || 'top',
+      padding: {
+        top: descriptionAlignment.padding?.top || 0,
+        bottom: descriptionAlignment.padding?.bottom || 0,
+        left: descriptionAlignment.padding?.left || 0,
+        right: descriptionAlignment.padding?.right || 0
+      }
+    },
+    padding: dbConfig.padding || 20,
+    borderRadius: dbConfig.borderRadius || 8,
+    borderWidth: dbConfig.borderWidth || 1,
+    borderColor: dbConfig.borderColor || '#e5e7eb',
+    borderStyle: dbConfig.borderStyle || 'solid',
+    shadow: dbConfig.shadow || false,
+    shadowColor: dbConfig.shadowColor || 'rgba(0, 0, 0, 0.1)',
+    shadowBlur: dbConfig.shadowBlur || 10,
+    shadowOffset: dbConfig.shadowOffset || 5,
+    hoverEffect: dbConfig.hoverEffect || 'none',
+    animationDuration: dbConfig.animationDuration || 300,
+    customCSS: dbConfig.customCSS || ''
+  };
+};
 
 // Enhanced safety check function - moved to top to avoid hoisting issues
 const sanitizeDesignConfig = (config: DesignConfig): DesignConfig => {
@@ -99,12 +190,53 @@ interface IndividualDesignConfig {
   [itemId: string]: DesignConfig;
 }
 
-export function EnhancedPromotionalSidebar() {
+interface EnhancedPromotionalSidebarProps {
+  maxItems?: number;
+  showSponsored?: boolean;
+  showDesignToolkit?: boolean;
+  userRole?: string;
+}
+
+export function EnhancedPromotionalSidebar({ 
+  maxItems = 4, 
+  showSponsored = true, 
+  showDesignToolkit: propShowDesignToolkit = false,
+  userRole 
+}: EnhancedPromotionalSidebarProps) {
+  const { data: session } = useSession();
   const [showAds, setShowAds] = useState(true);
-  const [showDesignToolkit, setShowDesignToolkit] = useState(false);
+  const [showDesignToolkit, setShowDesignToolkit] = useState(propShowDesignToolkit);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [individualDesignConfigs, setIndividualDesignConfigs] = useState<IndividualDesignConfig>({});
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [unsavedChanges, setUnsavedChanges] = useState<Set<string>>(new Set());
+
+  // Update internal state when prop changes
+  useEffect(() => {
+    setShowDesignToolkit(propShowDesignToolkit);
+  }, [propShowDesignToolkit]);
+
+  // Check if user has permission to access Design Toolkit
+  const canAccessDesignToolkit = propShowDesignToolkit && (userRole === 'ADMIN' || userRole === 'INSTITUTION');
+
+  // Debug logging
+  useEffect(() => {
+    console.log('🔐 Design Toolkit Access Control:', {
+      propShowDesignToolkit,
+      userRole,
+      canAccessDesignToolkit,
+      showDesignToolkit
+    });
+  }, [propShowDesignToolkit, userRole, canAccessDesignToolkit, showDesignToolkit]);
+
+  // Ensure Design Toolkit is hidden if user doesn't have access
+  useEffect(() => {
+    if (!canAccessDesignToolkit && showDesignToolkit) {
+      console.log('🚫 Hiding Design Toolkit - user does not have access');
+      setShowDesignToolkit(false);
+    }
+  }, [canAccessDesignToolkit, showDesignToolkit]);
 
   // Sample promotional items
   const promotionalItems: PromotionalItem[] = useMemo(() => [
@@ -152,31 +284,138 @@ export function EnhancedPromotionalSidebar() {
     }
   ], []);
 
-  // Load individual design configurations from localStorage
+  // Load design configurations from database
   useEffect(() => {
-    try {
-      const savedConfigs = localStorage.getItem('individualDesignConfigs');
-      if (savedConfigs) {
-        const parsed = JSON.parse(savedConfigs);
-        // Don't sanitize when loading - just load the configs as-is
-        setIndividualDesignConfigs(parsed);
+    const loadDesignConfigs = async () => {
+      if (!session?.user) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/design-configs?createdBy=' + session.user.id);
+        if (response.ok) {
+          const data = await response.json();
+          const configsMap: IndividualDesignConfig = {};
+          
+          // Convert array to map by itemId and transform database format to DesignConfig format
+          data.configs?.forEach((config: any) => {
+            if (config.itemId) {
+              configsMap[config.itemId] = transformDatabaseConfig(config);
+            }
+          });
+          
+          setIndividualDesignConfigs(configsMap);
+          console.log('📥 Loaded design configs from database:', configsMap);
+        }
+      } catch (error) {
+        console.error('Error loading design configs from database:', error);
+        // Fallback to localStorage for backward compatibility
+        try {
+          const savedConfigs = localStorage.getItem('individualDesignConfigs');
+          if (savedConfigs) {
+            const parsed = JSON.parse(savedConfigs);
+            setIndividualDesignConfigs(parsed);
+            console.log('📥 Fallback: Loaded design configs from localStorage');
+          }
+        } catch (localStorageError) {
+          console.error('Error loading from localStorage fallback:', localStorageError);
+        }
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading individual design configs:', error);
-    }
-  }, []);
+    };
 
-  // Save individual design configurations to localStorage
-  const saveIndividualConfig = (itemId: string, config: DesignConfig) => {
+    loadDesignConfigs();
+  }, [session?.user?.id]);
+
+  // Save design configuration to database
+  const saveIndividualConfig = async (itemId: string, config: DesignConfig) => {
+    if (!session?.user) {
+      console.error('No session available for saving design config');
+      return;
+    }
+
     const sanitized = sanitizeDesignConfig(config);
     const updated = { ...individualDesignConfigs, [itemId]: sanitized };
     setIndividualDesignConfigs(updated);
+
+    // Flatten the nested objects for database storage
+    const flattenedConfig = {
+      name: `Design for ${itemId}`,
+      description: `Custom design configuration for promotional item: ${itemId}`,
+      itemId: itemId,
+      backgroundType: sanitized.backgroundType,
+      backgroundColor: sanitized.backgroundColor,
+      backgroundGradientFrom: sanitized.backgroundGradient?.from,
+      backgroundGradientTo: sanitized.backgroundGradient?.to,
+      backgroundGradientDirection: sanitized.backgroundGradient?.direction,
+      backgroundImage: sanitized.backgroundImage,
+      backgroundPattern: sanitized.backgroundPattern,
+      backgroundOpacity: sanitized.backgroundOpacity,
+      titleFont: sanitized.titleFont,
+      titleSize: sanitized.titleSize,
+      titleWeight: sanitized.titleWeight,
+      titleColor: sanitized.titleColor,
+      titleAlignment: JSON.stringify(sanitized.titleAlignment),
+      titleShadow: sanitized.titleShadow,
+      titleShadowColor: sanitized.titleShadowColor,
+      descriptionFont: sanitized.descriptionFont,
+      descriptionSize: sanitized.descriptionSize,
+      descriptionColor: sanitized.descriptionColor,
+      descriptionAlignment: JSON.stringify(sanitized.descriptionAlignment),
+      padding: sanitized.padding,
+      borderRadius: sanitized.borderRadius,
+      borderWidth: sanitized.borderWidth,
+      borderColor: sanitized.borderColor,
+      borderStyle: sanitized.borderStyle,
+      shadow: sanitized.shadow,
+      shadowColor: sanitized.shadowColor,
+      shadowBlur: sanitized.shadowBlur,
+      shadowOffset: sanitized.shadowOffset,
+      hoverEffect: sanitized.hoverEffect,
+      animationDuration: sanitized.animationDuration,
+      customCSS: sanitized.customCSS,
+      isActive: true,
+      isDefault: false
+    };
     
     try {
-      localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
-      console.log(`✅ Saved individual design config for item: ${itemId}`);
+      // Save to database
+      const response = await fetch('/api/design-configs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(flattenedConfig),
+      });
+
+      if (response.ok) {
+        console.log(`✅ Saved design config for item: ${itemId} to database`);
+        
+        // Also save to localStorage as backup
+        try {
+          localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
+        } catch (localStorageError) {
+          console.warn('Could not save to localStorage backup:', localStorageError);
+        }
+      } else {
+        console.error('Failed to save to database:', response.statusText);
+        // Fallback to localStorage only
+        try {
+          localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
+          console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+        } catch (localStorageError) {
+          console.error('Error saving to localStorage fallback:', localStorageError);
+        }
+      }
     } catch (error) {
-      console.error('Error saving individual design config:', error);
+      console.error('Error saving design config:', error);
+      // Fallback to localStorage only
+      try {
+        localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
+        console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+      } catch (localStorageError) {
+        console.error('Error saving to localStorage fallback:', localStorageError);
+      }
     }
   };
 
@@ -251,28 +490,58 @@ export function EnhancedPromotionalSidebar() {
   };
 
   // Reset design config for a specific item
-  const resetItemDesign = (itemId: string) => {
+  const resetItemDesign = async (itemId: string) => {
     const updated = { ...individualDesignConfigs };
     delete updated[itemId];
     setIndividualDesignConfigs(updated);
     
     try {
-      localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
-      console.log(`🔄 Reset design config for item: ${itemId}`);
+      // Remove from database if it exists
+      if (session?.user) {
+        const response = await fetch(`/api/design-configs?itemId=${itemId}&createdBy=${session.user.id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          console.log(`🔄 Removed design config for item: ${itemId} from database`);
+        }
+      }
+      
+      // Also remove from localStorage
+      try {
+        localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
+        console.log(`🔄 Reset design config for item: ${itemId}`);
+      } catch (localStorageError) {
+        console.error('Error resetting design config in localStorage:', localStorageError);
+      }
     } catch (error) {
       console.error('Error resetting design config:', error);
     }
   };
 
   // Clear all individual design configurations
-  const clearAllDesignConfigs = () => {
+  const clearAllDesignConfigs = async () => {
     setIndividualDesignConfigs({});
     setSelectedItemId(null);
     setEditingItemId(null);
     
     try {
-      localStorage.removeItem('individualDesignConfigs');
-      console.log('🗑️ Cleared all individual design configs');
+      // Clear from database
+      if (session?.user) {
+        const response = await fetch(`/api/design-configs?createdBy=${session.user.id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          console.log('🗑️ Cleared all design configs from database');
+        }
+      }
+      
+      // Clear from localStorage
+      try {
+        localStorage.removeItem('individualDesignConfigs');
+        console.log('🗑️ Cleared all design configs from localStorage');
+      } catch (localStorageError) {
+        console.error('Error clearing from localStorage:', localStorageError);
+      }
     } catch (error) {
       console.error('Error clearing design configs:', error);
     }
@@ -280,20 +549,30 @@ export function EnhancedPromotionalSidebar() {
 
   const handleItemClick = (itemId: string) => {
     setSelectedItemId(itemId);
-    setShowDesignToolkit(true);
+    if (canAccessDesignToolkit) {
+      setShowDesignToolkit(true);
+    }
   };
 
   const handleEditItem = (itemId: string) => {
     console.log('🎨 Edit item clicked:', itemId);
     setEditingItemId(itemId);
     setSelectedItemId(itemId);
-    setShowDesignToolkit(true); // Ensure design toolkit is shown
+    if (canAccessDesignToolkit) {
+      setShowDesignToolkit(true); // Ensure design toolkit is shown
+    }
   };
 
   const handleSaveItemDesign = (config: DesignConfig) => {
     if (editingItemId) {
       console.log('🎨 Saving design config for item:', editingItemId, config);
       saveIndividualConfig(editingItemId, config);
+      // Clear unsaved changes flag
+      setUnsavedChanges(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(editingItemId);
+        return newSet;
+      });
       // Close the design toolkit after saving
       handleCloseDesignToolkit();
     }
@@ -332,21 +611,23 @@ export function EnhancedPromotionalSidebar() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-700 flex-1 mr-4">Featured & Promotions</h3>
           <div className="flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowDesignToolkit(!showDesignToolkit)}
-                  className="h-8 w-8 p-0"
-                >
-                  <Palette className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{showDesignToolkit ? 'Hide Design Toolkit' : 'Show Design Toolkit'}</p>
-              </TooltipContent>
-            </Tooltip>
+            {canAccessDesignToolkit && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowDesignToolkit(!showDesignToolkit)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Palette className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{showDesignToolkit ? 'Hide Design Toolkit' : 'Show Design Toolkit'}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -364,6 +645,13 @@ export function EnhancedPromotionalSidebar() {
             </Tooltip>
           </div>
         </div>
+
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-600">Loading design configurations...</p>
+          </div>
+        )}
 
         {/* Debug Tools - Moved below header for better accessibility */}
         {/* Temporarily disabled - can be re-enabled if needed for debugging */}
@@ -405,7 +693,7 @@ export function EnhancedPromotionalSidebar() {
         */}
 
         {/* Design Toolkit Panel */}
-        {showDesignToolkit && (
+        {showDesignToolkit && canAccessDesignToolkit && (
           <Card className="mb-4">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -431,12 +719,23 @@ export function EnhancedPromotionalSidebar() {
               {editingItemId && (
                 <div className="space-y-2">
                   <DesignToolkit
-                    key={`${editingItemId}-${JSON.stringify(getItemDesignConfig(editingItemId))}`} // Force re-render when config changes
+                    key={editingItemId} // Use stable key to prevent re-renders
                     config={getItemDesignConfig(editingItemId)}
-                    onConfigChange={handleSaveItemDesign}
+                    onConfigChange={(config) => {
+                      // Use a ref to track changes without causing re-renders
+                      const updated = { ...individualDesignConfigs, [editingItemId]: config };
+                      setIndividualDesignConfigs(updated);
+                      // Mark as having unsaved changes
+                      setUnsavedChanges(prev => new Set(prev).add(editingItemId!));
+                    }}
                     showSaveButton={true}
                     onSave={() => handleSaveItemDesign(getItemDesignConfig(editingItemId))}
                   />
+                  {unsavedChanges.has(editingItemId) && (
+                    <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded border border-orange-200">
+                      ⚠️ You have unsaved changes. Click "Save Design" to persist your changes.
+                    </div>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -471,7 +770,7 @@ export function EnhancedPromotionalSidebar() {
                   />
                   
                   {/* Design Mode Controls */}
-                  {showDesignToolkit && (
+                  {showDesignToolkit && canAccessDesignToolkit && (
                     <div className="absolute top-2 right-2 flex gap-1 z-10">
                       {isCustom && (
                         <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
