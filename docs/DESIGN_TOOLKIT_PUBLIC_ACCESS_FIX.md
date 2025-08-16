@@ -1,166 +1,118 @@
 # Design Toolkit Public Access Fix
 
 ## Problem
-Admin-created ads/promotion designs made using the Design Toolkit were not available to all site users (including unauthenticated users) as expected. Additionally, admin-approved designs from institution users were also not accessible to the public.
+Admin's ads/promotion designs made using the Design Toolkit were not available to all site users (including unauthenticated users) as expected. Additionally, the Design Toolkit needed to be implemented on the `/courses` page promotional banners that are controlled by the "Show/Hide Ads" button.
 
 ## Root Cause
-The Design Toolkit API (`/api/design-configs/route.ts`) required authentication for all requests, preventing unauthenticated users from accessing admin-created and admin-approved designs.
+1. The existing API endpoint (`/api/design-configs`) required user authentication, preventing unauthenticated users from accessing admin-created and admin-approved designs.
+2. The `/courses` page promotional banners (Premium Course Banner, Featured Institution Banner, and Promotional Banner) were not integrated with the Design Toolkit.
 
 ## Solution Implemented
 
-### 1. Created Public API Endpoint
-**File**: `app/api/design-configs/public/route.ts`
+### 1. Public API Endpoint
+Created a new public API endpoint (`/api/design-configs/public`) that provides unauthenticated access to:
+- Designs created by active `ADMIN` users
+- Designs that are explicitly `isApproved: true`, have `approvalStatus: 'APPROVED'`, and are `isActive: true` (including designs created by institution users that have been approved by an admin)
 
-- **Purpose**: Provides unauthenticated access to admin-created and admin-approved designs
-- **Access Control**: No authentication required
-- **Data Returned**: 
-  - Admin-created designs (from active admins only)
-  - Admin-approved designs from all users (including institution users)
-- **Security**: Only returns active designs, filters by admin status and approval status
+### 2. Frontend Integration
+Updated the frontend components to conditionally fetch design configurations:
+- If a user session exists, fetch from the authenticated `/api/design-configs?includeAdminDesigns=true`
+- If no session exists (unauthenticated user), fetch from the new public API endpoint `/api/design-configs/public`
 
-### 2. Updated Frontend Component
-**File**: `components/design/EnhancedPromotionalSidebar.tsx`
+### 3. Courses Page Design Toolkit Integration
+Implemented the Design Toolkit on the `/courses` page for the three promotional banners controlled by the "Show/Hide Ads" button:
 
-- **Modified**: `loadDesignConfigs` function
-- **Logic**: 
-  - Authenticated users: Use `/api/design-configs?includeAdminDesigns=true`
-  - Unauthenticated users: Use `/api/design-configs/public`
-- **Mapping**: Maps design configs to promotional items based on name patterns
+#### Banner Types:
+1. **Premium Course Banner** (`premium-course-banner`)
+   - Default: Purple gradient background (original AdvertisingBanner styling)
+   - Displays top premium/featured courses
 
-### 3. Updated Middleware
-**File**: `middleware.ts`
+2. **Featured Institution Banner** (`featured-institution-banner`)
+   - Default: Orange gradient background (original AdvertisingBanner styling)
+   - Displays featured institutions
 
-- **Added**: Explicit permission for public design configs API
-- **Routes Allowed**:
-  - `/api/design-configs/public`
-  - `/api/courses/public`
-  - `/api/institutions` (non-admin routes)
+3. **Promotional Banner** (`promotional-banner`)
+   - Default: Green gradient background (original AdvertisingBanner styling)
+   - Displays promotional offers and deals
 
-## Technical Implementation
+#### Implementation Details:
+- Created `DesignableAdvertisingBanner` component with full Design Toolkit support
+- Updated `CoursesPageClient` to use designable banners instead of static ones
+- Added Design Toolkit panel that appears when editing banner designs
+- Integrated with existing public access system for unauthenticated users
 
-### Public API Logic
-```typescript
-const publicWhere = {
-  OR: [
-    // Admin-created designs (only from active admins)
-    { createdBy: { in: await getActiveAdminUserIds() } },
-    // Admin-approved designs from all users (including institution users)
-    { 
-      isApproved: true, 
-      approvalStatus: 'APPROVED',
-      isActive: true
-    }
-  ]
-};
-```
+### 4. Middleware Updates
+Updated `middleware.ts` to explicitly allow unauthenticated access to the new public API endpoints.
 
-### Frontend Logic
-```typescript
-let response;
-if (session?.user) {
-  // Authenticated user - load user's own designs + admin designs
-  response = await fetch('/api/design-configs?includeAdminDesigns=true');
-} else {
-  // Unauthenticated user - load only public admin designs
-  response = await fetch('/api/design-configs/public');
-}
-```
+## Technical Details
 
-### Design Mapping
-The frontend maps design configs to promotional items based on name patterns:
-- `institution-*` → `institution-1`
-- `course-*` → `course-1`
-- `third-party-*` → `third-party-1`
+### Public API Data Returned
+The public API returns design configurations that meet either of these criteria:
+- `createdBy` is an active admin user ID
+- `isApproved: true` AND `approvalStatus: 'APPROVED'` AND `isActive: true`
 
-## Testing Results
+### Design Configuration Mapping
+The frontend maps database configurations to promotional item IDs:
+- `premium-course-banner` - Premium course advertising
+- `featured-institution-banner` - Featured institution advertising  
+- `promotional-banner` - General promotional content
+- `institution-1` - Institution promotional items
+- `course-1` - Course promotional items
+- `third-party-1` - Third-party promotional items
 
-### Current State
-- **Active Admin Users**: 4
-- **Active Institution Users**: 1
-- **Total Design Configs**: 16
-- **Admin-Created Configs**: 13
-- **Institution-Created Configs**: 3
-- **Approved Configs**: 4
-
-### Public Access Verification
-- **Institution Designs**: ✅ 1 design available
-- **Course Designs**: ✅ 9 designs available  
-- **Third-Party Designs**: ✅ 2 designs available
-
-### Design Sources Breakdown
-- **Admin-Created Designs**: 13 designs (automatically available)
-- **Admin-Approved Designs**: 4 designs (including institution user designs)
-
-### Final Result
-✅ **SUCCESS**: 3/3 promotional item types have designs available for unauthenticated users!
-
-## Security Considerations
-
-1. **Admin Filtering**: Only designs from active admin users are included
-2. **Approval Workflow**: Only designs approved by active admins are publicly accessible
-3. **Active Status**: Only active designs are returned to public
-4. **No Sensitive Data**: Public API doesn't expose internal user information
-5. **Rate Limiting**: Standard API rate limiting applies
+### Security Considerations
+- Only designs approved by active admins are publicly accessible
+- Unauthenticated users cannot modify designs
+- Design changes require appropriate user permissions (ADMIN or INSTITUTION_STAFF)
+- All design configurations are validated before saving
 
 ## Benefits
-
-1. **Universal Access**: All site users can now see admin-created and admin-approved promotional designs
-2. **Institution Collaboration**: Institution users can create designs that become public after admin approval
-3. **Quality Control**: Admin approval ensures only high-quality designs are publicly visible
-4. **Consistent Experience**: Authenticated and unauthenticated users see the same approved designs
-5. **Maintained Security**: Proper access controls remain in place
-6. **Scalable**: Solution works for any number of admin-created or approved designs
+1. **Universal Access**: All site users (including unauthenticated) can now see admin-created and admin-approved promotional designs
+2. **Consistent Branding**: Admin-approved designs ensure consistent visual identity across the platform
+3. **Flexible Design System**: Admins and institution staff can customize promotional content using the Design Toolkit
+4. **Enhanced User Experience**: Professional, branded promotional content improves user engagement
+5. **Scalable Solution**: The system supports multiple promotional item types and can be extended to other pages
 
 ## Workflow
 
-### For Institution Users
-1. Create designs using the Design Toolkit
+### For Institution Users:
+1. Create promotional designs using the Design Toolkit
 2. Submit designs for admin approval
-3. Admins review and approve/reject designs
-4. Approved designs become publicly accessible
+3. Once approved, designs become publicly accessible to all users
 
-### For Admins
-1. Create designs directly (automatically public)
-2. Review and approve institution user designs
-3. Manage approval status and notes
-4. All approved designs are publicly accessible
+### For Admins:
+1. Create promotional designs using the Design Toolkit
+2. Approve designs from institution users
+3. All admin-created and admin-approved designs are immediately publicly accessible
 
-### For Public Users
-1. See all admin-created designs automatically
-2. See all admin-approved designs from any user
-3. No authentication required
-4. Consistent experience across all user types
+### For Public Users (Unauthenticated):
+1. View promotional content with admin-approved designs applied
+2. Experience consistent, professional branding across the platform
 
-## Maintenance Notes
+### For Courses Page:
+1. Admins and institution staff see "Show Design Toolkit" button
+2. Click edit button on any promotional banner to open Design Toolkit
+3. Customize colors, fonts, backgrounds, and other design elements
+4. Save changes to database
+5. All users (including unauthenticated) see the updated designs
 
-- Admins can create designs through the existing Design Toolkit interface
-- Institution users can create designs and submit them for approval
-- All admin-created designs are automatically available to public users
-- All admin-approved designs are automatically available to public users
-- No additional configuration required for new designs
-- Existing authentication-based design access remains unchanged
+## Testing Results
+- ✅ Public API returns admin-created and admin-approved designs
+- ✅ Frontend correctly loads designs for both authenticated and unauthenticated users
+- ✅ Design configurations are properly mapped to promotional items
+- ✅ Courses page banners are fully integrated with Design Toolkit
+- ✅ All 3 promotional banner types have default designs
+- ✅ Design changes are saved to database and persist across sessions
+- ✅ Unauthenticated users can see all approved designs
 
 ## Files Modified
-
 1. `app/api/design-configs/public/route.ts` - New public API endpoint
 2. `components/design/EnhancedPromotionalSidebar.tsx` - Updated to use public API
-3. `middleware.ts` - Added public API permissions
-4. `scripts/test-public-design-api.ts` - Test script for API verification
-5. `scripts/test-public-design-access.ts` - Comprehensive access test
-6. `scripts/create-test-approved-designs.ts` - Test script for creating approved designs
-
-## Verification Commands
-
-```bash
-# Test public API functionality
-npx ts-node scripts/test-public-design-api.ts
-
-# Test comprehensive access
-npx ts-node scripts/test-public-design-access.ts
-
-# Create test approved designs
-npx ts-node scripts/create-test-approved-designs.ts
-```
+3. `middleware.ts` - Added public API access permissions
+4. `components/design/DesignableAdvertisingBanner.tsx` - New designable banner component
+5. `components/CoursesPageClient.tsx` - Integrated Design Toolkit for promotional banners
+6. `scripts/create-courses-page-designs.ts` - Script to create default designs
+7. `scripts/test-courses-page-design-toolkit.ts` - Test script for verification
 
 ## Status
-✅ **COMPLETED** - Admin-created and admin-approved ads/promotion designs are now accessible to all site users including unauthenticated users.
+✅ **COMPLETED** - Admin-created and admin-approved ads/promotion designs are now accessible to all site users including unauthenticated users. The Design Toolkit has been successfully implemented on the `/courses` page promotional banners, allowing admins and institution staff to customize the appearance of promotional content while ensuring all users see the approved designs.

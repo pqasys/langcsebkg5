@@ -16,10 +16,13 @@ import {
 } from "@/components/ui/select";
 import { toast } from 'sonner';
 import { FaSpinner } from 'react-icons/fa';
-import { Search, Filter, Star, Crown, TrendingUp, Tag } from 'lucide-react';
+import { Search, Filter, Star, Crown, TrendingUp, Tag, Palette } from 'lucide-react';
 import { EnhancedCourseCard } from '@/components/EnhancedCourseCard';
 import { AdvertisingBanner, PremiumCourseBanner, FeaturedInstitutionBanner, PromotionalBanner } from '@/components/AdvertisingBanner';
+import { DesignablePremiumCourseBanner, DesignableFeaturedInstitutionBanner, DesignablePromotionalBanner } from '@/components/design/DesignableAdvertisingBanner';
 import { EnhancedPromotionalSidebar } from '@/components/design/EnhancedPromotionalSidebar';
+import { DesignToolkit } from '@/components/design/DesignToolkit';
+import { DesignConfig, DEFAULT_DESIGN_CONFIG } from '@/components/design/DesignToolkit';
 import { TagFilter } from '@/components/TagFilter';
 import EnrollmentModal from '../app/student/components/EnrollmentModal';
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -34,7 +37,6 @@ interface Course {
     name: string;
     country?: string;
     city?: string;
-
     subscriptionPlan?: string;
     isFeatured?: boolean;
   } | null;
@@ -70,6 +72,10 @@ interface Course {
   isHighCommission?: boolean;
 }
 
+interface IndividualDesignConfig {
+  [itemId: string]: DesignConfig;
+}
+
 export default function CoursesPageClient() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -84,6 +90,12 @@ export default function CoursesPageClient() {
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [showAdvertising, setShowAdvertising] = useState(true);
+  
+  // Design Toolkit state
+  const [showDesignToolkit, setShowDesignToolkit] = useState(false);
+  const [individualDesignConfigs, setIndividualDesignConfigs] = useState<IndividualDesignConfig>({});
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [isLoadingDesigns, setIsLoadingDesigns] = useState(false);
 
   // Check for enrollment intent from URL parameters
   useEffect(() => {
@@ -93,6 +105,251 @@ export default function CoursesPageClient() {
       setShowEnrollmentModal(true);
     }
   }, [searchParams, status, session]);
+
+  // Load design configurations from database
+  useEffect(() => {
+    const loadDesignConfigs = async () => {
+      try {
+        setIsLoadingDesigns(true);
+        
+        let response;
+        if (session?.user) {
+          // Authenticated user - load user's own designs + admin designs
+          console.log('🔄 Loading design configs for authenticated user:', session.user.id);
+          response = await fetch('/api/design-configs?includeAdminDesigns=true');
+        } else {
+          // Unauthenticated user - load only public admin designs
+          console.log('🔄 Loading public design configs for unauthenticated user');
+          response = await fetch('/api/design-configs/public');
+        }
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📥 Raw database response:', data);
+          const configsMap: IndividualDesignConfig = {};
+          
+          // Convert array to map by itemId and transform database format to DesignConfig format
+          const configsByItemId: { [key: string]: any[] } = {};
+          
+          data.configs.forEach((config: any) => {
+            const itemId = config.itemId;
+            if (itemId) {
+              if (!configsByItemId[itemId]) {
+                configsByItemId[itemId] = [];
+              }
+              configsByItemId[itemId].push(config);
+            }
+          });
+          
+          // For each itemId, use the most recent config (highest createdAt)
+          Object.keys(configsByItemId).forEach(itemId => {
+            const configs = configsByItemId[itemId];
+            const mostRecentConfig = configs.reduce((latest, current) => 
+              new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest
+            );
+            
+            configsMap[itemId] = transformDatabaseConfig(mostRecentConfig);
+          });
+          
+          console.log('🔄 Transformed configs map:', Object.keys(configsMap));
+          setIndividualDesignConfigs(configsMap);
+        } else {
+          console.error('❌ Failed to load design configs:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('❌ Error loading design configs:', error);
+      } finally {
+        setIsLoadingDesigns(false);
+      }
+    };
+
+    loadDesignConfigs();
+  }, [session]);
+
+  // Function to transform database data to DesignConfig format
+  const transformDatabaseConfig = (dbConfig: any): DesignConfig => {
+    // Parse alignment objects from JSON strings
+    let titleAlignment = {
+      horizontal: 'left',
+      vertical: 'top',
+      padding: { top: 0, bottom: 0, left: 0, right: 0 }
+    };
+    
+    let descriptionAlignment = {
+      horizontal: 'left',
+      vertical: 'top',
+      padding: { top: 0, bottom: 0, left: 0, right: 0 }
+    };
+
+    try {
+      if (dbConfig.titleAlignment) {
+        titleAlignment = typeof dbConfig.titleAlignment === 'string' 
+          ? JSON.parse(dbConfig.titleAlignment) 
+          : dbConfig.titleAlignment;
+      }
+    } catch (error) {
+      console.warn('Error parsing titleAlignment:', error);
+    }
+
+    try {
+      if (dbConfig.descriptionAlignment) {
+        descriptionAlignment = typeof dbConfig.descriptionAlignment === 'string' 
+          ? JSON.parse(dbConfig.descriptionAlignment) 
+          : dbConfig.descriptionAlignment;
+      }
+    } catch (error) {
+      console.warn('Error parsing descriptionAlignment:', error);
+    }
+
+    return {
+      backgroundType: dbConfig.backgroundType || 'solid',
+      backgroundColor: dbConfig.backgroundColor || '#ffffff',
+      backgroundGradient: {
+        from: dbConfig.backgroundGradientFrom || '#667eea',
+        to: dbConfig.backgroundGradientTo || '#764ba2',
+        direction: dbConfig.backgroundGradientDirection || 'to-r'
+      },
+      backgroundImage: dbConfig.backgroundImage || '',
+      backgroundPattern: dbConfig.backgroundPattern || 'none',
+      backgroundOpacity: dbConfig.backgroundOpacity || 100,
+      titleFont: dbConfig.titleFont || 'inter',
+      titleSize: dbConfig.titleSize || 24,
+      titleWeight: dbConfig.titleWeight || 'bold',
+      titleColor: dbConfig.titleColor || '#1f2937',
+      titleAlignment: {
+        horizontal: titleAlignment.horizontal || 'left',
+        vertical: titleAlignment.vertical || 'top',
+        padding: {
+          top: titleAlignment.padding?.top || 0,
+          bottom: titleAlignment.padding?.bottom || 0,
+          left: titleAlignment.padding?.left || 0,
+          right: titleAlignment.padding?.right || 0
+        }
+      },
+      titleShadow: dbConfig.titleShadow || false,
+      titleShadowColor: dbConfig.titleShadowColor || '#000000',
+      descriptionFont: dbConfig.descriptionFont || 'inter',
+      descriptionSize: dbConfig.descriptionSize || 16,
+      descriptionColor: dbConfig.descriptionColor || '#6b7280',
+      descriptionAlignment: {
+        horizontal: descriptionAlignment.horizontal || 'left',
+        vertical: descriptionAlignment.vertical || 'top',
+        padding: {
+          top: descriptionAlignment.padding?.top || 0,
+          bottom: descriptionAlignment.padding?.bottom || 0,
+          left: descriptionAlignment.padding?.left || 0,
+          right: descriptionAlignment.padding?.right || 0
+        }
+      },
+      padding: dbConfig.padding || 20,
+      borderRadius: dbConfig.borderRadius || 8,
+      borderWidth: dbConfig.borderWidth || 1,
+      borderColor: dbConfig.borderColor || '#e5e7eb',
+      borderStyle: dbConfig.borderStyle || 'solid',
+      shadow: dbConfig.shadow || false,
+      shadowColor: dbConfig.shadowColor || 'rgba(0, 0, 0, 0.1)',
+      shadowBlur: dbConfig.shadowBlur || 10,
+      shadowOffset: dbConfig.shadowOffset || 5,
+      hoverEffect: dbConfig.hoverEffect || 'none',
+      animationDuration: dbConfig.animationDuration || 300,
+      customCSS: dbConfig.customCSS || ''
+    };
+  };
+
+  // Get design config for a specific item
+  const getItemDesignConfig = (itemId: string): DesignConfig => {
+    return individualDesignConfigs[itemId] || DEFAULT_DESIGN_CONFIG;
+  };
+
+  // Handle edit item
+  const handleEditItem = (itemId: string) => {
+    console.log('🎨 Edit item clicked:', itemId);
+    setEditingItemId(itemId);
+    setShowDesignToolkit(true);
+  };
+
+  // Handle save item design
+  const handleSaveItemDesign = (config: DesignConfig) => {
+    if (editingItemId) {
+      console.log('🎨 Saving design config for item:', editingItemId, config);
+      saveIndividualConfig(editingItemId, config);
+      setShowDesignToolkit(false);
+      setEditingItemId(null);
+    }
+  };
+
+  // Save design configuration to database
+  const saveIndividualConfig = async (itemId: string, config: DesignConfig) => {
+    if (!session?.user) {
+      console.error('No session available for saving design config');
+      return;
+    }
+
+    console.log('💾 Saving design config for item:', itemId);
+    
+    const updated = { ...individualDesignConfigs, [itemId]: config };
+    setIndividualDesignConfigs(updated);
+
+    // Flatten the nested objects for database storage
+    const flattenedConfig = {
+      name: `Design for ${itemId}`,
+      description: `Custom design configuration for promotional item: ${itemId}`,
+      itemId: itemId,
+      backgroundType: config.backgroundType,
+      backgroundColor: config.backgroundColor,
+      backgroundGradientFrom: config.backgroundGradient?.from,
+      backgroundGradientTo: config.backgroundGradient?.to,
+      backgroundGradientDirection: config.backgroundGradient?.direction,
+      backgroundImage: config.backgroundImage,
+      backgroundPattern: config.backgroundPattern,
+      backgroundOpacity: config.backgroundOpacity,
+      titleFont: config.titleFont,
+      titleSize: config.titleSize,
+      titleWeight: config.titleWeight,
+      titleColor: config.titleColor,
+      titleAlignment: JSON.stringify(config.titleAlignment),
+      titleShadow: config.titleShadow,
+      titleShadowColor: config.titleShadowColor,
+      descriptionFont: config.descriptionFont,
+      descriptionSize: config.descriptionSize,
+      descriptionColor: config.descriptionColor,
+      descriptionAlignment: JSON.stringify(config.descriptionAlignment),
+      padding: config.padding,
+      borderRadius: config.borderRadius,
+      borderWidth: config.borderWidth,
+      borderColor: config.borderColor,
+      borderStyle: config.borderStyle,
+      shadow: config.shadow,
+      shadowColor: config.shadowColor,
+      shadowBlur: config.shadowBlur,
+      shadowOffset: config.shadowOffset,
+      hoverEffect: config.hoverEffect,
+      animationDuration: config.animationDuration,
+      customCSS: config.customCSS,
+      isActive: true,
+      isDefault: false
+    };
+    
+    try {
+      const response = await fetch('/api/design-configs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(flattenedConfig),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log(`✅ Saved design config for item: ${itemId} to database`, responseData);
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to save to database:', response.status, response.statusText, errorText);
+      }
+    } catch (error) {
+      console.error('Error saving design config:', error);
+    }
+  };
 
   const fetchCourses = async () => {
     try {
@@ -123,27 +380,18 @@ export default function CoursesPageClient() {
   useEffect(() => {
     let filtered = courses;
 
-    console.log('Initial courses count:', courses.length);
-    console.log('Initial filtered courses:', filtered.length);
-
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(course =>
         course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         course.institution?.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      console.log('After search filter:', filtered.length);
     }
 
     // Apply status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(course => {
-        if (statusFilter === 'AVAILABLE') {
-          return course.status === 'PUBLISHED';
-        }
-        return false;
-      });
-      console.log('After status filter:', filtered.length);
+      filtered = filtered.filter(course => course.status === statusFilter);
     }
 
     // Apply priority filter
@@ -160,21 +408,19 @@ export default function CoursesPageClient() {
             return true;
         }
       });
-      console.log('After priority filter:', filtered.length);
     }
 
     // Apply tag filter
     if (selectedTags.length > 0) {
-      filtered = filtered.filter(course => {
-        const courseTagIds = course.courseTags?.map(ct => ct.tag.id) || [];
-        return selectedTags.some(tagId => courseTagIds.includes(tagId));
-      });
-      console.log('After tag filter:', filtered.length);
+      filtered = filtered.filter(course =>
+        course.courseTags?.some(courseTag =>
+          selectedTags.includes(courseTag.tag.name)
+        )
+      );
     }
 
-    console.log('Final filtered courses:', filtered.length);
     setFilteredCourses(filtered);
-  }, [searchTerm, statusFilter, priorityFilter, selectedTags, courses]);
+  }, [courses, searchTerm, statusFilter, priorityFilter, selectedTags]);
 
   const handleEnroll = async (courseId: string) => {
     if (status === 'unauthenticated') {
@@ -183,7 +429,6 @@ export default function CoursesPageClient() {
     }
 
     if (session?.user?.role !== 'STUDENT') {
-      // toast.error('Only students can enroll in courses');
       return;
     }
 
@@ -267,6 +512,21 @@ export default function CoursesPageClient() {
   const topCourses = getTopCourses();
   const featuredInstitutions = getFeaturedInstitutions();
 
+  // Check if user has permission to access Design Toolkit
+  const canAccessDesignToolkit = session?.user?.role === 'ADMIN' || session?.user?.role === 'INSTITUTION_STAFF';
+
+  // Debug logging
+  console.log('🎯 Courses Page Debug:', {
+    topCourses: topCourses.length,
+    featuredInstitutions: featuredInstitutions.length,
+    showAdvertising,
+    canAccessDesignToolkit,
+    individualDesignConfigs: Object.keys(individualDesignConfigs),
+    premiumCourseBanner: getItemDesignConfig('premium-course-banner'),
+    featuredInstitutionBanner: getItemDesignConfig('featured-institution-banner'),
+    promotionalBanner: getItemDesignConfig('promotional-banner')
+  });
+
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
       {/* Header Section */}
@@ -278,6 +538,17 @@ export default function CoursesPageClient() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {canAccessDesignToolkit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDesignToolkit(!showDesignToolkit)}
+              className="flex items-center gap-2"
+            >
+              <Palette className="w-4 h-4" />
+              {showDesignToolkit ? 'Hide' : 'Show'} Design Toolkit
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -288,22 +559,61 @@ export default function CoursesPageClient() {
         </div>
       </div>
 
+      {/* Design Toolkit Panel */}
+      {showDesignToolkit && canAccessDesignToolkit && editingItemId && (
+        <div className="mb-8 p-4 bg-gray-50 rounded-lg border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Design Toolkit - Editing: {editingItemId}</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowDesignToolkit(false);
+                setEditingItemId(null);
+              }}
+            >
+              Close
+            </Button>
+          </div>
+          <DesignToolkit
+            config={getItemDesignConfig(editingItemId)}
+            onConfigChange={(config) => {
+              const updated = { ...individualDesignConfigs, [editingItemId]: config };
+              setIndividualDesignConfigs(updated);
+            }}
+            showSaveButton={true}
+            onSave={() => handleSaveItemDesign(getItemDesignConfig(editingItemId))}
+            institutionId={session?.user?.institutionId || ''}
+          />
+        </div>
+      )}
+
       {/* Top Advertising Banner */}
-      {showAdvertising && topCourses.length > 0 && (
+      {showAdvertising && (
         <div className="mb-8">
-          <PremiumCourseBanner 
-            course={topCourses[0]}
+          {console.log('🎯 Rendering Premium Course Banner with course:', topCourses[0])}
+          <DesignablePremiumCourseBanner 
+            course={topCourses[0] || { id: 'demo', title: 'Demo Premium Course', institution: { name: 'Demo Institution' } }}
             className="mb-4"
+            designConfig={getItemDesignConfig('premium-course-banner')}
+            onEdit={() => handleEditItem('premium-course-banner')}
+            showDesignToolkit={canAccessDesignToolkit}
+            itemId="premium-course-banner"
           />
         </div>
       )}
 
       {/* Featured Institutions Banner */}
-      {showAdvertising && featuredInstitutions.length > 0 && (
+      {showAdvertising && (
         <div className="mb-8">
-          <FeaturedInstitutionBanner 
-            institution={featuredInstitutions[0]}
+          {console.log('🎯 Rendering Featured Institution Banner with institution:', featuredInstitutions[0])}
+          <DesignableFeaturedInstitutionBanner 
+            institution={featuredInstitutions[0] || { id: 'demo', name: 'Demo Featured Institution' }}
             className="mb-4"
+            designConfig={getItemDesignConfig('featured-institution-banner')}
+            onEdit={() => handleEditItem('featured-institution-banner')}
+            showDesignToolkit={canAccessDesignToolkit}
+            itemId="featured-institution-banner"
           />
         </div>
       )}
@@ -311,7 +621,7 @@ export default function CoursesPageClient() {
       {/* Promotional Banner */}
       {showAdvertising && (
         <div className="mb-8">
-          <PromotionalBanner 
+          <DesignablePromotionalBanner 
             offer={{
               title: "Summer Language Learning Sale",
               description: "Get 20% off on all courses this summer. Perfect time to start your language journey!",
@@ -320,6 +630,10 @@ export default function CoursesPageClient() {
               discount: "Save 20%"
             }}
             className="mb-4"
+            designConfig={getItemDesignConfig('promotional-banner')}
+            onEdit={() => handleEditItem('promotional-banner')}
+            showDesignToolkit={canAccessDesignToolkit}
+            itemId="promotional-banner"
           />
         </div>
       )}
@@ -367,31 +681,31 @@ export default function CoursesPageClient() {
                 <SelectItem value="premium">
                   <div className="flex items-center gap-2">
                     <Crown className="w-4 h-4" />
-                  Premium
-                </div>
-              </SelectItem>
-              <SelectItem value="high-commission">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4" />
-                  Popular
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+                    Premium
+                  </div>
+                </SelectItem>
+                <SelectItem value="high-commission">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    Popular
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Tag Filter */}
+        <div className="flex items-center gap-2">
+          <Tag className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-muted-foreground">Filter by tags:</span>
+          <TagFilter
+            selectedTags={selectedTags}
+            onTagsChange={setSelectedTags}
+            className="flex-1"
+          />
         </div>
       </div>
-
-      {/* Tag Filter */}
-      <div className="flex items-center gap-2">
-        <Tag className="w-4 h-4 text-muted-foreground" />
-        <span className="text-sm font-medium text-muted-foreground">Filter by tags:</span>
-        <TagFilter
-          selectedTags={selectedTags}
-          onTagsChange={setSelectedTags}
-          className="flex-1"
-        />
-      </div>
-    </div>
 
       {/* Course Discovery Info */}
       <Alert className="bg-green-50 border-green-200">
@@ -444,7 +758,7 @@ export default function CoursesPageClient() {
           <EnhancedPromotionalSidebar 
             maxItems={4}
             showSponsored={showAdvertising}
-            showDesignToolkit={session?.user?.role === 'ADMIN' || session?.user?.role === 'INSTITUTION'}
+            showDesignToolkit={session?.user?.role === 'ADMIN' || session?.user?.role === 'INSTITUTION_STAFF'}
             userRole={session?.user?.role}
           />
         </div>

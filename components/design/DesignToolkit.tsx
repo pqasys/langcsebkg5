@@ -427,21 +427,40 @@ export function DesignToolkit({
               </div>
 
               {localConfig?.backgroundType === 'solid' && (
-                <div>
-                  <Label className="text-sm font-medium">Background Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={localConfig?.backgroundColor || '#ffffff'}
-                      onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
-                      className="w-16 h-10"
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">Background Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={localConfig?.backgroundColor || '#ffffff'}
+                        onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                        className="w-16 h-10"
+                      />
+                      <Input
+                        value={localConfig?.backgroundColor || '#ffffff'}
+                        onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
+                        placeholder="#ffffff"
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
+                    <Slider
+                      value={[localConfig?.backgroundOpacity || 100]}
+                      onValueChange={([value]) => {
+                        console.log('🎨 Solid color opacity slider changed to:', value);
+                        handleConfigChange({ backgroundOpacity: value });
+                      }}
+                      max={100}
+                      min={0}
+                      step={1}
+                      className="w-full"
                     />
-                    <Input
-                      value={localConfig?.backgroundColor || '#ffffff'}
-                      onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
-                      placeholder="#ffffff"
-                      className="flex-1"
-                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Current opacity value: {localConfig?.backgroundOpacity || 100}%
+                    </p>
                   </div>
                 </div>
               )}
@@ -564,6 +583,23 @@ export function DesignToolkit({
                         />
                       </div>
                     </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
+                    <Slider
+                      value={[localConfig?.backgroundOpacity || 100]}
+                      onValueChange={([value]) => {
+                        console.log('🎨 Gradient opacity slider changed to:', value);
+                        handleConfigChange({ backgroundOpacity: value });
+                      }}
+                      max={100}
+                      min={0}
+                      step={1}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Current opacity value: {localConfig?.backgroundOpacity || 100}%
+                    </p>
                   </div>
                 </div>
               )}
