@@ -291,20 +291,48 @@ export function EnhancedPromotionalSidebar({
       
       try {
         setIsLoading(true);
+        console.log('🔄 Loading design configs for user:', session.user.id);
         const response = await fetch('/api/design-configs?createdBy=' + session.user.id);
         if (response.ok) {
           const data = await response.json();
+          console.log('📥 Raw database response:', data);
           const configsMap: IndividualDesignConfig = {};
           
-          // Convert array to map by itemId and transform database format to DesignConfig format
-          data.configs?.forEach((config: any) => {
-            if (config.itemId) {
-              configsMap[config.itemId] = transformDatabaseConfig(config);
-            }
-          });
+                     // Convert array to map by itemId and transform database format to DesignConfig format
+           // Group by itemId and get the most recent configuration for each item
+           const configsByItemId: { [key: string]: any[] } = {};
+           
+           data.configs?.forEach((config: any) => {
+             if (config.itemId) {
+               if (!configsByItemId[config.itemId]) {
+                 configsByItemId[config.itemId] = [];
+               }
+               configsByItemId[config.itemId].push(config);
+             }
+           });
+           
+           // For each itemId, get the most recent configuration (highest createdAt)
+           Object.keys(configsByItemId).forEach((itemId) => {
+             const configs = configsByItemId[itemId];
+             // Sort by createdAt descending and take the first (most recent)
+             const mostRecentConfig = configs.sort((a, b) => 
+               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+             )[0];
+             
+             console.log('🔄 Transforming most recent config for item:', itemId, mostRecentConfig);
+             console.log('🔄 Raw titleColor:', mostRecentConfig.titleColor);
+             console.log('🔄 Raw descriptionColor:', mostRecentConfig.descriptionColor);
+             const transformed = transformDatabaseConfig(mostRecentConfig);
+             console.log('✅ Transformed config:', transformed);
+             console.log('✅ Transformed titleColor:', transformed.titleColor);
+             console.log('✅ Transformed descriptionColor:', transformed.descriptionColor);
+             configsMap[itemId] = transformed;
+           });
           
           setIndividualDesignConfigs(configsMap);
-          console.log('📥 Loaded design configs from database:', configsMap);
+          console.log('📥 Final loaded design configs:', configsMap);
+        } else {
+          console.error('❌ Failed to load design configs:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('Error loading design configs from database:', error);
@@ -334,7 +362,12 @@ export function EnhancedPromotionalSidebar({
       return;
     }
 
+    console.log('💾 Saving design config for item:', itemId);
+    console.log('💾 Original config:', config);
+    
     const sanitized = sanitizeDesignConfig(config);
+    console.log('💾 Sanitized config:', sanitized);
+    
     const updated = { ...individualDesignConfigs, [itemId]: sanitized };
     setIndividualDesignConfigs(updated);
 
@@ -378,50 +411,62 @@ export function EnhancedPromotionalSidebar({
       isDefault: false
     };
     
-    try {
-      // Save to database
-      const response = await fetch('/api/design-configs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(flattenedConfig),
-      });
+    console.log('💾 Flattened config for database:', flattenedConfig);
+    
+         try {
+       // Save to database
+       console.log('🔄 Sending to database:', flattenedConfig);
+       const response = await fetch('/api/design-configs', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(flattenedConfig),
+       });
 
-      if (response.ok) {
-        console.log(`✅ Saved design config for item: ${itemId} to database`);
-        
-        // Also save to localStorage as backup
-        try {
-          localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
-        } catch (localStorageError) {
-          console.warn('Could not save to localStorage backup:', localStorageError);
-        }
-      } else {
-        console.error('Failed to save to database:', response.statusText);
-        // Fallback to localStorage only
-        try {
-          localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
-          console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
-        } catch (localStorageError) {
-          console.error('Error saving to localStorage fallback:', localStorageError);
-        }
-      }
-    } catch (error) {
-      console.error('Error saving design config:', error);
-      // Fallback to localStorage only
-      try {
-        localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
-        console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
-      } catch (localStorageError) {
-        console.error('Error saving to localStorage fallback:', localStorageError);
-      }
-    }
+       if (response.ok) {
+         const responseData = await response.json();
+         console.log(`✅ Saved design config for item: ${itemId} to database`, responseData);
+         
+         // Also save to localStorage as backup
+         try {
+           localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
+         } catch (localStorageError) {
+           console.warn('Could not save to localStorage backup:', localStorageError);
+         }
+       } else {
+         const errorText = await response.text();
+         console.error('Failed to save to database:', response.status, response.statusText, errorText);
+         // Fallback to localStorage only
+         try {
+           localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
+           console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+         } catch (localStorageError) {
+           console.error('Error saving to localStorage fallback:', localStorageError);
+         }
+       }
+     } catch (error) {
+       console.error('Error saving design config:', error);
+       // Fallback to localStorage only
+       try {
+         localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
+         console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+       } catch (localStorageError) {
+         console.error('Error saving to localStorage fallback:', localStorageError);
+       }
+     }
   };
 
   // Get design config for a specific item
   const getItemDesignConfig = (itemId: string): DesignConfig => {
-    return individualDesignConfigs[itemId] || DEFAULT_DESIGN_CONFIG;
+    const config = individualDesignConfigs[itemId] || DEFAULT_DESIGN_CONFIG;
+    console.log(`🎯 getItemDesignConfig for ${itemId}:`, {
+      hasCustomConfig: !!individualDesignConfigs[itemId],
+      titleColor: config.titleColor,
+      descriptionColor: config.descriptionColor,
+      backgroundType: config.backgroundType
+    });
+    return config;
   };
 
   // Check if an item has a custom design (different from default)
@@ -718,19 +763,20 @@ export function EnhancedPromotionalSidebar({
               
               {editingItemId && (
                 <div className="space-y-2">
-                  <DesignToolkit
-                    key={editingItemId} // Use stable key to prevent re-renders
-                    config={getItemDesignConfig(editingItemId)}
-                    onConfigChange={(config) => {
-                      // Use a ref to track changes without causing re-renders
-                      const updated = { ...individualDesignConfigs, [editingItemId]: config };
-                      setIndividualDesignConfigs(updated);
-                      // Mark as having unsaved changes
-                      setUnsavedChanges(prev => new Set(prev).add(editingItemId!));
-                    }}
-                    showSaveButton={true}
-                    onSave={() => handleSaveItemDesign(getItemDesignConfig(editingItemId))}
-                  />
+                                     <DesignToolkit
+                     key={editingItemId} // Use stable key to prevent re-renders
+                     config={getItemDesignConfig(editingItemId)}
+                     onConfigChange={(config) => {
+                       // Use a ref to track changes without causing re-renders
+                       const updated = { ...individualDesignConfigs, [editingItemId]: config };
+                       setIndividualDesignConfigs(updated);
+                       // Mark as having unsaved changes
+                       setUnsavedChanges(prev => new Set(prev).add(editingItemId!));
+                     }}
+                     showSaveButton={true}
+                     onSave={() => handleSaveItemDesign(getItemDesignConfig(editingItemId))}
+                                           institutionId={session?.user?.institutionId || ''}
+                   />
                   {unsavedChanges.has(editingItemId) && (
                     <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded border border-orange-200">
                       ⚠️ You have unsaved changes. Click "Save Design" to persist your changes.

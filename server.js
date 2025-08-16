@@ -9,7 +9,8 @@ process.env.TURBOPACK = '1';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
-const port = process.env.PORT || 3000;
+// Allow command line argument for port, fallback to environment variable, then default to 3000
+const port = process.argv[2] || process.env.PORT || 3000;
 
 // Prepare the Next.js app with Turbopack enabled
 const app = next({ 

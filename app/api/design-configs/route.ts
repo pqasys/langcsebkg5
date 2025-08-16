@@ -42,6 +42,13 @@ export async function GET(request: NextRequest) {
       ]
     });
 
+    console.log('📤 API returning configs:', configs.map(config => ({
+      itemId: config.itemId,
+      titleColor: config.titleColor,
+      descriptionColor: config.descriptionColor,
+      backgroundType: config.backgroundType
+    })));
+
     return NextResponse.json({ configs });
   } catch (error) {
     console.error('Error fetching design configs:', error);
@@ -66,6 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    console.log('📥 API received body:', body);
     const {
       name,
       description,
@@ -112,47 +120,118 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const config = await prisma.designConfig.create({
-      data: {
-        name,
-        description,
-        itemId,
-        backgroundType,
-        backgroundColor,
-        backgroundGradientFrom,
-        backgroundGradientTo,
-        backgroundGradientDirection,
-        backgroundImage,
-        backgroundPattern,
-        backgroundOpacity,
-        titleFont,
-        titleSize,
-        titleWeight,
-        titleColor,
-        titleAlignment,
-        titleShadow,
-        titleShadowColor,
-        descriptionFont,
-        descriptionSize,
-        descriptionColor,
-        descriptionAlignment,
-        padding,
-        borderRadius,
-        borderWidth,
-        borderColor,
-        borderStyle,
-        shadow,
-        shadowColor,
-        shadowBlur,
-        shadowOffset,
-        hoverEffect,
-        animationDuration,
-        customCSS,
-        isDefault,
-        createdBy: session.user.id,
-        isActive: true
+    console.log('🔄 Creating design config with data:', {
+      name,
+      description,
+      itemId,
+      titleColor,
+      descriptionColor,
+      titleAlignment,
+      descriptionAlignment
+    });
+
+    // Check if a configuration already exists for this itemId and user
+    const existingConfig = await prisma.designConfig.findFirst({
+      where: {
+        itemId: itemId,
+        createdBy: session.user.id
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
+
+    let config;
+    if (existingConfig) {
+      // Update existing configuration
+      console.log('🔄 Updating existing config for itemId:', itemId);
+      config = await prisma.designConfig.update({
+        where: {
+          id: existingConfig.id
+        },
+        data: {
+          name,
+          description,
+          backgroundType,
+          backgroundColor,
+          backgroundGradientFrom,
+          backgroundGradientTo,
+          backgroundGradientDirection,
+          backgroundImage,
+          backgroundPattern,
+          backgroundOpacity,
+          titleFont,
+          titleSize,
+          titleWeight,
+          titleColor,
+          titleAlignment: titleAlignment, // Already JSON string from frontend
+          titleShadow,
+          titleShadowColor,
+          descriptionFont,
+          descriptionSize,
+          descriptionColor,
+          descriptionAlignment: descriptionAlignment, // Already JSON string from frontend
+          padding,
+          borderRadius,
+          borderWidth,
+          borderColor,
+          borderStyle,
+          shadow,
+          shadowColor,
+          shadowBlur,
+          shadowOffset,
+          hoverEffect,
+          animationDuration,
+          customCSS,
+          isDefault,
+          isActive: true
+        }
+      });
+    } else {
+      // Create new configuration
+      console.log('🔄 Creating new config for itemId:', itemId);
+      config = await prisma.designConfig.create({
+        data: {
+          name,
+          description,
+          itemId,
+          backgroundType,
+          backgroundColor,
+          backgroundGradientFrom,
+          backgroundGradientTo,
+          backgroundGradientDirection,
+          backgroundImage,
+          backgroundPattern,
+          backgroundOpacity,
+          titleFont,
+          titleSize,
+          titleWeight,
+          titleColor,
+          titleAlignment: titleAlignment, // Already JSON string from frontend
+          titleShadow,
+          titleShadowColor,
+          descriptionFont,
+          descriptionSize,
+          descriptionColor,
+          descriptionAlignment: descriptionAlignment, // Already JSON string from frontend
+          padding,
+          borderRadius,
+          borderWidth,
+          borderColor,
+          borderStyle,
+          shadow,
+          shadowColor,
+          shadowBlur,
+          shadowOffset,
+          hoverEffect,
+          animationDuration,
+          customCSS,
+          isDefault,
+          createdBy: session.user.id,
+          isActive: true
+        }
+      });
+    }
 
     return NextResponse.json({ config }, { status: 201 });
   } catch (error) {

@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { TemplateSelector } from './TemplateSelector';
 import { Separator } from '@/components/ui/separator';
+import { FileUpload } from '@/components/ui/file-upload';
 import {
   Tooltip,
   TooltipContent,
@@ -112,9 +113,10 @@ export interface DesignToolkitProps {
   showSaveButton?: boolean;
   showResetButton?: boolean;
   showPreview?: boolean;
+  institutionId?: string;
 }
 
-const DEFAULT_DESIGN_CONFIG: DesignConfig = {
+export const DEFAULT_DESIGN_CONFIG: DesignConfig = {
   backgroundType: 'solid',
   backgroundColor: '#ffffff',
   backgroundGradient: {
@@ -214,7 +216,8 @@ export function DesignToolkit({
   className = '',
   showSaveButton = false,
   showResetButton = true,
-  showPreview = true
+  showPreview = true,
+  institutionId = 'default'
 }: DesignToolkitProps) {
   // Ensure we always have a valid config
   const safeConfig = config || DEFAULT_DESIGN_CONFIG;
@@ -251,12 +254,6 @@ export function DesignToolkit({
         to: '#764ba2',
         direction: 'to-r'
       };
-    }
-    
-    // Debug logging for gradient changes
-    if (updates.backgroundGradient) {
-      console.log('🎨 Gradient update:', updates.backgroundGradient);
-      console.log('🎨 New config gradient:', newConfig.backgroundGradient);
     }
     
     setLocalConfig(newConfig);
@@ -456,7 +453,6 @@ export function DesignToolkit({
                     <Select
                       value={localConfig?.backgroundGradient?.direction || 'to-r'}
                       onValueChange={(value: any) => {
-                        console.log('🎨 Direction change:', value);
                         const currentGradient = localConfig?.backgroundGradient || {
                           from: '#667eea',
                           to: '#764ba2',
@@ -466,7 +462,6 @@ export function DesignToolkit({
                           ...currentGradient,
                           direction: value
                         };
-                        console.log('🎨 Updated gradient:', updatedGradient);
                         handleConfigChange({
                           backgroundGradient: updatedGradient
                         });
@@ -492,7 +487,6 @@ export function DesignToolkit({
                           type="color"
                           value={localConfig?.backgroundGradient?.from || '#667eea'}
                           onChange={(e) => {
-                            console.log('🎨 From color change:', e.target.value);
                             const currentGradient = localConfig?.backgroundGradient || {
                               from: '#667eea',
                               to: '#764ba2',
@@ -502,7 +496,6 @@ export function DesignToolkit({
                               ...currentGradient,
                               from: e.target.value
                             };
-                            console.log('🎨 Updated gradient:', updatedGradient);
                             handleConfigChange({
                               backgroundGradient: updatedGradient
                             });
@@ -512,7 +505,6 @@ export function DesignToolkit({
                         <Input
                           value={localConfig?.backgroundGradient?.from || '#667eea'}
                           onChange={(e) => {
-                            console.log('🎨 From color text change:', e.target.value);
                             const currentGradient = localConfig?.backgroundGradient || {
                               from: '#667eea',
                               to: '#764ba2',
@@ -522,7 +514,6 @@ export function DesignToolkit({
                               ...currentGradient,
                               from: e.target.value
                             };
-                            console.log('🎨 Updated gradient:', updatedGradient);
                             handleConfigChange({
                               backgroundGradient: updatedGradient
                             });
@@ -538,7 +529,6 @@ export function DesignToolkit({
                           type="color"
                           value={localConfig?.backgroundGradient?.to || '#764ba2'}
                           onChange={(e) => {
-                            console.log('🎨 To color change:', e.target.value);
                             const currentGradient = localConfig?.backgroundGradient || {
                               from: '#667eea',
                               to: '#764ba2',
@@ -548,7 +538,6 @@ export function DesignToolkit({
                               ...currentGradient,
                               to: e.target.value
                             };
-                            console.log('🎨 Updated gradient:', updatedGradient);
                             handleConfigChange({
                               backgroundGradient: updatedGradient
                             });
@@ -558,7 +547,6 @@ export function DesignToolkit({
                         <Input
                           value={localConfig?.backgroundGradient?.to || '#764ba2'}
                           onChange={(e) => {
-                            console.log('🎨 To color text change:', e.target.value);
                             const currentGradient = localConfig?.backgroundGradient || {
                               from: '#667eea',
                               to: '#764ba2',
@@ -568,7 +556,6 @@ export function DesignToolkit({
                               ...currentGradient,
                               to: e.target.value
                             };
-                            console.log('🎨 Updated gradient:', updatedGradient);
                             handleConfigChange({
                               backgroundGradient: updatedGradient
                             });
@@ -584,41 +571,69 @@ export function DesignToolkit({
               {localConfig?.backgroundType === 'image' && (
                 <div className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium">Background Image URL</Label>
-                                         <Input
-                       value={localConfig?.backgroundImage || ''}
-                       onChange={(e) => {
-                         const value = e.target.value;
-                         // Update local state immediately for responsive UI
-                         setLocalConfig(prev => ({ ...prev, backgroundImage: value }));
-                         
-                         // Clear existing timeout
-                         if (backgroundImageTimeoutRef.current) {
-                           clearTimeout(backgroundImageTimeoutRef.current);
-                         }
-                         
-                         // Debounce the parent callback to prevent excessive re-renders
-                         backgroundImageTimeoutRef.current = setTimeout(() => {
-                           handleConfigChange({ backgroundImage: value });
-                         }, 300);
-                       }}
-                       placeholder="https://example.com/image.jpg"
-                       className="font-mono text-sm"
-                     />
-                    <p className="text-xs text-gray-500">
-                      Enter a valid URL starting with http://, https://, or / for local paths
-                    </p>
+                    <Label className="text-sm font-medium">Background Image</Label>
+                    
+                    {/* File Upload Component */}
+                    <FileUpload
+                      onUploadSuccess={(url) => {
+                        console.log('✅ Image uploaded successfully:', url);
+                        setLocalConfig(prev => ({ ...prev, backgroundImage: url }));
+                        handleConfigChange({ backgroundImage: url });
+                      }}
+                      onUploadError={(error) => {
+                        console.error('❌ Image upload failed:', error);
+                      }}
+                      institutionId={institutionId}
+                      label="Upload Background Image"
+                      className="mb-3"
+                    />
+                    
+                    <Separator className="my-3" />
+                    
+                    {/* URL Input (for external images) */}
+                    <div>
+                      <Label className="text-sm font-medium">Or Enter Image URL</Label>
+                      <Input
+                        value={localConfig?.backgroundImage || ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Update local state immediately for responsive UI
+                          setLocalConfig(prev => ({ ...prev, backgroundImage: value }));
+                          
+                          // Clear existing timeout
+                          if (backgroundImageTimeoutRef.current) {
+                            clearTimeout(backgroundImageTimeoutRef.current);
+                          }
+                          
+                          // Debounce the parent callback to prevent excessive re-renders
+                          backgroundImageTimeoutRef.current = setTimeout(() => {
+                            handleConfigChange({ backgroundImage: value });
+                          }, 300);
+                        }}
+                        placeholder="https://example.com/image.jpg"
+                        className="font-mono text-sm"
+                      />
+                      <p className="text-xs text-gray-500">
+                        Enter a valid URL starting with http://, https://, or / for local paths
+                      </p>
+                    </div>
                   </div>
                   <div>
                     <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
                     <Slider
                       value={[localConfig?.backgroundOpacity || 100]}
-                      onValueChange={([value]) => handleConfigChange({ backgroundOpacity: value })}
+                      onValueChange={([value]) => {
+                        console.log('🎨 Opacity slider changed to:', value);
+                        handleConfigChange({ backgroundOpacity: value });
+                      }}
                       max={100}
                       min={0}
                       step={1}
                       className="w-full"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Current opacity value: {localConfig?.backgroundOpacity || 100}%
+                    </p>
                   </div>
                 </div>
               )}
@@ -630,7 +645,6 @@ export function DesignToolkit({
                     <Select
                       value={localConfig?.backgroundPattern || 'none'}
                       onValueChange={(value) => {
-                        console.log('🎨 Pattern type changed to:', value);
                         handleConfigChange({ backgroundPattern: value });
                       }}
                     >
@@ -638,13 +652,11 @@ export function DesignToolkit({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        <SelectItem value="dots">Dots</SelectItem>
-                        <SelectItem value="lines">Lines</SelectItem>
-                        <SelectItem value="grid">Grid</SelectItem>
-                        <SelectItem value="hexagons">Hexagons</SelectItem>
-                        <SelectItem value="waves">Waves</SelectItem>
-                        <SelectItem value="stars">Stars</SelectItem>
+                        {PATTERN_OPTIONS.map((pattern) => (
+                          <SelectItem key={pattern.value} value={pattern.value}>
+                            {pattern.label}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -655,7 +667,6 @@ export function DesignToolkit({
                         type="color"
                         value={localConfig?.backgroundColor || '#e0e0e0'}
                         onChange={(e) => {
-                          console.log('🎨 Pattern color changed to:', e.target.value);
                           handleConfigChange({ backgroundColor: e.target.value });
                         }}
                         className="w-16 h-10"
@@ -663,7 +674,6 @@ export function DesignToolkit({
                       <Input
                         value={localConfig?.backgroundColor || '#e0e0e0'}
                         onChange={(e) => {
-                          console.log('🎨 Pattern color text changed to:', e.target.value);
                           handleConfigChange({ backgroundColor: e.target.value });
                         }}
                         placeholder="#e0e0e0"
@@ -688,11 +698,11 @@ export function DesignToolkit({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="inter">Inter</SelectItem>
-                    <SelectItem value="roboto">Roboto</SelectItem>
-                    <SelectItem value="open-sans">Open Sans</SelectItem>
-                    <SelectItem value="poppins">Poppins</SelectItem>
-                    <SelectItem value="montserrat">Montserrat</SelectItem>
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem key={font.value} value={font.value}>
+                        {font.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -797,85 +807,6 @@ export function DesignToolkit({
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-2">
-                <div>
-                  <Label className="text-sm font-medium">Top Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.titleAlignment?.padding?.top || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        titleAlignment: {
-                          ...localConfig?.titleAlignment,
-                          padding: { 
-                            ...localConfig?.titleAlignment?.padding, 
-                            top: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Bottom Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.titleAlignment?.padding?.bottom || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        titleAlignment: {
-                          ...localConfig?.titleAlignment,
-                          padding: { 
-                            ...localConfig?.titleAlignment?.padding, 
-                            bottom: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Left Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.titleAlignment?.padding?.left || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        titleAlignment: {
-                          ...localConfig?.titleAlignment,
-                          padding: { 
-                            ...localConfig?.titleAlignment?.padding, 
-                            left: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Right Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.titleAlignment?.padding?.right || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        titleAlignment: {
-                          ...localConfig?.titleAlignment,
-                          padding: { 
-                            ...localConfig?.titleAlignment?.padding, 
-                            right: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
               <div className="flex items-center space-x-2">
                 <Switch
                   id="title-shadow"
@@ -919,11 +850,11 @@ export function DesignToolkit({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="inter">Inter</SelectItem>
-                    <SelectItem value="roboto">Roboto</SelectItem>
-                    <SelectItem value="open-sans">Open Sans</SelectItem>
-                    <SelectItem value="poppins">Poppins</SelectItem>
-                    <SelectItem value="montserrat">Montserrat</SelectItem>
+                    {FONT_OPTIONS.map((font) => (
+                      <SelectItem key={font.value} value={font.value}>
+                        {font.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1006,85 +937,6 @@ export function DesignToolkit({
                       <SelectItem value="bottom">Bottom</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-4 gap-2">
-                <div>
-                  <Label className="text-sm font-medium">Top Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.descriptionAlignment?.padding?.top || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        descriptionAlignment: {
-                          ...localConfig?.descriptionAlignment,
-                          padding: { 
-                            ...localConfig?.descriptionAlignment?.padding, 
-                            top: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Bottom Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.descriptionAlignment?.padding?.bottom || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        descriptionAlignment: {
-                          ...localConfig?.descriptionAlignment,
-                          padding: { 
-                            ...localConfig?.descriptionAlignment?.padding, 
-                            bottom: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Left Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.descriptionAlignment?.padding?.left || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        descriptionAlignment: {
-                          ...localConfig?.descriptionAlignment,
-                          padding: { 
-                            ...localConfig?.descriptionAlignment?.padding, 
-                            left: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Right Padding</Label>
-                  <Input
-                    type="number"
-                    value={localConfig?.descriptionAlignment?.padding?.right || 0}
-                    onChange={(e) =>
-                      handleConfigChange({
-                        descriptionAlignment: {
-                          ...localConfig?.descriptionAlignment,
-                          padding: { 
-                            ...localConfig?.descriptionAlignment?.padding, 
-                            right: parseInt(e.target.value) || 0 
-                          }
-                        }
-                      })
-                    }
-                    className="w-full"
-                  />
                 </div>
               </div>
             </div>
@@ -1283,127 +1135,80 @@ export function DesignToolkit({
           <div className="mt-6">
             <Label className="text-sm font-medium mb-2 block">Live Preview</Label>
             
-            {/* Test pattern div for debugging */}
-            {localConfig?.backgroundType === 'pattern' && localConfig?.backgroundPattern !== 'none' && (
-              <div className="mb-4 p-2 border rounded">
-                <Label className="text-xs font-medium mb-1 block">Test Pattern:</Label>
-                <div 
-                  className="h-8 rounded"
+                          <div className="border rounded-lg p-4">
+                <div
+                  className="p-4 rounded-lg transition-all duration-300"
                   style={{
-                    ...generatePatternStyles(
-                      localConfig.backgroundPattern,
-                      localConfig.backgroundColor || '#e0e0e0',
-                      localConfig.backgroundColor || '#ffffff'
-                    )
-                  }}
-                ></div>
-              </div>
-            )}
-            
-            <div className="border rounded-lg p-4">
-              <div
-                className="p-4 rounded-lg transition-all duration-300"
-                style={{
-                  // Debug: Log the entire style object
-                  ...(() => {
-                    const bgType = localConfig?.backgroundType || 'solid';
-                    console.log('🎨 Background type:', bgType);
-                    console.log('🎨 Local config:', localConfig);
-                    
-                    const styleObj: React.CSSProperties = {
-                      minHeight: '120px',
-                      padding: `${localConfig?.padding || 16}px`,
-                      borderRadius: `${localConfig?.borderRadius || 8}px`,
-                      border: `${localConfig?.borderWidth || 1}px ${localConfig?.borderStyle || 'solid'} ${localConfig?.borderColor || '#e5e7eb'}`,
-                      boxShadow: localConfig?.shadow 
-                        ? `0 ${localConfig?.shadowOffset || 4}px ${localConfig?.shadowBlur || 10}px ${localConfig?.shadowColor || 'rgba(0, 0, 0, 0.1)'}`
-                        : 'none',
-                    };
-                    
-                    // Handle background based on type
-                    if (bgType === 'gradient') {
-                      const gradientDirection = localConfig?.backgroundGradient?.direction || 'to-r';
-                      const gradientFrom = localConfig?.backgroundGradient?.from || '#667eea';
-                      const gradientTo = localConfig?.backgroundGradient?.to || '#764ba2';
+                    minHeight: '120px',
+                    padding: `${localConfig?.padding || 16}px`,
+                    borderRadius: `${localConfig?.borderRadius || 8}px`,
+                    border: `${localConfig?.borderWidth || 1}px ${localConfig?.borderStyle || 'solid'} ${localConfig?.borderColor || '#e5e7eb'}`,
+                    boxShadow: localConfig?.shadow 
+                      ? `0 ${localConfig?.shadowOffset || 4}px ${localConfig?.shadowBlur || 10}px ${localConfig?.shadowColor || 'rgba(0, 0, 0, 0.1)'}`
+                      : 'none',
+                    ...(() => {
+                      const bgType = localConfig?.backgroundType || 'solid';
+                      const styleObj: React.CSSProperties = {};
                       
-                      // Convert direction to proper CSS syntax
-                      let cssDirection = 'to right';
-                      switch (gradientDirection) {
-                        case 'to-r': cssDirection = 'to right'; break;
-                        case 'to-l': cssDirection = 'to left'; break;
-                        case 'to-t': cssDirection = 'to top'; break;
-                        case 'to-b': cssDirection = 'to bottom'; break;
-                        case 'to-tr': cssDirection = 'to top right'; break;
-                        case 'to-tl': cssDirection = 'to top left'; break;
-                        case 'to-br': cssDirection = 'to bottom right'; break;
-                        case 'to-bl': cssDirection = 'to bottom left'; break;
+                      if (bgType === 'gradient') {
+                        const gradientDirection = localConfig?.backgroundGradient?.direction || 'to-r';
+                        const gradientFrom = localConfig?.backgroundGradient?.from || '#667eea';
+                        const gradientTo = localConfig?.backgroundGradient?.to || '#764ba2';
+                        
+                        // Convert direction to proper CSS syntax
+                        let cssDirection = 'to right';
+                        switch (gradientDirection) {
+                          case 'to-r': cssDirection = 'to right'; break;
+                          case 'to-l': cssDirection = 'to left'; break;
+                          case 'to-t': cssDirection = 'to top'; break;
+                          case 'to-b': cssDirection = 'to bottom'; break;
+                          case 'to-tr': cssDirection = 'to top right'; break;
+                          case 'to-tl': cssDirection = 'to top left'; break;
+                          case 'to-br': cssDirection = 'to bottom right'; break;
+                          case 'to-bl': cssDirection = 'to bottom left'; break;
+                        }
+                        
+                        styleObj.background = `linear-gradient(${cssDirection}, ${gradientFrom}, ${gradientTo})`;
+                        styleObj.backgroundColor = gradientFrom; // Fallback
+                        
+                      } else if (bgType === 'solid') {
+                        styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                        
+                      } else if (bgType === 'image') {
+                        if (localConfig?.backgroundImage) {
+                          const opacity = (localConfig?.backgroundOpacity || 100) / 100;
+                          const backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                          
+                          console.log('🎨 Preview opacity debug:', {
+                            opacity,
+                            backgroundOpacity: localConfig?.backgroundOpacity,
+                            backgroundImage: localConfig?.backgroundImage
+                          });
+                          
+                          // Apply opacity to the background image using linear-gradient overlay
+                          if (opacity < 1) {
+                            styleObj.background = `linear-gradient(rgba(255, 255, 255, ${1 - opacity}), rgba(255, 255, 255, ${1 - opacity})), url('${localConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
+                            console.log('🎨 Applied opacity overlay:', styleObj.background);
+                          } else {
+                            styleObj.background = `url('${localConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
+                            console.log('🎨 Applied full opacity:', styleObj.background);
+                          }
+                        } else {
+                          styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                        }
+                        
+                      } else if (bgType === 'pattern') {
+                        const pattern = localConfig?.backgroundPattern || 'none';
+                        const patternColor = localConfig?.backgroundColor || '#e0e0e0';
+                        const backgroundColor = localConfig?.backgroundColor || '#ffffff';
+                        
+                        const patternStyles = generatePatternStyles(pattern, patternColor, backgroundColor);
+                        Object.assign(styleObj, patternStyles);
                       }
                       
-                      const gradientString = `linear-gradient(${cssDirection}, ${gradientFrom}, ${gradientTo})`;
-                      
-                      console.log('🎨 Gradient string:', gradientString);
-                      styleObj.background = gradientString;
-                      
-                      // Add fallback background color in case gradient fails
-                      styleObj.backgroundColor = gradientFrom;
-                      
-                    } else if (bgType === 'solid') {
-                      styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
-                      
-                                         } else if (bgType === 'image') {
-                       if (localConfig?.backgroundImage) {
-                         const opacity = (localConfig?.backgroundOpacity || 100) / 100;
-                         const backgroundColor = localConfig?.backgroundColor || '#ffffff';
-                         
-                         // Apply opacity to the background image using rgba or opacity
-                         if (opacity < 1) {
-                           styleObj.background = `url('${localConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
-                           styleObj.position = 'relative';
-                           styleObj.backgroundImage = `linear-gradient(rgba(255, 255, 255, ${1 - opacity}), rgba(255, 255, 255, ${1 - opacity})), url('${localConfig.backgroundImage}')`;
-                         } else {
-                           styleObj.background = `url('${localConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`;
-                         }
-                       } else {
-                         styleObj.backgroundColor = localConfig?.backgroundColor || '#ffffff';
-                       }
-                    } else if (bgType === 'pattern') {
-                      const pattern = localConfig?.backgroundPattern || 'none';
-                      const patternColor = localConfig?.backgroundColor || '#e0e0e0';
-                      const backgroundColor = localConfig?.backgroundColor || '#ffffff';
-                      
-                      console.log('🎨 Pattern debug:', {
-                        pattern,
-                        patternColor,
-                        backgroundColor
-                      });
-                      
-                      const patternStyles = generatePatternStyles(pattern, patternColor, backgroundColor);
-                      Object.assign(styleObj, patternStyles);
-                      
-                      console.log('🎨 Pattern styles applied:', patternStyles);
-                    }
-                    
-                    console.log('🎨 Final style object:', styleObj);
-                    return styleObj;
-                  })(),
-                  ...(localConfig?.customCSS && {
-                    // Parse custom CSS but exclude background-related properties to avoid conflicts
-                    ...localConfig.customCSS
-                      .split(';')
-                      .filter(rule => rule.trim())
-                      .reduce((acc, rule) => {
-                        const [property, value] = rule.split(':').map(s => s.trim());
-                        if (property && value) {
-                          // Skip background-related properties to avoid conflicts
-                          const backgroundProps = ['background', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundRepeat', 'backgroundColor'];
-                          if (!backgroundProps.includes(property)) {
-                            acc[property] = value;
-                          }
-                        }
-                        return acc;
-                      }, {} as Record<string, string>)
-                  })
-                }}
+                      return styleObj;
+                    })(),
+                  }}
               >
                 <h4
                   style={{
@@ -1413,10 +1218,6 @@ export function DesignToolkit({
                     color: localConfig?.titleColor || '#1f2937',
                     textAlign: localConfig?.titleAlignment?.horizontal || 'left',
                     textShadow: localConfig?.titleShadow ? `2px 2px 4px ${localConfig?.titleShadowColor || '#000000'}` : 'none',
-                    paddingTop: `${localConfig?.titleAlignment?.padding?.top || 0}px`,
-                    paddingBottom: `${localConfig?.titleAlignment?.padding?.bottom || 0}px`,
-                    paddingLeft: `${localConfig?.titleAlignment?.padding?.left || 0}px`,
-                    paddingRight: `${localConfig?.titleAlignment?.padding?.right || 0}px`,
                   }}
                   className="mb-2"
                 >
@@ -1428,10 +1229,6 @@ export function DesignToolkit({
                     fontSize: `${localConfig?.descriptionSize || 14}px`,
                     color: localConfig?.descriptionColor || '#6b7280',
                     textAlign: localConfig?.descriptionAlignment?.horizontal || 'left',
-                    paddingTop: `${localConfig?.descriptionAlignment?.padding?.top || 0}px`,
-                    paddingBottom: `${localConfig?.descriptionAlignment?.padding?.bottom || 0}px`,
-                    paddingLeft: `${localConfig?.descriptionAlignment?.padding?.left || 0}px`,
-                    paddingRight: `${localConfig?.descriptionAlignment?.padding?.right || 0}px`,
                   }}
                 >
                   This is a sample description that shows how your text will look with the current settings.

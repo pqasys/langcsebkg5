@@ -1709,14 +1709,14 @@ model DesignConfig {
   titleSize           Int      @default(16)
   titleWeight         String   @default("semibold")
   titleColor          String   @default("#1f2937")
-  titleAlignment      String   @default("left")
+  titleAlignment      Json?    // Complex alignment object
   titleShadow         Boolean  @default(false)
   titleShadowColor    String   @default("#000000")
   
   descriptionFont     String   @default("inter")
   descriptionSize     Int      @default(14)
   descriptionColor    String   @default("#6b7280")
-  descriptionAlignment String  @default("left")
+  descriptionAlignment Json?   // Complex alignment object
   
   // Layout settings
   padding             Int      @default(16)
