@@ -287,73 +287,73 @@ export function EnhancedPromotionalSidebar({
   // Load design configurations from database
   useEffect(() => {
     const loadDesignConfigs = async () => {
-      if (!session?.user) return;
-      
       try {
         setIsLoading(true);
-        console.log('🔄 Loading design configs for user:', session.user.id);
-        const response = await fetch('/api/design-configs?createdBy=' + session.user.id);
+        
+        let response;
+        if (session?.user) {
+          // Authenticated user - load user's own designs + admin designs
+          console.log('🔄 Loading design configs for authenticated user:', session.user.id);
+          response = await fetch('/api/design-configs?includeAdminDesigns=true');
+        } else {
+          // Unauthenticated user - load only public admin designs
+          console.log('🔄 Loading public design configs for unauthenticated user');
+          response = await fetch('/api/design-configs/public');
+        }
+        
         if (response.ok) {
           const data = await response.json();
           console.log('📥 Raw database response:', data);
           const configsMap: IndividualDesignConfig = {};
           
-                     // Convert array to map by itemId and transform database format to DesignConfig format
-           // Group by itemId and get the most recent configuration for each item
-           const configsByItemId: { [key: string]: any[] } = {};
-           
-           data.configs?.forEach((config: any) => {
-             if (config.itemId) {
-               if (!configsByItemId[config.itemId]) {
-                 configsByItemId[config.itemId] = [];
-               }
-               configsByItemId[config.itemId].push(config);
-             }
-           });
-           
-           // For each itemId, get the most recent configuration (highest createdAt)
-           Object.keys(configsByItemId).forEach((itemId) => {
-             const configs = configsByItemId[itemId];
-             // Sort by createdAt descending and take the first (most recent)
-             const mostRecentConfig = configs.sort((a, b) => 
-               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-             )[0];
-             
-             console.log('🔄 Transforming most recent config for item:', itemId, mostRecentConfig);
-             console.log('🔄 Raw titleColor:', mostRecentConfig.titleColor);
-             console.log('🔄 Raw descriptionColor:', mostRecentConfig.descriptionColor);
-             const transformed = transformDatabaseConfig(mostRecentConfig);
-             console.log('✅ Transformed config:', transformed);
-             console.log('✅ Transformed titleColor:', transformed.titleColor);
-             console.log('✅ Transformed descriptionColor:', transformed.descriptionColor);
-             configsMap[itemId] = transformed;
-           });
+          // Convert array to map by config name and transform database format to DesignConfig format
+          // Group by config name and use the most recent config for each name
+          const configsByName: { [key: string]: any[] } = {};
           
+          data.configs.forEach((config: any) => {
+            const configKey = config.name || config.id;
+            if (!configsByName[configKey]) {
+              configsByName[configKey] = [];
+            }
+            configsByName[configKey].push(config);
+          });
+          
+          // For each config name, use the most recent config (highest createdAt)
+          Object.keys(configsByName).forEach(configKey => {
+            const configs = configsByName[configKey];
+            const mostRecentConfig = configs.reduce((latest, current) => 
+              new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest
+            );
+            
+            // Map configs to promotional item IDs based on name patterns
+            let itemId = configKey;
+            
+            // Try to extract itemId from config name if it follows a pattern
+            if (configKey.includes('institution-')) {
+              itemId = 'institution-1';
+            } else if (configKey.includes('course-')) {
+              itemId = 'course-1';
+            } else if (configKey.includes('third-party-')) {
+              itemId = 'third-party-1';
+            }
+            
+            configsMap[itemId] = transformDatabaseConfig(mostRecentConfig);
+          });
+          
+          console.log('🔄 Transformed configs map:', Object.keys(configsMap));
           setIndividualDesignConfigs(configsMap);
-          console.log('📥 Final loaded design configs:', configsMap);
         } else {
           console.error('❌ Failed to load design configs:', response.status, response.statusText);
         }
       } catch (error) {
-        console.error('Error loading design configs from database:', error);
-        // Fallback to localStorage for backward compatibility
-        try {
-          const savedConfigs = localStorage.getItem('individualDesignConfigs');
-          if (savedConfigs) {
-            const parsed = JSON.parse(savedConfigs);
-            setIndividualDesignConfigs(parsed);
-            console.log('📥 Fallback: Loaded design configs from localStorage');
-          }
-        } catch (localStorageError) {
-          console.error('Error loading from localStorage fallback:', localStorageError);
-        }
+        console.error('❌ Error loading design configs:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadDesignConfigs();
-  }, [session?.user?.id]);
+  }, [session]);
 
   // Save design configuration to database
   const saveIndividualConfig = async (itemId: string, config: DesignConfig) => {

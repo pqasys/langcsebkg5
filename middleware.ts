@@ -101,6 +101,18 @@ export default withAuth(
         if (req.nextUrl.pathname === '/') {
           return true;
         }
+        // Allow public design configs API without authentication
+        if (req.nextUrl.pathname.startsWith('/api/design-configs/public')) {
+          return true;
+        }
+        // Allow public courses API without authentication
+        if (req.nextUrl.pathname.startsWith('/api/courses/public')) {
+          return true;
+        }
+        // Allow public institutions API without authentication
+        if (req.nextUrl.pathname.startsWith('/api/institutions') && !req.nextUrl.pathname.includes('/admin')) {
+          return true;
+        }
         // Require authentication for other protected routes
         return !!token;
       }
