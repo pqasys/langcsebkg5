@@ -95,6 +95,9 @@ export function EnhancedCourseCard({
     ? getStudentTier(course.subscriptionTier) 
     : null;
 
+  // Determine if the current user is an authenticated student
+  const isAuthenticatedStudent = isAuthenticated && userRole === 'STUDENT';
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -337,6 +340,9 @@ export function EnhancedCourseCard({
           <Button
             size="sm"
             onClick={() => onEnroll(course.id)}
+            disabled={isAuthenticated && userRole !== 'STUDENT'}
+            aria-disabled={isAuthenticated && userRole !== 'STUDENT'}
+            title={isAuthenticated && userRole !== 'STUDENT' ? 'Available to students only' : undefined}
             className={`flex-1 ${
               course.isPremiumPlacement 
                 ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600' 
@@ -345,7 +351,7 @@ export function EnhancedCourseCard({
                 : 'bg-blue-600 hover:bg-blue-700'
             } text-white`}
           >
-            {isAuthenticated && userRole === 'STUDENT' 
+            {isAuthenticatedStudent 
               ? (isSubscriptionBased ? 'Subscribe Now' : 'Enroll Now') 
               : 'Learn More'
             }

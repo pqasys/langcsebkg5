@@ -5,12 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  MapPin, 
-  Clock, 
-  Users, 
-  BookOpen, 
-  Star, 
+import {
+  MapPin,
+  Clock,
+  Users,
+  BookOpen,
+  Star,
   Calendar,
   DollarSign,
   Building2,
@@ -35,14 +35,18 @@ interface Course {
   framework: string;
   isFeatured: boolean;
   isSponsored: boolean;
+  priority?: number;
   hasLiveClasses: boolean;
   liveClassType?: string;
   liveClassFrequency?: string;
+  liveClassSchedule?: any;
   isPlatformCourse: boolean;
   requiresSubscription: boolean;
   subscriptionTier?: string;
   marketingType: string;
   marketingDescription?: string;
+  createdAt?: string;
+  updatedAt?: string;
   institution?: {
     id: string;
     name: string;
@@ -72,6 +76,23 @@ export default function CourseDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  const formatPricingPeriod = (period?: string) => {
+    if (!period) return '';
+    const key = period.toLowerCase();
+    if (key === 'full_course' || key === 'full course' || key === 'fullcourse') {
+      return 'Full Course';
+    }
+    if (key === 'month' || key === 'monthly') return 'Month';
+    if (key === 'week' || key === 'weekly') return 'Week';
+    if (key === 'session' || key === 'per_session') return 'Session';
+    if (key === 'lesson' || key === 'per_lesson') return 'Lesson';
+    return period
+      .replace(/_/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -148,6 +169,21 @@ export default function CourseDetails() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumbs */}
+        <div className="mb-4 text-sm text-gray-600">
+          <Link href="/courses" className="hover:underline">Courses</Link>
+          {course.category ? (
+            <>
+              <span className="mx-2">/</span>
+              <Link href={`/search?category=${encodeURIComponent(course.category.slug)}`} className="hover:underline">
+                {course.category.name}
+              </Link>
+            </>
+          ) : null}
+          <span className="mx-2">/</span>
+          <span className="text-gray-900">{course.title}</span>
+        </div>
+
         {/* Header */}
         <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
           <div className="relative h-64 bg-gradient-to-r from-blue-600 to-purple-600">
@@ -163,7 +199,7 @@ export default function CourseDetails() {
                 )}
                 <div>
                   <h1 className="text-3xl font-bold text-white mb-2">{course.title}</h1>
-                  <div className="flex items-center space-x-4 text-white">
+                  <div className="flex flex-wrap items-center gap-2 text-white">
                     {course.isFeatured && (
                       <Badge variant="secondary" className="bg-yellow-400 text-yellow-900">
                         <Star className="w-4 h-4 mr-1" />
@@ -175,10 +211,34 @@ export default function CourseDetails() {
                         Sponsored
                       </Badge>
                     )}
-                    <Badge variant="secondary" className="bg-blue-400 text-blue-900">
-                      {course.level}
-                    </Badge>
+                    {course.level && (
+                      <Badge variant="secondary" className="bg-blue-400 text-blue-900">
+                        {course.level}
+                      </Badge>
+                    )}
+                    {course.status && (
+                      <Badge variant="secondary" className="bg-white/90 text-gray-900">
+                        Status: {course.status}
+                      </Badge>
+                    )}
+                    {course.requiresSubscription && (
+                      <Badge variant="secondary" className="bg-purple-300 text-purple-900">
+                        Requires Subscription{course.subscriptionTier ? ` (${course.subscriptionTier})` : ''}
+                      </Badge>
+                    )}
+                    {course.isPlatformCourse && (
+                      <Badge variant="secondary" className="bg-indigo-300 text-indigo-900">
+                        Platform Course
+                      </Badge>
+                    )}
                   </div>
+                </div>
+              </div>
+              {/* Price pill */}
+              <div className="mt-4">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/90 text-gray-900 font-semibold shadow">
+                  <DollarSign className="w-4 h-4 mr-1" />
+                  ${course.base_price} / {formatPricingPeriod(course.pricingPeriod)}
                 </div>
               </div>
             </div>
@@ -200,6 +260,12 @@ export default function CourseDetails() {
                 <p className="text-gray-700 leading-relaxed">
                   {course.description || 'No description available for this course.'}
                 </p>
+                {course.marketingDescription && (
+                  <div className="mt-4">
+                    <h3 className="text-md font-semibold mb-2">Why take this course?</h3>
+                    <p className="text-gray-700 leading-relaxed">{course.marketingDescription}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -218,7 +284,6 @@ export default function CourseDetails() {
                         <p className="font-medium">{course.duration} weeks</p>
                       </div>
                     </div>
-                    
                     <div className="flex items-center">
                       <Users className="w-4 h-4 text-gray-400 mr-3" />
                       <div>
@@ -226,7 +291,6 @@ export default function CourseDetails() {
                         <p className="font-medium">{course.maxStudents}</p>
                       </div>
                     </div>
-                    
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 text-gray-400 mr-3" />
                       <div>
@@ -234,8 +298,16 @@ export default function CourseDetails() {
                         <p className="font-medium">{new Date(course.startDate).toLocaleDateString()}</p>
                       </div>
                     </div>
+                    {course.endDate && (
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 text-gray-400 mr-3" />
+                        <div>
+                          <p className="text-sm text-gray-600">End Date</p>
+                          <p className="font-medium">{new Date(course.endDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
                   <div className="space-y-4">
                     <div className="flex items-center">
                       <BookOpen className="w-4 h-4 text-gray-400 mr-3" />
@@ -244,21 +316,26 @@ export default function CourseDetails() {
                         <p className="font-medium">{course.framework}</p>
                       </div>
                     </div>
-                    
                     <div className="flex items-center">
                       <DollarSign className="w-4 h-4 text-gray-400 mr-3" />
                       <div>
                         <p className="text-sm text-gray-600">Price</p>
-                        <p className="font-medium">${course.base_price} per {course.pricingPeriod.toLowerCase()}</p>
+                        <p className="font-medium">${course.base_price} per {formatPricingPeriod(course.pricingPeriod)}</p>
                       </div>
                     </div>
-                    
+                    <div className="flex items-center">
+                      <Globe className="w-4 h-4 text-gray-400 mr-3" />
+                      <div>
+                        <p className="text-sm text-gray-600">Delivery</p>
+                        <p className="font-medium">{course.marketingType}</p>
+                      </div>
+                    </div>
                     {course.hasLiveClasses && (
                       <div className="flex items-center">
                         <Globe className="w-4 h-4 text-gray-400 mr-3" />
                         <div>
                           <p className="text-sm text-gray-600">Live Classes</p>
-                          <p className="font-medium">{course.liveClassType} - {course.liveClassFrequency}</p>
+                          <p className="font-medium">{course.liveClassType} {course.liveClassFrequency ? `• ${course.liveClassFrequency}` : ''}</p>
                         </div>
                       </div>
                     )}
@@ -266,6 +343,24 @@ export default function CourseDetails() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Live Class Schedule */}
+            {course.hasLiveClasses && course.liveClassSchedule && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Live Class Schedule</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-gray-700">
+                    {typeof course.liveClassSchedule === 'string' ? (
+                      <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-3 rounded border border-gray-100">{course.liveClassSchedule}</pre>
+                    ) : (
+                      <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-3 rounded border border-gray-100">{JSON.stringify(course.liveClassSchedule, null, 2)}</pre>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Tags */}
             {course.tags && course.tags.length > 0 && (
@@ -319,7 +414,16 @@ export default function CourseDetails() {
                     )}
                     <div>
                       <h3 className="font-semibold">{course.institution.name}</h3>
-                      <p className="text-sm text-gray-600">Approved Institution</p>
+                      <div className="text-sm text-gray-600">
+                        {course.institution.isApproved ? (
+                          <span className="inline-flex items-center"><span className="mr-1">✔</span>Approved</span>
+                        ) : (
+                          <span className="inline-flex items-center"><span className="mr-1">•</span>Pending Approval</span>
+                        )}
+                        {course.institution.status ? (
+                          <span className="ml-2">• Status: {course.institution.status}</span>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                   <Button asChild className="w-full">
@@ -345,6 +449,43 @@ export default function CourseDetails() {
               </Card>
             )}
 
+            {/* Meta & Access */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Access & Meta</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm text-gray-700">
+                  <div className="flex items-center justify-between">
+                    <span>Requires Subscription</span>
+                    <span className="font-medium">{course.requiresSubscription ? `Yes${course.subscriptionTier ? ` (${course.subscriptionTier})` : ''}` : 'No'}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Platform Course</span>
+                    <span className="font-medium">{course.isPlatformCourse ? 'Yes' : 'No'}</span>
+                  </div>
+                  {typeof course.priority !== 'undefined' && (
+                    <div className="flex items-center justify-between">
+                      <span>Priority</span>
+                      <span className="font-medium">{course.priority}</span>
+                    </div>
+                  )}
+                  {course.createdAt && (
+                    <div className="flex items-center justify-between">
+                      <span>Created</span>
+                      <span className="font-medium">{new Date(course.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  {course.updatedAt && (
+                    <div className="flex items-center justify-between">
+                      <span>Last Updated</span>
+                      <span className="font-medium">{new Date(course.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Actions */}
             <Card>
               <CardContent className="pt-6">
@@ -357,6 +498,11 @@ export default function CourseDetails() {
                       Browse All Courses
                     </Link>
                   </Button>
+                  {course.requiresSubscription && (
+                    <Button variant="outline" asChild className="w-full">
+                      <Link href="/subscription-signup">Subscription Options</Link>
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
