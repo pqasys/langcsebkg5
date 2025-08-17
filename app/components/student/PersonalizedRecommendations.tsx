@@ -118,7 +118,7 @@ export default function PersonalizedRecommendations({
   const handleRecommendationClick = (recommendation: Recommendation) => {
     switch (recommendation.type) {
       case 'course':
-        router.push(`/courses/${recommendation.id}`);
+        router.push(`/courses/${(recommendation as any).slug || recommendation.id}`);
         break;
       case 'module':
         router.push(`/student/courses/${recommendation.id}`);

@@ -32,6 +32,7 @@ export interface SearchOptions {
 
 export interface SearchResult {
   id: string;
+  slug?: string;
   title: string;
   description: string;
   score: number;
@@ -244,6 +245,7 @@ class SearchService {
 
       return {
         id: course.id,
+        slug: (course as any).slug,
         title: course.title,
         description: course.description || '',
         score,

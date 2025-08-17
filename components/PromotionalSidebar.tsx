@@ -110,7 +110,7 @@ export function PromotionalSidebar({
             description: `${inst.city}, ${inst.country} • ${inst.courseCount} courses`,
             imageUrl: inst.logoUrl,
             ctaText: 'View Institution',
-            ctaLink: `/institutions/${inst.id}`,
+            ctaLink: `/institutions/${(inst as any).slug || inst.id}`,
             badge: inst.isFeatured ? 'Featured' : inst.subscriptionPlan,
             stats: {
               students: inst.studentCount,
@@ -138,7 +138,7 @@ export function PromotionalSidebar({
             title: course.title,
             description: `${course.institution?.name || 'Platform Course'} • ${course.duration || 0} weeks • ${course.level || 'All Levels'}`,
             ctaText: 'View Course',
-            ctaLink: `/courses/${course.id}`,
+            ctaLink: `/courses/${(course as any).slug || course.id}`,
             badge: course.isPremiumPlacement ? 'Premium' : course.isFeaturedPlacement ? 'Featured' : 'Popular',
             stats: {
               rating: 4.5

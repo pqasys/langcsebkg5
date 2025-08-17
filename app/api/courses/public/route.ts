@@ -41,6 +41,7 @@ export async function GET() {
           select: {
             id: true,
             name: true,
+            slug: true,
             country: true,
             city: true,
             commissionRate: true,

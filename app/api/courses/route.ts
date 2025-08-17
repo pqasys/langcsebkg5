@@ -101,9 +101,41 @@ export async function POST(request: Request) {
       )
     }
 
+    // Generate unique slug for the course
+    function generateSlug(title: string): string {
+      return title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters except hyphens
+        .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+    }
+
+    async function ensureUniqueSlug(baseSlug: string): Promise<string> {
+      let slug = baseSlug;
+      let counter = 1;
+      
+      while (true) {
+        const existing = await prisma.course.findFirst({
+          where: { slug: slug }
+        });
+        
+        if (!existing) {
+          return slug;
+        }
+        
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+    }
+
+    const baseSlug = generateSlug(title);
+    const uniqueSlug = await ensureUniqueSlug(baseSlug);
+
     const course = await prisma.course.create({
       data: {
         title,
+        slug: uniqueSlug,
         description,
         base_price: parseFloat(base_price || '0'),
         duration: parseInt(duration),

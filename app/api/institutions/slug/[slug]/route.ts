@@ -33,6 +33,7 @@ export async function GET(
             }
           },
           select: {
+            slug: true,
             id: true,
             title: true,
             description: true,

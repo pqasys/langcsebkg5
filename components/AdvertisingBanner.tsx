@@ -177,7 +177,7 @@ export function PremiumCourseBanner({ course, ...props }: unknown) {
       title="Premium Course Available"
       description={`Enroll in "${course.title}" from ${course.institution.name} and get exclusive access to premium features, personalized support, and advanced learning materials.`}
       ctaText="Enroll Now"
-      ctaLink={`/courses/${course.id}`}
+      ctaLink={`/courses/${(course as any).slug || course.id}`}
       stats={{
         students: course.enrollmentCount || 150,
         rating: 4.8
@@ -195,7 +195,7 @@ export function FeaturedInstitutionBanner({ institution, ...props }: unknown) {
       title={`Featured: ${institution.name}`}
       description={`Discover why ${institution.name} is a top-rated language institution with proven results and exceptional student satisfaction.`}
       ctaText="View Institution"
-      ctaLink={`/institutions/${institution.id}`}
+      ctaLink={`/institutions/${(institution as any).slug || institution.id}`}
       stats={{
         students: institution.studentCount || 500,
         courses: institution.courseCount || 25,

@@ -53,7 +53,7 @@ interface CourseProgress {
   }[];
 }
 
-export default function CourseProgressPage({ params }: { params: { id: string } }) {
+export default function CourseProgressPage({ params }: { params: { slug: string } }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -76,7 +76,7 @@ export default function CourseProgressPage({ params }: { params: { id: string } 
     }
 
     fetchCourseProgress();
-  }, [session, status, params.id]);
+  }, [session, status, params.slug]);
 
   const fetchCourseProgress = async () => {
     try {
@@ -89,7 +89,14 @@ export default function CourseProgressPage({ params }: { params: { id: string } 
       }
       
       const data = await response.json();
-      const course = data.courses?.find((c: CourseProgress) => c.courseId === params.id);
+      // Resolve course id by slug
+      const courseBySlugResp = await fetch(`/api/courses/slug/${params.slug}`);
+      if (!courseBySlugResp.ok) {
+        setError('Course not found');
+        return;
+      }
+      const courseBySlug = await courseBySlugResp.json();
+      const course = data.courses?.find((c: CourseProgress) => c.courseId === courseBySlug.id);
       
       if (!course) {
         setError('Course not found or not enrolled');
@@ -129,7 +136,8 @@ export default function CourseProgressPage({ params }: { params: { id: string } 
   };
 
   const navigateToModule = (moduleId: string) => {
-    router.push(`/student/courses/${params.id}/modules/${moduleId}`);
+    // Student course routes appear id-based; resolve id first
+    router.push(`/student/courses/${courseProgress?.courseId}/modules/${moduleId}`);
   };
 
   const navigateToAllProgress = () => {
@@ -206,8 +214,8 @@ export default function CourseProgressPage({ params }: { params: { id: string } 
 
         <Breadcrumb items={[
           { label: 'Courses', href: '/courses' },
-          { label: courseProgress.title, href: `/courses/${params.id}` },
-          { label: 'Progress', href: `/courses/${params.id}/progress` }
+          { label: courseProgress.title, href: `/courses/${params.slug}` },
+          { label: 'Progress', href: `/courses/${params.slug}/progress` }
         ]} />
 
         {/* Course Overview Cards */}
@@ -395,7 +403,7 @@ export default function CourseProgressPage({ params }: { params: { id: string } 
             <BarChart2 className="h-4 w-4 mr-2" />
             View All Progress
           </Button>
-          <Button onClick={() => router.push(`/student/courses/${params.id}`)}>
+          <Button onClick={() => router.push(`/student/courses/${courseProgress.courseId}`)}>
             <BookOpen className="h-4 w-4 mr-2" />
             Continue Learning
           </Button>

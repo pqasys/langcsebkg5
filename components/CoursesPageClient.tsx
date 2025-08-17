@@ -722,7 +722,9 @@ export default function CoursesPageClient() {
   };
 
   const handleView = (courseId: string) => {
-    router.push(`/courses/${courseId}`);
+    const course = courses.find(c => c.id === courseId);
+    const slug = (course as any)?.slug;
+    router.push(`/courses/${slug || courseId}`);
   };
 
   // Get top courses for advertising

@@ -36,6 +36,7 @@ interface Module {
 
 interface Course {
   id: string
+  slug: string
   title: string
   description: string
   institution: {
@@ -43,7 +44,7 @@ interface Course {
   }
 }
 
-export default function CourseModules({ params }: { params: { id: string } }) {
+export default function CourseModules({ params }: { params: { slug: string } }) {
   const router = useRouter()
   const [course, setCourse] = useState<Course | null>(null)
   const [modules, setModules] = useState<Module[]>([])
@@ -55,16 +56,16 @@ export default function CourseModules({ params }: { params: { id: string } }) {
       try {
         setLoading(true)
         
-        // Fetch course details
-        const courseResponse = await fetch(`/api/courses/${params.id}`)
+        // Fetch course details by slug to resolve id
+        const courseResponse = await fetch(`/api/courses/slug/${params.slug}`)
         if (!courseResponse.ok) {
           throw new Error('Failed to fetch course details')
         }
         const courseData = await courseResponse.json()
         setCourse(courseData)
 
-        // Fetch modules for this course
-        const modulesResponse = await fetch(`/api/courses/${params.id}/modules`)
+        // Fetch modules for this course by id
+        const modulesResponse = await fetch(`/api/courses/${courseData.id}/modules`)
         if (!modulesResponse.ok) {
           // If modules endpoint doesn't exist, create sample modules
           console.log('Modules endpoint not found, using sample data')
@@ -124,7 +125,7 @@ export default function CourseModules({ params }: { params: { id: string } }) {
     }
 
     fetchData()
-  }, [params.id])
+  }, [params.slug])
 
   const handleStartModule = (moduleId: string) => {
     // For now, just show a toast message
@@ -132,7 +133,8 @@ export default function CourseModules({ params }: { params: { id: string } }) {
   }
 
   const handleBackToCourse = () => {
-    router.push(`/courses/${params.id}`)
+    if (!course) return
+    router.push(`/courses/${course.slug}`)
   }
 
   const getStatusIcon = (status: string) => {

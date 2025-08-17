@@ -350,7 +350,7 @@ export function DesignablePremiumCourseBanner({ course, designConfig, onEdit, sh
       title={course.title || "Premium Course"}
       description={course.description || "Experience our highest quality language learning program with expert instructors and comprehensive materials."}
       ctaText="Enroll Now"
-      ctaLink={`/courses/${course.id}`}
+      ctaLink={`/courses/${(course as any).slug || course.id}`}
       highlight="Top Rated"
       stats={{
         students: course.stats?.students || 1000,
@@ -373,7 +373,7 @@ export function DesignableFeaturedInstitutionBanner({ institution, designConfig,
       title={institution.name || "Featured Institution"}
       description={`Join ${institution.name} and access their exclusive language learning programs.`}
       ctaText="Learn More"
-      ctaLink={`/institutions/${institution.id}`}
+      ctaLink={`/institutions/${(institution as any).slug || institution.id}`}
       highlight="Featured"
       stats={{
         students: institution.studentCount || 5000,

@@ -128,6 +128,10 @@ export default withAuth(
         if (req.nextUrl.pathname === '/courses') {
           return true;
         }
+        // Allow public course detail pages without authentication
+        if (req.nextUrl.pathname.startsWith('/courses/')) {
+          return true;
+        }
         // Allow public institutions listing without authentication
         if (req.nextUrl.pathname === '/institutions') {
           return true;
@@ -177,7 +181,10 @@ export default withAuth(
           // Allow public API routes
           const publicApiRoutes = [
             '/api/institutions',
+            '/api/institutions/slug',
             '/api/courses',
+            '/api/courses/slug',
+            '/api/courses/public',
             '/api/design-configs/public',
             '/api/auth',
             '/api/institution-registration'

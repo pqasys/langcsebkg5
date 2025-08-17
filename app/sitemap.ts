@@ -119,28 +119,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Dynamic pages (these would be populated from your database)
   // For now, we'll include placeholder URLs that would be generated dynamically
   const dynamicPages = [
-    // Course detail pages
+    // Course detail pages with SEO-friendly slugs
     {
-      url: `${baseUrl}/courses/sample-course-1`,
+      url: `${baseUrl}/courses/general-english`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/courses/sample-course-2`,
+      url: `${baseUrl}/courses/ielts-exam-preparation`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/courses/business-english`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     // Institution detail pages with SEO-friendly slugs
     {
-      url: `${baseUrl}/institutions/sample-institution-1`,
+      url: `${baseUrl}/institutions/xyz-language-school`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/institutions/sample-institution-2`,
+      url: `${baseUrl}/institutions/abc-shool-of-english`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,

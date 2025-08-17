@@ -314,11 +314,22 @@ export default function SubscriptionSignupPage() {
           console.error('❌ Error fetching course data:', error);
         }
         
-        // Fallback: if course fetch fails, redirect to course page
-        console.log('Fallback: redirecting to course page');
+        // Fallback: if course fetch fails, resolve slug then redirect
+        console.log('Fallback: resolving slug and redirecting to course page');
         sessionStorage.removeItem('fromEnrollment');
         sessionStorage.removeItem('pendingCourseEnrollment');
         sessionStorage.setItem('fromSubscriptionSignup', 'true');
+        try {
+          const fallbackResp = await fetch(`/api/courses/${pendingCourseId}`);
+          if (fallbackResp.ok) {
+            const fallbackData = await fallbackResp.json();
+            if (fallbackData?.slug) {
+              router.push(`/courses/${fallbackData.slug}`);
+              toast.success(successMessage + ' You can now enroll in the course.');
+              return;
+            }
+          }
+        } catch (_) {}
         router.push(`/courses/${pendingCourseId}`);
         toast.success(successMessage + ' You can now enroll in the course.');
       } else {
@@ -364,9 +375,19 @@ export default function SubscriptionSignupPage() {
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <button
-              onClick={() => {
+              onClick={async () => {
                 const courseId = sessionStorage.getItem('pendingCourseEnrollment');
                 if (courseId) {
+                  try {
+                    const resp = await fetch(`/api/courses/${courseId}`);
+                    if (resp.ok) {
+                      const data = await resp.json();
+                      if (data?.slug) {
+                        router.push(`/courses/${data.slug}`);
+                        return;
+                      }
+                    }
+                  } catch (_) {}
                   router.push(`/courses/${courseId}`);
                 } else {
                   router.push('/student/courses');

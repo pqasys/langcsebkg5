@@ -234,7 +234,7 @@ export default function InstitutionDetails() {
                           asChild
                           className="w-full mt-4"
                         >
-                          <Link href={`/courses/${course.id}`}>
+                          <Link href={`/courses/${(course as any).slug || course.id}`}>
                             View Course
                           </Link>
                         </Button>

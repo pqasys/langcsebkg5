@@ -534,7 +534,9 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/courses/${result.id}`);
+    // Prefer slug if available on result
+    const maybeSlug = (result as any).slug;
+    router.push(`/courses/${maybeSlug || result.id}`);
   };
 
   return (
