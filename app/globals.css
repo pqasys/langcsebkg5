@@ -1,4 +1,7 @@
 
+/* Import Google Fonts for Design Toolkit */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Merriweather:wght@300;400;700&family=Source+Sans+Pro:wght@300;400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -98,6 +101,39 @@ body {
     --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
   
+  /* Font family classes for Design Toolkit */
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .font-roboto {
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .font-opensans {
+    font-family: 'Open Sans', sans-serif;
+  }
+  
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-merriweather {
+    font-family: 'Merriweather', serif;
+  }
+  
+  .font-source-sans {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  
   /* Mobile-first responsive typography */
   html {
     font-size: 16px; /* Base font size for mobile */
@@ -124,10 +160,13 @@ body {
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible,
-  [role="button"]:focus-visible {
-    outline: 2px solid #3b82f6;
+  [role="button"]:focus-visible,
+  [role="slider"]:focus-visible,
+  [role="tab"]:focus-visible {
+    outline: 3px solid #3b82f6;
     outline-offset: 2px;
     border-radius: 4px;
+    box-shadow: 0 0 0 1px #ffffff, 0 0 0 3px #3b82f6;
   }
   
   /* Dark mode focus indicators */
@@ -137,8 +176,11 @@ body {
     input:focus-visible,
     select:focus-visible,
     textarea:focus-visible,
-    [role="button"]:focus-visible {
+    [role="button"]:focus-visible,
+    [role="slider"]:focus-visible,
+    [role="tab"]:focus-visible {
       outline-color: #60a5fa;
+      box-shadow: 0 0 0 1px #1f2937, 0 0 0 3px #60a5fa;
     }
   }
   
@@ -193,6 +235,18 @@ body {
   
   .search-container-long input {
     padding-left: 4rem !important;
+  }
+  
+  /* Enhanced slider accessibility */
+  [role="slider"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  [role="slider"]:focus-visible {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 8px;
   }
   
   /* Mobile-optimized buttons */

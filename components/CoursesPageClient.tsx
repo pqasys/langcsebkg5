@@ -153,6 +153,9 @@ export default function CoursesPageClient() {
           
           console.log('🔄 Transformed configs map:', Object.keys(configsMap));
           setIndividualDesignConfigs(configsMap);
+          
+          // Initialize default banner styles if they don't exist
+          initializeDefaultBannerStyles(configsMap);
         } else {
           console.error('❌ Failed to load design configs:', response.status, response.statusText);
         }
@@ -165,6 +168,189 @@ export default function CoursesPageClient() {
 
     loadDesignConfigs();
   }, [session]);
+
+  // Initialize default banner styles in the database
+  const initializeDefaultBannerStyles = async (existingConfigs: IndividualDesignConfig) => {
+    if (!session?.user) return;
+
+    const defaultBannerConfigs = {
+      'premium-course-banner': {
+        name: 'Default Premium Course Banner',
+        description: 'Default styling for premium course banners with purple gradient',
+        itemId: 'premium-course-banner',
+        backgroundType: 'gradient',
+        backgroundColor: '#8b5cf6',
+        backgroundGradientFrom: '#8b5cf6',
+        backgroundGradientTo: '#ec4899',
+        backgroundGradientDirection: 'to-r',
+        backgroundImage: '',
+        backgroundPattern: 'none',
+        backgroundOpacity: 10,
+        titleFont: 'inter',
+        titleSize: 24,
+        titleWeight: 'bold',
+        titleColor: '#1f2937',
+        titleAlignment: JSON.stringify({
+          horizontal: 'left' as const,
+          vertical: 'top' as const,
+          padding: { top: 0, bottom: 0, left: 0, right: 0 }
+        }),
+        titleShadow: false,
+        titleShadowColor: '#000000',
+        descriptionFont: 'inter',
+        descriptionSize: 16,
+        descriptionColor: '#6b7280',
+        descriptionAlignment: JSON.stringify({
+          horizontal: 'left' as const,
+          vertical: 'top' as const,
+          padding: { top: 0, bottom: 0, left: 0, right: 0 }
+        }),
+        padding: 20,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        borderStyle: 'solid',
+        shadow: false,
+        shadowColor: 'rgba(0, 0, 0, 0.1)',
+        shadowBlur: 10,
+        shadowOffset: 5,
+        hoverEffect: 'none',
+        animationDuration: 300,
+        customCSS: '',
+        isActive: true,
+        isDefault: true
+      },
+      'featured-institution-banner': {
+        name: 'Default Featured Institution Banner',
+        description: 'Default styling for featured institution banners with orange gradient',
+        itemId: 'featured-institution-banner',
+        backgroundType: 'gradient',
+        backgroundColor: '#f97316',
+        backgroundGradientFrom: '#f97316',
+        backgroundGradientTo: '#ef4444',
+        backgroundGradientDirection: 'to-r',
+        backgroundImage: '',
+        backgroundPattern: 'none',
+        backgroundOpacity: 10,
+        titleFont: 'inter',
+        titleSize: 24,
+        titleWeight: 'bold',
+        titleColor: '#1f2937',
+        titleAlignment: JSON.stringify({
+          horizontal: 'left' as const,
+          vertical: 'top' as const,
+          padding: { top: 0, bottom: 0, left: 0, right: 0 }
+        }),
+        titleShadow: false,
+        titleShadowColor: '#000000',
+        descriptionFont: 'inter',
+        descriptionSize: 16,
+        descriptionColor: '#6b7280',
+        descriptionAlignment: JSON.stringify({
+          horizontal: 'left' as const,
+          vertical: 'top' as const,
+          padding: { top: 0, bottom: 0, left: 0, right: 0 }
+        }),
+        padding: 20,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        borderStyle: 'solid',
+        shadow: false,
+        shadowColor: 'rgba(0, 0, 0, 0.1)',
+        shadowBlur: 10,
+        shadowOffset: 5,
+        hoverEffect: 'none',
+        animationDuration: 300,
+        customCSS: '',
+        isActive: true,
+        isDefault: true
+      },
+      'promotional-banner': {
+        name: 'Default Promotional Banner',
+        description: 'Default styling for promotional banners with green gradient',
+        itemId: 'promotional-banner',
+        backgroundType: 'gradient',
+        backgroundColor: '#22c55e',
+        backgroundGradientFrom: '#22c55e',
+        backgroundGradientTo: '#10b981',
+        backgroundGradientDirection: 'to-r',
+        backgroundImage: '',
+        backgroundPattern: 'none',
+        backgroundOpacity: 10,
+        titleFont: 'inter',
+        titleSize: 24,
+        titleWeight: 'bold',
+        titleColor: '#1f2937',
+        titleAlignment: JSON.stringify({
+          horizontal: 'left' as const,
+          vertical: 'top' as const,
+          padding: { top: 0, bottom: 0, left: 0, right: 0 }
+        }),
+        titleShadow: false,
+        titleShadowColor: '#000000',
+        descriptionFont: 'inter',
+        descriptionSize: 16,
+        descriptionColor: '#6b7280',
+        descriptionAlignment: JSON.stringify({
+          horizontal: 'left' as const,
+          vertical: 'top' as const,
+          padding: { top: 0, bottom: 0, left: 0, right: 0 }
+        }),
+        padding: 20,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        borderStyle: 'solid',
+        shadow: false,
+        shadowColor: 'rgba(0, 0, 0, 0.1)',
+        shadowBlur: 10,
+        shadowOffset: 5,
+        hoverEffect: 'none',
+        animationDuration: 300,
+        customCSS: '',
+        isActive: true,
+        isDefault: true
+      }
+    };
+
+    // Check which default configs need to be created
+    const configsToCreate = Object.keys(defaultBannerConfigs).filter(
+      itemId => !existingConfigs[itemId]
+    );
+
+    if (configsToCreate.length > 0) {
+      console.log('🔄 Creating default banner styles for:', configsToCreate);
+      
+      try {
+        // Create default configs in parallel
+        const createPromises = configsToCreate.map(itemId => 
+          fetch('/api/design-configs', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(defaultBannerConfigs[itemId as keyof typeof defaultBannerConfigs]),
+          })
+        );
+
+        const responses = await Promise.all(createPromises);
+        const successful = responses.filter(response => response.ok);
+        
+        console.log(`✅ Created ${successful.length} default banner styles`);
+        
+        // Reload configs to include the newly created defaults
+        if (successful.length > 0) {
+          setTimeout(() => {
+            // Reload the page to refresh the design configs
+            window.location.reload();
+          }, 1000);
+        }
+      } catch (error) {
+        console.error('❌ Error creating default banner styles:', error);
+      }
+    }
+  };
 
   // Function to transform database data to DesignConfig format
   const transformDatabaseConfig = (dbConfig: any): DesignConfig => {
@@ -256,9 +442,65 @@ export default function CoursesPageClient() {
     };
   };
 
+  // Get appropriate default design config for each banner type
+  const getDefaultConfigForItem = (itemId: string): DesignConfig => {
+    switch (itemId) {
+      case 'premium-course-banner':
+        return {
+          ...DEFAULT_DESIGN_CONFIG,
+          backgroundType: 'gradient',
+          backgroundGradient: {
+            from: '#8b5cf6', // purple-500
+            to: '#ec4899',  // pink-500
+            direction: 'to-r',
+          },
+          backgroundColor: '#8b5cf6',
+          backgroundOpacity: 10, // 10% opacity like the original
+          titleColor: '#1f2937',
+          descriptionColor: '#6b7280',
+        };
+      case 'featured-institution-banner':
+        return {
+          ...DEFAULT_DESIGN_CONFIG,
+          backgroundType: 'gradient',
+          backgroundGradient: {
+            from: '#f97316', // orange-500
+            to: '#ef4444',  // red-500
+            direction: 'to-r',
+          },
+          backgroundColor: '#f97316',
+          backgroundOpacity: 10,
+          titleColor: '#1f2937',
+          descriptionColor: '#6b7280',
+        };
+      case 'promotional-banner':
+        return {
+          ...DEFAULT_DESIGN_CONFIG,
+          backgroundType: 'gradient',
+          backgroundGradient: {
+            from: '#22c55e', // green-500
+            to: '#10b981',  // emerald-500
+            direction: 'to-r',
+          },
+          backgroundColor: '#22c55e',
+          backgroundOpacity: 10,
+          titleColor: '#1f2937',
+          descriptionColor: '#6b7280',
+        };
+      default:
+        return DEFAULT_DESIGN_CONFIG;
+    }
+  };
+
   // Get design config for a specific item
   const getItemDesignConfig = (itemId: string): DesignConfig => {
-    return individualDesignConfigs[itemId] || DEFAULT_DESIGN_CONFIG;
+    // First check if there's a saved config for this item
+    if (individualDesignConfigs[itemId]) {
+      return individualDesignConfigs[itemId];
+    }
+    
+    // If no saved config, use the default config for this banner type
+    return getDefaultConfigForItem(itemId);
   };
 
   // Handle edit item
@@ -575,24 +817,24 @@ export default function CoursesPageClient() {
               Close
             </Button>
           </div>
-          <DesignToolkit
-            config={getItemDesignConfig(editingItemId)}
-            onConfigChange={(config) => {
-              const updated = { ...individualDesignConfigs, [editingItemId]: config };
-              setIndividualDesignConfigs(updated);
-            }}
-            showSaveButton={true}
-            onSave={() => handleSaveItemDesign(getItemDesignConfig(editingItemId))}
-            institutionId={session?.user?.institutionId || ''}
-          />
+                     <DesignToolkit
+             config={getItemDesignConfig(editingItemId)}
+             onConfigChange={(config) => {
+               const updated = { ...individualDesignConfigs, [editingItemId]: config };
+               setIndividualDesignConfigs(updated);
+             }}
+             showSaveButton={true}
+             onSave={() => handleSaveItemDesign(getItemDesignConfig(editingItemId))}
+             institutionId={session?.user?.institutionId || ''}
+             itemId={editingItemId}
+           />
         </div>
       )}
 
-      {/* Top Advertising Banner */}
-      {showAdvertising && (
-        <div className="mb-8">
-          {console.log('🎯 Rendering Premium Course Banner with course:', topCourses[0])}
-          <DesignablePremiumCourseBanner 
+             {/* Top Advertising Banner */}
+       {showAdvertising && (
+         <div className="mb-8">
+           <DesignablePremiumCourseBanner 
             course={topCourses[0] || { id: 'demo', title: 'Demo Premium Course', institution: { name: 'Demo Institution' } }}
             className="mb-4"
             designConfig={getItemDesignConfig('premium-course-banner')}
@@ -603,11 +845,10 @@ export default function CoursesPageClient() {
         </div>
       )}
 
-      {/* Featured Institutions Banner */}
-      {showAdvertising && (
-        <div className="mb-8">
-          {console.log('🎯 Rendering Featured Institution Banner with institution:', featuredInstitutions[0])}
-          <DesignableFeaturedInstitutionBanner 
+             {/* Featured Institutions Banner */}
+       {showAdvertising && (
+         <div className="mb-8">
+           <DesignableFeaturedInstitutionBanner 
             institution={featuredInstitutions[0] || { id: 'demo', name: 'Demo Featured Institution' }}
             className="mb-4"
             designConfig={getItemDesignConfig('featured-institution-banner')}

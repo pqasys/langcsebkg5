@@ -114,6 +114,7 @@ export interface DesignToolkitProps {
   showResetButton?: boolean;
   showPreview?: boolean;
   institutionId?: string;
+  itemId?: string; // Add itemId to know which default config to use
 }
 
 export const DEFAULT_DESIGN_CONFIG: DesignConfig = {
@@ -217,8 +218,11 @@ export function DesignToolkit({
   showSaveButton = false,
   showResetButton = true,
   showPreview = true,
-  institutionId = 'default'
+  institutionId = 'default',
+  itemId
 }: DesignToolkitProps) {
+  // High contrast mode state
+  const [highContrastMode, setHighContrastMode] = useState(false);
   // Ensure we always have a valid config
   const safeConfig = config || DEFAULT_DESIGN_CONFIG;
   const isInitialMount = useRef(true);
@@ -266,11 +270,91 @@ export function DesignToolkit({
     }
   };
 
-  const handleReset = () => {
-    setLocalConfig(DEFAULT_DESIGN_CONFIG);
-    onConfigChange(DEFAULT_DESIGN_CONFIG);
-    if (onReset) {
-      onReset();
+  // Get appropriate default design config for each banner type
+  const getDefaultConfigForItem = (itemId?: string): DesignConfig => {
+    if (!itemId) return DEFAULT_DESIGN_CONFIG;
+    
+    // For now, use hardcoded defaults until the database defaults are properly loaded
+    switch (itemId) {
+      case 'premium-course-banner':
+        return {
+          ...DEFAULT_DESIGN_CONFIG,
+          backgroundType: 'gradient',
+          backgroundGradient: {
+            from: '#8b5cf6', // purple-500
+            to: '#ec4899',  // pink-500
+            direction: 'to-r',
+          },
+          backgroundColor: '#8b5cf6',
+          backgroundOpacity: 10, // 10% opacity like the original
+          titleColor: '#1f2937',
+          descriptionColor: '#6b7280',
+        };
+      case 'featured-institution-banner':
+        return {
+          ...DEFAULT_DESIGN_CONFIG,
+          backgroundType: 'gradient',
+          backgroundGradient: {
+            from: '#f97316', // orange-500
+            to: '#ef4444',  // red-500
+            direction: 'to-r',
+          },
+          backgroundColor: '#f97316',
+          backgroundOpacity: 10,
+          titleColor: '#1f2937',
+          descriptionColor: '#6b7280',
+        };
+      case 'promotional-banner':
+        return {
+          ...DEFAULT_DESIGN_CONFIG,
+          backgroundType: 'gradient',
+          backgroundGradient: {
+            from: '#22c55e', // green-500
+            to: '#10b981',  // emerald-500
+            direction: 'to-r',
+          },
+          backgroundColor: '#22c55e',
+          backgroundOpacity: 10,
+          titleColor: '#1f2937',
+          descriptionColor: '#6b7280',
+        };
+      default:
+        return DEFAULT_DESIGN_CONFIG;
+    }
+  };
+
+  const handleReset = async () => {
+    try {
+      // Try to load the default config from the database
+      if (itemId) {
+        const response = await fetch(`/api/design-configs/default/${itemId}`);
+        if (response.ok) {
+          const defaultConfig = await response.json();
+          setLocalConfig(defaultConfig);
+          onConfigChange(defaultConfig);
+          if (onReset) {
+            onReset();
+          }
+          return;
+        }
+      }
+      
+      // Fallback to hardcoded defaults if database load fails
+      const defaultConfig = getDefaultConfigForItem(itemId);
+      setLocalConfig(defaultConfig);
+      onConfigChange(defaultConfig);
+      if (onReset) {
+        onReset();
+      }
+    } catch (error) {
+      console.error('Error loading default config from database:', error);
+      // Fallback to hardcoded defaults
+      const defaultConfig = getDefaultConfigForItem(itemId);
+      setLocalConfig(defaultConfig);
+      onConfigChange(defaultConfig);
+      if (onReset) {
+        onReset();
+      }
     }
   };
 
@@ -349,49 +433,71 @@ export function DesignToolkit({
 
   return (
     <TooltipProvider>
-      <div className={`space-y-4 ${className}`}>
+      <div 
+        className={`space-y-4 p-4 bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-700 shadow-lg ${className} ${highContrastMode ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}
+        role="application"
+        aria-label="Design toolkit"
+      >
+        {/* Keyboard Navigation Helper */}
+        <div className="sr-only">
+          <p>Use Tab to navigate between controls. Use arrow keys to adjust sliders. Use Enter or Space to activate buttons.</p>
+        </div>
         {/* Action Buttons */}
-        {(showSaveButton || showResetButton) && (
-          <div className="flex gap-2">
-            {showSaveButton && (
-              <Button
-                onClick={handleSave}
-                className="flex-1"
-                size="sm"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save Design
-              </Button>
-            )}
-            {showResetButton && (
-              <Button
-                variant="outline"
-                onClick={handleReset}
-                size="sm"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Reset
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex gap-2 flex-wrap">
+          {showSaveButton && (
+            <Button
+              onClick={handleSave}
+              className="flex-1 min-w-fit"
+              size="sm"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Design
+            </Button>
+          )}
+          {showResetButton && (
+            <Button
+              variant="outline"
+              onClick={handleReset}
+              size="sm"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Reset
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => setHighContrastMode(!highContrastMode)}
+            size="sm"
+            className="min-w-fit"
+            aria-label={highContrastMode ? "Disable high contrast mode" : "Enable high contrast mode"}
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            {highContrastMode ? "Normal" : "High Contrast"}
+          </Button>
+        </div>
 
         {/* Tab Navigation - Icons Only with Tooltips */}
-        <div className="flex space-x-1 border-b">
+        <div className="flex space-x-1 border-b" role="tablist" aria-label="Design toolkit sections">
           {tabs.map((tab) => {
             const IconComponent = tab.icon;
+            const isActive = activeTab === tab.id;
             return (
               <Tooltip key={tab.id}>
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setActiveTab(tab.id)}
-                    className={`p-3 text-sm font-medium rounded-t-lg transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    className={`p-3 text-sm font-medium rounded-t-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+                      isActive
+                        ? 'bg-blue-100 text-blue-700 border-b-2 border-blue-700 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-300'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
                     }`}
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={`panel-${tab.id}`}
+                    id={`tab-${tab.id}`}
                   >
                     <IconComponent className="w-5 h-5" />
+                    <span className="sr-only">{tab.label}</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -405,7 +511,12 @@ export function DesignToolkit({
         {/* Tab Content */}
         <div className="space-y-4">
           {activeTab === 'background' && (
-            <div className="space-y-4">
+            <div 
+              role="tabpanel" 
+              id="panel-background" 
+              aria-labelledby="tab-background"
+              className="space-y-4"
+            >
               <div>
                 <Label className="text-sm font-medium">Background Type</Label>
                 <Select
@@ -429,38 +540,52 @@ export function DesignToolkit({
               {localConfig?.backgroundType === 'solid' && (
                 <div className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium">Background Color</Label>
+                    <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">Background Color</Label>
                     <div className="flex gap-2">
                       <Input
                         type="color"
                         value={localConfig?.backgroundColor || '#ffffff'}
                         onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
-                        className="w-16 h-10"
+                        className="w-16 h-10 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                        aria-label="Choose background color"
                       />
                       <Input
                         value={localConfig?.backgroundColor || '#ffffff'}
                         onChange={(e) => handleConfigChange({ backgroundColor: e.target.value })}
                         placeholder="#ffffff"
-                        className="flex-1"
+                        className="flex-1 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                        aria-label="Enter background color hex code"
                       />
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
-                    <Slider
-                      value={[localConfig?.backgroundOpacity || 100]}
-                      onValueChange={([value]) => {
-                        console.log('🎨 Solid color opacity slider changed to:', value);
-                        handleConfigChange({ backgroundOpacity: value });
-                      }}
-                      max={100}
-                      min={0}
-                      step={1}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Current opacity value: {localConfig?.backgroundOpacity || 100}%
-                    </p>
+                    <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      Background Opacity: {localConfig?.backgroundOpacity || 100}%
+                    </Label>
+                    <div className="mt-2 space-y-2">
+                      <Slider
+                        value={[localConfig?.backgroundOpacity || 100]}
+                        onValueChange={([value]) => {
+                          console.log('🎨 Solid color opacity slider changed to:', value);
+                          handleConfigChange({ backgroundOpacity: value });
+                        }}
+                        max={100}
+                        min={0}
+                        step={1}
+                        className="w-full"
+                        aria-label={`Background opacity: ${localConfig?.backgroundOpacity || 100}%`}
+                      />
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">0% (Transparent)</span>
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">100% (Opaque)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex items-center justify-center">
+                          <span className="text-xs font-bold">{localConfig?.backgroundOpacity || 100}%</span>
+                        </div>
+                        <span>Current opacity level</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -585,21 +710,33 @@ export function DesignToolkit({
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
-                    <Slider
-                      value={[localConfig?.backgroundOpacity || 100]}
-                      onValueChange={([value]) => {
-                        console.log('🎨 Gradient opacity slider changed to:', value);
-                        handleConfigChange({ backgroundOpacity: value });
-                      }}
-                      max={100}
-                      min={0}
-                      step={1}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Current opacity value: {localConfig?.backgroundOpacity || 100}%
-                    </p>
+                    <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      Gradient Opacity: {localConfig?.backgroundOpacity || 100}%
+                    </Label>
+                    <div className="mt-2 space-y-2">
+                      <Slider
+                        value={[localConfig?.backgroundOpacity || 100]}
+                        onValueChange={([value]) => {
+                          console.log('🎨 Gradient opacity slider changed to:', value);
+                          handleConfigChange({ backgroundOpacity: value });
+                        }}
+                        max={100}
+                        min={0}
+                        step={1}
+                        className="w-full"
+                        aria-label={`Gradient opacity: ${localConfig?.backgroundOpacity || 100}%`}
+                      />
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">0% (Transparent)</span>
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">100% (Opaque)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex items-center justify-center">
+                          <span className="text-xs font-bold">{localConfig?.backgroundOpacity || 100}%</span>
+                        </div>
+                        <span>Current opacity level</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -655,21 +792,33 @@ export function DesignToolkit({
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">Opacity: {localConfig?.backgroundOpacity || 100}%</Label>
-                    <Slider
-                      value={[localConfig?.backgroundOpacity || 100]}
-                      onValueChange={([value]) => {
-                        console.log('🎨 Opacity slider changed to:', value);
-                        handleConfigChange({ backgroundOpacity: value });
-                      }}
-                      max={100}
-                      min={0}
-                      step={1}
-                      className="w-full"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Current opacity value: {localConfig?.backgroundOpacity || 100}%
-                    </p>
+                    <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      Image Opacity: {localConfig?.backgroundOpacity || 100}%
+                    </Label>
+                    <div className="mt-2 space-y-2">
+                      <Slider
+                        value={[localConfig?.backgroundOpacity || 100]}
+                        onValueChange={([value]) => {
+                          console.log('🎨 Image opacity slider changed to:', value);
+                          handleConfigChange({ backgroundOpacity: value });
+                        }}
+                        max={100}
+                        min={0}
+                        step={1}
+                        className="w-full"
+                        aria-label={`Image opacity: ${localConfig?.backgroundOpacity || 100}%`}
+                      />
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">0% (Transparent)</span>
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">100% (Opaque)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <div className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex items-center justify-center">
+                          <span className="text-xs font-bold">{localConfig?.backgroundOpacity || 100}%</span>
+                        </div>
+                        <span>Current opacity level</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -723,12 +872,20 @@ export function DesignToolkit({
           )}
 
           {activeTab === 'typography' && (
-            <div className="space-y-4">
+            <div 
+              role="tabpanel" 
+              id="panel-typography" 
+              aria-labelledby="tab-typography"
+              className="space-y-4"
+            >
               <div>
                 <Label className="text-sm font-medium">Title Font</Label>
                 <Select
                   value={localConfig?.titleFont || 'inter'}
-                  onValueChange={(value) => handleConfigChange({ titleFont: value })}
+                  onValueChange={(value) => {
+                    console.log('🎨 Title font changed to:', value);
+                    handleConfigChange({ titleFont: value });
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -776,19 +933,21 @@ export function DesignToolkit({
               </div>
 
               <div>
-                <Label className="text-sm font-medium">Title Color</Label>
+                <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">Title Color</Label>
                 <div className="flex gap-2">
                   <Input
                     type="color"
                     value={localConfig?.titleColor || '#1f2937'}
                     onChange={(e) => handleConfigChange({ titleColor: e.target.value })}
-                    className="w-16 h-10"
+                    className="w-16 h-10 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                    aria-label="Choose title color"
                   />
                   <Input
                     value={localConfig?.titleColor || '#1f2937'}
                     onChange={(e) => handleConfigChange({ titleColor: e.target.value })}
                     placeholder="#1f2937"
-                    className="flex-1"
+                    className="flex-1 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                    aria-label="Enter title color hex code"
                   />
                 </div>
               </div>
@@ -880,7 +1039,10 @@ export function DesignToolkit({
                 <Label className="text-sm font-medium">Description Font</Label>
                 <Select
                   value={localConfig?.descriptionFont || 'inter'}
-                  onValueChange={(value) => handleConfigChange({ descriptionFont: value })}
+                  onValueChange={(value) => {
+                    console.log('🎨 Description font changed to:', value);
+                    handleConfigChange({ descriptionFont: value });
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -908,19 +1070,21 @@ export function DesignToolkit({
                   />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">Description Color</Label>
+                  <Label className="text-sm font-medium text-gray-900 dark:text-gray-100">Description Color</Label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
                       value={localConfig?.descriptionColor || '#6b7280'}
                       onChange={(e) => handleConfigChange({ descriptionColor: e.target.value })}
-                      className="w-12 h-8"
+                      className="w-12 h-8 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                      aria-label="Choose description color"
                     />
                     <Input
                       value={localConfig?.descriptionColor || '#6b7280'}
                       onChange={(e) => handleConfigChange({ descriptionColor: e.target.value })}
                       placeholder="#6b7280"
-                      className="flex-1"
+                      className="flex-1 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                      aria-label="Enter description color hex code"
                     />
                   </div>
                 </div>
@@ -979,7 +1143,12 @@ export function DesignToolkit({
           )}
 
           {activeTab === 'layout' && (
-            <div className="space-y-4">
+            <div 
+              role="tabpanel" 
+              id="panel-layout" 
+              aria-labelledby="tab-layout"
+              className="space-y-4"
+            >
               <div>
                 <Label className="text-sm font-medium">Padding: {localConfig?.padding || 16}px</Label>
                 <Slider
@@ -1055,7 +1224,12 @@ export function DesignToolkit({
           )}
 
           {activeTab === 'effects' && (
-            <div className="space-y-4">
+            <div 
+              role="tabpanel" 
+              id="panel-effects" 
+              aria-labelledby="tab-effects"
+              className="space-y-4"
+            >
               <div className="flex items-center space-x-2">
                 <Switch
                   id="shadow"
@@ -1147,7 +1321,12 @@ export function DesignToolkit({
           )}
 
           {activeTab === 'custom' && (
-            <div className="space-y-4">
+            <div 
+              role="tabpanel" 
+              id="panel-custom" 
+              aria-labelledby="tab-custom"
+              className="space-y-4"
+            >
               <div>
                 <Label className="text-sm font-medium">Custom CSS</Label>
                 <Textarea
@@ -1169,9 +1348,13 @@ export function DesignToolkit({
         {/* Live Preview */}
         {showPreview && (
           <div className="mt-6">
-            <Label className="text-sm font-medium mb-2 block">Live Preview</Label>
+            <Label className="text-sm font-medium mb-2 block text-gray-900 dark:text-gray-100">Live Preview</Label>
             
-                          <div className="border rounded-lg p-4">
+            <div 
+              className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-800"
+              role="region"
+              aria-label="Design preview"
+            >
                 <div
                   className="p-4 rounded-lg transition-all duration-300"
                   style={{
@@ -1246,29 +1429,28 @@ export function DesignToolkit({
                     })(),
                   }}
               >
-                <h4
-                  style={{
-                    fontFamily: localConfig?.titleFont || 'inter',
-                    fontSize: `${localConfig?.titleSize || 16}px`,
-                    fontWeight: localConfig?.titleWeight || 'semibold',
-                    color: localConfig?.titleColor || '#1f2937',
-                    textAlign: localConfig?.titleAlignment?.horizontal || 'left',
-                    textShadow: localConfig?.titleShadow ? `2px 2px 4px ${localConfig?.titleShadowColor || '#000000'}` : 'none',
-                  }}
-                  className="mb-2"
-                >
-                  Sample Title
-                </h4>
-                <p
-                  style={{
-                    fontFamily: localConfig?.descriptionFont || 'inter',
-                    fontSize: `${localConfig?.descriptionSize || 14}px`,
-                    color: localConfig?.descriptionColor || '#6b7280',
-                    textAlign: localConfig?.descriptionAlignment?.horizontal || 'left',
-                  }}
-                >
-                  This is a sample description that shows how your text will look with the current settings.
-                </p>
+                                 <h4
+                   style={{
+                     fontSize: `${localConfig?.titleSize || 16}px`,
+                     fontWeight: localConfig?.titleWeight || 'semibold',
+                     color: localConfig?.titleColor || '#1f2937',
+                     textAlign: localConfig?.titleAlignment?.horizontal || 'left',
+                     textShadow: localConfig?.titleShadow ? `2px 2px 4px ${localConfig?.titleShadowColor || '#000000'}` : 'none',
+                   }}
+                   className={`mb-2 font-${localConfig?.titleFont || 'inter'}`}
+                 >
+                   Sample Title
+                 </h4>
+                 <p
+                   style={{
+                     fontSize: `${localConfig?.descriptionSize || 14}px`,
+                     color: localConfig?.descriptionColor || '#6b7280',
+                     textAlign: localConfig?.descriptionAlignment?.horizontal || 'left',
+                   }}
+                   className={`font-${localConfig?.descriptionFont || 'inter'}`}
+                 >
+                   This is a sample description that shows how your text will look with the current settings.
+                 </p>
               </div>
             </div>
           </div>

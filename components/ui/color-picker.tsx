@@ -71,7 +71,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
       setCustomColor(color);
       setError(null);
     } catch (err) {
-      toast.error(`Failed to in handleColorSelect. Please try again or contact support if the problem persists.`);
+      // toast.error(`Failed to in handleColorSelect. Please try again or contact support if the problem persists.`);
       setError('Failed to select color. Please try again.');
     }
   };
@@ -98,41 +98,44 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2 overflow-x-auto pb-2 px-1">
+      <div className="flex gap-2 overflow-x-auto pb-2 px-1" role="group" aria-label="Predefined colors">
         {PREDEFINED_COLORS.map((color) => (
           <button
             type="button"
             key={color}
             className={cn(
-              'h-8 w-8 flex-shrink-0 rounded-full border border-input hover:ring-2 hover:ring-offset-2',
-              value === color && 'ring-2 ring-offset-2'
+              'h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-300 dark:border-gray-600 hover:ring-2 hover:ring-blue-500 hover:ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-200',
+              value === color && 'ring-2 ring-blue-500 ring-offset-2 border-blue-500'
             )}
             style={{ backgroundColor: color }}
             onClick={() => handleColorSelect(color)}
-            title={color}
+            aria-label={`Select color ${color}`}
+            title={`Color: ${color}`}
           />
         ))}
       </div>
       <div className="mt-2">
-        <Label htmlFor="custom-color">Custom Color</Label>
+        <Label htmlFor="custom-color" className="text-sm font-medium text-gray-900 dark:text-gray-100">Custom Color</Label>
         <div className="flex gap-2 mt-1">
           <Input
             id="custom-color"
             type="color"
             value={customColor}
             onChange={handleColorInputChange}
-            className="h-8 w-8 p-0 border-0"
+            className="h-8 w-8 p-0 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+            aria-label="Choose custom color"
           />
           <Input
             type="text"
             value={customColor}
             onChange={handleHexInputChange}
             placeholder="#000000"
-            className="h-8"
+            className="h-8 border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+            aria-label="Enter custom color hex code"
           />
         </div>
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>}
     </div>
   );
 } 

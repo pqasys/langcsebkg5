@@ -148,21 +148,41 @@ export function DesignableAdvertisingBanner({
                               gradientDirection === 'to-bl' ? 'to bottom left' :
                               gradientDirection; // Use as-is if it's already a standard CSS value
           
-                     // Apply opacity to the gradient colors themselves
-           const gradientOpacity = designConfig.backgroundOpacity / 100;
-           const gradientStyle = {
-             background: `linear-gradient(${cssDirection}, ${gradientFrom}, ${gradientTo})`,
-             opacity: gradientOpacity
-           };
-         
-         console.log('🎨 Applied gradient style:', gradientStyle);
-         return gradientStyle;
+          // Apply opacity to the gradient using a white overlay
+          const gradientOpacity = designConfig.backgroundOpacity / 100;
+          const backgroundColor = designConfig.backgroundColor || '#ffffff';
+          
+          if (gradientOpacity < 1) {
+            const gradientStyle = {
+              background: `linear-gradient(rgba(255, 255, 255, ${1 - gradientOpacity}), rgba(255, 255, 255, ${1 - gradientOpacity})), linear-gradient(${cssDirection}, ${gradientFrom}, ${gradientTo}), ${backgroundColor}`
+            };
+            console.log('🎨 Applied gradient style with opacity:', gradientStyle);
+            return gradientStyle;
+          } else {
+            const gradientStyle = {
+              background: `linear-gradient(${cssDirection}, ${gradientFrom}, ${gradientTo})`
+            };
+            console.log('🎨 Applied gradient style:', gradientStyle);
+            return gradientStyle;
+                     }
       case 'image':
+        if (designConfig.backgroundImage) {
+          const opacity = designConfig.backgroundOpacity / 100;
+          const backgroundColor = designConfig.backgroundColor || '#ffffff';
+          
+          // Apply opacity to the background image using linear-gradient overlay
+          if (opacity < 1) {
+            return {
+              background: `linear-gradient(rgba(255, 255, 255, ${1 - opacity}), rgba(255, 255, 255, ${1 - opacity})), url('${designConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`
+            };
+          } else {
+            return {
+              background: `url('${designConfig.backgroundImage}') center / cover no-repeat, ${backgroundColor}`
+            };
+          }
+        }
         return {
-          backgroundImage: designConfig.backgroundImage ? `url(${designConfig.backgroundImage})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: designConfig.backgroundOpacity / 100
+          backgroundColor: designConfig.backgroundColor || '#ffffff'
         };
       default:
         return {};
@@ -173,18 +193,25 @@ export function DesignableAdvertisingBanner({
     if (!designConfig) return {};
     
     const config = element === 'title' ? {
-      fontFamily: designConfig.titleFont,
       fontSize: `${designConfig.titleSize}px`,
       fontWeight: designConfig.titleWeight,
       color: designConfig.titleColor,
       textShadow: designConfig.titleShadow ? `2px 2px 4px ${designConfig.titleShadowColor}` : undefined
     } : {
-      fontFamily: designConfig.descriptionFont,
       fontSize: `${designConfig.descriptionSize}px`,
       color: designConfig.descriptionColor
     };
     
     return config;
+  };
+
+  const getFontClass = (element: 'title' | 'description') => {
+    if (!designConfig) return 'font-inter';
+    
+    const fontName = element === 'title' ? designConfig.titleFont : designConfig.descriptionFont;
+    const fontClass = `font-${fontName || 'inter'}`;
+    console.log(`🎨 ${element} font class:`, fontClass, 'for font:', fontName);
+    return fontClass;
   };
 
      const backgroundStyle = getBackgroundStyle();
@@ -247,7 +274,7 @@ export function DesignableAdvertisingBanner({
             </div>
 
             <h3 
-              className="text-xl font-bold mb-2"
+              className={`text-xl font-bold mb-2 ${getFontClass('title')}`}
               style={getTextStyle('title')}
             >
               {title}
@@ -260,7 +287,7 @@ export function DesignableAdvertisingBanner({
             </h3>
 
             <p 
-              className="text-gray-600 mb-4"
+              className={`text-gray-600 mb-4 ${getFontClass('description')}`}
               style={getTextStyle('description')}
             >
               {description}
