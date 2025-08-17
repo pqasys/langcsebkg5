@@ -8,10 +8,25 @@ export default withAuth(
       return NextResponse.next();
     }
 
+    // Handle institution URL redirects for SEO-friendly URLs
+    if (req.nextUrl.pathname.startsWith('/institutions/')) {
+      const pathParts = req.nextUrl.pathname.split('/');
+      if (pathParts.length >= 3) {
+        const institutionIdentifier = pathParts[2];
+        
+        // Check if this looks like a UUID (old format)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(institutionIdentifier)) {
+          // This is an old UUID-based URL, redirect to slug-based URL
+          // We'll need to look up the institution by ID and redirect to its slug
+          // For now, we'll let the page handle the redirect
+          console.log('UUID-based institution URL detected:', req.nextUrl.pathname);
+        }
+      }
+    }
+
     const token = req.nextauth.token;
     const userRole = token?.role as string | undefined;
-
-
 
     // If user is authenticated and trying to access auth pages, redirect to appropriate dashboard
     if (token && req.nextUrl.pathname.startsWith('/auth/')) {
@@ -102,21 +117,84 @@ export default withAuth(
           return true;
         }
         // Allow public design configs API without authentication
-        if (req.nextUrl.pathname.startsWith('/api/design-configs/public')) {
+        if (req.nextUrl.pathname === '/api/design-configs/public') {
           return true;
         }
-        // Allow public courses API without authentication
-        if (req.nextUrl.pathname.startsWith('/api/courses/public')) {
+        // Allow public institution pages without authentication
+        if (req.nextUrl.pathname.startsWith('/institutions/')) {
           return true;
         }
-        // Allow public institutions API without authentication
-        if (req.nextUrl.pathname.startsWith('/api/institutions') && !req.nextUrl.pathname.includes('/admin')) {
+        // Allow public courses page without authentication
+        if (req.nextUrl.pathname === '/courses') {
           return true;
         }
-        // Require authentication for other protected routes
+        // Allow public institutions listing without authentication
+        if (req.nextUrl.pathname === '/institutions') {
+          return true;
+        }
+        // Allow public students page without authentication
+        if (req.nextUrl.pathname === '/students-public') {
+          return true;
+        }
+        // Allow public institutions page without authentication
+        if (req.nextUrl.pathname === '/institutions-public') {
+          return true;
+        }
+        // Allow offline page without authentication
+        if (req.nextUrl.pathname === '/offline') {
+          return true;
+        }
+        // Allow features pages without authentication
+        if (req.nextUrl.pathname.startsWith('/features/')) {
+          return true;
+        }
+        // Allow institution registration without authentication
+        if (req.nextUrl.pathname === '/institution-registration') {
+          return true;
+        }
+        // Allow awaiting approval page without authentication
+        if (req.nextUrl.pathname === '/awaiting-approval') {
+          return true;
+        }
+        // Allow sitemap without authentication
+        if (req.nextUrl.pathname === '/sitemap.xml') {
+          return true;
+        }
+        // Allow robots.txt without authentication
+        if (req.nextUrl.pathname === '/robots.txt') {
+          return true;
+        }
+        // Allow manifest without authentication
+        if (req.nextUrl.pathname === '/manifest.json') {
+          return true;
+        }
+        // Allow favicon without authentication
+        if (req.nextUrl.pathname === '/favicon.ico') {
+          return true;
+        }
+        // Allow API routes that don't require authentication
+        if (req.nextUrl.pathname.startsWith('/api/')) {
+          // Allow public API routes
+          const publicApiRoutes = [
+            '/api/institutions',
+            '/api/courses',
+            '/api/design-configs/public',
+            '/api/auth',
+            '/api/institution-registration'
+          ];
+          
+          const isPublicApiRoute = publicApiRoutes.some(route => 
+            req.nextUrl.pathname.startsWith(route)
+          );
+          
+          if (isPublicApiRoute) {
+            return true;
+          }
+        }
+        
         return !!token;
       }
-    },
+    }
   }
 );
 

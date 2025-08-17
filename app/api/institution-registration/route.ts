@@ -6,6 +6,35 @@ import { sendInstitutionWelcomeEmail } from '@/lib/email-service';
 import { auditLog } from '@/lib/audit-logger';
 const prisma = new PrismaClient();
 
+// Function to generate a URL-friendly slug from institution name
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // Remove special characters except hyphens
+    .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+}
+
+// Function to ensure slug uniqueness
+async function ensureUniqueSlug(baseSlug: string, prisma: PrismaClient): Promise<string> {
+  let slug = baseSlug;
+  let counter = 1;
+  
+  while (true) {
+    const existing = await prisma.institution.findFirst({
+      where: { slug: slug }
+    });
+    
+    if (!existing) {
+      return slug;
+    }
+    
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+}
+
 // Validation schema for institution registration
 const institutionRegistrationSchema = z.object({
   name: z.string().min(1, 'Institution name is required'),
@@ -69,12 +98,17 @@ export async function POST(request: NextRequest) {
     const temporaryPassword = generateTemporaryPassword();
     const hashedPassword = await hash(temporaryPassword, 12);
 
+    // Generate unique slug for the institution
+    const baseSlug = generateSlug(validatedData.name);
+    const uniqueSlug = await ensureUniqueSlug(baseSlug, prisma);
+
     // Create institution and user in a transaction
     const result = await prisma.$transaction(async (tx) => {
       // Create the institution
       const institution = await tx.institution.create({
         data: {
           name: validatedData.name,
+          slug: uniqueSlug, // Add the unique slug
           email: validatedData.institutionEmail || validatedData.email,
           website: validatedData.website || null,
           description: validatedData.description,

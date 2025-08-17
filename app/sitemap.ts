@@ -132,7 +132,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
-    // Institution detail pages
+    // Institution detail pages with SEO-friendly slugs
     {
       url: `${baseUrl}/institutions/sample-institution-1`,
       lastModified: new Date(),

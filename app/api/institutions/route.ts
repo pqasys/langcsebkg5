@@ -26,6 +26,7 @@ export async function GET(request: Request) {
       select: {
         id: true,
         name: true,
+        slug: true,
         description: true,
         country: true,
         city: true,
@@ -68,6 +69,7 @@ export async function GET(request: Request) {
     const institutionsWithStats = institutions.map(inst => ({
       id: inst.id,
       name: inst.name,
+      slug: inst.slug,
       description: inst.description,
       country: inst.country,
       city: inst.city,

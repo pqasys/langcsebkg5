@@ -269,12 +269,12 @@ export default function InstitutionsPageClient() {
 
                 <div className="flex gap-2">
                   <Button asChild className="flex-1">
-                    <Link href={`/institutions/${institution.id}`}>
+                    <Link href={`/institutions/${institution.slug}`}>
                       View Details
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href={`/institutions/${institution.id}/courses`}>
+                    <Link href={`/institutions/${institution.slug}/courses`}>
                       Browse Courses
                     </Link>
                   </Button>
