@@ -11,7 +11,7 @@ export async function GET() {
           // Platform courses (always show these)
           {
             institutionId: null,
-            status: 'PUBLISHED'
+            status: { in: ['PUBLISHED', 'ACTIVE'] }
           },
           // Institution courses with approved and active institutions
           {
@@ -19,7 +19,7 @@ export async function GET() {
               isApproved: true,
               status: 'ACTIVE'
             },
-            status: 'PUBLISHED',
+            status: { in: ['PUBLISHED', 'ACTIVE'] },
             // Show courses that started within the last 6 months or start within the next 6 months
             OR: [
               {
@@ -110,9 +110,13 @@ export async function GET() {
       const daysSinceCreation = Math.floor((Date.now() - new Date(course.createdAt).getTime()) / (1000 * 60 * 60 * 24));
       priorityScore += Math.max(0, 30 - daysSinceCreation); // Up to 30 points for very new courses
       
-      // Start date proximity bonus (sooner courses get boost)
-      const daysUntilStart = Math.floor((new Date(course.startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-      priorityScore += Math.max(0, 30 - daysUntilStart); // Up to 30 points for courses starting soon
+      // Start date proximity bonus (sooner courses get boost). Guard against missing startDate
+      const daysUntilStart = course.startDate
+        ? Math.floor((new Date(course.startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+        : Number.POSITIVE_INFINITY;
+      if (Number.isFinite(daysUntilStart)) {
+        priorityScore += Math.max(0, 30 - daysUntilStart); // Up to 30 points for courses starting soon
+      }
       
       // Commission rate band categorization
       const commissionRate = course.institution?.commissionRate || 0;

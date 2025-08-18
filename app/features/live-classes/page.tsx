@@ -281,18 +281,16 @@ export default function VideoConferencingFeaturePage() {
     setSelectedSession(null);
   };
 
-  // Load upcoming classes data
+  // Load live classes data for feature showcase (always fetch; join gated by access)
   useEffect(() => {
     const fetchLiveClassesData = async () => {
       try {
-        // Fetch ready to join classes
         const readyResponse = await fetch('/api/features/live-classes/ready-to-join');
         if (readyResponse.ok) {
           const readyData = await readyResponse.json();
           setReadyToJoinClasses(readyData.readyToJoinClasses || []);
         }
 
-        // Fetch upcoming classes
         const upcomingResponse = await fetch('/api/features/live-classes/upcoming');
         if (upcomingResponse.ok) {
           const upcomingData = await upcomingResponse.json();
@@ -306,9 +304,7 @@ export default function VideoConferencingFeaturePage() {
       }
     };
 
-    if (canAccessLiveClasses) {
-      fetchLiveClassesData();
-    }
+    fetchLiveClassesData();
   }, [canAccessLiveClasses]);
 
   // Join specific upcoming class
@@ -620,95 +616,148 @@ export default function VideoConferencingFeaturePage() {
            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {demoSessions.map((session) => (
-              <Card key={session.id} className="hover:shadow-lg transition-shadow duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      {session.type}
-                    </Badge>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <FaStar className="w-4 h-4 text-yellow-400 mr-1" />
-                      {session.rating} ({session.reviews})
-                    </div>
-                  </div>
-
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{session.title}</h3>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FaGlobe className="w-4 h-4 mr-2" />
-                      {session.language}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FaGraduationCap className="w-4 h-4 mr-2" />
-                      {session.instructor}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FaClock className="w-4 h-4 mr-2" />
-                      {session.time} • {session.duration}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FaUsers className="w-4 h-4 mr-2" />
-                      {session.participants}/{session.maxParticipants} students
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <FaDollarSign className="w-4 h-4 mr-2" />
-                      ${session.price}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {session.features.map((feature, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {feature}
+            {(readyToJoinClasses.length > 0 || upcomingClassesData.length > 0) ? (
+              [...readyToJoinClasses, ...upcomingClassesData].slice(0, 3).map((cls) => (
+                <Card key={cls.id} className="hover:shadow-lg transition-shadow duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        {cls.isReady ? 'Starting Soon' : 'Upcoming'}
                       </Badge>
-                    ))}
-                  </div>
+                    </div>
 
-                                     <div className="flex gap-2">
-                     {canAccessLiveClasses ? (
-                       <>
-                         <Button 
-                           className="flex-1 bg-green-600 hover:bg-green-700"
-                           onClick={() => handleJoinClass(session.id)}
-                         >
-                           <FaPlay className="w-4 h-4 mr-2" />
-                           Join Class
-                         </Button>
-                         <Button 
-                           variant="outline" 
-                           className="px-3"
-                           onClick={() => handleBookSession(session.id)}
-                         >
-                           <FaCalendarAlt className="w-4 h-4" />
-                         </Button>
-                       </>
-                     ) : (
-                       <>
-                         <Button 
-                           className="flex-1 bg-blue-600 hover:bg-blue-700"
-                           onClick={() => handlePreviewClass(session.id)}
-                         >
-                           <FaPlay className="w-4 h-4 mr-2" />
-                           Preview Class
-                         </Button>
-                         <Button 
-                           variant="outline" 
-                           className="px-3"
-                           onClick={() => handleToggleFavorite(session.id)}
-                         >
-                           <FaHeart className={`w-4 h-4 ${favoriteSessions.includes(session.id) ? 'text-red-500' : ''}`} />
-                         </Button>
-                       </>
-                     )}
-                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{cls.title}</h3>
+
+                    <div className="space-y-2 mb-4">
+                      {cls.instructor?.name && (
+                        <div className="flex items-center text-sm text-gray-600">
+                          <FaGraduationCap className="w-4 h-4 mr-2" />
+                          {cls.instructor.name}
+                        </div>
+                      )}
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaClock className="w-4 h-4 mr-2" />
+                        {formatClassDate(String(cls.startTime))} • {formatClassTime(String(cls.startTime))}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaUsers className="w-4 h-4 mr-2" />
+                        {cls.duration} min
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      {canAccessLiveClasses ? (
+                        <Button 
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => handleJoinUpcomingClass(cls.id)}
+                        >
+                          <FaPlay className="w-4 h-4 mr-2" />
+                          Join Class
+                        </Button>
+                      ) : (
+                        <Button 
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          onClick={() => setShowTrialModal(true)}
+                        >
+                          <FaPlay className="w-4 h-4 mr-2" />
+                          Preview Class
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              demoSessions.map((session) => (
+                <Card key={session.id} className="hover:shadow-lg transition-shadow duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        {session.type}
+                      </Badge>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <FaStar className="w-4 h-4 text-yellow-400 mr-1" />
+                        {session.rating} ({session.reviews})
+                      </div>
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{session.title}</h3>
+
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaGlobe className="w-4 h-4 mr-2" />
+                        {session.language}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaGraduationCap className="w-4 h-4 mr-2" />
+                        {session.instructor}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaClock className="w-4 h-4 mr-2" />
+                        {session.time} • {session.duration}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaUsers className="w-4 h-4 mr-2" />
+                        {session.participants}/{session.maxParticipants} students
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaDollarSign className="w-4 h-4 mr-2" />
+                        ${session.price}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {session.features.map((feature, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {feature}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-2">
+                      {canAccessLiveClasses ? (
+                        <>
+                          <Button 
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                            onClick={() => handleJoinClass(session.id)}
+                          >
+                            <FaPlay className="w-4 h-4 mr-2" />
+                            Join Class
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            className="px-3"
+                            onClick={() => handleBookSession(session.id)}
+                          >
+                            <FaCalendarAlt className="w-4 h-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button 
+                            className="flex-1 bg-blue-600 hover:bg-blue-700"
+                            onClick={() => handlePreviewClass(session.id)}
+                          >
+                            <FaPlay className="w-4 h-4 mr-2" />
+                            Preview Class
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            className="px-3"
+                            onClick={() => handleToggleFavorite(session.id)}
+                          >
+                            <FaHeart className={`w-4 h-4 ${favoriteSessions.includes(session.id) ? 'text-red-500' : ''}`} />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
-        </div>
-      </section>
+         </div>
+       </section>
 
       {/* Instructors Section */}
       <section className="py-16 bg-gray-50">

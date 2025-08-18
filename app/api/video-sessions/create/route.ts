@@ -32,6 +32,11 @@ export async function POST(request: NextRequest) {
       allowRecording,
     } = body;
 
+    // Enforce: All sessions must be linked to a course (directly or via module)
+    if (!courseId && !moduleId) {
+      return NextResponse.json({ error: 'A courseId or moduleId is required to create a live class' }, { status: 400 });
+    }
+
     // Validate required fields
     if (!title || !sessionType || !language || !level || !startTime || !endTime) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });

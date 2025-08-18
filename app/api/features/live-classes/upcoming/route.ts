@@ -6,13 +6,19 @@ export async function GET(request: NextRequest) {
   try {
     const now = new Date();
 
-    // Get upcoming classes (future classes not ready yet)
+    // Get upcoming classes (future classes and currently active ones)
     const upcomingClasses = await prisma.videoSession.findMany({
       where: {
-        status: 'SCHEDULED',
-        startTime: {
-          gt: new Date(now.getTime() + 15 * 60 * 1000), // More than 15 minutes from now
-        },
+        OR: [
+          {
+            status: 'SCHEDULED',
+            startTime: { gte: now },
+          },
+          {
+            status: 'ACTIVE',
+            endTime: { gt: now },
+          }
+        ],
       },
       include: {
         instructor: {
@@ -34,10 +40,10 @@ export async function GET(request: NextRequest) {
       title: cls.title,
       startTime: cls.startTime,
       duration: cls.duration,
-      instructor: {
+      instructor: cls.instructor ? {
         name: cls.instructor.name,
         avatar: undefined, // Not available in current schema
-      },
+      } : undefined,
       meetingLink: cls.meetingUrl,
       isReady: false,
     }));

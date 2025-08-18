@@ -180,12 +180,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Enforce: All sessions must be linked to a course (directly or via module)
+    if (!courseId && !moduleId) {
+      return NextResponse.json(
+        { error: 'A courseId or moduleId is required to create a live class' },
+        { status: 400 }
+      );
+    }
+
     // Validate course if provided
     if (courseId) {
-      const course = await prisma.course.findUnique({
-        where: { id: courseId },
-      });
-
+      const course = await prisma.course.findUnique({ where: { id: courseId } });
       if (!course) {
         return NextResponse.json(
           { error: 'Course not found' },
