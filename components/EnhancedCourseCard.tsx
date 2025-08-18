@@ -90,6 +90,9 @@ export function EnhancedCourseCard({
     course.marketingType === 'BLENDED'
   );
 
+  // Determine platform vs partner for source badge
+  const isPlatformSource = (course as any)?.isPlatformCourse === true || (course as any)?.institutionId == null;
+
   // Get subscription tier info if applicable
   const subscriptionInfo = isSubscriptionBased && course.subscriptionTier 
     ? getStudentTier(course.subscriptionTier) 
@@ -226,7 +229,7 @@ export function EnhancedCourseCard({
             </p>
           )}
 
-          {/* Institution Info and Rating - Better spacing */}
+          {/* Institution Info, Source Badge and Rating */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm text-gray-500 flex-1 min-w-0">
               <MapPin className="w-4 h-4 flex-shrink-0" />
@@ -236,6 +239,17 @@ export function EnhancedCourseCard({
                   <span className="text-gray-400"> • {course.institution.city}</span>
                 )}
               </div>
+              <Badge 
+                variant="outline" 
+                className={`ml-2 text-[10px] px-2 py-0.5 whitespace-nowrap flex-shrink-0 ${
+                  isPlatformSource 
+                    ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                }`}
+                title={isPlatformSource ? 'Course by Fluentship Platform' : 'Course by Partner Institution'}
+              >
+                {isPlatformSource ? 'Fluentship Platform' : 'Partner Institution'}
+              </Badge>
             </div>
             
             {/* Priority Score - Moved to right side */}

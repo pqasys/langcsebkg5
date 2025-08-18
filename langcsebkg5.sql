@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 17, 2025 at 10:22 PM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 18, 2025 at 07:53 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -361,8 +361,7 @@ INSERT INTO `course` (`id`, `title`, `description`, `duration`, `level`, `status
 ('c5f5c533-6eef-4b50-8bee-47e4cfaa4d15', 'Cambridge Exams Preparation - CPE', 'The Cambridge examinations are recognised worldwide as a proof of your English language ability. They can be useful when applying for jobs where English Language competence is assessed, and, in some cases, for universities.', 150, 'CEFR_B2', 'PUBLISHED', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '3f6ef397-0c98-4d1d-937f-e47fce5775a3', '2025-06-13 12:32:01.989', '2025-08-17 16:19:04.063', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 270, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, 'null', 0, NULL, 0, NULL, NULL, 'IN_PERSON', 'cambridge-exams-preparation-cpe'),
 ('7e806add-bd45-43f6-a28f-fb736707653c', 'Conversation & Pronunciation', 'Our Conversation and Pronunciation classes take place in small groups to allow as much speaking time as possible.', 10, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 17:12:21.300', '2025-08-17 16:19:04.069', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 100, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'Conversation & Pronunciation - Self-paced learning', 'SELF_PACED', 'conversation-pronunciation'),
 ('6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'General French', 'Learn French in the heart of London on this lively interactive course for beginners. The course will be taught in French, with an emphasis on developing your speaking and listening skills.', 12, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-07-26 15:47:30.135', '2025-08-17 16:19:04.083', '2025-09-01 00:00:00.000', '2025-11-21 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'General French - Self-paced learning', 'SELF_PACED', 'general-french'),
-('21058bb2-c9f3-4af1-90fc-235b350f5718', 'Advanced Spanish Conversation - Live Classes', 'Master Spanish conversation through interactive live sessions with native speakers. This intensive course features real-time practice, immediate feedback, and cultural immersion.', 12, 'ADVANCED', 'ACTIVE', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.203', '2025-08-17 16:19:04.094', '2024-02-01 00:00:00.000', '2024-04-30 00:00:00.000', 15, 299.99, 'WEEKLY', 'CEFR', 0, 0, 0, 0, 'WEEKLY', '{\"time\": \"19:00\", \"duration\": 90, \"timezone\": \"UTC-5\", \"dayOfWeek\": \"Wednesday\"}', 0, NULL, 1, 'CONVERSATION', 'Advanced Spanish Conversation - Live Classes - Interactive live conversation practice', 'LIVE_ONLINE', 'advanced-spanish-conversation-live-classes'),
-('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'CEFR_B1', 'DRAFT', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-17 16:19:04.110', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 99.99, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', 'null', 1, 'PREMIUM', 1, 'COMPREHENSIVE', NULL, 'LIVE_ONLINE', 'global-english-mastery-live-platform-course');
+('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'CEFR_B1', 'DRAFT', NULL, 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-17 16:19:04.110', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 99.99, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', 'null', 1, 'PREMIUM', 1, 'COMPREHENSIVE', NULL, 'LIVE_ONLINE', 'global-english-mastery-live-platform-course');
 
 -- --------------------------------------------------------
 

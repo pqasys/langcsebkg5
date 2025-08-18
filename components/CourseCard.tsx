@@ -96,6 +96,9 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
     };
   }, [course]);
 
+  // Determine platform vs partner for source badge
+  const isPlatformSource = (course as any)?.isPlatformCourse === true || (course as any)?.institutionId == null;
+
   // Simple handlers without debounce
   const handleEnroll = useCallback(async () => {
     if (onEnroll) {
@@ -134,6 +137,17 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
             <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
               <MapPin className="w-4 h-4" />
               <span>{course.institution.city}, {course.institution.country}</span>
+              <Badge 
+                variant="outline" 
+                className={`ml-2 text-[10px] px-2 py-0.5 whitespace-nowrap flex-shrink-0 ${
+                  isPlatformSource 
+                    ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                }`}
+                title={isPlatformSource ? 'Course by Fluentship Platform' : 'Course by Partner Institution'}
+              >
+                {isPlatformSource ? 'Fluentship Platform' : 'Partner Institution'}
+              </Badge>
             </div>
           </div>
           <Badge 
