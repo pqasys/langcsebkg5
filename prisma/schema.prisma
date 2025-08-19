@@ -628,6 +628,7 @@ model VideoSession {
   instructor user @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   participants VideoSessionParticipant[]
+  likes VideoSessionLike[]
 
   @@index([instructorId])
   @@index([courseId])
@@ -640,6 +641,21 @@ model VideoSession {
   @@index([recurringPatternId])
   @@index([isRecurring])
   @@map("video_sessions")
+}
+
+model VideoSessionLike {
+  id        String       @id @default(uuid()) @db.VarChar(36)
+  sessionId String       @db.VarChar(36)
+  userId    String       @db.VarChar(36)
+  createdAt DateTime     @default(now())
+
+  // Relations
+  session VideoSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+  @@map("video_session_likes")
 }
 
 model RecurringSessionPattern {

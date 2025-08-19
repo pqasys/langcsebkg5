@@ -990,6 +990,8 @@ export default function CoursesPageClient() {
                 userRole={session?.user?.role}
                 isAuthenticated={status === 'authenticated'}
                 showPriorityIndicators={true}
+                // Hide price on platform-wide subscription courses in public-facing listing
+                hidePrice={Boolean((course as any).isPlatformCourse && (course as any).requiresSubscription)}
                 showAdvertising={showAdvertising}
               />
             ))}

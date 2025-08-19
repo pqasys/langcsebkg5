@@ -24,6 +24,7 @@ import {
   Monitor,
   MonitorOff
 } from 'lucide-react';
+import { FaStar } from 'react-icons/fa';
 import { format } from 'date-fns';
 
 interface LiveClass {
@@ -43,6 +44,8 @@ interface LiveClass {
     email: string;
   };
   meetingUrl?: string;
+  rating?: number | null;
+  reviews?: number;
 }
 
 interface ChatMessage {
@@ -81,6 +84,8 @@ export default function LiveClassSessionPage() {
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(new Map());
+  const [pendingRating, setPendingRating] = useState(0);
+  const [submittingRating, setSubmittingRating] = useState(false);
 
   // WebRTC refs
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -431,6 +436,26 @@ export default function LiveClassSessionPage() {
     setIsJoined(false);
   };
 
+  const submitRating = async (value: number) => {
+    try {
+      setSubmittingRating(true);
+      await fetch('/api/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetType: 'CONTENT', targetId: liveClass.id, rating: value }),
+      });
+      // Refresh aggregate
+      const res = await fetch(`/api/ratings?targetType=CONTENT&targetId=${liveClass.id}`);
+      if (res.ok) {
+        const stats = await res.json();
+        setLiveClass(prev => prev ? { ...prev, rating: stats.average, reviews: stats.count } : prev);
+      }
+    } finally {
+      setSubmittingRating(false);
+      setPendingRating(0);
+    }
+  };
+
   if (!session?.user || session.user.role !== 'STUDENT') {
     return (
       <div className="container mx-auto p-6">
@@ -476,6 +501,27 @@ export default function LiveClassSessionPage() {
           <p className="text-gray-300 text-sm">
             {format(new Date(liveClass.startTime), 'MMM dd, yyyy HH:mm')} - {format(new Date(liveClass.endTime), 'HH:mm')}
           </p>
+          <div className="mt-1 flex items-center gap-2 text-sm text-gray-300">
+            <FaStar className="w-4 h-4 text-yellow-400" />
+            <span>{typeof liveClass.rating === 'number' ? liveClass.rating.toFixed(1) : '—'}{typeof liveClass.reviews === 'number' ? ` (${liveClass.reviews})` : ''}</span>
+            {session?.user && (
+              <span className="ml-2 flex items-center gap-1">
+                {[1,2,3,4,5].map(v => (
+                  <button
+                    key={v}
+                    className={`p-1 ${v <= (pendingRating || 0) ? 'text-yellow-500' : 'text-gray-500'}`}
+                    onMouseEnter={() => setPendingRating(v)}
+                    onMouseLeave={() => setPendingRating(0)}
+                    onClick={() => submitRating(v)}
+                    disabled={submittingRating}
+                    aria-label={`Rate ${v}`}
+                  >
+                    <FaStar className="w-4 h-4" />
+                  </button>
+                ))}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex items-center space-x-4">
           <Badge variant="secondary" className="bg-green-600">

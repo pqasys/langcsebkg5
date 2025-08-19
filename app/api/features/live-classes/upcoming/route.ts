@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 // GET /api/features/live-classes/upcoming - Get upcoming classes
@@ -45,33 +47,62 @@ export async function GET(request: NextRequest) {
       take: 10, // Limit to 10 upcoming classes
     });
 
-    // Format the response to match the expected interface
-    const formattedClasses = upcomingClasses.map(cls => ({
-      id: cls.id,
-      title: cls.title,
-      startTime: cls.startTime,
-      duration: cls.duration,
-      language: cls.language,
-      price: cls.price,
-      currency: cls.currency,
-      isRecorded: cls.isRecorded,
-      allowChat: cls.allowChat,
-      allowScreenShare: cls.allowScreenShare,
-      course: cls.course ? {
-        id: cls.course.id,
-        title: cls.course.title,
-        requiresSubscription: cls.course.requiresSubscription,
-        subscriptionTier: cls.course.subscriptionTier,
-        institutionId: cls.course.institutionId,
-      } : undefined,
-      features: Array.isArray((cls as any).features) ? (cls as any).features : undefined,
-      instructor: cls.instructor ? {
-        name: cls.instructor.name,
-        avatar: undefined, // Not available in current schema
-      } : undefined,
-      meetingLink: cls.meetingUrl,
-      isReady: false,
-    }));
+    // Session is optional; when present we can compute likedByMe
+    const session = await getServerSession(authOptions).catch(() => null as any);
+    const userId = session?.user?.id as string | undefined;
+
+    const formattedClasses = await Promise.all(
+      upcomingClasses.map(async (cls) => {
+        const [likesCount, likedByMe, ratingStats] = await Promise.all([
+          prisma.videoSessionLike.count({ where: { sessionId: cls.id } }),
+          userId
+            ? prisma.videoSessionLike
+                .findUnique({ where: { sessionId_userId: { sessionId: cls.id, userId } } })
+                .then(Boolean)
+            : Promise.resolve(false),
+          prisma.rating.aggregate({
+            where: { targetType: 'CONTENT' as any, targetId: cls.id },
+            _avg: { rating: true },
+            _count: { rating: true },
+          }),
+        ]);
+
+        return {
+          id: cls.id,
+          title: cls.title,
+          startTime: cls.startTime,
+          duration: cls.duration,
+          language: cls.language,
+          price: cls.price,
+          currency: cls.currency,
+          rating: ratingStats._avg.rating ?? null,
+          reviews: ratingStats._count.rating ?? 0,
+          isRecorded: cls.isRecorded,
+          allowChat: cls.allowChat,
+          allowScreenShare: cls.allowScreenShare,
+          course: cls.course
+            ? {
+                id: cls.course.id,
+                title: cls.course.title,
+                requiresSubscription: cls.course.requiresSubscription,
+                subscriptionTier: cls.course.subscriptionTier,
+                institutionId: cls.course.institutionId,
+              }
+            : undefined,
+          features: Array.isArray((cls as any).features) ? ((cls as any).features as string[]) : undefined,
+          instructor: cls.instructor
+            ? {
+                name: cls.instructor.name,
+                avatar: undefined as any, // Not available in current schema
+              }
+            : undefined,
+          meetingLink: cls.meetingUrl,
+          isReady: false,
+          likesCount,
+          likedByMe,
+        };
+      })
+    );
 
     return NextResponse.json({
       upcomingClasses: formattedClasses,

@@ -55,6 +55,9 @@ export default function VideoConferencingFeaturePage() {
   const [showTrialModal, setShowTrialModal] = useState(false);
   const [upcomingClassesData, setUpcomingClassesData] = useState<UpcomingClass[]>([]);
   const [readyToJoinClasses, setReadyToJoinClasses] = useState<UpcomingClass[]>([]);
+  const [togglingLikeId, setTogglingLikeId] = useState<string | null>(null);
+  const [submittingRatingId, setSubmittingRatingId] = useState<string | null>(null);
+  const [pendingRating, setPendingRating] = useState<Record<string, number>>({});
 
   // Handler functions
   const handleAccessLiveClasses = () => {
@@ -112,22 +115,7 @@ export default function VideoConferencingFeaturePage() {
     );
   };
 
-  const handleBookSession = (sessionId: number) => {
-    if (canAccessLiveClasses) {
-      // Route to appropriate live classes page based on user role
-      if (session?.user?.role === 'ADMIN') {
-        window.location.href = "/admin/live-classes";
-      } else if (session?.user?.role === 'INSTITUTION_STAFF') {
-        window.location.href = "/institution/live-classes";
-      } else if (session?.user?.role === 'STUDENT') {
-        window.location.href = "/student/live-classes";
-      } else {
-        window.location.href = "/student/live-classes";
-      }
-    } else {
-      setShowTrialModal(true);
-    }
-  };
+  // NOTE: booking handled by the async variant below; this legacy version is removed to avoid duplicate names
 
   const handleViewSchedule = () => {
     if (canAccessLiveClasses) {
@@ -307,13 +295,107 @@ export default function VideoConferencingFeaturePage() {
     fetchLiveClassesData();
   }, [canAccessLiveClasses]);
 
+  const toggleLiveLike = async (classId: string) => {
+    try {
+      setTogglingLikeId(classId);
+      const res = await fetch(`/api/student/live-classes/${classId}/like`, { method: 'POST' });
+      if (!res.ok) return;
+      const data = await res.json();
+      setReadyToJoinClasses(prev => prev.map(c => c.id === classId ? { ...c, likesCount: data.likesCount, likedByMe: data.likedByMe } as any : c));
+      setUpcomingClassesData(prev => prev.map(c => c.id === classId ? { ...c, likesCount: data.likesCount, likedByMe: data.likedByMe } as any : c));
+    } finally {
+      setTogglingLikeId(null);
+    }
+  };
+
+  const submitRating = async (classId: string, value: number) => {
+    try {
+      setSubmittingRatingId(classId);
+      await fetch('/api/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetType: 'CONTENT', targetId: classId, rating: value }),
+      });
+      // Refresh aggregates locally
+      const res = await fetch(`/api/ratings?targetType=CONTENT&targetId=${classId}`);
+      if (res.ok) {
+        const stats = await res.json();
+        setReadyToJoinClasses(prev => prev.map(c => c.id === classId ? { ...c, rating: stats.average, reviews: stats.count } as any : c));
+        setUpcomingClassesData(prev => prev.map(c => c.id === classId ? { ...c, rating: stats.average, reviews: stats.count } as any : c));
+      }
+    } finally {
+      setSubmittingRatingId(null);
+    }
+  };
+
   // Join specific upcoming class
-  const handleJoinUpcomingClass = (classId: string) => {
-    if (canAccessLiveClasses) {
-      // Use the WebRTC session page instead of external meeting link
-      window.open(`/student/live-classes/session/${classId}`, '_blank');
-    } else {
+  const handleJoinUpcomingClass = async (classId: string) => {
+    if (!canAccessLiveClasses) {
       setShowTrialModal(true);
+      return;
+    }
+    // Enforce enrollment for students
+    if (session?.user?.role === 'STUDENT') {
+      try {
+        const res = await fetch(`/api/student/live-classes/${classId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.liveClass?.isEnrolled) {
+            window.open(`/student/live-classes/session/${classId}`, '_blank');
+          } else {
+            alert('Please enroll in this class before joining. You will be redirected to My Live Classes.');
+            window.location.href = `/student/live-classes?classId=${classId}`;
+          }
+        } else {
+          window.location.href = `/student/live-classes?classId=${classId}`;
+        }
+      } catch (e) {
+        window.location.href = `/student/live-classes?classId=${classId}`;
+      }
+      return;
+    }
+    // For other roles, route to appropriate page
+    if (session?.user?.role === 'ADMIN') {
+      window.location.href = "/admin/live-classes";
+    } else if (session?.user?.role === 'INSTITUTION_STAFF') {
+      window.location.href = "/institution/live-classes";
+    } else {
+      window.location.href = "/student/live-classes";
+    }
+  };
+
+  const handleBookSession = async (sessionId: string) => {
+    if (!canAccessLiveClasses) {
+      setShowTrialModal(true);
+      return;
+    }
+    if (session?.user?.role === 'STUDENT') {
+      try {
+        const res = await fetch(`/api/student/live-classes/${sessionId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.liveClass?.isEnrolled) {
+            // Direct user to their live classes schedule
+            window.location.href = `/student/live-classes?classId=${sessionId}`;
+          } else {
+            // Prompt enrollment
+            window.location.href = `/student/live-classes?classId=${sessionId}`;
+          }
+        } else {
+          window.location.href = `/student/live-classes?classId=${sessionId}`;
+        }
+      } catch (e) {
+        window.location.href = `/student/live-classes?classId=${sessionId}`;
+      }
+      return;
+    }
+    // For other roles, route to respective live-classes pages
+    if (session?.user?.role === 'ADMIN') {
+      window.location.href = "/admin/live-classes";
+    } else if (session?.user?.role === 'INSTITUTION_STAFF') {
+      window.location.href = "/institution/live-classes";
+    } else {
+      window.location.href = "/student/live-classes";
     }
   };
 
@@ -623,6 +705,10 @@ export default function VideoConferencingFeaturePage() {
                     <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                       {cls.isReady ? 'Starting Soon' : 'Upcoming'}
                     </Badge>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FaStar className="w-4 h-4 text-yellow-400 mr-1" />
+                      {typeof (cls as any).rating === 'number' ? (cls as any).rating.toFixed(1) : '—'}{typeof (cls as any).reviews === 'number' ? ` (${(cls as any).reviews})` : ''}
+                    </div>
                   </div>
 
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">{cls.title}</h3>
@@ -654,11 +740,15 @@ export default function VideoConferencingFeaturePage() {
                     {/* Price / Subscription */}
                     <div className="flex items-center gap-2 text-sm">
                       {cls.course && (!cls.course.institutionId) && cls.course.requiresSubscription ? (
-                        <Badge variant="secondary" className="bg-purple-100 text-purple-800">{cls.course.subscriptionTier || 'SUBSCRIPTION'}</Badge>
+                        <>
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">Platform-wide</Badge>
+                          <Badge variant="secondary" className="bg-purple-100 text-purple-800">{cls.course.subscriptionTier || 'SUBSCRIPTION'}</Badge>
+                        </>
                       ) : (
                         <>
                           <FaDollarSign className="w-4 h-4 text-gray-600" />
                           <span>{typeof cls.price === 'number' ? `$${cls.price} ${cls.currency || ''}` : '—'}</span>
+                          <Badge variant="secondary" className="bg-amber-100 text-amber-800 border border-amber-200">Institution</Badge>
                         </>
                       )}
                     </div>
@@ -685,23 +775,44 @@ export default function VideoConferencingFeaturePage() {
 
                   <div className="flex gap-2">
                     {canAccessLiveClasses ? (
-                      <Button 
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        onClick={() => handleJoinUpcomingClass(cls.id)}
-                      >
-                        <FaPlay className="w-4 h-4 mr-2" />
-                        Join Class
-                      </Button>
+                      <>
+                        <Button 
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => handleJoinUpcomingClass(cls.id)}
+                        >
+                          <FaPlay className="w-4 h-4 mr-2" />
+                          Join Class
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="px-3"
+                          onClick={() => handleBookSession(cls.id as any)}
+                        >
+                          <FaCalendarAlt className="w-4 h-4" />
+                        </Button>
+                      </>
                     ) : (
-                      <Button 
-                        className="flex-1 bg-blue-600 hover:bg-blue-700"
-                        onClick={() => setShowTrialModal(true)}
-                      >
-                        <FaPlay className="w-4 h-4 mr-2" />
-                        Preview Class
-                      </Button>
+                      <>
+                        <Button 
+                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          onClick={() => setShowTrialModal(true)}
+                        >
+                          <FaPlay className="w-4 h-4 mr-2" />
+                          Preview Class
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="px-3"
+                          onClick={() => toggleLiveLike(cls.id)}
+                          disabled={togglingLikeId === cls.id}
+                        >
+                          <FaHeart className={`w-4 h-4 ${((cls as any).likedByMe) ? 'text-red-500' : ''}`} />
+                        </Button>
+                      </>
                     )}
                   </div>
+
+
                 </CardContent>
               </Card>
             ))}

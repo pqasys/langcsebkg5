@@ -13,6 +13,7 @@ import { Calendar, Clock, Users, Video, Save, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getAllStudentTiers } from '@/lib/subscription-pricing';
 
 interface LiveClassFormData {
   title: string;
@@ -77,6 +78,37 @@ export default function AdminCreateLiveClassPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const studentPlans = getAllStudentTiers();
+  const [featureOptions, setFeatureOptions] = useState<string[]>([
+    'Screen Sharing',
+    'Recording',
+    'Chat',
+    'Breakout Rooms',
+    'File Sharing',
+    'HD Video',
+    'Mobile Optimized',
+  ]);
+  const [tagOptions, setTagOptions] = useState<string[]>([
+    'Beginner',
+    'Intermediate',
+    'Advanced',
+    'Workshop',
+    'Conversation',
+    'Business',
+    'Exam Prep',
+  ]);
+  const [materialOptions, setMaterialOptions] = useState<string[]>([
+    'Slides',
+    'PDF',
+    'Worksheet',
+    'Audio',
+    'Video',
+    'Vocabulary List',
+    'Grammar Notes',
+  ]);
+  const [customFeature, setCustomFeature] = useState('');
+  const [customTag, setCustomTag] = useState('');
+  const [customMaterial, setCustomMaterial] = useState('');
   const [formData, setFormData] = useState<LiveClassFormData>({
     title: '',
     description: '',
@@ -598,36 +630,67 @@ export default function AdminCreateLiveClassPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Display Settings for feature parity */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price">Price</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={formData.price as any}
-                    onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
-                    min="0"
-                    step="0.01"
-                    disabled={formData.institutionId === 'none' && formData.courseId && formData.courseId !== 'none'}
-                  />
-                  {formData.institutionId === 'none' && formData.courseId && formData.courseId !== 'none' && (
-                    <p className="text-xs text-gray-500 mt-1">Price is derived from the platform-wide subscription plan of the selected course.</p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select value={formData.currency || 'USD'} onValueChange={(value) => handleInputChange('currency', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="USD">USD ($)</SelectItem>
-                      <SelectItem value="EUR">EUR (€)</SelectItem>
-                      <SelectItem value="GBP">GBP (£)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              {(() => {
+                const selectedCourse = courses.find(c => c.id === formData.courseId);
+                const isPlatformWide = (formData.institutionId === 'none' || !formData.institutionId) && selectedCourse && (selectedCourse.institutionId === null || !selectedCourse.institutionId);
+                const subscriptionBased = !!(selectedCourse && selectedCourse.requiresSubscription);
+                if (isPlatformWide && subscriptionBased) {
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="subscriptionPlan">Subscription Plan</Label>
+                        <Select onValueChange={(planType) => {
+                          const plan = studentPlans.find(p => p.planType === planType);
+                          if (plan) {
+                            handleInputChange('price', plan.price);
+                            handleInputChange('currency', 'USD');
+                          }
+                        }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select plan" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {studentPlans.map(plan => (
+                              <SelectItem key={plan.planType} value={plan.planType}>
+                                {plan.name?.replace?.(' Plan','') || plan.planType} — ${plan.price}/month
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-blue-700 mt-2">Price is governed by the selected subscription plan for platform-wide sessions.</p>
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="price">Price</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={formData.price as any}
+                        onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="currency">Currency</Label>
+                      <Select value={formData.currency || 'USD'} onValueChange={(value) => handleInputChange('currency', value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD ($)</SelectItem>
+                          <SelectItem value="EUR">EUR (€)</SelectItem>
+                          <SelectItem value="GBP">GBP (£)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div>
                 <Label htmlFor="rating">Rating (0-5)</Label>
@@ -652,28 +715,151 @@ export default function AdminCreateLiveClassPage() {
                 />
               </div>
               <div>
-                <Label>Features (comma-separated)</Label>
-                <Input
-                  placeholder="Screen Sharing, Recording, Chat"
-                  value={(formData.features || []).join(', ')}
-                  onChange={(e) => handleInputChange('features', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                />
+                <Label>Features</Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {featureOptions.map(opt => (
+                    <button
+                      key={opt}
+                      type="button"
+                      className={`text-xs px-2 py-1 rounded-full border ${formData.features?.includes(opt) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                      onClick={() => handleInputChange('features', (formData.features || []).includes(opt) ? (formData.features || []).filter(v => v !== opt) : [ ...(formData.features || []), opt ])}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <Input
+                    placeholder="Add custom feature"
+                    value={customFeature}
+                    onChange={(e) => setCustomFeature(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (customFeature.trim()) {
+                          const val = customFeature.trim();
+                          if (!featureOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                            setFeatureOptions(prev => [...prev, val]);
+                          }
+                          if (!(formData.features || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                            handleInputChange('features', [ ...(formData.features || []), val ]);
+                          }
+                          setCustomFeature('');
+                        }
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={() => {
+                    if (customFeature.trim()) {
+                      const val = customFeature.trim();
+                      if (!featureOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                        setFeatureOptions(prev => [...prev, val]);
+                      }
+                      if (!(formData.features || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                        handleInputChange('features', [ ...(formData.features || []), val ]);
+                      }
+                      setCustomFeature('');
+                    }
+                  }}>Add</Button>
+                </div>
               </div>
               <div>
-                <Label>Tags (comma-separated)</Label>
-                <Input
-                  placeholder="Beginner, Workshop"
-                  value={(formData.tags || []).join(', ')}
-                  onChange={(e) => handleInputChange('tags', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                />
+                <Label>Tags</Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {tagOptions.map(opt => (
+                    <button
+                      key={opt}
+                      type="button"
+                      className={`text-xs px-2 py-1 rounded-full border ${formData.tags?.includes(opt) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                      onClick={() => handleInputChange('tags', (formData.tags || []).includes(opt) ? (formData.tags || []).filter(v => v !== opt) : [ ...(formData.tags || []), opt ])}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <Input
+                    placeholder="Add custom tag"
+                    value={customTag}
+                    onChange={(e) => setCustomTag(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (customTag.trim()) {
+                          const val = customTag.trim();
+                          if (!tagOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                            setTagOptions(prev => [...prev, val]);
+                          }
+                          if (!(formData.tags || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                            handleInputChange('tags', [ ...(formData.tags || []), val ]);
+                          }
+                          setCustomTag('');
+                        }
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={() => {
+                    if (customTag.trim()) {
+                      const val = customTag.trim();
+                      if (!tagOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                        setTagOptions(prev => [...prev, val]);
+                      }
+                      if (!(formData.tags || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                        handleInputChange('tags', [ ...(formData.tags || []), val ]);
+                      }
+                      setCustomTag('');
+                    }
+                  }}>Add</Button>
+                </div>
               </div>
               <div>
-                <Label>Materials (comma-separated)</Label>
-                <Input
-                  placeholder="PDF, Slides"
-                  value={(formData.materials || []).join(', ')}
-                  onChange={(e) => handleInputChange('materials', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                />
+                <Label>Materials</Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {materialOptions.map(opt => (
+                    <button
+                      key={opt}
+                      type="button"
+                      className={`text-xs px-2 py-1 rounded-full border ${formData.materials?.includes(opt) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                      onClick={() => handleInputChange('materials', (formData.materials || []).includes(opt) ? (formData.materials || []).filter(v => v !== opt) : [ ...(formData.materials || []), opt ])}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <Input
+                    placeholder="Add custom material"
+                    value={customMaterial}
+                    onChange={(e) => setCustomMaterial(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (customMaterial.trim()) {
+                          const val = customMaterial.trim();
+                          if (!materialOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                            setMaterialOptions(prev => [...prev, val]);
+                          }
+                          if (!(formData.materials || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                            handleInputChange('materials', [ ...(formData.materials || []), val ]);
+                          }
+                          setCustomMaterial('');
+                        }
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={() => {
+                    if (customMaterial.trim()) {
+                      const val = customMaterial.trim();
+                      if (!materialOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                        setMaterialOptions(prev => [...prev, val]);
+                      }
+                      if (!(formData.materials || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                        handleInputChange('materials', [ ...(formData.materials || []), val ]);
+                      }
+                      setCustomMaterial('');
+                    }
+                  }}>Add</Button>
+                </div>
               </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex-1">

@@ -38,15 +38,26 @@ export async function GET(
       );
     }
 
-    // Check if student is enrolled
-    const enrollment = await prisma.videoSessionParticipant.findUnique({
-      where: {
-        sessionId_userId: {
-          sessionId: liveClassId,
-          userId: session.user.id,
+    // Check enrollment, likes, and rating stats
+    const [enrollment, likesCount, likedByMe, ratingStats] = await Promise.all([
+      prisma.videoSessionParticipant.findUnique({
+        where: {
+          sessionId_userId: {
+            sessionId: liveClassId,
+            userId: session.user.id,
+          },
         },
-      },
-    });
+      }),
+      prisma.videoSessionLike.count({ where: { sessionId: liveClassId } }),
+      prisma.videoSessionLike.findUnique({
+        where: { sessionId_userId: { sessionId: liveClassId, userId: session.user.id } },
+      }).then(Boolean),
+      prisma.rating.aggregate({
+        where: { targetType: 'CONTENT' as any, targetId: liveClassId },
+        _avg: { rating: true },
+        _count: { rating: true },
+      }),
+    ]);
 
     // Format the response
     const formattedLiveClass = {
@@ -72,6 +83,10 @@ export async function GET(
         joinedAt: enrollment.joinedAt,
         isActive: enrollment.isActive,
       } : undefined,
+      likesCount,
+      likedByMe,
+      rating: ratingStats._avg.rating ?? null,
+      reviews: ratingStats._count.rating ?? 0,
     };
 
     return NextResponse.json({

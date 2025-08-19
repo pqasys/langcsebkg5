@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Calendar, Users, DollarSign, Clock, BookOpen, Bookmark, Video, MessageCircle, Share2, User } from 'lucide-react';
+import { Search, Calendar, Users, DollarSign, Clock, BookOpen, Bookmark, Video, MessageCircle, Share2, User, Heart } from 'lucide-react';
+import { FaStar } from 'react-icons/fa';
 import { format } from 'date-fns';
 import VideoConferencingCTA from '@/components/VideoConferencingCTA'
 
@@ -48,6 +49,10 @@ interface LiveClass {
     joinedAt: string;
     isActive: boolean;
   };
+  likesCount?: number;
+  likedByMe?: boolean;
+  rating?: number | null;
+  reviews?: number;
 }
 
 interface AccessLevel {
@@ -70,6 +75,10 @@ export default function StudentLiveClassesPage() {
     hasInstitutionAccess: false,
   });
   const [activeTab, setActiveTab] = useState('available');
+  const [togglingLikeId, setTogglingLikeId] = useState<string | null>(null);
+  const [pendingRating, setPendingRating] = useState<Record<string, number>>({});
+  const [submittingRatingId, setSubmittingRatingId] = useState<string | null>(null);
+  const [redirectedClass, setRedirectedClass] = useState<LiveClass | null>(null);
   const [enrollmentModal, setEnrollmentModal] = useState<{
     isOpen: boolean;
     liveClass: LiveClass | null;
@@ -81,6 +90,31 @@ export default function StudentLiveClassesPage() {
   useEffect(() => {
     fetchLiveClasses();
   }, [currentPage, searchTerm, languageFilter, levelFilter, activeTab]);
+
+  // If redirected with a specific classId, prefilter to show it and highlight enroll CTA
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const classId = params.get('classId');
+    if (classId) {
+      setActiveTab('available');
+      setSearchTerm('');
+      setLanguageFilter('');
+      setLevelFilter('');
+      // Fetch that specific class to display even if it doesn't appear in current filters
+      (async () => {
+        try {
+          const res = await fetch(`/api/student/live-classes/${classId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.liveClass) {
+              setRedirectedClass(data.liveClass);
+            }
+          }
+        } catch {}
+      })();
+    }
+  }, []);
 
   const fetchLiveClasses = async () => {
     try {
@@ -105,6 +139,39 @@ export default function StudentLiveClassesPage() {
       console.error('Error fetching live classes:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleLike = async (sessionId: string) => {
+    try {
+      setTogglingLikeId(sessionId);
+      const res = await fetch(`/api/student/live-classes/${sessionId}/like`, { method: 'POST' });
+      if (!res.ok) throw new Error('Failed to toggle like');
+      const data = await res.json();
+      setLiveClasses(prev => prev.map(c => c.id === sessionId ? { ...c, likesCount: data.likesCount, likedByMe: data.likedByMe } : c));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setTogglingLikeId(null);
+    }
+  };
+
+  const submitRating = async (sessionId: string, value: number) => {
+    try {
+      setSubmittingRatingId(sessionId);
+      await fetch('/api/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetType: 'CONTENT', targetId: sessionId, rating: value }),
+      });
+      const res = await fetch(`/api/ratings?targetType=CONTENT&targetId=${sessionId}`);
+      if (res.ok) {
+        const stats = await res.json();
+        setLiveClasses(prev => prev.map(c => c.id === sessionId ? { ...c, rating: stats.average, reviews: stats.count } : c));
+      }
+    } finally {
+      setSubmittingRatingId(null);
+      setPendingRating(prev => ({ ...prev, [sessionId]: 0 }));
     }
   };
 
@@ -358,7 +425,7 @@ export default function StudentLiveClassesPage() {
                 <div className="text-center py-8">
                   <p>Loading available classes...</p>
                 </div>
-              ) : liveClasses.length === 0 ? (
+              ) : (liveClasses.length === 0 && !redirectedClass) ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">No available live classes found.</p>
                   {!accessLevel.hasSubscription && !accessLevel.hasInstitutionAccess && (
@@ -372,7 +439,7 @@ export default function StudentLiveClassesPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {liveClasses.map((liveClass) => (
+                  {(redirectedClass ? [redirectedClass, ...liveClasses.filter(c => c.id !== redirectedClass.id)] : liveClasses).map((liveClass) => (
                     <Card key={liveClass.id} className="hover:shadow-md transition-shadow">
                       <CardHeader>
                         <div className="flex justify-between items-start">
@@ -409,11 +476,41 @@ export default function StudentLiveClassesPage() {
                               {liveClass.price} {liveClass.currency}
                             </span>
                           </div>
-                          <div className="flex space-x-2">
+                          <div className="flex space-x-2 items-center">
                             <Badge variant="outline">{liveClass.language.toUpperCase()}</Badge>
                             {getLevelBadge(liveClass.level)}
+                            {/* Price (if any) */}
+                            <div className="flex items-center gap-1 text-xs text-gray-600">
+                              <DollarSign className="w-3 h-3" />
+                              <span>{liveClass.price} {liveClass.currency}</span>
+                            </div>
+                            {/* Scope badges */}
+                            {liveClass.institution ? (
+                              <Badge variant="secondary" className="bg-amber-100 text-amber-800 border border-amber-200">Institution</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">Platform-wide</Badge>
+                            )}
+                            {(!liveClass.institution && liveClass.course && (liveClass as any).course?.requiresSubscription) ? (
+                              <Badge variant="secondary" className="bg-purple-100 text-purple-800">{(liveClass as any).course?.subscriptionTier || 'SUBSCRIPTION'}</Badge>
+                            ) : null}
                           </div>
-                          <div className="pt-2">
+                          <div className="pt-2 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <button
+                                className={`flex items-center gap-1 text-sm ${liveClass.likedByMe ? 'text-red-600' : 'text-gray-500'} disabled:opacity-50`}
+                                onClick={() => toggleLike(liveClass.id)}
+                                disabled={togglingLikeId === liveClass.id}
+                                aria-label={liveClass.likedByMe ? 'Unlike' : 'Like'}
+                              >
+                                <Heart className={`w-4 h-4 ${liveClass.likedByMe ? 'fill-red-600' : ''}`} />
+                                <span>{liveClass.likesCount ?? 0}</span>
+                              </button>
+                            </div>
+                            {/* Compact rating display for available */}
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <FaStar className="w-3 h-3 text-yellow-400" />
+                              <span>{typeof liveClass.rating === 'number' ? liveClass.rating.toFixed(1) : '—'}{typeof liveClass.reviews === 'number' ? ` (${liveClass.reviews})` : ''}</span>
+                            </div>
                             <Button 
                               className="w-full" 
                               onClick={() => handleEnrollClick(liveClass)}
@@ -476,11 +573,58 @@ export default function StudentLiveClassesPage() {
                             <Clock className="w-4 h-4 text-gray-400" />
                             <span className="text-sm">{liveClass.duration} minutes</span>
                           </div>
-                          <div className="flex space-x-2">
+                          <div className="flex space-x-2 items-center">
                             <Badge variant="outline">{liveClass.language.toUpperCase()}</Badge>
                             {getLevelBadge(liveClass.level)}
+                            {/* Price (if any) */}
+                            <div className="flex items-center gap-1 text-xs text-gray-600">
+                              <DollarSign className="w-3 h-3" />
+                              <span>{liveClass.price} {liveClass.currency}</span>
+                            </div>
+                            {/* Scope badges */}
+                            {liveClass.institution ? (
+                              <Badge variant="secondary" className="bg-amber-100 text-amber-800 border border-amber-200">Institution</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">Platform-wide</Badge>
+                            )}
+                            {(!liveClass.institution && liveClass.course && (liveClass as any).course?.requiresSubscription) ? (
+                              <Badge variant="secondary" className="bg-purple-100 text-purple-800">{(liveClass as any).course?.subscriptionTier || 'SUBSCRIPTION'}</Badge>
+                            ) : null}
                           </div>
                           <div className="pt-2 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <button
+                                className={`flex items-center gap-1 text-sm ${liveClass.likedByMe ? 'text-red-600' : 'text-gray-500'} disabled:opacity-50`}
+                                onClick={() => toggleLike(liveClass.id)}
+                                disabled={togglingLikeId === liveClass.id}
+                                aria-label={liveClass.likedByMe ? 'Unlike' : 'Like'}
+                              >
+                                <Heart className={`w-4 h-4 ${liveClass.likedByMe ? 'fill-red-600' : ''}`} />
+                                <span>{liveClass.likesCount ?? 0}</span>
+                              </button>
+                            </div>
+                            {/* Compact rating display + submission for enrolled */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1 text-xs text-gray-500">
+                                <FaStar className="w-3 h-3 text-yellow-400" />
+                                <span>{typeof liveClass.rating === 'number' ? liveClass.rating.toFixed(1) : '—'}{typeof liveClass.reviews === 'number' ? ` (${liveClass.reviews})` : ''}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                {[1,2,3,4,5].map(v => (
+                                  <button
+                                    key={v}
+                                    className={`p-0.5 ${v <= (pendingRating[liveClass.id] || 0) ? 'text-yellow-500' : 'text-gray-400'}`}
+                                    onMouseEnter={() => setPendingRating(prev => ({ ...prev, [liveClass.id]: v }))}
+                                    onMouseLeave={() => setPendingRating(prev => ({ ...prev, [liveClass.id]: 0 }))}
+                                    onClick={() => submitRating(liveClass.id, v)}
+                                    disabled={submittingRatingId === liveClass.id}
+                                    aria-label={`Rate ${v}`}
+                                  >
+                                    <FaStar className="w-3 h-3" />
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
                             {(() => {
                               const now = new Date();
                               const startTime = new Date(liveClass.startTime);

@@ -71,6 +71,12 @@ export default function EditLiveClassPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [featureOptions, setFeatureOptions] = useState<string[]>(['Screen Sharing','Recording','Chat','Breakout Rooms','File Sharing','HD Video','Mobile Optimized']);
+  const [tagOptions, setTagOptions] = useState<string[]>(['Beginner','Intermediate','Advanced','Workshop','Conversation','Business','Exam Prep']);
+  const [materialOptions, setMaterialOptions] = useState<string[]>(['Slides','PDF','Worksheet','Audio','Video','Vocabulary List','Grammar Notes']);
+  const [customFeature, setCustomFeature] = useState('');
+  const [customTag, setCustomTag] = useState('');
+  const [customMaterial, setCustomMaterial] = useState('');
   const [formData, setFormData] = useState<LiveClass>({
     id: '',
     title: '',
@@ -464,28 +470,151 @@ export default function EditLiveClassPage() {
             </div>
 
             <div>
-              <Label>Features (comma-separated)</Label>
-              <Input
-                placeholder="Screen Sharing, Recording, Chat"
-                value={(formData.features || []).join(', ')}
-                onChange={(e) => handleInputChange('features', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-              />
+              <Label>Features</Label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {featureOptions.map(opt => (
+                  <button
+                    key={opt}
+                    type="button"
+                    className={`text-xs px-2 py-1 rounded-full border ${formData.features?.includes(opt) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                    onClick={() => handleInputChange('features', (formData.features || []).includes(opt) ? (formData.features || []).filter(v => v !== opt) : [ ...(formData.features || []), opt ])}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 flex gap-2">
+                <Input
+                  placeholder="Add custom feature"
+                  value={customFeature}
+                  onChange={(e) => setCustomFeature(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (customFeature.trim()) {
+                        const val = customFeature.trim();
+                        if (!featureOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                          setFeatureOptions(prev => [...prev, val]);
+                        }
+                        if (!(formData.features || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                          handleInputChange('features', [ ...(formData.features || []), val ]);
+                        }
+                        setCustomFeature('');
+                      }
+                    }
+                  }}
+                />
+                <Button type="button" onClick={() => {
+                  if (customFeature.trim()) {
+                    const val = customFeature.trim();
+                    if (!featureOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                      setFeatureOptions(prev => [...prev, val]);
+                    }
+                    if (!(formData.features || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                      handleInputChange('features', [ ...(formData.features || []), val ]);
+                    }
+                    setCustomFeature('');
+                  }
+                }}>Add</Button>
+              </div>
             </div>
             <div>
-              <Label>Tags (comma-separated)</Label>
-              <Input
-                placeholder="Beginner, Workshop"
-                value={(formData.tags || []).join(', ')}
-                onChange={(e) => handleInputChange('tags', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-              />
+              <Label>Tags</Label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {tagOptions.map(opt => (
+                  <button
+                    key={opt}
+                    type="button"
+                    className={`text-xs px-2 py-1 rounded-full border ${formData.tags?.includes(opt) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                    onClick={() => handleInputChange('tags', (formData.tags || []).includes(opt) ? (formData.tags || []).filter(v => v !== opt) : [ ...(formData.tags || []), opt ])}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 flex gap-2">
+                <Input
+                  placeholder="Add custom tag"
+                  value={customTag}
+                  onChange={(e) => setCustomTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (customTag.trim()) {
+                        const val = customTag.trim();
+                        if (!tagOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                          setTagOptions(prev => [...prev, val]);
+                        }
+                        if (!(formData.tags || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                          handleInputChange('tags', [ ...(formData.tags || []), val ]);
+                        }
+                        setCustomTag('');
+                      }
+                    }
+                  }}
+                />
+                <Button type="button" onClick={() => {
+                  if (customTag.trim()) {
+                    const val = customTag.trim();
+                    if (!tagOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                      setTagOptions(prev => [...prev, val]);
+                    }
+                    if (!(formData.tags || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                      handleInputChange('tags', [ ...(formData.tags || []), val ]);
+                    }
+                    setCustomTag('');
+                  }
+                }}>Add</Button>
+              </div>
             </div>
             <div>
-              <Label>Materials (comma-separated)</Label>
-              <Input
-                placeholder="PDF, Slides"
-                value={(formData.materials || []).join(', ')}
-                onChange={(e) => handleInputChange('materials', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-              />
+              <Label>Materials</Label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {materialOptions.map(opt => (
+                  <button
+                    key={opt}
+                    type="button"
+                    className={`text-xs px-2 py-1 rounded-full border ${formData.materials?.includes(opt) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                    onClick={() => handleInputChange('materials', (formData.materials || []).includes(opt) ? (formData.materials || []).filter(v => v !== opt) : [ ...(formData.materials || []), opt ])}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 flex gap-2">
+                <Input
+                  placeholder="Add custom material"
+                  value={customMaterial}
+                  onChange={(e) => setCustomMaterial(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (customMaterial.trim()) {
+                        const val = customMaterial.trim();
+                        if (!materialOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                          setMaterialOptions(prev => [...prev, val]);
+                        }
+                        if (!(formData.materials || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                          handleInputChange('materials', [ ...(formData.materials || []), val ]);
+                        }
+                        setCustomMaterial('');
+                      }
+                    }
+                  }}
+                />
+                <Button type="button" onClick={() => {
+                  if (customMaterial.trim()) {
+                    const val = customMaterial.trim();
+                    if (!materialOptions.some(o => o.toLowerCase() === val.toLowerCase())) {
+                      setMaterialOptions(prev => [...prev, val]);
+                    }
+                    if (!(formData.materials || []).some(o => o.toLowerCase() === val.toLowerCase())) {
+                      handleInputChange('materials', [ ...(formData.materials || []), val ]);
+                    }
+                    setCustomMaterial('');
+                  }
+                }}>Add</Button>
+              </div>
             </div>
           </CardContent>
         </Card>

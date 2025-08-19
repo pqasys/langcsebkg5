@@ -70,6 +70,7 @@ interface EnhancedCourseCardProps {
   isAuthenticated: boolean;
   showPriorityIndicators?: boolean;
   showAdvertising?: boolean;
+  hidePrice?: boolean;
 }
 
 export function EnhancedCourseCard({
@@ -79,7 +80,8 @@ export function EnhancedCourseCard({
   userRole,
   isAuthenticated,
   showPriorityIndicators = true,
-  showAdvertising = true
+  showAdvertising = true,
+  hidePrice = false
 }: EnhancedCourseCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -282,9 +284,11 @@ export function EnhancedCourseCard({
                   </div>
                 </div>
               ) : (
-                <div className="text-2xl font-bold text-green-600">
-                  {formatPrice(course.base_price)}
-                </div>
+                hidePrice ? null : (
+                  <div className="text-2xl font-bold text-green-600">
+                    {formatPrice(course.base_price)}
+                  </div>
+                )
               )}
             </div>
           </div>

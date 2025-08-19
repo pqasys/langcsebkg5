@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 19, 2025 at 02:17 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 19, 2025 at 07:53 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -362,7 +362,7 @@ INSERT INTO `course` (`id`, `title`, `description`, `duration`, `level`, `status
 ('7e806add-bd45-43f6-a28f-fb736707653c', 'Conversation & Pronunciation', 'Our Conversation and Pronunciation classes take place in small groups to allow as much speaking time as possible.', 10, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'f9ab03c0-acbe-4974-a1f5-1fff81e97269', '2025-06-13 17:12:21.300', '2025-08-17 16:19:04.069', '2025-07-07 00:00:00.000', '2025-09-12 00:00:00.000', 15, 100, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'Conversation & Pronunciation - Self-paced learning', 'SELF_PACED', 'conversation-pronunciation'),
 ('6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'General French', 'Learn French in the heart of London on this lively interactive course for beginners. The course will be taught in French, with an emphasis on developing your speaking and listening skills.', 12, 'CEFR_A1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-07-26 15:47:30.135', '2025-08-17 16:19:04.083', '2025-09-01 00:00:00.000', '2025-11-21 00:00:00.000', 15, 210, 'WEEKLY', 'CEFR', 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, NULL, 'General French - Self-paced learning', 'SELF_PACED', 'general-french'),
 ('21058bb2-c9f3-4af1-90fc-235b350f5718', 'Advanced Spanish Conversation - Live Classes', 'Master Spanish conversation through interactive live sessions with native speakers. This intensive course features real-time practice, immediate feedback, and cultural immersion.', 12, 'ADVANCED', 'ACTIVE', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.203', '2025-08-17 16:19:04.094', '2024-02-01 00:00:00.000', '2024-04-30 00:00:00.000', 15, 299.99, 'WEEKLY', 'CEFR', 0, 0, 0, 0, 'WEEKLY', '{\"time\": \"19:00\", \"duration\": 90, \"timezone\": \"UTC-5\", \"dayOfWeek\": \"Wednesday\"}', 0, NULL, 1, 'CONVERSATION', 'Advanced Spanish Conversation - Live Classes - Interactive live conversation practice', 'LIVE_ONLINE', 'advanced-spanish-conversation-live-classes'),
-('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'CEFR_B1', 'PUBLISHED', '42308252-a934-4eef-b663-37a7076bb177', 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-18 21:32:36.452', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 99.99, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', 'null', 1, 'PREMIUM', 1, 'COMPREHENSIVE', NULL, 'LIVE_ONLINE', 'global-english-mastery-live-platform-course');
+('c35b2490-a08e-4c29-9d28-30735f91bd1f', 'Global English Mastery - Live Platform Course', 'Join learners worldwide in this comprehensive English course featuring live interactive sessions, peer practice, and expert instruction. Perfect for international students.', 8, 'CEFR_B1', 'PUBLISHED', NULL, 'c7ee11f4-44e5-47f1-ad67-f497c5e89f11', '2025-08-07 16:04:17.331', '2025-08-19 17:52:38.724', '2024-02-01 00:00:00.000', '2024-03-31 00:00:00.000', 25, 99.99, 'MONTHLY', 'CEFR', 0, 0, 0, 1, 'BIWEEKLY', 'null', 1, 'PREMIUM', 1, 'COMPREHENSIVE', NULL, 'LIVE_ONLINE', 'global-english-mastery-live-platform-course');
 
 -- --------------------------------------------------------
 
@@ -435,9 +435,9 @@ INSERT INTO `coursetag` (`id`, `courseId`, `tagId`, `createdAt`, `updatedAt`) VA
 ('de64acf9-dd9f-485b-b331-f55ec62c2be5', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', 'dda75544-c43a-422b-a994-748e396be685', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442'),
 ('486a1eac-a237-4995-a65f-bf06fb67bed8', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', '67b01751-5587-4230-8d8c-118da2270485', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442'),
 ('260f4f3f-3f2c-49e1-af44-ca8f44d397f0', '6852a928-8dbe-46ec-b1cd-57cca8f1ed62', '6724fbd1-241f-4ba5-9d5a-c2036d94b8fd', '2025-08-07 15:03:19.442', '2025-08-07 15:03:19.442'),
-('946368c9-0cdd-4d68-a4a4-ed6011ce2e13', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', '048f677e-0e5b-4704-9415-19d10a5be921', '2025-08-18 21:32:36.452', '2025-08-18 21:32:36.452'),
-('bb4b9c48-d2a9-487b-a489-bf73341a74ed', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', '67b01751-5587-4230-8d8c-118da2270485', '2025-08-18 21:32:36.452', '2025-08-18 21:32:36.452'),
-('b9fad54b-e02d-4552-a4e6-4c0490183efd', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'dda75544-c43a-422b-a994-748e396be685', '2025-08-18 21:32:36.452', '2025-08-18 21:32:36.452');
+('d4116367-c692-49ea-aeb7-e7703eacc8f6', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', '048f677e-0e5b-4704-9415-19d10a5be921', '2025-08-19 17:26:45.209', '2025-08-19 17:26:45.209'),
+('f1b947cc-f98d-4118-bd5f-712fdc9d2935', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'dda75544-c43a-422b-a994-748e396be685', '2025-08-19 17:26:45.209', '2025-08-19 17:26:45.209'),
+('3a6edb1c-4ee4-4b06-82b7-d983edb5e948', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', '67b01751-5587-4230-8d8c-118da2270485', '2025-08-19 17:26:45.209', '2025-08-19 17:26:45.209');
 
 -- --------------------------------------------------------
 
@@ -3027,12 +3027,12 @@ CREATE TABLE IF NOT EXISTS `rate_limit_logs` (
 
 DROP TABLE IF EXISTS `ratings`;
 CREATE TABLE IF NOT EXISTS `ratings` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `targetType` enum('INSTITUTION','COURSE','INSTRUCTOR','CONTENT') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `targetId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `targetType` enum('INSTITUTION','COURSE','INSTRUCTOR','CONTENT') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `targetId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `rating` int NOT NULL,
-  `comment` text COLLATE utf8mb4_unicode_ci,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
   PRIMARY KEY (`id`),
@@ -3040,6 +3040,13 @@ CREATE TABLE IF NOT EXISTS `ratings` (
   KEY `idx_ratings_target` (`targetType`,`targetId`),
   KEY `idx_ratings_user` (`userId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ratings`
+--
+
+INSERT INTO `ratings` (`id`, `targetType`, `targetId`, `userId`, `rating`, `comment`, `createdAt`, `updatedAt`) VALUES
+('cmeiml5450000seil81icqsnp', 'CONTENT', 'd4c6ec04-e601-4ee6-ab04-721ad946db0e', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 3, NULL, '2025-08-19 14:14:51.942', '2025-08-19 14:19:30.062');
 
 -- --------------------------------------------------------
 
@@ -3276,8 +3283,8 @@ INSERT INTO `student_course_enrollments` (`id`, `studentId`, `courseId`, `status
 ('cmdfxzczf0007b4ejk2ggjy0u', '5b5fbd13-8776-4f96-ada9-091973974873', '7e806add-bd45-43f6-a28f-fb736707653c', 'PENDING_PAYMENT', 0, '2025-07-23 12:30:15.839', '2025-09-12 00:00:00.000', 'PENDING', NULL, '2025-07-23 12:30:50.236', '2025-08-05 16:23:06.800', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
 ('cmdfxjuwr0002b4ejo5suxfwp', '5b5fbd13-8776-4f96-ada9-091973974873', '78bfbb28-7f43-423d-9454-1910b1fdabcf', 'ENROLLED', 0, '2025-07-23 12:18:19.570', '2025-08-29 00:00:00.000', 'PAID', '2025-08-08 16:56:10.940', '2025-07-23 12:18:46.971', '2025-08-08 16:56:10.941', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
 ('cmdg69uuh00029kkxm7wbnam0', '5b5fbd13-8776-4f96-ada9-091973974873', '5002bdce-b66b-4be2-95b7-a1d08d8c0981', 'ENROLLED', 0, '2025-07-23 15:46:54.128', '2025-09-05 00:00:00.000', 'PAID', '2025-08-08 16:14:55.237', '2025-07-23 16:22:56.186', '2025-08-08 16:14:55.239', 1, 1, NULL, 'INSTITUTION', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
-('cmeascn27000r49m9wt4jyg8k', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'ENROLLED', 0, '2025-08-14 02:34:03.580', '2024-03-31 00:00:00.000', 'PAID', '2025-08-14 02:34:03.582', '2025-08-14 02:34:03.583', '2025-08-14 02:34:03.583', 1, 1, NULL, 'DIRECT', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL),
-('cmeat1fb7001849m9xatoysda', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'ENROLLED', 0, '2025-08-14 02:53:19.937', '2024-03-31 00:00:00.000', 'PAID', '2025-08-14 02:53:19.938', '2025-08-14 02:53:19.940', '2025-08-14 02:53:19.940', 1, 1, NULL, 'DIRECT', 0, 0, 'COURSE_BASED', 0, 1, 0, NULL, NULL, NULL);
+('cmeascn27000r49m9wt4jyg8k', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'ENROLLED', 0, '2025-08-14 02:34:03.580', '2024-03-31 00:00:00.000', 'PAID', '2025-08-14 02:34:03.582', '2025-08-14 02:34:03.583', '2025-08-19 17:52:38.758', 1, 1, NULL, 'DIRECT', 0, 0, 'COURSE_BASED', 0, 1, 1, NULL, NULL, NULL),
+('cmeat1fb7001849m9xatoysda', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'c35b2490-a08e-4c29-9d28-30735f91bd1f', 'ENROLLED', 0, '2025-08-14 02:53:19.937', '2024-03-31 00:00:00.000', 'PAID', '2025-08-14 02:53:19.938', '2025-08-14 02:53:19.940', '2025-08-19 17:52:38.758', 1, 1, NULL, 'DIRECT', 0, 0, 'COURSE_BASED', 0, 1, 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3759,14 +3766,32 @@ INSERT INTO `video_sessions` (`id`, `title`, `description`, `sessionType`, `lang
 ('0b943d34-96f8-42a3-9030-942c8b3baeb8', 'Week 10: Spanish Conversation Practice', 'Live Spanish conversation session covering week 10 topics and vocabulary.', 'LIVE_CLASS', 'Spanish', 'ADVANCED', 15, '2024-04-10 18:00:00.000', '2024-04-10 19:30:00.000', 90, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', '42308252-a934-4eef-b663-37a7076bb177', '21058bb2-c9f3-4af1-90fc-235b350f5718', NULL, 0, 0, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.428', '2025-08-07 16:04:17.428', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
 ('9123d065-46fa-4c13-8a94-154806eb19f8', 'Week 11: Spanish Conversation Practice', 'Live Spanish conversation session covering week 11 topics and vocabulary.', 'LIVE_CLASS', 'Spanish', 'ADVANCED', 15, '2024-04-17 18:00:00.000', '2024-04-17 19:30:00.000', 90, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', '42308252-a934-4eef-b663-37a7076bb177', '21058bb2-c9f3-4af1-90fc-235b350f5718', NULL, 0, 0, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.432', '2025-08-07 16:04:17.432', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
 ('d98d1298-cf3a-4e20-a687-e92ed364019e', 'Week 12: Spanish Conversation Practice', 'Live Spanish conversation session covering week 12 topics and vocabulary.', 'LIVE_CLASS', 'Spanish', 'ADVANCED', 15, '2024-04-24 18:00:00.000', '2024-04-24 19:30:00.000', 90, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', '42308252-a934-4eef-b663-37a7076bb177', '21058bb2-c9f3-4af1-90fc-235b350f5718', NULL, 0, 0, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.435', '2025-08-07 16:04:17.435', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('4c7f9e24-24e4-4b05-a710-30caa99a7025', 'Week 1: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-02-03 14:00:00.000', '2024-02-03 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.446', '2025-08-07 16:04:17.446', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('e92c3b99-19f3-4c35-80e3-e6c2ff449528', 'Week 2: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-02-17 14:00:00.000', '2024-02-17 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.451', '2025-08-07 16:04:17.451', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('81d7352e-8ede-4552-a65d-5f470825cedf', 'Week 3: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-03-02 14:00:00.000', '2024-03-02 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.456', '2025-08-07 16:04:17.456', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('02672128-23a1-4968-ac68-c790830ac30a', 'Week 4: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-03-16 14:00:00.000', '2024-03-16 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.461', '2025-08-07 16:04:17.461', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('c3b6a20f-6881-40b3-bd09-96afdc24f9c1', 'Week 5: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-03-30 14:00:00.000', '2024-03-30 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.465', '2025-08-07 16:04:17.465', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('c314db13-f3f1-42fc-96c9-64039dfca93e', 'Week 6: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-04-13 13:00:00.000', '2024-04-13 15:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.468', '2025-08-07 16:04:17.468', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('58485146-963e-4ef7-9cfe-bd7b415b5d0f', 'Week 7: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-01-27 13:00:00.000', '2024-04-27 22:00:00.000', 118, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.476', '2025-08-18 23:01:51.599', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
-('6d610fd7-00c6-4c2c-8942-46f446df812c', 'Week 8: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-08-19 11:00:00.000', '2024-12-19 15:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.481', '2025-08-18 23:00:34.061', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL);
+('4c7f9e24-24e4-4b05-a710-30caa99a7025', 'Week 1: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-02-03 14:00:00.000', '2024-02-03 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.446', '2025-08-19 17:52:38.738', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('e92c3b99-19f3-4c35-80e3-e6c2ff449528', 'Week 2: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-02-17 14:00:00.000', '2024-02-17 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.451', '2025-08-19 17:52:38.738', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('81d7352e-8ede-4552-a65d-5f470825cedf', 'Week 3: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-03-02 14:00:00.000', '2024-03-02 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.456', '2025-08-19 17:52:38.738', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('02672128-23a1-4968-ac68-c790830ac30a', 'Week 4: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-03-16 14:00:00.000', '2024-03-16 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.461', '2025-08-19 17:52:38.738', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('c3b6a20f-6881-40b3-bd09-96afdc24f9c1', 'Week 5: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-03-30 14:00:00.000', '2024-03-30 16:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.465', '2025-08-19 17:52:38.738', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('c314db13-f3f1-42fc-96c9-64039dfca93e', 'Week 6: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-04-13 13:00:00.000', '2024-04-13 15:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.468', '2025-08-19 17:52:38.738', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('58485146-963e-4ef7-9cfe-bd7b415b5d0f', 'Week 7: Global English Mastery', 'Live English learning session with international participants.', 'LIVE_CLASS', 'English', 'INTERMEDIATE', 25, '2024-01-27 13:00:00.000', '2024-04-27 22:00:00.000', 118, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 0, NULL, '2025-08-07 16:04:17.476', '2025-08-19 17:52:38.738', 'USD', NULL, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, NULL),
+('6d610fd7-00c6-4c2c-8942-46f446df812c', 'Week 8: Global English Mastery', 'Live English learning session with international participants.', 'CONVERSATION', 'en', 'INTERMEDIATE', 25, '2025-08-19 08:00:00.000', '2025-12-19 15:00:00.000', 120, 'SCHEDULED', NULL, NULL, NULL, 'd00a7d05-f380-46f1-8cb4-344f0d04c0f2', NULL, 'c35b2490-a08e-4c29-9d28-30735f91bd1f', NULL, 0, 1, 1, 1, 1, 1, NULL, '2025-08-07 16:04:17.481', '2025-08-19 17:52:38.738', 'USD', '[\"Breakout Rooms\", \"File Sharing\", \"Screen Sharing\", \"Recording\", \"Chat\", \"HD Video\", \"Mobile Optimized\"]', 0, 0, 0, '[\"Slides\", \"Audio\", \"Video\", \"PDF\", \"Worksheet\", \"Vocabulary List\", \"Grammar Notes\"]', 0.5, 10, '[\"Workshop\"]', 0, 0, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `video_session_likes`
+--
+
+DROP TABLE IF EXISTS `video_session_likes`;
+CREATE TABLE IF NOT EXISTS `video_session_likes` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `video_session_likes_sessionId_userId_key` (`sessionId`,`userId`),
+  KEY `video_session_likes_sessionId_idx` (`sessionId`),
+  KEY `video_session_likes_userId_idx` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 

@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
     try {
       liveClassesWithEnrollment = await Promise.all(
         liveClasses.map(async (liveClass) => {
-          const [instructor, course, enrollment] = await Promise.all([
+          const [instructor, course, enrollment, likesCount, likedByMe, ratingStats] = await Promise.all([
             prisma.user.findUnique({
               where: { id: liveClass.instructorId },
               select: { id: true, name: true, email: true },
@@ -162,6 +162,15 @@ export async function GET(request: NextRequest) {
                 },
               },
             }),
+            prisma.videoSessionLike.count({ where: { sessionId: liveClass.id } }),
+            prisma.videoSessionLike.findUnique({
+              where: { sessionId_userId: { sessionId: liveClass.id, userId: session.user.id } },
+            }).then(Boolean),
+            prisma.rating.aggregate({
+              where: { targetType: 'CONTENT' as any, targetId: liveClass.id },
+              _avg: { rating: true },
+              _count: { rating: true },
+            }),
           ]);
 
           return {
@@ -170,6 +179,10 @@ export async function GET(request: NextRequest) {
             course,
             isEnrolled: !!enrollment,
             enrollment,
+            likesCount,
+            likedByMe,
+            rating: ratingStats._avg.rating ?? null,
+            reviews: ratingStats._count.rating ?? 0,
           };
         })
       );

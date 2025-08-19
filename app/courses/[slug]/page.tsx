@@ -256,12 +256,18 @@ export default function CourseDetails() {
                   </div>
                 </div>
               </div>
-              {/* Price pill */}
+              {/* Price/Subscription pill */}
               <div className="mt-4">
-                <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/90 text-gray-900 font-semibold shadow">
-                  <DollarSign className="w-4 h-4 mr-1" />
-                  ${course.base_price} / {formatPricingPeriod(course.pricingPeriod)}
-                </div>
+                {(course.isPlatformCourse && course.requiresSubscription) ? (
+                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/90 text-gray-900 font-semibold shadow">
+                    <span>Included in {course.subscriptionTier || 'Subscription'}</span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/90 text-gray-900 font-semibold shadow">
+                    <DollarSign className="w-4 h-4 mr-1" />
+                    ${course.base_price} / {formatPricingPeriod(course.pricingPeriod)}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -338,13 +344,15 @@ export default function CourseDetails() {
                         <p className="font-medium">{course.framework}</p>
                       </div>
                     </div>
-                    <div className="flex items-center">
-                      <DollarSign className="w-4 h-4 text-gray-400 mr-3" />
-                      <div>
-                        <p className="text-sm text-gray-600">Price</p>
-                        <p className="font-medium">${course.base_price} per {formatPricingPeriod(course.pricingPeriod)}</p>
+                    {!(course.isPlatformCourse && course.requiresSubscription) && (
+                      <div className="flex items-center">
+                        <DollarSign className="w-4 h-4 text-gray-400 mr-3" />
+                        <div>
+                          <p className="text-sm text-gray-600">Price</p>
+                          <p className="font-medium">${course.base_price} per {formatPricingPeriod(course.pricingPeriod)}</p>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="flex items-center">
                       <Globe className="w-4 h-4 text-gray-400 mr-3" />
                       <div>
