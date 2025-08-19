@@ -1833,6 +1833,31 @@ model AdvertisingItem {
   @@map("advertising_items")
 }
 
+// Generic Ratings System
+// Supports rating multiple target types (institutions, courses, instructors, content)
+enum RatingTargetType {
+  INSTITUTION
+  COURSE
+  INSTRUCTOR
+  CONTENT
+}
+
+model Rating {
+  id         String           @id @default(cuid())
+  targetType RatingTargetType
+  targetId   String           @db.VarChar(36)
+  userId     String           @db.VarChar(36)
+  rating     Int              // 1 - 5
+  comment    String?          @db.Text
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([userId, targetType, targetId], name: "unique_user_target_rating")
+  @@index([targetType, targetId], name: "idx_ratings_target")
+  @@index([userId], name: "idx_ratings_user")
+  @@map("ratings")
+}
+
 model DesignTemplate {
   id          String   @id @default(cuid())
   name        String

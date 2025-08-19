@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 19, 2025 at 02:17 AM
+-- Generation Time: Aug 19, 2025 at 12:26 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -3017,28 +3017,6 @@ CREATE TABLE IF NOT EXISTS `rate_limit_logs` (
   KEY `rate_limit_logs_identifier_idx` (`identifier`(250)),
   KEY `rate_limit_logs_timestamp_idx` (`timestamp`),
   KEY `rate_limit_logs_allowed_idx` (`allowed`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ratings`
---
-
-DROP TABLE IF EXISTS `ratings`;
-CREATE TABLE IF NOT EXISTS `ratings` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `targetType` enum('INSTITUTION','COURSE','INSTRUCTOR','CONTENT') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `targetId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `rating` int NOT NULL,
-  `comment` text COLLATE utf8mb4_unicode_ci,
-  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `updatedAt` datetime(3) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ratings_userId_targetType_targetId_key` (`userId`,`targetType`,`targetId`),
-  KEY `idx_ratings_target` (`targetType`,`targetId`),
-  KEY `idx_ratings_user` (`userId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

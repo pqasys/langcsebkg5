@@ -19,6 +19,7 @@ import {
   DollarSign
 } from 'lucide-react';
 import Link from 'next/link';
+import { Rating as StarRating } from '@/components/ui/rating';
 
 interface Institution {
   id: string;
@@ -62,6 +63,8 @@ export default function InstitutionDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [myRating, setMyRating] = useState<number | null>(null);
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -117,6 +120,25 @@ export default function InstitutionDetails() {
       setLoading(false);
     }
   }, [params.slug, mounted]);
+
+  const handleSubmitRating = async () => {
+    if (!institution || !myRating) return;
+    try {
+      setIsSubmittingRating(true);
+      const res = await fetch('/api/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetType: 'INSTITUTION', targetId: institution.id, rating: myRating }),
+      });
+      if (!res.ok) {
+        console.error('Failed to submit rating');
+      }
+    } catch (e) {
+      console.error('Error submitting rating', e);
+    } finally {
+      setIsSubmittingRating(false);
+    }
+  };
 
   if (!mounted) return null;
 
@@ -340,6 +362,19 @@ export default function InstitutionDetails() {
                     </Link>
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Your Rating (does not alter existing displayed ratings) */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Rating</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <StarRating value={myRating ?? 0} onChange={(v) => setMyRating(v)} />
+                <Button className="mt-4 w-full" onClick={handleSubmitRating} disabled={isSubmittingRating || !myRating}>
+                  {isSubmittingRating ? 'Saving...' : 'Submit Rating'}
+                </Button>
               </CardContent>
             </Card>
           </div>
