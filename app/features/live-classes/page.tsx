@@ -616,60 +616,101 @@ export default function VideoConferencingFeaturePage() {
            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(readyToJoinClasses.length > 0 || upcomingClassesData.length > 0) ? (
-              [...readyToJoinClasses, ...upcomingClassesData].slice(0, 3).map((cls) => (
-                <Card key={cls.id} className="hover:shadow-lg transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                        {cls.isReady ? 'Starting Soon' : 'Upcoming'}
-                      </Badge>
+            {[...readyToJoinClasses, ...upcomingClassesData].slice(0, 3).map((cls) => (
+              <Card key={cls.id} className="hover:shadow-lg transition-shadow duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      {cls.isReady ? 'Starting Soon' : 'Upcoming'}
+                    </Badge>
+                  </div>
+
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{cls.title}</h3>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <FaGlobe className="w-4 h-4 mr-2" />
+                      {(() => {
+                        const map: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese', ru: 'Russian', ja: 'Japanese', ko: 'Korean', zh: 'Chinese' };
+                        const code = (cls.language || '').toLowerCase();
+                        return map[code] || cls.language || '—';
+                      })()}
+                    </div>
+                    {cls.instructor?.name && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <FaGraduationCap className="w-4 h-4 mr-2" />
+                        {cls.instructor.name}
+                      </div>
+                    )}
+                    <div className="flex items-center text-sm text-gray-600">
+                      <FaClock className="w-4 h-4 mr-2" />
+                      {formatClassDate(String(cls.startTime))} • {formatClassTime(String(cls.startTime))}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <FaUsers className="w-4 h-4 mr-2" />
+                      {cls.duration} min
                     </div>
 
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{cls.title}</h3>
-
-                    <div className="space-y-2 mb-4">
-                      {cls.instructor?.name && (
-                        <div className="flex items-center text-sm text-gray-600">
-                          <FaGraduationCap className="w-4 h-4 mr-2" />
-                          {cls.instructor.name}
-                        </div>
-                      )}
-                      <div className="flex items-center text-sm text-gray-600">
-                        <FaClock className="w-4 h-4 mr-2" />
-                        {formatClassDate(String(cls.startTime))} • {formatClassTime(String(cls.startTime))}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <FaUsers className="w-4 h-4 mr-2" />
-                        {cls.duration} min
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      {canAccessLiveClasses ? (
-                        <Button 
-                          className="flex-1 bg-green-600 hover:bg-green-700"
-                          onClick={() => handleJoinUpcomingClass(cls.id)}
-                        >
-                          <FaPlay className="w-4 h-4 mr-2" />
-                          Join Class
-                        </Button>
+                    {/* Price / Subscription */}
+                    <div className="flex items-center gap-2 text-sm">
+                      {cls.course && (!cls.course.institutionId) && cls.course.requiresSubscription ? (
+                        <Badge variant="secondary" className="bg-purple-100 text-purple-800">{cls.course.subscriptionTier || 'SUBSCRIPTION'}</Badge>
                       ) : (
-                        <Button 
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
-                          onClick={() => setShowTrialModal(true)}
-                        >
-                          <FaPlay className="w-4 h-4 mr-2" />
-                          Preview Class
-                        </Button>
+                        <>
+                          <FaDollarSign className="w-4 h-4 text-gray-600" />
+                          <span>{typeof cls.price === 'number' ? `$${cls.price} ${cls.currency || ''}` : '—'}</span>
+                        </>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              demoSessions.map((session) => (
-                <Card key={session.id} className="hover:shadow-lg transition-shadow duration-300">
+
+                    {/* Session settings badges */}
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {cls.isRecorded && (
+                        <Badge variant="outline" className="text-xs">Recording</Badge>
+                      )}
+                      {cls.allowChat && (
+                        <Badge variant="outline" className="text-xs">Chat</Badge>
+                      )}
+                      {cls.allowScreenShare && (
+                        <Badge variant="outline" className="text-xs">Screen Sharing</Badge>
+                      )}
+                      {Array.isArray((cls as any).features) && (cls as any).features.some((f: string) => /breakout/i.test(f)) && (
+                        <Badge variant="outline" className="text-xs">Breakout Rooms</Badge>
+                      )}
+                      {Array.isArray((cls as any).features) && (cls as any).features.some((f: string) => /file\s*sharing/i.test(f)) && (
+                        <Badge variant="outline" className="text-xs">File Sharing</Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    {canAccessLiveClasses ? (
+                      <Button 
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        onClick={() => handleJoinUpcomingClass(cls.id)}
+                      >
+                        <FaPlay className="w-4 h-4 mr-2" />
+                        Join Class
+                      </Button>
+                    ) : (
+                      <Button 
+                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        onClick={() => setShowTrialModal(true)}
+                      >
+                        <FaPlay className="w-4 h-4 mr-2" />
+                        Preview Class
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {(() => {
+              const totalReal = [...readyToJoinClasses, ...upcomingClassesData].length;
+              const fillerCount = totalReal >= 3 ? 0 : 3 - totalReal;
+              return demoSessions.slice(0, fillerCount).map((session) => (
+                <Card key={`demo-${session.id}`} className="hover:shadow-lg transition-shadow duration-300">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <Badge variant="secondary" className="bg-blue-100 text-blue-800">
@@ -753,8 +794,8 @@ export default function VideoConferencingFeaturePage() {
                     </div>
                   </CardContent>
                 </Card>
-              ))
-            )}
+              ));
+            })()}
           </div>
          </div>
        </section>

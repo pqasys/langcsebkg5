@@ -31,6 +31,14 @@ interface LiveClassFormData {
   instructorId?: string;
   institutionId?: string;
   courseId?: string;
+  // Additional display fields
+  features?: string[];
+  tags?: string[];
+  materials?: string[];
+  rating?: number;
+  reviews?: number;
+  currency?: string;
+  price?: number; // Added price field
 }
 
 interface Instructor {
@@ -55,6 +63,11 @@ interface Course {
     id: string;
     name: string;
   } | null;
+  // Extra fields for subscription-based platform courses
+  requiresSubscription?: boolean;
+  subscriptionTier?: string;
+  institutionId?: string | null;
+  isPlatformCourse?: boolean;
 }
 
 export default function AdminCreateLiveClassPage() {
@@ -81,6 +94,13 @@ export default function AdminCreateLiveClassPage() {
     instructorId: '',
     institutionId: '',
     courseId: '',
+    currency: 'USD',
+    features: [],
+    tags: [],
+    materials: [],
+    rating: undefined,
+    reviews: 0,
+    price: 0, // Initialize price
   });
 
   useEffect(() => {
@@ -250,8 +270,13 @@ export default function AdminCreateLiveClassPage() {
         instructorId: formData.instructorId || undefined,
         institutionId: formData.institutionId || null,
         courseId: formData.courseId || null,
-        price: 0, // Live classes are free for subscribers
-        currency: 'USD', // Default currency
+        price: 0,
+        currency: formData.currency || 'USD',
+        features: formData.features,
+        tags: formData.tags,
+        materials: formData.materials,
+        rating: formData.rating,
+        reviews: formData.reviews,
       };
 
       console.log('Submitting session data:', sessionData);
@@ -477,6 +502,19 @@ export default function AdminCreateLiveClassPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {/* Subscription plan hint when platform-wide and subscription-based */}
+                  {(() => {
+                    const selectedCourse = courses.find(c => c.id === formData.courseId);
+                    const isPlatformWide = (formData.institutionId === 'none' || !formData.institutionId) && selectedCourse && (selectedCourse.institutionId === null || !selectedCourse.institutionId);
+                    if (selectedCourse && isPlatformWide && selectedCourse.requiresSubscription) {
+                      return (
+                        <p className="mt-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded p-2">
+                          Subscription Plan: <strong>{selectedCourse.subscriptionTier || 'SUBSCRIPTION'}</strong> (price derives from course plan)
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </div>
               
@@ -559,6 +597,84 @@ export default function AdminCreateLiveClassPage() {
               <CardTitle>Session Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Display Settings for feature parity */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="price">Price</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    value={formData.price as any}
+                    onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
+                    min="0"
+                    step="0.01"
+                    disabled={formData.institutionId === 'none' && formData.courseId && formData.courseId !== 'none'}
+                  />
+                  {formData.institutionId === 'none' && formData.courseId && formData.courseId !== 'none' && (
+                    <p className="text-xs text-gray-500 mt-1">Price is derived from the platform-wide subscription plan of the selected course.</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="currency">Currency</Label>
+                  <Select value={formData.currency || 'USD'} onValueChange={(value) => handleInputChange('currency', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USD">USD ($)</SelectItem>
+                      <SelectItem value="EUR">EUR (€)</SelectItem>
+                      <SelectItem value="GBP">GBP (£)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="rating">Rating (0-5)</Label>
+                <Input
+                  id="rating"
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={formData.rating ?? ''}
+                  onChange={(e) => handleInputChange('rating', e.target.value === '' ? undefined : parseFloat(e.target.value))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="reviews">Reviews</Label>
+                <Input
+                  id="reviews"
+                  type="number"
+                  min="0"
+                  value={formData.reviews || 0}
+                  onChange={(e) => handleInputChange('reviews', parseInt(e.target.value) || 0)}
+                />
+              </div>
+              <div>
+                <Label>Features (comma-separated)</Label>
+                <Input
+                  placeholder="Screen Sharing, Recording, Chat"
+                  value={(formData.features || []).join(', ')}
+                  onChange={(e) => handleInputChange('features', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                />
+              </div>
+              <div>
+                <Label>Tags (comma-separated)</Label>
+                <Input
+                  placeholder="Beginner, Workshop"
+                  value={(formData.tags || []).join(', ')}
+                  onChange={(e) => handleInputChange('tags', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                />
+              </div>
+              <div>
+                <Label>Materials (comma-separated)</Label>
+                <Input
+                  placeholder="PDF, Slides"
+                  value={(formData.materials || []).join(', ')}
+                  onChange={(e) => handleInputChange('materials', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                />
+              </div>
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex-1">
                   <Label htmlFor="isPublic" className="text-base font-medium text-gray-900">
@@ -685,6 +801,72 @@ export default function AdminCreateLiveClassPage() {
                     checked={formData.allowRecording}
                     onCheckedChange={(checked) => handleInputChange('allowRecording', checked)}
                     aria-label="Toggle participant recording functionality"
+                  />
+                </div>
+              </div>
+
+              {/* Breakout Rooms */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <Label htmlFor="breakoutRooms" className="text-base font-medium text-gray-900">
+                    Breakout Rooms
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Enable small-group rooms during the session
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    (formData.features || []).some(f => f.toLowerCase().includes('breakout'))
+                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {(formData.features || []).some(f => f.toLowerCase().includes('breakout')) ? 'ENABLED' : 'DISABLED'}
+                  </div>
+                  <Switch
+                    id="breakoutRooms"
+                    checked={(formData.features || []).some(f => f.toLowerCase().includes('breakout'))}
+                    onCheckedChange={(checked) => {
+                      const current = formData.features || [];
+                      const next = checked
+                        ? Array.from(new Set([...current, 'Breakout Rooms']))
+                        : current.filter(f => f.toLowerCase() !== 'breakout rooms' && !/breakout/i.test(f));
+                      handleInputChange('features', next);
+                    }}
+                    aria-label="Toggle breakout rooms"
+                  />
+                </div>
+              </div>
+
+              {/* File Sharing */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <Label htmlFor="fileSharing" className="text-base font-medium text-gray-900">
+                    File Sharing
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Allow participants to share files during the session
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    (formData.features || []).some(f => f.toLowerCase().includes('file'))
+                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      : 'bg-gray-100 text-gray-600 border border-gray-200'
+                  }`}>
+                    {(formData.features || []).some(f => f.toLowerCase().includes('file')) ? 'ENABLED' : 'DISABLED'}
+                  </div>
+                  <Switch
+                    id="fileSharing"
+                    checked={(formData.features || []).some(f => f.toLowerCase().includes('file'))}
+                    onCheckedChange={(checked) => {
+                      const current = formData.features || [];
+                      const next = checked
+                        ? Array.from(new Set([...current, 'File Sharing']))
+                        : current.filter(f => f.toLowerCase() !== 'file sharing' && !/file\s*sharing/i.test(f) && !/file/i.test(f));
+                      handleInputChange('features', next);
+                    }}
+                    aria-label="Toggle file sharing"
                   />
                 </div>
               </div>

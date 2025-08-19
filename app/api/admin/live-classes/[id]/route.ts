@@ -24,6 +24,9 @@ export async function GET(
           select: {
             id: true,
             title: true,
+            requiresSubscription: true,
+            subscriptionTier: true,
+            institutionId: true,
           },
         },
         participants: true,

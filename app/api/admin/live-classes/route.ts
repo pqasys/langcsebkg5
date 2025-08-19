@@ -144,6 +144,8 @@ export async function POST(request: NextRequest) {
       features,
       tags,
       materials,
+      rating,
+      reviews,
     } = body;
 
     // Validate required fields
@@ -225,6 +227,8 @@ export async function POST(request: NextRequest) {
         features: features ? JSON.parse(JSON.stringify(features)) : null,
         tags: tags ? JSON.parse(JSON.stringify(tags)) : null,
         materials: materials ? JSON.parse(JSON.stringify(materials)) : null,
+        rating: typeof rating === 'number' ? rating : null,
+        reviews: typeof reviews === 'number' ? reviews : 0,
       },
       include: {
         course: {

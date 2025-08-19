@@ -31,6 +31,7 @@ interface LiveClassFormData {
   allowRecording: boolean;
   courseId?: string;
   moduleId?: string;
+  features?: string[];
 }
 
 interface Course {
@@ -60,6 +61,7 @@ export default function InstitutionCreateLiveClassPage() {
     allowRecording: false,
     courseId: '',
     moduleId: '',
+    features: [],
   });
 
   useEffect(() => {
@@ -508,6 +510,46 @@ export default function InstitutionCreateLiveClassPage() {
                   id="allowRecording"
                   checked={formData.allowRecording}
                   onCheckedChange={(checked) => handleInputChange('allowRecording', checked)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="breakoutRooms">Breakout Rooms</Label>
+                  <p className="text-sm text-gray-500">
+                    Enable small-group rooms during the session
+                  </p>
+                </div>
+                <Switch
+                  id="breakoutRooms"
+                  checked={(formData.features || []).some(f => f.toLowerCase().includes('breakout'))}
+                  onCheckedChange={(checked) => {
+                    const current = formData.features || [];
+                    const next = checked
+                      ? Array.from(new Set([...current, 'Breakout Rooms']))
+                      : current.filter(f => f.toLowerCase() !== 'breakout rooms' && !/breakout/i.test(f));
+                    handleInputChange('features', next);
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="fileSharing">File Sharing</Label>
+                  <p className="text-sm text-gray-500">
+                    Allow participants to share files during the session
+                  </p>
+                </div>
+                <Switch
+                  id="fileSharing"
+                  checked={(formData.features || []).some(f => f.toLowerCase().includes('file'))}
+                  onCheckedChange={(checked) => {
+                    const current = formData.features || [];
+                    const next = checked
+                      ? Array.from(new Set([...current, 'File Sharing']))
+                      : current.filter(f => f.toLowerCase() !== 'file sharing' && !/file\s*sharing/i.test(f) && !/file/i.test(f));
+                    handleInputChange('features', next);
+                  }}
                 />
               </div>
             </CardContent>

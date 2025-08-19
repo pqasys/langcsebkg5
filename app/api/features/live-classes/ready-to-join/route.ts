@@ -31,6 +31,16 @@ export async function GET(request: NextRequest) {
             name: true,
           },
         },
+        course: {
+          select: {
+            id: true,
+            title: true,
+            requiresSubscription: true,
+            subscriptionTier: true,
+            institutionId: true,
+          }
+        },
+        
       },
       orderBy: {
         startTime: 'asc',
@@ -43,6 +53,20 @@ export async function GET(request: NextRequest) {
       title: cls.title,
       startTime: cls.startTime,
       duration: cls.duration,
+      language: cls.language,
+      price: cls.price,
+      currency: cls.currency,
+      isRecorded: cls.isRecorded,
+      allowChat: cls.allowChat,
+      allowScreenShare: cls.allowScreenShare,
+      course: cls.course ? {
+        id: cls.course.id,
+        title: cls.course.title,
+        requiresSubscription: cls.course.requiresSubscription,
+        subscriptionTier: cls.course.subscriptionTier,
+        institutionId: cls.course.institutionId,
+      } : undefined,
+      features: Array.isArray((cls as any).features) ? (cls as any).features : undefined,
       instructor: cls.instructor ? {
         name: cls.instructor.name,
         avatar: undefined, // Not available in current schema
