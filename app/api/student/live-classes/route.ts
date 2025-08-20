@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
     const level = searchParams.get('level');
     const search = searchParams.get('search');
     const type = searchParams.get('type'); // 'available', 'enrolled', 'completed'
+    const courseId = searchParams.get('courseId');
 
     const skip = (page - 1) * limit;
 
@@ -56,19 +57,31 @@ export async function GET(request: NextRequest) {
     const institutionId = user?.institutionId;
 
     // Build where clause based on student's access
+    const now = new Date();
     const where: any = {
       status: 'SCHEDULED',
-      startTime: { gt: new Date() }, // Only future classes
+      OR: [
+        { startTime: { gt: now } }, // upcoming
+        { AND: [{ startTime: { lte: now } }, { endTime: { gt: now } }] } // in progress
+      ],
     };
 
     if (status) where.status = status;
     if (language) where.language = language;
     if (level) where.level = level;
+    if (courseId) where.courseId = courseId;
     if (search) {
-      where.OR = [
+      // Combine text search with time/status OR using AND
+      const textOR = [
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
       ];
+      if (where.OR) {
+        where.AND = [{ OR: where.OR }, { OR: textOR }];
+        delete where.OR;
+      } else {
+        where.OR = textOR;
+      }
     }
 
     // Filter based on access level (eligibility-based)
@@ -82,10 +95,7 @@ export async function GET(request: NextRequest) {
       
       if (where.OR) {
         // If there's already an OR for search, we need to combine them
-        where.AND = [
-          { OR: where.OR }, // Search conditions
-          { OR: institutionAccess } // Institution access conditions
-        ];
+        where.AND = [{ OR: where.OR }, { OR: institutionAccess }];
         delete where.OR;
       } else {
         where.OR = institutionAccess;

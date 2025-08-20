@@ -18,6 +18,7 @@ import {
   Target
 } from 'lucide-react';
 import { getStudentTier } from '@/lib/subscription-pricing';
+import { formatDisplayLabel } from '@/lib/utils';
 
 interface EnhancedCourseCardProps {
   course: {
@@ -300,7 +301,7 @@ export function EnhancedCourseCard({
         <div className="flex flex-wrap gap-2 mb-4">
           {course.level && (
             <Badge variant="outline" className="text-xs">
-              {course.level}
+              {formatDisplayLabel(course.level)}
             </Badge>
           )}
           {course.category && (

@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { getLevelLabel } from '@/lib/framework-utils'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -92,3 +93,31 @@ export function formatDuration(seconds: number): string {
   }
   return `${minutes}m`;
 } 
+
+/**
+ * Formats enum-like database values for display by removing underscores
+ * and converting to title case. Also maps known framework levels to
+ * user-friendly labels when possible.
+ */
+export function formatDisplayLabel(value?: string | null): string {
+  if (!value) return '';
+
+  try {
+    // Prefer friendly labels for known framework level codes
+    const prefix = value.split('_')[0];
+    if (['CEFR', 'ACTFL', 'JLPT', 'HSK', 'TOPIK'].includes(prefix)) {
+      const mapped = getLevelLabel(value);
+      if (mapped && mapped !== value) {
+        return mapped;
+      }
+    }
+
+    // Generic formatting: replace underscores and Title Case
+    const withoutUnderscores = value.replace(/_/g, ' ');
+    return withoutUnderscores
+      .toLowerCase()
+      .replace(/\b\w/g, (m) => m.toUpperCase());
+  } catch {
+    return value.replace(/_/g, ' ');
+  }
+}

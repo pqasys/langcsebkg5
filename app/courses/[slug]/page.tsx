@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Rating as StarRating } from '@/components/ui/rating';
+import { formatDisplayLabel } from '@/lib/utils';
 
 interface Course {
   id: string;
@@ -235,7 +236,7 @@ export default function CourseDetails() {
                     )}
                     {course.level && (
                       <Badge variant="secondary" className="bg-blue-400 text-blue-900">
-                        {course.level}
+                        {formatDisplayLabel(course.level)}
                       </Badge>
                     )}
                     {course.status && (
@@ -341,7 +342,7 @@ export default function CourseDetails() {
                       <BookOpen className="w-4 h-4 text-gray-400 mr-3" />
                       <div>
                         <p className="text-sm text-gray-600">Framework</p>
-                        <p className="font-medium">{course.framework}</p>
+                        <p className="font-medium">{formatDisplayLabel(course.framework)}</p>
                       </div>
                     </div>
                     {!(course.isPlatformCourse && course.requiresSubscription) && (
@@ -357,7 +358,7 @@ export default function CourseDetails() {
                       <Globe className="w-4 h-4 text-gray-400 mr-3" />
                       <div>
                         <p className="text-sm text-gray-600">Delivery</p>
-                        <p className="font-medium">{course.marketingType}</p>
+                        <p className="font-medium">{formatDisplayLabel(course.marketingType)}</p>
                       </div>
                     </div>
                     {course.hasLiveClasses && (

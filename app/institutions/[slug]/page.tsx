@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Rating as StarRating } from '@/components/ui/rating';
+import { formatDisplayLabel } from '@/lib/utils';
 
 interface Institution {
   id: string;
@@ -238,7 +239,7 @@ export default function InstitutionDetails() {
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="text-lg font-semibold text-gray-900">{course.title}</h3>
                           <Badge variant="outline" className="text-xs">
-                            {course.level}
+                            {formatDisplayLabel(course.level)}
                           </Badge>
                         </div>
                         <p className="text-gray-600 text-sm mb-4 line-clamp-3">{course.description}</p>

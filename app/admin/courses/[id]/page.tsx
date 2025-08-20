@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, Edit, Eye, BookOpen, Users, Calendar, DollarSign } from 'lucide-react';
+import { formatDisplayLabel } from '@/lib/utils';
 import { toast } from 'sonner';
 import { FaSpinner } from 'react-icons/fa';
 
@@ -210,7 +211,7 @@ export default function AdminCourseDetailPage({ params }: { params: { id: string
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h3 className="font-semibold mb-2">Level</h3>
-                  <Badge variant="secondary">{course.level}</Badge>
+                  <Badge variant="secondary">{formatDisplayLabel(course.level)}</Badge>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-2">Status</h3>
@@ -220,7 +221,7 @@ export default function AdminCourseDetailPage({ params }: { params: { id: string
                 </div>
                 <div>
                   <h3 className="font-semibold mb-2">Framework</h3>
-                  <Badge variant="outline">{course.framework}</Badge>
+                  <Badge variant="outline">{formatDisplayLabel(course.framework)}</Badge>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-2">Duration</h3>
@@ -375,7 +376,7 @@ export default function AdminCourseDetailPage({ params }: { params: { id: string
               </div>
               <div className="flex items-center justify-between">
                 <span>Pricing Period</span>
-                <Badge variant="outline">{course.pricingPeriod}</Badge>
+                <Badge variant="outline">{formatDisplayLabel(course.pricingPeriod)}</Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span>Max Students</span>

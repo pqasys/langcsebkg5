@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Users, Clock, Star, Tag } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDisplayLabel } from '@/lib/utils';
 import { getStudentTier } from '@/lib/subscription-pricing';
 
 interface CourseTag {
@@ -88,7 +88,7 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
       formattedDuration: `${course.duration} weeks`,
       startDate: new Date(course.startDate).toLocaleDateString(),
       endDate: new Date(course.endDate).toLocaleDateString(),
-      levelDisplay: course.level.replace('CEFR_', ''),
+      levelDisplay: formatDisplayLabel(course.level),
       tags: course.courseTags.slice(0, 3), // Limit to 3 tags for performance
       hasMoreTags: course.courseTags.length > 3,
       isSubscriptionBased,
@@ -230,7 +230,7 @@ const CourseCard = memo<CourseCardProps>(({ course, onEnroll, onView, className 
               <div className="text-lg font-bold text-green-600">
                 {courseData.formattedPrice}
                 <span className="text-sm text-gray-500 font-normal">
-                  /{course.pricingPeriod.toLowerCase()}
+                  /{formatDisplayLabel(course.pricingPeriod)}
                 </span>
               </div>
             )}

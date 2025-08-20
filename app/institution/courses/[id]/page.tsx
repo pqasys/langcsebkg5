@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatDisplayLabel } from '@/lib/utils';
 
 interface Course {
   id: string;
@@ -374,11 +375,11 @@ export default function CourseDetailPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-gray-400" />
-                  <span>Level: {course.level}</span>
+                  <span>Level: {formatDisplayLabel(course.level)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-gray-400" />
-                  <span>Framework: {course.framework || 'CEFR'}</span>
+                  <span>Framework: {formatDisplayLabel(course.framework || 'CEFR')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-gray-400" />
@@ -386,7 +387,7 @@ export default function CourseDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-4 h-4 text-gray-400" />
-                  <span>Pricing: {course.pricingPeriod}</span>
+                  <span>Pricing: {formatDisplayLabel(course.pricingPeriod || 'FULL_COURSE')}</span>
                 </div>
                 {course.category && (
                   <div className="flex items-center gap-2">

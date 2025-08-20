@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { formatDisplayLabel } from '@/lib/utils';
 
 interface Course {
   id: string;
@@ -158,16 +159,7 @@ export default function AutoEnrollmentConfirmationModal({
     }
   };
 
-  const getCourseTypeLabel = (marketingType: string) => {
-    switch (marketingType) {
-      case 'LIVE_ONLINE':
-        return 'Live Online';
-      case 'BLENDED':
-        return 'Blended Learning';
-      default:
-        return 'Self-Paced';
-    }
-  };
+  const getCourseTypeLabel = (marketingType: string) => formatDisplayLabel(marketingType);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

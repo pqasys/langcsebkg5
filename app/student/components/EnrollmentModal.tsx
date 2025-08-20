@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDisplayLabel } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Loader2, Info, Calendar } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -571,7 +571,7 @@ export default function EnrollmentModal({
                   <p><strong>Course:</strong> {course.title}</p>
                   <p><strong>Institution:</strong> {course.institution?.name || 'Not assigned'}</p>
                   <p><strong>Description:</strong> {course.description}</p>
-                  <p><strong>Pricing Model:</strong> {isSubscriptionBasedCourse ? 'Subscription-based' : (enrollmentDetails?.pricingPeriod || course.pricingPeriod || 'FULL_COURSE').replace('_', ' ')}</p>
+                  <p><strong>Pricing Model:</strong> {isSubscriptionBasedCourse ? 'Subscription-based' : formatDisplayLabel(enrollmentDetails?.pricingPeriod || course.pricingPeriod || 'FULL_COURSE')}</p>
                   <p><strong>Course Period:</strong> {formatDate(course.startDate)} - {formatDate(course.endDate)}</p>
                 </div>
               </div>

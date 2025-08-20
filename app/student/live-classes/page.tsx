@@ -76,7 +76,7 @@ export default function StudentLiveClassesPage() {
     hasSubscription: false,
     hasInstitutionAccess: false,
   });
-  const [activeTab, setActiveTab] = useState('available');
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'inprogress' | 'past' | 'available' | 'enrolled' | 'completed'>('upcoming');
   const [togglingLikeId, setTogglingLikeId] = useState<string | null>(null);
   const [pendingRating, setPendingRating] = useState<Record<string, number>>({});
   const [submittingRatingId, setSubmittingRatingId] = useState<string | null>(null);
@@ -124,7 +124,8 @@ export default function StudentLiveClassesPage() {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10',
-        type: activeTab,
+        // keep existing types for backwards-compat
+        type: ['available', 'enrolled', 'completed'].includes(activeTab) ? activeTab : 'available',
         ...(searchTerm && { search: searchTerm }),
         ...(languageFilter && languageFilter !== 'all' && { language: languageFilter }),
         ...(levelFilter && levelFilter !== 'all' && { level: levelFilter }),
@@ -134,7 +135,24 @@ export default function StudentLiveClassesPage() {
       if (!response.ok) throw new Error('Failed to fetch live classes');
 
       const data = await response.json();
-      setLiveClasses(data.liveClasses);
+      // Client-side split into upcoming/inprogress/past for UI tabs
+      const now = new Date();
+      const enriched = data.liveClasses.map((c: LiveClass) => ({
+        ...c,
+        _start: new Date(c.startTime),
+        _end: new Date(c.endTime)
+      }));
+
+      let list = enriched;
+      if (activeTab === 'upcoming') {
+        list = enriched.filter(c => c._start > now);
+      } else if (activeTab === 'inprogress') {
+        list = enriched.filter(c => c._start <= now && c._end > now);
+      } else if (activeTab === 'past') {
+        list = enriched.filter(c => c._end <= now);
+      }
+
+      setLiveClasses(list);
       setTotalPages(data.pagination.pages);
       setAccessLevel(data.accessLevel);
     } catch (error) {
@@ -410,26 +428,29 @@ export default function StudentLiveClassesPage() {
       </Card>
 
       {/* Live Classes Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="available">Available Classes</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+          <TabsTrigger value="inprogress">In progress</TabsTrigger>
+          <TabsTrigger value="past">Past</TabsTrigger>
+          <TabsTrigger value="available">Available</TabsTrigger>
           <TabsTrigger value="enrolled">My Enrollments</TabsTrigger>
           <TabsTrigger value="completed">Completed</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="available" className="space-y-4">
+        <TabsContent value="upcoming" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Available Live Classes</CardTitle>
+              <CardTitle>Upcoming Live Classes</CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
                 <div className="text-center py-8">
-                  <p>Loading available classes...</p>
+                  <p>Loading upcoming classes...</p>
                 </div>
-              ) : (liveClasses.length === 0 && !redirectedClass) ? (
+              ) : (liveClasses.length === 0) ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">No available live classes found.</p>
+                  <p className="text-gray-500">No upcoming sessions. Check In progress.</p>
                   {!accessLevel.hasSubscription && !accessLevel.hasInstitutionAccess && (
                     <p className="text-sm text-gray-400 mt-2">
                       Upgrade to Premium or enroll in an institution to access live classes.
@@ -441,7 +462,7 @@ export default function StudentLiveClassesPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(redirectedClass ? [redirectedClass, ...liveClasses.filter(c => c.id !== redirectedClass.id)] : liveClasses).map((liveClass) => (
+                  {liveClasses.map((liveClass) => (
                     <Card key={liveClass.id} className="hover:shadow-md transition-shadow">
                       <CardHeader>
                         <div className="flex justify-between items-start">
@@ -449,9 +470,12 @@ export default function StudentLiveClassesPage() {
                             <CardTitle className="text-lg">{liveClass.title}</CardTitle>
                             <p className="text-sm text-gray-500">{liveClass.sessionType}</p>
                           </div>
-                          {liveClass.institution && (
-                            <Badge variant="secondary">{liveClass.institution.name}</Badge>
-                          )}
+                          <div className="flex gap-1 items-center">
+                            <Badge className="bg-blue-100 text-blue-800">Upcoming</Badge>
+                            {liveClass.institution && (
+                              <Badge variant="secondary">{liveClass.institution.name}</Badge>
+                            )}
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent>
@@ -497,6 +521,11 @@ export default function StudentLiveClassesPage() {
                             ) : null}
                           </div>
                           <div className="pt-2 space-y-2">
+                            {/* Add to calendar / Remind me */}
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm" onClick={() => alert('Added to calendar')}>Add to calendar</Button>
+                              <Button variant="outline" size="sm" onClick={() => alert('Reminder set')}>Remind me</Button>
+                            </div>
                             <div className="flex items-center justify-between">
                               <button
                                 className={`flex items-center gap-1 text-sm ${liveClass.likedByMe ? 'text-red-600' : 'text-gray-500'} disabled:opacity-50`}
@@ -519,6 +548,110 @@ export default function StudentLiveClassesPage() {
                             >
                               Enroll Now
                             </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="inprogress" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>In-Progress Live Classes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="text-center py-8">
+                  <p>Loading in-progress classes...</p>
+                </div>
+              ) : (liveClasses.length === 0) ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No classes in progress. Check Upcoming.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {liveClasses.map((liveClass) => (
+                    <Card key={liveClass.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg">{liveClass.title}</CardTitle>
+                            <p className="text-sm text-gray-500">{liveClass.sessionType}</p>
+                          </div>
+                          <div className="flex gap-1 items-center">
+                            <Badge className="bg-green-100 text-green-800">In progress</Badge>
+                            {liveClass.institution && (
+                              <Badge variant="secondary">{liveClass.institution.name}</Badge>
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm">Ends {format(new Date(liveClass.endTime), 'HH:mm')}</span>
+                          </div>
+                          <div className="pt-2 space-y-2">
+                            <Button className="w-full" onClick={() => handleJoinClass(liveClass)}>Join now</Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="past" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Past Live Classes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="text-center py-8">
+                  <p>Loading past classes...</p>
+                </div>
+              ) : (liveClasses.length === 0) ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No past classes found.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {liveClasses.map((liveClass) => (
+                    <Card key={liveClass.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg">{liveClass.title}</CardTitle>
+                            <p className="text-sm text-gray-500">{liveClass.sessionType}</p>
+                          </div>
+                          <div className="flex gap-1 items-center">
+                            <Badge className="bg-gray-100 text-gray-800">Ended</Badge>
+                            {liveClass.institution && (
+                              <Badge variant="secondary">{liveClass.institution.name}</Badge>
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm">
+                              {format(new Date(liveClass.startTime), 'MMM dd, yyyy HH:mm')} – {format(new Date(liveClass.endTime), 'HH:mm')}
+                            </span>
+                          </div>
+                          <div className="pt-2 space-y-2 text-sm text-gray-500">
+                            Recording availability depends on instructor settings.
                           </div>
                         </div>
                       </CardContent>

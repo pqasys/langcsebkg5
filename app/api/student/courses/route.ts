@@ -31,7 +31,9 @@ export async function GET() {
         level: true,
         framework: true,
         marketingType: true,
-        hasLiveClasses: true
+        hasLiveClasses: true,
+        startDate: true,
+        endDate: true
       }
     });
 
@@ -140,8 +142,9 @@ export async function GET() {
         ...course,
         status: enrollment ? enrollment.status : 'AVAILABLE',
         progress: enrollment?.progress || 0,
-        startDate: enrollment?.startDate,
-        endDate: enrollment?.endDate,
+        // Prefer enrollment dates if present; otherwise fall back to course dates
+        startDate: enrollment?.startDate ?? (course as any).startDate,
+        endDate: enrollment?.endDate ?? (course as any).endDate,
         hasOutstandingPayment: !!payment && payment.some(p => p.status === 'PENDING' || p.status === 'PROCESSING'),
         payment: payment && payment.length > 0 ? {
           id: payment[0].id,

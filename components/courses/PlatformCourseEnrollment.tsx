@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { formatDisplayLabel } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -180,7 +181,7 @@ export function PlatformCourseEnrollment({
               <Users className="w-4 h-4" />
               <span>Max {course.maxStudents} students</span>
             </div>
-            <Badge variant="outline">{course.level}</Badge>
+            <Badge variant="outline">{formatDisplayLabel(course.level)}</Badge>
           </div>
         </div>
 

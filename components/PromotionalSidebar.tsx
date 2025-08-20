@@ -16,7 +16,7 @@ import {
   Award,
   BookOpen
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDisplayLabel } from '@/lib/utils';
 // import { toast } from 'sonner';
 
 interface PromotionalItem {
@@ -136,7 +136,7 @@ export function PromotionalSidebar({
             id: course.id,
             type: 'course',
             title: course.title,
-            description: `${course.institution?.name || 'Platform Course'} • ${course.duration || 0} weeks • ${course.level || 'All Levels'}`,
+            description: `${course.institution?.name || 'Platform Course'} • ${course.duration || 0} weeks • ${formatDisplayLabel(course.level || 'All Levels')}`,
             ctaText: 'View Course',
             ctaLink: `/courses/${(course as any).slug || course.id}`,
             badge: course.isPremiumPlacement ? 'Premium' : course.isFeaturedPlacement ? 'Featured' : 'Popular',

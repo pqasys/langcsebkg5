@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { formatDisplayLabel } from '@/lib/utils';
 import { getFrameworkLevels, getFrameworkInfo, type Framework, frameworkMappings } from '@/lib/framework-utils';
 import { Label } from '@/components/ui/label';
 
@@ -518,7 +519,7 @@ export default function InstitutionCoursesPage() {
                     <div className="mt-2 flex gap-4 text-sm text-gray-500">
                       <span>${course.price}</span>
                       <span>{course.duration} weeks</span>
-                      <span className="capitalize">{course.level}</span>
+                      <span className="capitalize">{formatDisplayLabel(course.level)}</span>
                       <span className="capitalize">{course.status}</span>
                       <span>{course._count.bookings} bookings</span>
                     </div>
@@ -591,7 +592,7 @@ export default function InstitutionCoursesPage() {
                 <div className="mt-2 flex flex-wrap gap-2 text-sm text-gray-500">
                   <span>${course.price}</span>
                   <span>{course.duration} weeks</span>
-                  <span className="capitalize">{course.level}</span>
+                  <span className="capitalize">{formatDisplayLabel(course.level)}</span>
                   <span className="capitalize">{course.status}</span>
                   <span>{course._count.bookings} bookings</span>
                 </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { formatDisplayLabel } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -162,7 +163,7 @@ export default function PlatformCourseEnrollment({
             )}
             <Badge className={getDeliveryModeColor(course.deliveryMode)}>
               {getDeliveryModeIcon(course.deliveryMode)}
-              <span className="ml-1">{course.deliveryMode.replace('_', ' ')}</span>
+              <span className="ml-1">{formatDisplayLabel(course.deliveryMode)}</span>
             </Badge>
           </div>
         </div>
@@ -172,7 +173,7 @@ export default function PlatformCourseEnrollment({
         {/* Course Details */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{course.level}</div>
+            <div className="text-2xl font-bold text-blue-600">{formatDisplayLabel(course.level)}</div>
             <div className="text-sm text-gray-600">Level</div>
           </div>
           <div className="text-center">
@@ -186,7 +187,7 @@ export default function PlatformCourseEnrollment({
             <div className="text-sm text-gray-600">Students</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600">{course.courseType}</div>
+            <div className="text-2xl font-bold text-orange-600">{formatDisplayLabel(course.courseType)}</div>
             <div className="text-sm text-gray-600">Type</div>
           </div>
         </div>
