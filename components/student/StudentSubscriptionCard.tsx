@@ -106,7 +106,16 @@ export default function StudentSubscriptionCard() {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    fetchSubscriptionData();
+    let isMounted = true;
+    const run = async () => {
+      await fetchSubscriptionData();
+    };
+    // Defer to next tick to reduce duplicate invokes under StrictMode
+    const id = setTimeout(run, 0);
+    return () => {
+      isMounted = false;
+      clearTimeout(id);
+    };
   }, []);
 
   const fetchSubscriptionData = async () => {
@@ -119,7 +128,17 @@ export default function StudentSubscriptionCard() {
       if (subscriptionRes.ok) {
         const data = await subscriptionRes.json();
         setSubscriptionData(data.subscriptionStatus);
-        setLogs(data.logs || []);
+        // Fetch logs separately if available; otherwise fall back to empty without causing re-fetch loops
+        if (logsRes.ok) {
+          try {
+            const logsData = await logsRes.json();
+            setLogs(logsData.logs || []);
+          } catch {
+            setLogs([]);
+          }
+        } else {
+          setLogs([]);
+        }
       }
     } catch (error) {
       console.error('Error occurred:', error);
@@ -132,15 +151,22 @@ export default function StudentSubscriptionCard() {
   const handleSubscriptionAction = async (action: string, planType?: string) => {
     setActionLoading(true);
     try {
+      // Determine method: create (POST) when subscribing from no active subscription; otherwise PUT/DELETE
+      const isCreatingNew = action === 'UPGRADE' && !subscriptionData?.hasActiveSubscription;
+      const method = action === 'DELETE' ? 'DELETE' : isCreatingNew ? 'POST' : 'PUT';
+
+      const body = method === 'DELETE'
+        ? undefined
+        : JSON.stringify(
+            isCreatingNew
+              ? { planType, billingCycle }
+              : { action, planType, billingCycle, reason: reason || undefined }
+          );
+
       const response = await fetch('/api/student/subscription', {
-        method: action === 'DELETE' ? 'DELETE' : 'PUT',
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: action === 'DELETE' ? undefined : JSON.stringify({
-          action,
-          planType,
-          billingCycle,
-          reason: reason || undefined
-        })
+        body
       });
 
       if (response.ok) {

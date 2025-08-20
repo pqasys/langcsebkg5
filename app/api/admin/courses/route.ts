@@ -195,16 +195,20 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('Creating course with data:', {
-      title,
-      base_price,
-      pricingPeriod,
-      institutionId: institutionId || 'PLATFORM_WIDE',
-      categoryId,
-      tags: tags?.length,
-      weeklyPrices: weeklyPrices?.length,
-      monthlyPrices: monthlyPrices?.length
-    });
+    // debug removed
+
+    // Robust boolean coercion for placement flags
+    const coerceBoolean = (val: unknown): boolean => {
+      if (typeof val === 'boolean') return val;
+      if (typeof val === 'number') return val === 1;
+      if (typeof val === 'string') return val.toLowerCase() === 'true' || val === '1';
+      return false;
+    };
+
+    const isFeaturedFlag = coerceBoolean((body as any).isFeatured);
+    const isSponsoredFlag = coerceBoolean((body as any).isSponsored);
+    const normalizedIsFeatured = isSponsoredFlag ? false : isFeaturedFlag;
+    const normalizedIsSponsored = isSponsoredFlag;
 
     // Create the course
     const course = await prisma.course.create({
@@ -223,6 +227,10 @@ export async function POST(request: Request) {
         startDate: startDate ? new Date(startDate) : new Date(),
         endDate: endDate ? new Date(endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         maxStudents: parseInt(maxStudents) || 30,
+        // Priority & placement
+        priority: parseInt((body as any).priority) || 0,
+        isFeatured: normalizedIsFeatured,
+        isSponsored: normalizedIsSponsored,
         // Simplified course classification fields
         hasLiveClasses: hasLiveClasses || false,
         liveClassType: liveClassType || null,
@@ -232,8 +240,8 @@ export async function POST(request: Request) {
         requiresSubscription: requiresSubscription || false,
         subscriptionTier: subscriptionTier || null,
         // Marketing fields
-        marketingType: marketingType || 'SELF_PACED',
-        marketingDescription: marketingDescription || null,
+        marketingType: marketingType ?? 'SELF_PACED',
+        marketingDescription: marketingDescription ?? null,
         courseTags: {
           create: tags?.map((tag: { id: string }) => ({
             tagId: tag.id
@@ -248,8 +256,7 @@ export async function POST(request: Request) {
         }
       }
     });
-
-    console.log('Course created successfully:', course);
+    // debug removed
     return NextResponse.json(course);
   } catch (error) {
     console.error('Error creating course:');

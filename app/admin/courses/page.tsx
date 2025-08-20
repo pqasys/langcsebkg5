@@ -156,7 +156,23 @@ const courseFormSchema = z.object({
     name: z.string()
   })),
   pricingPeriod: z.enum(['FULL_COURSE', 'WEEKLY', 'MONTHLY']),
-  institutionId: z.string().optional()
+  institutionId: z.string().optional(),
+  // Placement & priority
+  priority: z.string().optional(),
+  isFeatured: z.boolean().default(false).optional(),
+  isSponsored: z.boolean().default(false).optional(),
+  // Marketing & classification (kept optional in page schema)
+  marketingType: z.string().optional(),
+  marketingDescription: z.string().optional(),
+  courseType: z.string().optional(),
+  deliveryMode: z.string().optional(),
+  enrollmentType: z.string().optional(),
+  hasLiveClasses: z.boolean().optional(),
+  liveClassType: z.string().optional(),
+  liveClassFrequency: z.string().optional(),
+  requiresSubscription: z.boolean().optional(),
+  subscriptionTier: z.string().optional(),
+  isPlatformCourse: z.boolean().optional()
 });
 
 type CourseFormData = z.infer<typeof courseFormSchema>;
@@ -180,6 +196,9 @@ const resetFormData = (): CourseFormData => ({
   priority: '0',
   isFeatured: false,
   isSponsored: false,
+  // Marketing fields
+  marketingType: 'SELF_PACED',
+  marketingDescription: '',
   // New course type fields
   courseType: 'STANDARD',
   deliveryMode: 'SELF_PACED',
@@ -584,6 +603,10 @@ function AdminCoursesContent() {
       setShowPlatformWideOnly(false);
     }
     setPage(1);
+    // Trigger course reload after state updates
+    setTimeout(() => {
+      fetchCourses();
+    }, 0);
   };
 
   // Add toast for pagination
@@ -732,80 +755,9 @@ function AdminCoursesContent() {
     }
   }, [inView, hasMore, isLoadingMore]);
 
-  useEffect(() => {
-    // Load all data in parallel
-    const loadInitialData = async () => {
-      try {
-        setLoadingStates(prev => ({ ...prev, isFetching: true }));
-        const [institutionsResponse, categoriesResponse] = await Promise.all([
-          fetch('/api/admin/institutions'),
-          fetch('/api/admin/categories')
-        ]);
+  // Removed duplicate initial data loader to avoid repeated requests; rely on the isInitialLoad effect above
 
-        if (!institutionsResponse.ok || !categoriesResponse.ok) {
-          throw new Error('Failed to fetch initial data');
-        }
-
-        const [institutionsData, categoriesData] = await Promise.all([
-          institutionsResponse.json(),
-          categoriesResponse.json()
-        ]);
-
-        // Admin API returns direct array
-        const institutionsArray = Array.isArray(institutionsData) ? institutionsData : [];
-        setInstitutions(institutionsArray);
-        setCategories(categoriesData);
-
-        // Set default category
-        if (categoriesData.length > 0 && !formData.categoryId) {
-          const webDevCategory = categoriesData.find(cat => cat.name === 'Web Development');
-          if (webDevCategory) {
-            setFormData(prev => ({ ...prev, categoryId: webDevCategory.id }));
-          } else {
-            setFormData(prev => ({ ...prev, categoryId: categoriesData[0].id }));
-          }
-        }
-
-        // Fetch courses after institutions and categories are loaded
-        if (institutionId) {
-          await fetchCourses(institutionId);
-        } else {
-          await fetchCourses();
-        }
-      } catch (error) {
-              console.error('Error occurred:', error);
-        toast.error(`Failed to loading initial data. Please try again or contact support if the problem persists.`);
-        toast.error('Failed to load initial data');
-      } finally {
-        setLoadingStates(prev => ({ ...prev, isFetching: false }));
-      }
-    };
-
-    loadInitialData();
-  }, [institutionId]);
-
-  // Show loading while checking authentication
-  if (status === 'loading') {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if not authenticated
-  if (!session || session.user?.role !== 'ADMIN') {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-sm text-muted-foreground">Access denied. Please log in as an admin.</p>
-        </div>
-      </div>
-    );
-  }
+  // Move auth guards below all hooks to preserve hook order
 
   const loadMoreCourses = async () => {
     try {
@@ -918,11 +870,7 @@ function AdminCoursesContent() {
     }
   }, [selectedInstitution?.id, searchQuery, selectedCategory, selectedStatus, session]);
 
-  // Update useEffect to fetch courses when institution changes
-  useEffect(() => {
-    console.log('Selected institution changed:', selectedInstitution);
-    fetchCourses();
-  }, [fetchCourses, selectedInstitution]);
+  // Fetch courses is triggered explicitly by handlers to avoid duplicate loops
 
   // Optimized filtered courses logic
   const filteredCourses = useMemo(() => {
@@ -1010,12 +958,22 @@ function AdminCoursesContent() {
 
       const method = selectedCourse ? 'PUT' : 'POST';
 
+      const payload = {
+        ...formData,
+        // Ensure booleans are present explicitly
+        isFeatured: !!(formData as any).isFeatured,
+        isSponsored: !!(formData as any).isSponsored,
+      } as any;
+
+      // Log outgoing payload for debugging placement flags
+      // debug removed
+
       const response = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -1023,9 +981,18 @@ function AdminCoursesContent() {
       }
 
       const result = await response.json();
+      // debug removed
 
       // Refresh the courses list
       await fetchCourses();
+      // Ensure dialog reflects the saved flags when editing
+      if (selectedCourse) {
+        setFormData(prev => ({
+          ...prev,
+          isFeatured: !!result.isFeatured,
+          isSponsored: !!result.isSponsored,
+        } as any));
+      }
 
       // Reset unsaved changes and form submission state
       setHasUnsavedChanges(false);
@@ -1112,6 +1079,9 @@ function AdminCoursesContent() {
         priority: (course.priority || 0).toString(),
         isFeatured: course.isFeatured || false,
         isSponsored: course.isSponsored || false,
+        // Marketing fields
+        marketingType: course.marketingType || 'SELF_PACED',
+        marketingDescription: course.marketingDescription || '',
         // New course type fields
         courseType: course.courseType || 'STANDARD',
         deliveryMode: course.deliveryMode || 'SELF_PACED',
@@ -1269,48 +1239,19 @@ function AdminCoursesContent() {
               <LayoutGrid className="h-4 w-4" />
             </Button>
           </div>
-          <UnsavedChangesDialog
-            open={isAddModalOpen}
-            onOpenChange={handleDialogOpenChange}
-            hasUnsavedChanges={hasUnsavedChanges}
-            onConfirmClose={handleDialogOpenChange}
-            isSubmitting={isFormSubmitting}
-            isFormSubmitting={isFormSubmitting}
+          <Button 
+            className="bg-gray-800 hover:bg-gray-900 text-white"
+            onClick={handleAddCourse}
+            disabled={!Array.isArray(categories) || categories.length === 0}
           >
-            <DialogTrigger asChild>
-              <Button 
-                className="bg-gray-800 hover:bg-gray-900 text-white"
-                onClick={handleAddCourse}
-                disabled={!Array.isArray(categories) || categories.length === 0}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Course
-                {(!Array.isArray(categories) || categories.length === 0) && (
-                  <span className="ml-2 text-xs bg-red-500 text-white px-2 py-1 rounded">
-                    No Categories
-                  </span>
-                )}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Course</DialogTitle>
-                <DialogDescription>
-                  Fill in the course details below. Fields marked with * are required.
-                </DialogDescription>
-              </DialogHeader>
-              <AdminCourseForm
-                formData={formData}
-                setFormData={handleFormDataChange}
-                categories={categories}
-                onSubmit={handleFormSubmit}
-                onUnsavedChangesChange={setHasUnsavedChanges}
-                onPricingManagement={handlePricingManagement}
-                onClose={() => setIsAddModalOpen(false)}
-                institutions={institutions}
-              />
-            </DialogContent>
-          </UnsavedChangesDialog>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Course
+            {(!Array.isArray(categories) || categories.length === 0) && (
+              <span className="ml-2 text-xs bg-red-500 text-white px-2 py-1 rounded">
+                No Categories
+              </span>
+            )}
+          </Button>
         </div>
       </div>
 
@@ -1757,9 +1698,10 @@ function AdminCoursesContent() {
 }
 
 export default function AdminCoursesPage() {
+  // Render a static fallback first to avoid hook order mismatches during hydration
   return (
-    <Suspense fallback={<div>Loading admin courses...</div>}>
+    <Suspense fallback={<div className="p-4">Loading admin courses...</div>}>
       <AdminCoursesContent />
     </Suspense>
   );
-} 
+}

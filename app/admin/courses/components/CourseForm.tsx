@@ -1,28 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CourseTagManager } from '@/components/CourseTagManager';
 import type { Tag } from '@/components/CourseTagManager';
+// Using native radios for robust mutually-exclusive selection
 import { getFrameworkLevels, getFrameworkInfo, frameworkMappings, type Framework } from '@/lib/framework-utils';
 import { Textarea } from '@/components/ui/textarea';
 import { z } from 'zod';
-// import { toast } from 'sonner'; // Removed to fix server-side build issue
-
-// Toast replacement for server-side compatibility
-const toast = {
-  success: (message: string) => console.log('Success:', message),
-  error: (message: string) => console.error('Error:', message),
-  info: (message: string) => console.log('Info:', message),
-  loading: (message: string) => {
-    console.log('Loading:', message);
-    return 'toast-id'; // Return a dummy ID for compatibility
-  },
-  dismiss: (id: string) => console.log('Dismissed toast:', id)
-};
+// Using sonner toast for client-side notifications
 
 // Define Institution interface - matches admin API response
 interface Institution {
@@ -130,12 +120,16 @@ export function AdminCourseForm({
   const [errors, setErrors] = useState<Partial<Record<keyof CourseFormData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Add success toast for form initialization
+  // Remove verbose init toast
+
+  // Normalize mutually exclusive placement on mount and when toggled
   useEffect(() => {
-    if (selectedCourse) {
-      toast.success('Course data loaded successfully');
+    if (formData.isFeatured && formData.isSponsored) {
+      // Prefer Featured if both are mistakenly true
+      const normalized = { ...formData, isSponsored: false };
+      setFormData(normalized);
     }
-  }, [selectedCourse]);
+  }, [formData.isFeatured, formData.isSponsored, setFormData]);
 
   // Update validateForm to be more specific about validation errors
   const validateForm = (data: CourseFormData): boolean => {
@@ -198,7 +192,7 @@ export function AdminCourseForm({
 
   // Update handleFormChange to properly handle field changes
   const handleFormChange = (field: keyof CourseFormData, value: unknown) => {
-    console.log('Form field changed:', field, value);
+    // no-op debug removed
     
     // Normalize status to uppercase
     if (field === 'status') {
@@ -250,14 +244,14 @@ export function AdminCourseForm({
     setFormData(newFormData);
 
     // Mark form as having unsaved changes
-    console.log('Setting hasUnsavedChanges to true');
+    // no-op debug removed
     onUnsavedChangesChange?.(true);
   };
 
   // Update handleFormSubmit to properly handle form state after submission
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submission started');
+    // no-op debug removed
     
     try {
       // Validate form data first
@@ -274,8 +268,17 @@ export function AdminCourseForm({
         toast.error('Saving is taking longer than expected. Please try again.');
       }, SAVING_TIMEOUT);
 
+      // Ensure mutually exclusive placement is reflected explicitly in submit payload
+      const currentPlacement = placementRef.current;
+      const dataToSubmit = {
+        ...formData,
+        isFeatured: currentPlacement === 'FEATURED',
+        isSponsored: currentPlacement === 'SPONSORED',
+      } as typeof formData;
+      // no-op debug removed
+
       // Call parent's onSubmit and wait for it to complete
-      await onSubmit(formData);
+      await onSubmit(dataToSubmit as any);
       
       // Clear timeout and dismiss loading toast
       clearTimeout(timeoutId);
@@ -286,10 +289,7 @@ export function AdminCourseForm({
       setErrors({});
       
       // Reset unsaved changes after successful submission
-      console.log('Setting hasUnsavedChanges to false after successful submission');
       onUnsavedChangesChange?.(false);
-      
-      console.log('Form submission completed successfully');
       // Don't call onClose here - let user close manually
     } catch (error) {
       console.error('Form submission error:', error);
@@ -317,6 +317,13 @@ export function AdminCourseForm({
 
   const frameworkLevels = getFrameworkLevels(formData.framework as Framework);
   const frameworkInfo = getFrameworkInfo(formData.framework as Framework);
+  const placement = formData.isSponsored ? 'SPONSORED' : formData.isFeatured ? 'FEATURED' : 'NORMAL';
+  const [placementLocal, setPlacementLocal] = useState<string>(placement);
+  const placementRef = useRef<string>(placement);
+  useEffect(() => {
+    placementRef.current = placement;
+    setPlacementLocal(placement);
+  }, [placement]);
 
   // Add error display component
   const ErrorMessage = ({ field }: { field: keyof CourseFormData }) => {
@@ -325,6 +332,16 @@ export function AdminCourseForm({
       <p className="text-sm text-red-500 mt-1">{errors[field]}</p>
     );
   };
+
+  // Debug placement changes
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('[CourseForm] placement flags changed', {
+      isFeatured: formData.isFeatured,
+      isSponsored: formData.isSponsored,
+      derivedPlacement: placement,
+    });
+  }, [formData.isFeatured, formData.isSponsored, placement]);
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
@@ -853,36 +870,64 @@ export function AdminCourseForm({
             <ErrorMessage field="priority" />
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isFeatured"
-                checked={formData.isFeatured || false}
-                onChange={(e) => handleFormChange('isFeatured', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <Label htmlFor="isFeatured" className="text-sm font-medium">Featured Course</Label>
-            </div>
-            <p className="text-xs text-gray-500">
-              Featured courses get priority placement and special styling.
-            </p>
-          </div>
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Placement</Label>
+            <div className="flex flex-row flex-wrap items-center gap-6">
+              <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="placement"
+                  value="NORMAL"
+                  checked={placementLocal === 'NORMAL'}
+                  onChange={() => {
+                    setPlacementLocal('NORMAL');
+                    handleFormChange('isFeatured', false);
+                    handleFormChange('isSponsored', false);
+                    placementRef.current = 'NORMAL';
+                  }}
+                  className="h-4 w-4 accent-blue-600"
+                  style={{ appearance: 'auto', WebkitAppearance: 'radio', MozAppearance: 'radio' as any }}
+                />
+                <span className="text-sm text-gray-800">Normal</span>
+              </label>
 
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isSponsored"
-                checked={formData.isSponsored || false}
-                onChange={(e) => handleFormChange('isSponsored', e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <Label htmlFor="isSponsored" className="text-sm font-medium">Sponsored Course</Label>
+              <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="placement"
+                  value="FEATURED"
+                  checked={placementLocal === 'FEATURED'}
+                  onChange={() => {
+                    setPlacementLocal('FEATURED');
+                    handleFormChange('isFeatured', true);
+                    handleFormChange('isSponsored', false);
+                    placementRef.current = 'FEATURED';
+                  }}
+                  className="h-4 w-4 accent-blue-600"
+                  style={{ appearance: 'auto', WebkitAppearance: 'radio', MozAppearance: 'radio' as any }}
+                />
+                <span className="text-sm text-gray-800">Featured</span>
+              </label>
+
+              <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="radio"
+                  name="placement"
+                  value="SPONSORED"
+                  checked={placementLocal === 'SPONSORED'}
+                  onChange={() => {
+                    setPlacementLocal('SPONSORED');
+                    handleFormChange('isSponsored', true);
+                    handleFormChange('isFeatured', false);
+                    placementRef.current = 'SPONSORED';
+                  }}
+                  className="h-4 w-4 accent-blue-600"
+                  style={{ appearance: 'auto', WebkitAppearance: 'radio', MozAppearance: 'radio' as any }}
+                />
+                <span className="text-sm text-gray-800">Sponsored</span>
+              </label>
             </div>
-            <p className="text-xs text-gray-500">
-              Sponsored courses appear in premium advertising positions.
-            </p>
+            <p className="text-xs text-gray-600">Only one of Featured or Sponsored can be selected.</p>
           </div>
         </div>
       </div>

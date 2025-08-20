@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -63,6 +64,7 @@ interface AccessLevel {
 
 export default function StudentLiveClassesPage() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [liveClasses, setLiveClasses] = useState<LiveClass[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -325,7 +327,7 @@ export default function StudentLiveClassesPage() {
         <h1 className="text-3xl font-bold">Live Classes</h1>
         <div className="flex space-x-2">
           {!accessLevel.hasSubscription && (
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => router.push('/student/subscription')}>
               <BookOpen className="w-4 h-4 mr-2" />
               Upgrade to Premium
             </Button>

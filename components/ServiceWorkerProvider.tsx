@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
 import { toast } from 'sonner';
 import { useNavigation } from '@/lib/navigation';
 
@@ -36,6 +36,7 @@ export function ServiceWorkerProvider({ children }: { children: ReactNode }) {
   const [hasUpdate, setHasUpdate] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const hasReloadedRef = useRef(false);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -104,7 +105,11 @@ export function ServiceWorkerProvider({ children }: { children: ReactNode }) {
         // Handle service worker controller change
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           setHasUpdate(false);
-          navigate.reload();
+          // Avoid reload loops during development; only auto-reload once in production
+          if (process.env.NODE_ENV === 'production' && !hasReloadedRef.current) {
+            hasReloadedRef.current = true;
+            navigate.reload();
+          }
         });
 
         // Initialize offline storage

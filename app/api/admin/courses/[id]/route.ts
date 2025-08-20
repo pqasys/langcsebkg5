@@ -113,8 +113,7 @@ export async function PUT(
     if (!data) throw new Error('Request body is required');;
     if (!data) throw new Error('Request body is required');;
     if (!data) throw new Error('Request body is required');;
-    console.log('PUT request received for course:', courseId);
-    console.log('Session validated:', session);
+    // debug removed
 
     // Validate required fields
     const requiredFields = ['title', 'categoryId'];
@@ -131,6 +130,21 @@ export async function PUT(
     // Ensure base_price is a number
     const base_price = parseFloat(data.base_price) || 0;
 
+    // Robust boolean coercion for placement flags
+    const coerceBoolean = (val: unknown): boolean => {
+      if (typeof val === 'boolean') return val;
+      if (typeof val === 'number') return val === 1;
+      if (typeof val === 'string') return val.toLowerCase() === 'true' || val === '1';
+      return false;
+    };
+
+    const isFeaturedFlag = coerceBoolean(data.isFeatured);
+    const isSponsoredFlag = coerceBoolean(data.isSponsored);
+
+    // Mutually exclusive: if sponsored, force featured false
+    const normalizedIsFeatured = isSponsoredFlag ? false : isFeaturedFlag;
+    const normalizedIsSponsored = isSponsoredFlag;
+
     // Update the course
     const updatedCourse = await prisma.course.update({
       where: { id: courseId },
@@ -139,7 +153,11 @@ export async function PUT(
         description: data.description,
         base_price: base_price,
         duration: parseInt(data.duration) || 0,
+        priority: parseInt(data.priority) || 0,
+        isFeatured: normalizedIsFeatured,
+        isSponsored: normalizedIsSponsored,
         level: data.level,
+        // Priority & placement (duplicate keys removed)
         framework: data.framework,
         status: data.status,
         institution: data.institutionId ? {
@@ -161,8 +179,8 @@ export async function PUT(
         requiresSubscription: data.requiresSubscription || false,
         subscriptionTier: data.subscriptionTier || null,
         // Marketing fields
-        marketingType: data.marketingType || 'SELF_PACED',
-        marketingDescription: data.marketingDescription || null,
+        marketingType: data.marketingType ?? 'SELF_PACED',
+        marketingDescription: data.marketingDescription ?? null,
         // Update tags
         courseTags: {
           deleteMany: {},
@@ -183,6 +201,7 @@ export async function PUT(
         }
       }
     });
+    // debug removed
 
     return NextResponse.json(updatedCourse);
   } catch (error) {
