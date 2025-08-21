@@ -381,6 +381,13 @@ export default function StudentDashboard() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Button 
+                    onClick={() => router.push('/subscription/trial')}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900"
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Start Free Trial
+                  </Button>
+                  <Button 
                     onClick={() => router.push('/student/subscription')}
                     className="bg-blue-600 hover:bg-blue-700"
                   >

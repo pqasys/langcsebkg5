@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -78,6 +80,7 @@ interface IndividualDesignConfig {
 
 export default function CoursesPageClient() {
   const { data: session, status } = useSession();
+  const { hasActiveSubscription, userType } = useSubscription();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -802,6 +805,26 @@ export default function CoursesPageClient() {
           </Button>
         </div>
       </div>
+
+      {/* Free Trial Banner for users without active subscription */}
+      {status === 'authenticated' && !hasActiveSubscription && (
+        <Alert className="bg-yellow-50 border-yellow-200">
+          <Info className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="text-yellow-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <span>
+              Unlock premium course experiences with a 7-day Free Trial. Cancel anytime.
+            </span>
+            <span className="flex gap-2">
+              <Link href="/subscription/trial">
+                <Button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900" size="sm">Start Free Trial</Button>
+              </Link>
+              <Link href="/subscription-signup">
+                <Button variant="outline" size="sm">View Plans</Button>
+              </Link>
+            </span>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Design Toolkit Panel */}
       {showDesignToolkit && canAccessDesignToolkit && editingItemId && (

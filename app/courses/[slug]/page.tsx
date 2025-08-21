@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   MapPin,
   Clock,
@@ -15,11 +17,13 @@ import {
   DollarSign,
   Building2,
   Tag,
-  Globe
+  Globe,
+  Info
 } from 'lucide-react';
 import Link from 'next/link';
 import { Rating as StarRating } from '@/components/ui/rating';
 import { formatDisplayLabel } from '@/lib/utils';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface Course {
   id: string;
@@ -72,6 +76,8 @@ interface Course {
 }
 
 export default function CourseDetails() {
+  const { data: session } = useSession();
+  const { hasActiveSubscription } = useSubscription();
   const params = useParams();
   const router = useRouter();
   const [course, setCourse] = useState<Course | null>(null);
@@ -212,6 +218,27 @@ export default function CourseDetails() {
           <div className="relative h-64 bg-gradient-to-r from-blue-600 to-purple-600">
             <div className="absolute inset-0 bg-black bg-opacity-40"></div>
             <div className="absolute bottom-6 left-6 right-6">
+              {/* Free Trial banner for authenticated users without subscription on subscription-required platform courses */}
+              {session?.user && course.isPlatformCourse && course.requiresSubscription && !hasActiveSubscription && (
+                <div className="mb-4">
+                  <Alert className="bg-yellow-50 border-yellow-200">
+                    <Info className="h-4 w-4 text-yellow-600" />
+                    <AlertDescription className="text-yellow-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <span>
+                        Try this platform course with a 7-day Free Trial. Cancel anytime.
+                      </span>
+                      <span className="flex gap-2">
+                        <Link href="/subscription/trial" className="inline-block">
+                          <Button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900" size="sm">Start Free Trial</Button>
+                        </Link>
+                        <Link href="/subscription-signup" className="inline-block">
+                          <Button variant="outline" size="sm">View Plans</Button>
+                        </Link>
+                      </span>
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
               <div className="flex items-center space-x-4">
                 {course.institution?.logoUrl && (
                   <img 

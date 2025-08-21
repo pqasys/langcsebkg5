@@ -135,6 +135,20 @@ export default function CommunityLearningFeaturePage() {
   const generatePricingPlans = () => {
     const studentTiers = getAllStudentTiers();
     
+    // Create a free trial plan for premium community features
+    const freeTrialPlan = {
+      name: 'Free Trial',
+      price: '$0',
+      period: '',
+      features: [
+        'Try premium community features',
+        'Sample study groups',
+        'Limited-time access'
+      ],
+      cta: 'Start Free Trial',
+      popular: false
+    };
+
     // Create a free community plan
     const freeCommunityPlan = {
       name: 'Free Community',
@@ -182,7 +196,7 @@ export default function CommunityLearningFeaturePage() {
       popular: false
     };
     
-    return [freeCommunityPlan, ...tierPlans, enterprisePlan];
+    return [freeTrialPlan, freeCommunityPlan, ...tierPlans, enterprisePlan];
   };
 
   const pricingPlans = generatePricingPlans();
@@ -607,11 +621,19 @@ export default function CommunityLearningFeaturePage() {
                       </li>
                     ))}
                   </ul>
-                  <Button 
-                    className={`w-full ${plan.popular ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-600 hover:bg-gray-700'}`}
-                  >
-                    {plan.cta}
-                  </Button>
+                  {plan.name === 'Free Trial' ? (
+                    <Link href="/subscription/trial">
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                        {plan.cta}
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button 
+                      className={`w-full ${plan.popular ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+                    >
+                      {plan.cta}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}

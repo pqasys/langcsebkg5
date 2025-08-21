@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useSession } from "next-auth/react";
+import { getAllStudentTiers } from "@/lib/subscription-pricing";
 import { 
   upcomingClasses, 
   getUpcomingClasses, 
@@ -58,6 +59,65 @@ export default function VideoConferencingFeaturePage() {
   const [togglingLikeId, setTogglingLikeId] = useState<string | null>(null);
   const [submittingRatingId, setSubmittingRatingId] = useState<string | null>(null);
   const [pendingRating, setPendingRating] = useState<Record<string, number>>({});
+
+  // Generate pricing plans from source-of-truth tiers
+  const generatePricingPlans = () => {
+    const studentTiers = getAllStudentTiers();
+
+    const freeTrialPlan = {
+      name: "Free Trial",
+      price: "$0",
+      period: "1 session",
+      features: [
+        "1 free live class",
+        "Basic video features",
+        "Screen sharing",
+        "Chat functionality",
+        "Class recording (24h)",
+        "Community forum access",
+      ],
+      cta: "Start Free Trial",
+      popular: false,
+    };
+
+    const tierPlans = studentTiers.map((tier) => ({
+      name: tier.name.replace(" Plan", ""),
+      price: `$${tier.price}`,
+      period: "/month",
+      features: tier.features.filter((feature) =>
+        feature.toLowerCase().includes("live") ||
+        feature.toLowerCase().includes("conversation") ||
+        feature.toLowerCase().includes("video") ||
+        feature.toLowerCase().includes("tutoring")
+      ),
+      cta: `Start ${tier.name.replace(" Plan", "")}`,
+      popular: tier.popular || false,
+    }));
+
+    const enterprisePlan = {
+      name: "Enterprise",
+      price: "Custom",
+      period: "",
+      features: [
+        "Custom live class programs",
+        "Dedicated instructors",
+        "Unlimited recordings",
+        "Advanced analytics",
+        "API integration",
+        "White-label options",
+        "24/7 priority support",
+        "Custom branding",
+        "Multi-language support",
+        "Bulk pricing",
+      ],
+      cta: "Contact Sales",
+      popular: false,
+    };
+
+    return [freeTrialPlan, ...tierPlans, enterprisePlan];
+  };
+
+  const pricingPlans = generatePricingPlans();
 
   // Handler functions
   const handleAccessLiveClasses = () => {
@@ -222,6 +282,18 @@ export default function VideoConferencingFeaturePage() {
 
   const handleContactSales = () => {
     window.location.href = "/contact/sales";
+  };
+
+  const handleChoosePlan = (planName: string) => {
+    if (planName === "Free Trial") {
+      handleStartFreeTrial();
+      return;
+    }
+    if (planName === "Enterprise") {
+      handleContactSales();
+      return;
+    }
+    window.location.href = "/subscription-signup";
   };
 
   const handleBrowseAllClasses = () => {
@@ -1159,96 +1231,36 @@ export default function VideoConferencingFeaturePage() {
            </div>
 
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-             {[
-               {
-                 name: "Free Trial",
-                 price: "$0",
-                 period: "1 session",
-                 features: [
-                   "1 free live class",
-                   "Basic video features",
-                   "Screen sharing",
-                   "Chat functionality",
-                   "Class recording (24h)",
-                   "Community forum access",
-                 ],
-                 cta: "Start Free Trial",
-                 popular: false,
-               },
-               {
-                 name: "Premium",
-                 price: "$24.99",
-                 period: "/month",
-                 features: [
-                   "Unlimited live classes",
-                   "All languages and instructors",
-                   "Priority booking",
-                   "HD video quality",
-                   "Advanced screen sharing",
-                   "Class recordings (30 days)",
-                   "Breakout rooms",
-                   "File sharing",
-                   "Advanced analytics",
-                   "Study group access",
-                 ],
-                 cta: "Start Premium",
-                 popular: true,
-               },
-               {
-                 name: "Enterprise",
-                 price: "Custom",
-                 period: "",
-                 features: [
-                   "Custom live class programs",
-                   "Dedicated instructors",
-                   "Unlimited recordings",
-                   "Advanced analytics",
-                   "API integration",
-                   "White-label options",
-                   "24/7 priority support",
-                   "Custom branding",
-                   "Multi-language support",
-                   "Bulk pricing",
-                 ],
-                 cta: "Contact Sales",
-                 popular: false,
-               },
-             ].map((plan, index) => (
-               <Card key={index} className={`relative ${plan.popular ? "border-2 border-blue-500 bg-blue-50" : ""}`}>
-                 {plan.popular && (
-                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                     <Badge className="bg-blue-500 text-white">Most Popular</Badge>
-                   </div>
-                 )}
-                 <CardContent className="p-6 text-center">
-                   <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                   <div className="text-3xl font-bold text-blue-600 mb-4">
-                     {plan.price}
-                     {plan.period && <span className="text-lg text-gray-500">{plan.period}</span>}
-                   </div>
-                   <ul className="space-y-3 mb-8 text-left">
-                     {plan.features.map((feature, featureIndex) => (
-                       <li key={featureIndex} className="flex items-center">
-                         <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                         <span className="text-sm">{feature}</span>
-                       </li>
-                     ))}
-                   </ul>
-                                       <Button
-                      className={`w-full ${plan.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"}`}
-                      onClick={
-                        plan.name === "Free Trial" 
-                          ? handleStartFreeTrial
-                          : plan.name === "Premium" 
-                          ? handleStartPremium
-                          : handleContactSales
-                      }
-                    >
-                      {plan.cta}
-                    </Button>
-                 </CardContent>
-               </Card>
-             ))}
+            {pricingPlans.map((plan, index) => (
+              <Card key={index} className={`relative ${plan.popular ? "border-2 border-blue-500 bg-blue-50" : ""}`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-blue-500 text-white">Most Popular</Badge>
+                  </div>
+                )}
+                <CardContent className="p-6 text-center">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                  <div className="text-3xl font-bold text-blue-600 mb-4">
+                    {plan.price}
+                    {plan.period && <span className="text-lg text-gray-500">{plan.period}</span>}
+                  </div>
+                  <ul className="space-y-3 mb-8 text-left">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center">
+                        <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    className={`w-full ${plan.popular ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"}`}
+                    onClick={() => handleChoosePlan(plan.name)}
+                  >
+                    {plan.cta}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
            </div>
          </div>
        </section>

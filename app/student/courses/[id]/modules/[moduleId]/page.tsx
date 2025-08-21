@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from 'sonner';
 import { FaSpinner } from 'react-icons/fa';
 import { 
@@ -16,8 +17,11 @@ import {
   Circle,
   Target,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Info
 } from 'lucide-react';
+import Link from 'next/link';
+import { useSubscription } from '@/hooks/useSubscription';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { QuizCard } from '@/components/student/QuizCard';
 import ExerciseInterface from '@/components/student/ExerciseInterface';
@@ -104,6 +108,7 @@ interface ProgressData {
 
 export default function ModulePage({ params }: { params: { id: string; moduleId: string } }) {
   const { data: session, status } = useSession();
+  const { hasActiveSubscription } = useSubscription();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [module, setModule] = useState<Module | null>(null);
@@ -233,6 +238,25 @@ export default function ModulePage({ params }: { params: { id: string; moduleId:
 
   return (
     <div className="space-y-6">
+      {/* Free Trial banner for authenticated students without active subscription */}
+      {session?.user && !hasActiveSubscription && (
+        <Alert className="bg-yellow-50 border-yellow-200">
+          <Info className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="text-yellow-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <span>
+              Enjoy full access with a 7-day Free Trial. Cancel anytime.
+            </span>
+            <span className="flex gap-2">
+              <Link href="/subscription/trial" className="inline-block">
+                <Button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900" size="sm">Start Free Trial</Button>
+              </Link>
+              <Link href="/subscription-signup" className="inline-block">
+                <Button variant="outline" size="sm">View Plans</Button>
+              </Link>
+            </span>
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-xl md:text-2xl font-bold tracking-tight">{module.title}</h1>

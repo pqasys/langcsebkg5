@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { toast } from 'sonner';
 import { FaSpinner } from 'react-icons/fa';
@@ -22,6 +23,8 @@ import {
   Target,
   Star
 } from 'lucide-react';
+import Link from 'next/link';
+import { useSubscription } from '@/hooks/useSubscription';
 import { Rating as StarRating } from '@/components/ui/rating';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { ModuleProgressCard } from '@/components/course/ModuleProgressCard';
@@ -63,6 +66,7 @@ interface CourseDetails {
 
 export default function CourseDetailsPage({ params }: { params: { id: string } }) {
   const { data: session, status } = useSession();
+  const { hasActiveSubscription } = useSubscription();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState<CourseDetails | null>(null);
@@ -286,6 +290,25 @@ export default function CourseDetailsPage({ params }: { params: { id: string } }
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
+      {/* Free Trial banner for authenticated users without subscription */}
+      {session?.user && !hasActiveSubscription && (
+        <Alert className="bg-yellow-50 border-yellow-200">
+          <ArrowRight className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="text-yellow-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <span>
+              Unlock premium learning with a 7-day Free Trial. Cancel anytime.
+            </span>
+            <span className="flex gap-2">
+              <Link href="/subscription/trial" className="inline-block">
+                <Button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900" size="sm">Start Free Trial</Button>
+              </Link>
+              <Link href="/subscription-signup" className="inline-block">
+                <Button variant="outline" size="sm">View Plans</Button>
+              </Link>
+            </span>
+          </AlertDescription>
+        </Alert>
+      )}
       <Breadcrumb items={[
         { label: 'Student', href: '/student' },
         { label: 'Courses', href: '/student/courses' },

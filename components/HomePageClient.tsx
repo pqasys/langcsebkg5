@@ -32,6 +32,7 @@ import {
   FaRocket
 } from 'react-icons/fa'
 import { Button } from '@/components/ui/button'
+import { getAllStudentTiers } from '@/lib/subscription-pricing'
 import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner';
 import { useMobileOptimization } from '@/components/MobileOptimizer';
@@ -100,6 +101,30 @@ export default function HomePageClient() {
   const [isOfflineData, setIsOfflineData] = useState(false)
   const hasFetchedData = useRef(false)
   const [mounted, setMounted] = useState(false);
+
+  // Pricing: derive student plans from single source of truth
+  const homepageStudentTiers = useMemo(() => getAllStudentTiers(), [])
+  const homepagePricingPlans = useMemo(() => homepageStudentTiers.map(tier => ({
+    name: tier.name.replace(' Plan', ''),
+    price: tier.price,
+    period: '/month',
+    features: tier.features,
+    popular: !!tier.popular
+  })), [homepageStudentTiers])
+
+  const homepageFreeTrialPlan = useMemo(() => ({
+    name: 'Free Trial',
+    price: '$0',
+    period: '',
+    features: [
+      'Access to basic courses',
+      'Limited practice sessions',
+      'Basic community access'
+    ],
+    popular: false
+  }), [])
+
+  const homepageDisplayPlans = useMemo(() => [homepageFreeTrialPlan, ...homepagePricingPlans], [homepageFreeTrialPlan, homepagePricingPlans])
 
   // Ensure component is mounted before rendering icons
   useEffect(() => {
@@ -887,118 +912,40 @@ export default function HomePageClient() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            {/* Free Plan */}
-            <Card className="border-2 border-gray-200 hover:border-blue-500 transition-all duration-300">
-              <CardContent className="p-6 md:p-8 text-center">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Free</h3>
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-4">$0</div>
-                <p className="text-gray-600 mb-6">Perfect for getting started</p>
-                <ul className="space-y-3 mb-8 text-left">
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Access to basic courses</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Limited practice sessions</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Basic community access</span>
-                  </li>
-                </ul>
-                <Link href="/students-public">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    Get Started Free
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Premium Plan */}
-            <Card className="border-2 border-blue-500 relative bg-blue-50">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                  Most Popular
-                </span>
-              </div>
-              <CardContent className="p-6 md:p-8 text-center">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Premium</h3>
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-4">$19.99<span className="text-lg text-gray-500">/month</span></div>
-                <p className="text-gray-600 mb-6">For serious learners</p>
-                <ul className="space-y-3 mb-8 text-left">
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">All courses and languages</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Unlimited practice sessions</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Live conversation classes</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Study groups & language exchanges</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">AI-powered learning paths</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">In-person classes at partner institutions</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Progress certificates</span>
-                  </li>
-                </ul>
-                <Link href="/students-public">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    Start Premium Trial
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Enterprise Plan */}
-            <Card className="border-2 border-gray-200 hover:border-purple-500 transition-all duration-300">
-              <CardContent className="p-6 md:p-8 text-center">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
-                <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-4">Custom</div>
-                <p className="text-gray-600 mb-6">For institutions and teams</p>
-                <ul className="space-y-3 mb-8 text-left">
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Custom course creation</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Advanced analytics</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">Dedicated support</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">In-person & hybrid learning programs</span>
-                  </li>
-                  <li className="flex items-center">
-                    <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
-                    <span className="text-sm md:text-base">API integration</span>
-                  </li>
-                </ul>
-                <Link href="/institutions-public">
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                    Contact Sales
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            {homepageDisplayPlans.map((plan, index) => (
+              <Card key={index} className={`relative ${plan.popular ? 'border-2 border-blue-500 bg-blue-50' : 'border-2 border-gray-200 hover:border-blue-500 transition-all duration-300'}`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Most Popular</span>
+                  </div>
+                )}
+                <CardContent className="p-6 md:p-8 text-center">
+                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                  <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-4">{typeof plan.price === 'number' ? `$${plan.price}` : plan.price}<span className="text-lg text-gray-500">{plan.period}</span></div>
+                  <ul className="space-y-3 mb-8 text-left">
+                    {plan.features.slice(0, 7).map((feature, i) => (
+                      <li key={i} className="flex items-center">
+                        <FaCheckCircle className="w-4 h-4 text-green-500 mr-3" />
+                        <span className="text-sm md:text-base">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.name === 'Free Trial' ? (
+                    <Link href="/subscription/trial">
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                        Start Free Trial
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/subscription-signup">
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                        Choose {plan.name}
+                      </Button>
+                    </Link>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>

@@ -4,6 +4,8 @@
 
 The **Live Conversations** feature enables real-time language practice through scheduled conversation sessions. Users can create, join, and participate in live conversation sessions with native speakers and fellow learners.
 
+> See also: [Live Conversations — Complete Implementation Plan](./LIVE_CONVERSATIONS_FULL_IMPLEMENTATION_PLAN.md)
+
 ## ✅ **Implementation Status**
 
 ### **Frontend Components** ✅
