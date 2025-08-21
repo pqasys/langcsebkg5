@@ -65,6 +65,7 @@ CREATE TABLE live_conversation_bookings (...);
 - Phase 2:
   - WebSocket chat/presence, live participant counts
   - Video conferencing (WebRTC/provider), join/leave, basic host moderation; optional recording
+  - Single shared MediaSession service reused by both Live Classes and Live Conversations. Differentiate via a `sessionType` enum (CLASS | CONVERSATION) and foreign keys (`classId` or `conversationId`).
 - Phase 3:
   - AI translation overlays, speech recognition/pronunciation feedback, live transcripts, learning signals
 - Phase 4 (enterprise):
@@ -84,11 +85,50 @@ CREATE TABLE live_conversation_bookings (...);
 - Institution-linked access
   - Hybrid users: institution sessions vs platform sessions; enforce institution plan features
 
+### Platform Creators Institution & Per‑Instructor Overrides
+
+- Group independent instructors under a single "Platform Creators" Institution to reuse existing commission and payout rails.
+- Defaults come from the Institution's CommissionTier; allow minimal per‑instructor overrides:
+  - commissionRateOverride (percentage)
+  - payoutMethod / payoutSchedule
+  - priceFloor, maxDiscountPercent (safety rails)
+  - recordingAllowedOverride
+  - capacity/duration overrides (bounded)
+- Precedence: Instructor override → Platform Creators CommissionTier → Global default.
+
+### Tiered Entitlements for Live Conversations (Students)
+
+- BASIC:
+  - Browse + 1 free trial session
+  - No booked group/1:1 sessions; no recordings
+  - Booking horizon: n/a
+- PREMIUM:
+  - Group sessions: 4 per month
+  - 1:1 sessions: 0 per month (top-ups optional)
+  - Booking horizon: 7 days; recording access: 30 days
+  - Fair-use minutes: e.g., 600/month (optional)
+- PRO:
+  - Group sessions: unlimited (fair-use minutes e.g., 1000/month)
+  - 1:1 sessions: 4 per month
+  - Booking horizon: 14 days; recording access: 90 days
+
+Institution mapping (per student defaults):
+- STARTER: none
+- PROFESSIONAL: 4 group / 0 1:1; 30d retention
+- ENTERPRISE: unlimited group (fair-use), 2 1:1; 90d retention
+
+Enforcement:
+- Booking API gates: verify plan entitlements (per session type) and current cycle usage; redirect to trial/sign-up or top-ups when exceeded.
+- Usage tracking table (per user, per cycle): sessionsBooked, oneToOneBooked, minutesConsumed, lastReset.
+- Optional top-ups (Stripe products): add session packs.
+
 ## Payments & Pricing
 
 - Free sessions: instant booking
 - Paid sessions: Stripe (or provider) products/prices; attach receipt to booking; cancellation/refund policy integration
 - Commissions: platform share for instructor-led sessions; configurable per tier/instructor
+
+Implementation note: Instructor-led sessions settle through the Platform Creators Institution; apply CommissionTier unless a per‑instructor override exists.
 
 ## Notifications & Lifecycle
 
@@ -135,3 +175,42 @@ CREATE TABLE live_conversation_bookings (...);
   - `docs/VIDEO_CONFERENCING_IMPLEMENTATION_COMPLETE.md`
   - `docs/VIDEO_CONFERENCING_REVENUE_OPTIMIZATION.md`
   - `docs/COMPLETE_SYSTEM_OVERVIEW.md`
+
+## Media Engine and Product Differentiation
+
+- Shared real-time stack: Both Live Classes and Live Conversations use the same underlying RTC/media engine (WebRTC or provider SDK such as Zoom/Twilio) to minimize duplication and ensure a single investment in reliability and UX components (chat, presence, device controls, recording hooks).
+- Differentiation layer: Behavior differences live above the media layer via a `sessionType` discriminator and policy gates.
+  - sessionType: `CLASS | CONVERSATION`
+  - Data linkage: classes reference `videoSession` or class-bound sessions; conversations reference `LiveConversation` rows.
+- Policy differences:
+  - Capacity: Conversations are small-group or 1:1; Classes support larger cohorts.
+  - Scheduling: Conversations are booking-led (ad‑hoc/slots) with `bookingHorizonDays`; Classes follow course timetables/enrollments.
+  - Entitlements: Conversations enforce monthly caps from `lib/subscription-pricing.ts` (group/1:1/fair-use minutes); Classes are gated by course access and plan level.
+  - Recording: Conversations optional, shorter `recordingRetentionDays`; Classes often default to recording with longer retention.
+  - Moderation: Conversations use lightweight host controls; Classes include richer classroom tooling (materials/attendance).
+- Implementation note: A single MediaSession service is reused; features like chat/presence are shared modules toggled by policy (allowChat, allowRecording, etc.).
+
+## Future Improvements & Enhancements
+
+### Near-term (1–2 sprints)
+- In-room chat/presence for Conversations (shared module with Classes)
+- Session reminders and calendar invites (ICS)
+- Booking waitlists and auto-fill from waitlist
+- Host quick tools: mute-all, admit/ban, end-for-all
+- Top-up packs for 1:1 sessions; Stripe products
+- Usage reset cron + “cycle remaining” widgets everywhere
+
+### Mid-term (quarter)
+- Reusable MediaSession UI kit (devices, screen share, reactions)
+- Recording pipeline unification; transcripts gated by retention policy
+- Conversation templates (language/level prompts) for fast creation
+- Improved discovery: popularity, personalized recommendations
+- Institution overrides: capacity/duration/recording policy bounds
+- Exportable reports for bookings/attendance/usage
+
+### Long-term
+- AI assist: live translation captions, pronunciation feedback, topic suggestions
+- Skill signals: speaking time, vocabulary coverage, CEFR-aligned rubrics
+- Federation: external provider rooms bridged into platform policy/analytics
+- Enterprise admin: SLA dashboards, white-label media domains
+- Public APIs for scheduling and booking integrations

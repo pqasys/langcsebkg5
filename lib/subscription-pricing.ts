@@ -18,6 +18,14 @@ export interface StudentTier {
   };
   popular?: boolean;
   trialDays: number;
+  // Optional Live Conversations entitlements
+  liveConversations?: {
+    groupSessionsPerMonth?: number; // -1 for unlimited
+    oneToOneSessionsPerMonth?: number; // -1 for unlimited
+    fairUseMinutesPerMonth?: number; // soft cap, e.g., 600, 1000
+    recordingRetentionDays?: number; // 0 for none
+    bookingHorizonDays?: number; // how far ahead user can book
+  };
 }
 
 export interface InstitutionTier {
@@ -35,6 +43,14 @@ export interface InstitutionTier {
   };
   popular?: boolean;
   trialDays: number;
+  // Optional per-student Live Conversations defaults for institution-enrolled users
+  liveConversations?: {
+    groupSessionsPerMonth?: number; // -1 for unlimited
+    oneToOneSessionsPerMonth?: number; // -1 for unlimited
+    fairUseMinutesPerMonth?: number;
+    recordingRetentionDays?: number;
+    bookingHorizonDays?: number;
+  };
 }
 
 export const STUDENT_TIERS: Record<string, StudentTier> = {
@@ -57,7 +73,14 @@ export const STUDENT_TIERS: Record<string, StudentTier> = {
       maxLanguages: 5
     },
     popular: false,
-    trialDays: 7
+    trialDays: 7,
+    liveConversations: {
+      groupSessionsPerMonth: 0,
+      oneToOneSessionsPerMonth: 0,
+      fairUseMinutesPerMonth: 0,
+      recordingRetentionDays: 0,
+      bookingHorizonDays: 0
+    }
   },
   PREMIUM: {
     planType: 'PREMIUM',
@@ -83,7 +106,14 @@ export const STUDENT_TIERS: Record<string, StudentTier> = {
       maxLanguages: -1 // Unlimited
     },
     popular: true,
-    trialDays: 7
+    trialDays: 7,
+    liveConversations: {
+      groupSessionsPerMonth: 4,
+      oneToOneSessionsPerMonth: 0,
+      fairUseMinutesPerMonth: 600,
+      recordingRetentionDays: 30,
+      bookingHorizonDays: 7
+    }
   },
   PRO: {
     planType: 'PRO',
@@ -109,7 +139,14 @@ export const STUDENT_TIERS: Record<string, StudentTier> = {
       maxLanguages: -1 // Unlimited
     },
     popular: false,
-    trialDays: 7
+    trialDays: 7,
+    liveConversations: {
+      groupSessionsPerMonth: -1, // unlimited (fair-use applies)
+      oneToOneSessionsPerMonth: 4,
+      fairUseMinutesPerMonth: 1000,
+      recordingRetentionDays: 90,
+      bookingHorizonDays: 14
+    }
   }
 };
 
@@ -137,7 +174,14 @@ export const INSTITUTION_TIERS: Record<string, InstitutionTier> = {
       maxTeachers: 2
     },
     popular: false,
-    trialDays: 14
+    trialDays: 14,
+    liveConversations: {
+      groupSessionsPerMonth: 0,
+      oneToOneSessionsPerMonth: 0,
+      fairUseMinutesPerMonth: 0,
+      recordingRetentionDays: 0,
+      bookingHorizonDays: 0
+    }
   },
   PROFESSIONAL: {
     planType: 'PROFESSIONAL',
@@ -165,7 +209,14 @@ export const INSTITUTION_TIERS: Record<string, InstitutionTier> = {
       maxTeachers: 5
     },
     popular: true,
-    trialDays: 14
+    trialDays: 14,
+    liveConversations: {
+      groupSessionsPerMonth: 4,
+      oneToOneSessionsPerMonth: 0,
+      fairUseMinutesPerMonth: 600,
+      recordingRetentionDays: 30,
+      bookingHorizonDays: 7
+    }
   },
   ENTERPRISE: {
     planType: 'ENTERPRISE',
@@ -193,7 +244,14 @@ export const INSTITUTION_TIERS: Record<string, InstitutionTier> = {
       maxTeachers: 20
     },
     popular: false,
-    trialDays: 14
+    trialDays: 14,
+    liveConversations: {
+      groupSessionsPerMonth: -1,
+      oneToOneSessionsPerMonth: 2,
+      fairUseMinutesPerMonth: 1000,
+      recordingRetentionDays: 90,
+      bookingHorizonDays: 14
+    }
   }
 };
 
@@ -262,6 +320,49 @@ export const getVideoConferencingAccess = (planType: string, userType: 'STUDENT'
 // Live conversations specific helpers
 export const getLiveConversationsAccess = (planType: string): boolean => {
   return planType === 'PREMIUM' || planType === 'PRO';
+};
+
+// Live Conversations entitlements helpers
+export type LiveConversationsEntitlements = Required<NonNullable<StudentTier['liveConversations']>>;
+
+export const getStudentLiveConversationEntitlements = (planType: string): LiveConversationsEntitlements => {
+  const tier = STUDENT_TIERS[planType];
+  const defaults: LiveConversationsEntitlements = {
+    groupSessionsPerMonth: 0,
+    oneToOneSessionsPerMonth: 0,
+    fairUseMinutesPerMonth: 0,
+    recordingRetentionDays: 0,
+    bookingHorizonDays: 0
+  };
+  if (!tier || !tier.liveConversations) return defaults;
+  return { ...defaults, ...tier.liveConversations } as LiveConversationsEntitlements;
+};
+
+export const getInstitutionLiveConversationDefaults = (planType: string): LiveConversationsEntitlements => {
+  const tier = INSTITUTION_TIERS[planType];
+  const defaults: LiveConversationsEntitlements = {
+    groupSessionsPerMonth: 0,
+    oneToOneSessionsPerMonth: 0,
+    fairUseMinutesPerMonth: 0,
+    recordingRetentionDays: 0,
+    bookingHorizonDays: 0
+  };
+  if (!tier || !tier.liveConversations) return defaults;
+  return { ...defaults, ...tier.liveConversations } as LiveConversationsEntitlements;
+};
+
+// Hybrid users: combine platform and institution entitlements per session type by taking the max; keep fair-use as the max too
+export const mergeLiveConversationEntitlements = (
+  studentEntitlements: LiveConversationsEntitlements,
+  institutionEntitlements: LiveConversationsEntitlements
+): LiveConversationsEntitlements => {
+  return {
+    groupSessionsPerMonth: Math.max(studentEntitlements.groupSessionsPerMonth, institutionEntitlements.groupSessionsPerMonth),
+    oneToOneSessionsPerMonth: Math.max(studentEntitlements.oneToOneSessionsPerMonth, institutionEntitlements.oneToOneSessionsPerMonth),
+    fairUseMinutesPerMonth: Math.max(studentEntitlements.fairUseMinutesPerMonth, institutionEntitlements.fairUseMinutesPerMonth),
+    recordingRetentionDays: Math.max(studentEntitlements.recordingRetentionDays, institutionEntitlements.recordingRetentionDays),
+    bookingHorizonDays: Math.max(studentEntitlements.bookingHorizonDays, institutionEntitlements.bookingHorizonDays)
+  };
 };
 
 // Community learning specific helpers

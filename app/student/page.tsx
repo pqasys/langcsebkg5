@@ -160,6 +160,20 @@ export default function StudentDashboard() {
   const { data: session } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  // Immediate session guards to avoid flashing dashboard after sign-out
+  if (typeof window !== 'undefined') {
+    // If unauthenticated, redirect synchronously and render nothing
+    // NextAuth status can change asynchronously; this guard prevents UI flicker
+    // Note: we intentionally avoid setting local loading here to unmount quickly
+    // eslint-disable-next-line no-restricted-globals
+  }
+
+  // Render-time guard: if session is loading or unauthenticated, do not render content
+  if ((typeof window !== 'undefined' && !session) && loading === false) {
+    // If session is missing but our loading finished (e.g., after sign-out), push to signin
+    router.replace('/auth/signin');
+    return null;
+  }
   const [courses, setCourses] = useState<CourseProgress[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalCourses: 0,
@@ -182,8 +196,14 @@ export default function StudentDashboard() {
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionStatus | null>(null);
 
   useEffect(() => {
+    // If no session, redirect early to avoid dashboard flash
+    if (!session) {
+      router.replace('/auth/signin');
+      return;
+    }
     fetchDashboardData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
 
   const fetchDashboardData = async () => {
     try {
@@ -381,7 +401,7 @@ export default function StudentDashboard() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Button 
-                    onClick={() => router.push('/subscription/trial')}
+                    onClick={() => router.push('/subscription/trial?context=conversation')}
                     className="bg-yellow-500 hover:bg-yellow-600 text-gray-900"
                   >
                     <Zap className="h-4 w-4 mr-2" />

@@ -11,7 +11,8 @@ import {
   Mail,
   CreditCard,
   Activity,
-  Megaphone
+  Megaphone,
+  MessageCircle
 } from 'lucide-react';
 
 const menuItems = [
@@ -19,6 +20,11 @@ const menuItems = [
     title: 'Dashboard',
     href: '/admin/dashboard',
     icon: LayoutDashboard
+  },
+  {
+    title: 'Live Conversations',
+    href: '/admin/live-conversations',
+    icon: MessageCircle
   },
   {
     title: 'Institutions',

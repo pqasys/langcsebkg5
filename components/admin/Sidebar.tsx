@@ -33,7 +33,8 @@ import {
   Activity,
   LogOut,
   Video,
-  Palette
+  Palette,
+  MessageCircle
 } from 'lucide-react';
 // import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -187,6 +188,7 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
   const isPerformancePage = pathname.startsWith('/admin/performance');
   // Check if we're on live classes page
   const isLiveClassesPage = pathname.startsWith('/admin/live-classes');
+  const isLiveConversationsPage = pathname.startsWith('/admin/live-conversations');
   // Check if we're on design configs page
   const isDesignConfigsPage = pathname.startsWith('/admin/design-configs');
 
@@ -290,6 +292,17 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
                   >
                     <Video className="h-4 w-4" />
                     Live Classes
+                  </Link>
+
+                  <Link
+                    href="/admin/live-conversations"
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                      isLiveConversationsPage ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                    )}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Live Conversations
                   </Link>
 
                   <Link

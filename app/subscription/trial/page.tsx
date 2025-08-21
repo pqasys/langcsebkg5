@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,10 +18,20 @@ interface TrialStatus {
 }
 
 export default function TrialPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto py-10">Loading...</div>}>
+      <TrialPageContent />
+    </Suspense>
+  );
+}
+
+function TrialPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [trial, setTrial] = useState<TrialStatus | null>(null);
   const [loading, setLoading] = useState(false);
+  const [context, setContext] = useState<'conversation' | 'community' | 'class'>('class');
 
   const fetchStatus = async () => {
     try {
@@ -40,6 +50,23 @@ export default function TrialPage() {
     if (status !== 'loading') fetchStatus();
   }, [status]);
 
+  useEffect(() => {
+    const qp = (searchParams.get('context') || '').toLowerCase();
+    let next: 'conversation' | 'community' | 'class' = 'class';
+    if (qp === 'conversation' || qp === 'community' || qp === 'class') {
+      next = qp as any;
+    } else if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('trialContext');
+      if (stored === 'conversation' || stored === 'community' || stored === 'class') {
+        next = stored as any;
+      }
+    }
+    setContext(next);
+    try {
+      if (typeof window !== 'undefined') localStorage.setItem('trialContext', next);
+    } catch {}
+  }, [searchParams]);
+
   const startTrial = async () => {
     try {
       setLoading(true);
@@ -51,7 +78,13 @@ export default function TrialPage() {
       }
       toast.success('Your free trial is active');
       await fetchStatus();
-      router.push('/features/live-classes');
+      router.push(
+        context === 'conversation'
+          ? '/features/live-conversations'
+          : context === 'community'
+          ? '/features/community-learning'
+          : '/features/live-classes'
+      );
     } catch (e) {
       toast.error('Failed to start trial');
     } finally {
@@ -63,8 +96,20 @@ export default function TrialPage() {
     <div className="container mx-auto py-10">
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Try a Live Class for Free</h1>
-          <p className="text-gray-600">One session. No card required. Real instructor-led experience.</p>
+          <h1 className="text-3xl font-bold">
+            {context === 'conversation'
+              ? 'Try a Live Conversation for Free'
+              : context === 'community'
+              ? 'Try Community Features for Free'
+              : 'Try a Live Class for Free'}
+          </h1>
+          <p className="text-gray-600">
+            {context === 'conversation'
+              ? 'One conversation session. No card required. Real-time practice.'
+              : context === 'community'
+              ? 'Join a community event. No card required. Meet fellow learners.'
+              : 'One session. No card required. Real instructor-led experience.'}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -111,8 +156,8 @@ export default function TrialPage() {
             <div className="flex gap-2">
               {session ? (
                 trial?.active ? (
-                  <Button onClick={() => router.push('/features/live-classes')} disabled={loading}>
-                    Join a Live Class
+                  <Button onClick={() => router.push(context === 'conversation' ? '/features/live-conversations' : context === 'community' ? '/features/community-learning' : '/features/live-classes')} disabled={loading}>
+                    {context === 'conversation' ? 'Join a Conversation' : context === 'community' ? 'Join a Community Event' : 'Join a Live Class'}
                   </Button>
                 ) : (
                   <Button onClick={startTrial} disabled={loading || trial?.eligible === false}>

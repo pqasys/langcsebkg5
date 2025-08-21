@@ -214,7 +214,7 @@ export default function LiveConversationsFeaturePage() {
               "Set sail for your next language" - Practice with certified native speakers in real-time conversations
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/subscription/trial">
+              <Link href="/subscription/trial?context=conversation">
                 <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
                   <FaPlay className="w-5 h-5 mr-2" />
                   Try Free Session

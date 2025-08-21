@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { mapConversationRow } from '@/lib/live-conversations';
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
       whereClause.conversationType = type;
     }
 
-    if (isFree !== null) {
+    if (isFree !== null && isFree !== 'all') {
       whereClause.isFree = isFree === 'true';
     }
 
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    // Check if user is booked for each conversation
+    // Check if user is booked and map DTO shape
     const conversationsWithBookingStatus = await Promise.all(
       conversations.map(async (conversation) => {
         const userBooking = await prisma.liveConversationBooking.findUnique({
@@ -106,8 +107,14 @@ export async function GET(request: NextRequest) {
           },
         });
 
+        const dto = mapConversationRow(conversation);
+
         return {
-          ...conversation,
+          ...dto,
+          instructor: conversation.instructor || null,
+          host: conversation.host,
+          participants: conversation.participants,
+          _count: conversation._count,
           isBooked: !!userBooking,
           bookingStatus: userBooking?.status || null,
         };
@@ -252,9 +259,15 @@ export async function POST(request: NextRequest) {
 
     logger.info(`Live conversation created: ${conversation.id} by user ${session.user.id}`);
 
+    const dto = mapConversationRow(conversation as any);
+
     return NextResponse.json({
       success: true,
-      conversation,
+      conversation: {
+        ...dto,
+        instructor: conversation.instructor || null,
+        host: conversation.host,
+      },
     });
   } catch (error) {
     logger.error('Error creating live conversation:', error);

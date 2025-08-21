@@ -269,7 +269,7 @@ export default function VideoConferencingFeaturePage() {
   const handleStartFreeTrial = () => {
     // Always allow reaching the trial page without immediate sign-in.
     // Sign-in will be requested on the trial page when attempting to start.
-    window.location.href = "/subscription/trial";
+    window.location.href = "/subscription/trial?context=class";
   };
 
   const handleStartPremium = () => {

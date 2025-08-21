@@ -3,6 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import {
+  getStudentLiveConversationEntitlements,
+  getInstitutionLiveConversationDefaults,
+  mergeLiveConversationEntitlements,
+  type LiveConversationsEntitlements,
+} from '@/lib/subscription-pricing';
+import { SubscriptionCommissionService } from '@/lib/subscription-commission-service';
 
 export async function POST(
   request: NextRequest,
@@ -57,13 +64,17 @@ export async function POST(
       return NextResponse.json({ error: 'Conversation is full' }, { status: 400 });
     }
 
-    // Check if user has access to book conversations
-    // This would typically check subscription status or institution enrollment
-    const hasAccess = await checkUserBookingAccess(session.user.id);
-    if (!hasAccess) {
-      return NextResponse.json({ 
-        error: 'You need a subscription or institution enrollment to book conversations' 
-      }, { status: 403 });
+    // Enforce entitlements based on subscription/institution
+    const entitlementResult = await checkEntitlementsForBooking(session.user.id, conversation);
+    if (!entitlementResult.allowed) {
+      return NextResponse.json(
+        {
+          error: entitlementResult.reason || 'Booking not allowed under your plan',
+          redirectUrl: entitlementResult.redirectUrl,
+          details: entitlementResult.details,
+        },
+        { status: entitlementResult.statusCode || 402 }
+      );
     }
 
     // Create booking
@@ -253,3 +264,157 @@ async function checkUserBookingAccess(userId: string): Promise<boolean> {
     return false;
   }
 } 
+
+/**
+ * Check Live Conversations entitlements for a booking attempt.
+ * Applies student subscription tier and institution defaults, then enforces caps.
+ */
+async function checkEntitlementsForBooking(
+  userId: string,
+  conversation: any
+): Promise<{
+  allowed: boolean;
+  reason?: string;
+  redirectUrl?: string;
+  statusCode?: number;
+  details?: Record<string, any>;
+}> {
+  try {
+    // 1) Resolve student subscription plan type (if any)
+    const subscription = await prisma.studentSubscription.findUnique({
+      where: { studentId: userId }
+    });
+    const studentPlanType = subscription?.planType || 'BASIC';
+    const studentEnt = getStudentLiveConversationEntitlements(studentPlanType);
+
+    // 2) Resolve institution tier defaults (if enrolled)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { institutionId: true }
+    });
+    let instEnt: LiveConversationsEntitlements = {
+      groupSessionsPerMonth: 0,
+      oneToOneSessionsPerMonth: 0,
+      fairUseMinutesPerMonth: 0,
+      recordingRetentionDays: 0,
+      bookingHorizonDays: 0,
+    };
+    if (user?.institutionId) {
+      try {
+        const instStatus = await SubscriptionCommissionService.getSubscriptionStatus(user.institutionId);
+        const instPlan = instStatus.currentPlan as string | undefined;
+        if (instPlan) {
+          instEnt = getInstitutionLiveConversationDefaults(instPlan);
+        }
+      } catch (e) {
+        logger.warn?.('Failed to fetch institution status for entitlements; defaulting to none');
+      }
+    }
+
+    // 3) Merge entitlements (take max per field)
+    const ent = mergeLiveConversationEntitlements(studentEnt, instEnt);
+
+    // 4) Enforce booking horizon
+    if (ent.bookingHorizonDays > 0) {
+      const now = new Date();
+      const msAhead = conversation.startTime.getTime() - now.getTime();
+      const daysAhead = msAhead / (1000 * 60 * 60 * 24);
+      if (daysAhead > ent.bookingHorizonDays) {
+        return {
+          allowed: false,
+          reason: `Bookings allowed up to ${ent.bookingHorizonDays} days in advance for your plan`,
+          redirectUrl: '/subscription-signup',
+          statusCode: 403,
+          details: { bookingHorizonDays: ent.bookingHorizonDays }
+        };
+      }
+    }
+
+    // 5) Determine session type (group vs 1:1)
+    const isOneToOne = (conversation.maxParticipants ?? 0) <= 2 || conversation.conversationType === 'PRIVATE';
+
+    // 6) Compute current cycle usage (calendar month)
+    const cycleStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const cycleEnd = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const bookings = await prisma.liveConversationBooking.findMany({
+      where: {
+        studentId: userId,
+        status: { not: 'CANCELLED' },
+        scheduledAt: { gte: cycleStart, lte: cycleEnd }
+      },
+      include: {
+        conversation: true
+      }
+    });
+
+    let groupCount = 0;
+    let oneToOneCount = 0;
+    let minutesConsumed = 0;
+
+    for (const b of bookings) {
+      const bIsOneToOne = (b.conversation?.maxParticipants ?? 0) <= 2 || b.conversation?.conversationType === 'PRIVATE';
+      if (bIsOneToOne) {
+        oneToOneCount += 1;
+      } else {
+        groupCount += 1;
+      }
+      minutesConsumed += b.duration || 0;
+    }
+
+    // 7) Enforce caps
+    if (isOneToOne) {
+      if (ent.oneToOneSessionsPerMonth >= 0 && oneToOneCount >= ent.oneToOneSessionsPerMonth) {
+        return {
+          allowed: false,
+          reason: 'Monthly 1:1 session limit reached for your plan',
+          redirectUrl: '/subscription-signup',
+          statusCode: 402,
+          details: { used: oneToOneCount, cap: ent.oneToOneSessionsPerMonth }
+        };
+      }
+    } else {
+      if (ent.groupSessionsPerMonth >= 0 && groupCount >= ent.groupSessionsPerMonth) {
+        return {
+          allowed: false,
+          reason: 'Monthly group session limit reached for your plan',
+          redirectUrl: '/subscription-signup',
+          statusCode: 402,
+          details: { used: groupCount, cap: ent.groupSessionsPerMonth }
+        };
+      }
+    }
+
+    if (ent.fairUseMinutesPerMonth > 0 && minutesConsumed >= ent.fairUseMinutesPerMonth) {
+      return {
+        allowed: false,
+        reason: 'Monthly fair-use minutes limit reached for your plan',
+        redirectUrl: '/subscription-signup',
+        statusCode: 402,
+        details: { used: minutesConsumed, cap: ent.fairUseMinutesPerMonth }
+      };
+    }
+
+    // BASIC plan with no institution: allow exactly if entitlements non-zero, otherwise suggest trial
+    const hasAnyAllowance =
+      (isOneToOne ? (ent.oneToOneSessionsPerMonth !== 0) : (ent.groupSessionsPerMonth !== 0)) ||
+      ent.fairUseMinutesPerMonth > 0;
+    if (!hasAnyAllowance) {
+      return {
+        allowed: false,
+        reason: 'Your current plan does not include Live Conversations booking',
+        redirectUrl: '/subscription/trial',
+        statusCode: 402
+      };
+    }
+
+    return { allowed: true };
+  } catch (error) {
+    logger.error?.('Entitlement check failed:', error);
+    return {
+      allowed: false,
+      reason: 'Failed to verify entitlements',
+      statusCode: 500
+    };
+  }
+}

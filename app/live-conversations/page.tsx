@@ -36,6 +36,8 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface LiveConversation {
   id: string
@@ -98,12 +100,20 @@ interface ConversationFilters {
   search: string
 }
 
+type UsageSummary = {
+  group: number
+  oneToOne: number
+  minutes: number
+  ent: { groupCap: number; oneToOneCap: number; minutesCap: number }
+}
+
 export default function LiveConversationsPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [conversations, setConversations] = useState<LiveConversation[]>([])
   const [loading, setLoading] = useState(true)
   const [bookingLoading, setBookingLoading] = useState<string | null>(null)
+  const [usageSummary, setUsageSummary] = useState<UsageSummary | null>(null)
   const [filters, setFilters] = useState<ConversationFilters>({
     language: 'all',
     level: 'all',
@@ -146,6 +156,7 @@ export default function LiveConversationsPage() {
   useEffect(() => {
     if (status === 'authenticated') {
       fetchConversations()
+      fetchUsage()
     } else if (status === 'unauthenticated') {
       setLoading(false)
     }
@@ -176,6 +187,15 @@ export default function LiveConversationsPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const fetchUsage = async () => {
+    try {
+      const res = await fetch('/api/live-conversations/usage')
+      if (!res.ok) return
+      const data = await res.json()
+      setUsageSummary(data)
+    } catch {}
   }
 
   const handleBookConversation = async (conversationId: string) => {
@@ -324,6 +344,15 @@ export default function LiveConversationsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {status === 'authenticated' && usageSummary && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <Alert className="mb-4 bg-blue-50 border-blue-200">
+            <AlertDescription className="text-sm text-blue-800">
+              Live Conversations this cycle — Group: {usageSummary.group}{usageSummary.ent.groupCap >= 0 ? ` / ${usageSummary.ent.groupCap}` : ''}, 1:1: {usageSummary.oneToOne}{usageSummary.ent.oneToOneCap >= 0 ? ` / ${usageSummary.ent.oneToOneCap}` : ''}, Minutes: {usageSummary.minutes}{usageSummary.ent.minutesCap > 0 ? ` / ${usageSummary.ent.minutesCap}` : ''}
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -456,6 +485,35 @@ export default function LiveConversationsPage() {
                           {conversation.conversationType}
                         </Badge>
                       </div>
+                      {usageSummary && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {(() => {
+                            const isOneToOne = (conversation.maxParticipants ?? 0) <= 2 || conversation.conversationType === 'PRIVATE'
+                            if (isOneToOne) {
+                              const cap = usageSummary.ent.oneToOneCap
+                              const left = cap >= 0 ? Math.max(0, cap - usageSummary.oneToOne) : -1
+                              return (
+                                <Badge variant="outline" className="text-xs border-purple-300 text-purple-700">
+                                  {cap >= 0 ? `${left} 1:1 left this month` : '1:1 unlimited'}
+                                </Badge>
+                              )
+                            } else {
+                              const cap = usageSummary.ent.groupCap
+                              const left = cap >= 0 ? Math.max(0, cap - usageSummary.group) : -1
+                              return (
+                                <Badge variant="outline" className="text-xs border-blue-300 text-blue-700">
+                                  {cap >= 0 ? `${left} group left this month` : 'Group unlimited'}
+                                </Badge>
+                              )
+                            }
+                          })()}
+                          {usageSummary.ent.minutesCap > 0 && (
+                            <Badge variant="outline" className="text-xs border-amber-300 text-amber-700">
+                              {Math.max(0, usageSummary.ent.minutesCap - usageSummary.minutes)} min left
+                            </Badge>
+                          )}
+                        </div>
+                      )}
                       <CardTitle className="text-lg">{conversation.title}</CardTitle>
                       {conversation.topic && (
                         <p className="text-sm text-gray-600 mt-1">{conversation.topic}</p>
@@ -524,25 +582,68 @@ export default function LiveConversationsPage() {
                         )}
                       </Button>
                     ) : (
-                      <Button
-                        className="flex-1"
-                        onClick={() => handleBookConversation(conversation.id)}
-                        disabled={bookingLoading === conversation.id || conversation.currentParticipants >= conversation.maxParticipants}
-                      >
-                        {bookingLoading === conversation.id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        ) : conversation.currentParticipants >= conversation.maxParticipants ? (
-                          <>
-                            <AlertCircle className="w-4 h-4 mr-2" />
-                            Full
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-2" />
-                            Join Session
-                          </>
-                        )}
-                      </Button>
+                      (() => {
+                        const isOneToOne = (conversation.maxParticipants ?? 0) <= 2 || conversation.conversationType === 'PRIVATE'
+                        const cap = usageSummary ? (isOneToOne ? usageSummary.ent.oneToOneCap : usageSummary.ent.groupCap) : Infinity
+                        const used = usageSummary ? (isOneToOne ? usageSummary.oneToOne : usageSummary.group) : 0
+                        const left = cap >= 0 ? cap - used : Infinity
+                        const minutesLeft = usageSummary?.ent.minutesCap ? (usageSummary.ent.minutesCap - usageSummary.minutes) : Infinity
+                        const reached = (left <= 0) || (minutesLeft <= 0)
+
+                        const btn = (
+                          <Button
+                            className="flex-1"
+                            onClick={() => handleBookConversation(conversation.id)}
+                            disabled={
+                              bookingLoading === conversation.id ||
+                              conversation.currentParticipants >= conversation.maxParticipants ||
+                              reached
+                            }
+                          >
+                            {bookingLoading === conversation.id ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            ) : conversation.currentParticipants >= conversation.maxParticipants ? (
+                              <>
+                                <AlertCircle className="w-4 h-4 mr-2" />
+                                Full
+                              </>
+                            ) : reached ? (
+                              <>
+                                <AlertCircle className="w-4 h-4 mr-2" />
+                                Limit Reached
+                              </>
+                            ) : (
+                              <>
+                                <Play className="w-4 h-4 mr-2" />
+                                Join Session
+                              </>
+                            )}
+                          </Button>
+                        )
+
+                        if (reached) {
+                          const reason = (() => {
+                            if (left <= 0) return isOneToOne ? 'You have used all your 1:1 sessions this month.' : 'You have used all your group sessions this month.'
+                            if (minutesLeft <= 0) return 'You have used all your fair‑use minutes this month.'
+                            return 'Limit reached.'
+                          })()
+                          return (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  {btn}
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <div className="max-w-xs text-sm">
+                                    {reason}
+                                  </div>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )
+                        }
+                        return btn
+                      })()
                     )}
                     
                     <Button

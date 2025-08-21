@@ -249,6 +249,10 @@ CREATE TABLE live_conversation_bookings (
 - **Custom Branding**: White-label solutions
 - **API Access**: Third-party integrations
 
+### Future Improvements
+
+A staged roadmap covers chat/presence, reminders, waitlists, unified media UI, recording/transcripts alignment, templates, recommendations, institution overrides, reporting, and AI-assisted features. See the detailed roadmap in the full plan: [Future Improvements & Enhancements](./LIVE_CONVERSATIONS_FULL_IMPLEMENTATION_PLAN.md#future-improvements--enhancements).
+
 ## 🧪 **Testing Strategy**
 
 ### **Unit Tests**
@@ -319,3 +323,7 @@ CREATE TABLE live_conversation_bookings (
 - [ ] Production deployment ready
 
 **Status**: ✅ **READY FOR PRODUCTION** 
+
+### Shared Media Engine vs Product Differences
+
+Both Live Classes and Live Conversations run on the same media engine (WebRTC/provider). The differentiation is at the product/policy layer via `sessionType` (CLASS | CONVERSATION), capacity, booking model, entitlements, and recording policies. See the detailed matrix in [Live Conversations — Complete Implementation Plan](./LIVE_CONVERSATIONS_FULL_IMPLEMENTATION_PLAN.md#media-engine-and-product-differentiation). 
