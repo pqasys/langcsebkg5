@@ -81,6 +81,7 @@ export default function StudentLiveClassesPage() {
   const [pendingRating, setPendingRating] = useState<Record<string, number>>({});
   const [submittingRatingId, setSubmittingRatingId] = useState<string | null>(null);
   const [redirectedClass, setRedirectedClass] = useState<LiveClass | null>(null);
+  const [listMode, setListMode] = useState<'group' | 'cap' | 'none'>('group');
   const [enrollmentModal, setEnrollmentModal] = useState<{
     isOpen: boolean;
     liveClass: LiveClass | null;
@@ -91,7 +92,7 @@ export default function StudentLiveClassesPage() {
 
   useEffect(() => {
     fetchLiveClasses();
-  }, [currentPage, searchTerm, languageFilter, levelFilter, activeTab]);
+  }, [currentPage, searchTerm, languageFilter, levelFilter, activeTab, listMode]);
 
   // If redirected with a specific classId, prefilter to show it and highlight enroll CTA
   useEffect(() => {
@@ -130,6 +131,20 @@ export default function StudentLiveClassesPage() {
         ...(languageFilter && languageFilter !== 'all' && { language: languageFilter }),
         ...(levelFilter && levelFilter !== 'all' && { level: levelFilter }),
       });
+
+      // Apply listing mode controls
+      if (listMode === 'group') {
+        params.set('groupByCourse', 'true');
+        params.set('limit', '10');
+      } else if (listMode === 'cap') {
+        params.set('capPerCourse', '2');
+        params.set('limit', '20');
+      } else {
+        // neither: leave defaults
+        params.delete('groupByCourse');
+        params.delete('capPerCourse');
+        params.set('limit', '10');
+      }
 
       const response = await fetch(`/api/student/live-classes?${params}`);
       if (!response.ok) throw new Error('Failed to fetch live classes');
@@ -384,7 +399,7 @@ export default function StudentLiveClassesPage() {
           <CardTitle>Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -421,6 +436,16 @@ export default function StudentLiveClassesPage() {
                 <SelectItem value="BEGINNER">Beginner</SelectItem>
                 <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
                 <SelectItem value="ADVANCED">Advanced</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={listMode} onValueChange={(v) => setListMode(v as 'group' | 'cap' | 'none')}>
+              <SelectTrigger>
+                <SelectValue placeholder="Listing mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="group">Group by Course (recommended)</SelectItem>
+                <SelectItem value="cap">Cap per Course (2 per course)</SelectItem>
+                <SelectItem value="none">Standard Flat List</SelectItem>
               </SelectContent>
             </Select>
           </div>

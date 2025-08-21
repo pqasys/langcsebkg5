@@ -1,0 +1,169 @@
+#!/usr/bin/env tsx
+
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
+type Frequency = 'DAILY' | 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
+
+function addDays(date: Date, days: number): Date {
+  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
+}
+
+function addWeeks(date: Date, weeks: number): Date {
+  return addDays(date, weeks * 7);
+}
+
+function addMonths(date: Date, months: number): Date {
+  const next = new Date(date);
+  next.setMonth(next.getMonth() + months);
+  return next;
+}
+
+function setTimeFromString(base: Date, time: string | undefined): Date {
+  if (!time) return base;
+  const [hh, mm] = time.split(':').map((v) => parseInt(v, 10));
+  const d = new Date(base);
+  d.setHours(isNaN(hh) ? 0 : hh, isNaN(mm) ? 0 : mm, 0, 0);
+  return d;
+}
+
+async function resolveDefaultInstructorId(): Promise<string | null> {
+  const user = await prisma.user.findFirst({
+    where: { role: { in: ['ADMIN', 'INSTRUCTOR' as any] } },
+    select: { id: true }
+  });
+  return user?.id || null;
+}
+
+async function main() {
+  console.log('⏳ Regenerating platform-wide live-online course sessions...');
+
+  const defaultInstructorId = await resolveDefaultInstructorId();
+  if (!defaultInstructorId) {
+    console.error('❌ No default instructor found (ADMIN/INSTRUCTOR). Aborting.');
+    process.exit(1);
+  }
+
+  const courses = await prisma.course.findMany({
+    where: {
+      isPlatformCourse: true,
+      hasLiveClasses: true,
+      marketingType: 'LIVE_ONLINE'
+    },
+    select: {
+      id: true,
+      title: true,
+      startDate: true,
+      endDate: true,
+      maxStudents: true,
+      level: true,
+      framework: true,
+      liveClassFrequency: true,
+      liveClassSchedule: true,
+    }
+  });
+
+  console.log(`🔎 Found ${courses.length} eligible courses.`);
+
+  let totalDeleted = 0;
+  let totalCreated = 0;
+
+  for (const course of courses) {
+    const start = new Date(course.startDate);
+    const end = new Date(course.endDate);
+    const frequency = (course.liveClassFrequency || '').toUpperCase() as Frequency;
+    const schedule: any = course.liveClassSchedule || {};
+    const timeString: string | undefined = schedule?.time; // 'HH:mm'
+    const durationMinutes: number = Number(schedule?.duration) || 60;
+
+    if (!(start instanceof Date) || isNaN(start.getTime()) || !(end instanceof Date) || isNaN(end.getTime()) || start >= end) {
+      console.warn(`⚠️  Skipping course ${course.title} (${course.id}) due to invalid start/end dates.`);
+      continue;
+    }
+
+    console.log(`\n🧹 Removing existing sessions for: ${course.title}`);
+    const delRes = await prisma.videoSession.deleteMany({ where: { courseId: course.id } });
+    console.log(`   • Deleted ${delRes.count} sessions`);
+    totalDeleted += delRes.count;
+
+    if (!['DAILY', 'WEEKLY', 'BIWEEKLY', 'MONTHLY'].includes(frequency)) {
+      console.warn(`⚠️  Unsupported or missing frequency for ${course.title}. Skipping re-creation.`);
+      continue;
+    }
+
+    console.log(`🗓️  Generating ${frequency} sessions for date range ${start.toISOString()} → ${end.toISOString()}`);
+    const sessions: Array<{ startTime: Date; endTime: Date }> = [];
+
+    let cursor = new Date(start);
+    // Set time-of-day if provided
+    cursor = setTimeFromString(cursor, timeString);
+
+    const advance = () => {
+      switch (frequency) {
+        case 'DAILY':
+          cursor = addDays(cursor, 1);
+          break;
+        case 'WEEKLY':
+          cursor = addWeeks(cursor, 1);
+          break;
+        case 'BIWEEKLY':
+          cursor = addWeeks(cursor, 2);
+          break;
+        case 'MONTHLY':
+          cursor = addMonths(cursor, 1);
+          break;
+      }
+      cursor = setTimeFromString(cursor, timeString);
+    };
+
+    while (cursor <= end) {
+      const sessionStart = new Date(cursor);
+      const sessionEnd = new Date(sessionStart.getTime() + durationMinutes * 60 * 1000);
+      sessions.push({ startTime: sessionStart, endTime: sessionEnd });
+      advance();
+    }
+
+    console.log(`   • Planned ${sessions.length} sessions`);
+
+    for (let index = 0; index < sessions.length; index++) {
+      const s = sessions[index];
+      await prisma.videoSession.create({
+        data: {
+          title: `${course.title} - Session ${index + 1}`,
+          description: `Auto-generated session for ${course.title}`,
+          sessionType: 'LIVE_CLASS',
+          language: (course.framework as any) || 'en',
+          level: course.level || 'BEGINNER',
+          maxParticipants: course.maxStudents || 10,
+          startTime: s.startTime,
+          endTime: s.endTime,
+          duration: Math.ceil((s.endTime.getTime() - s.startTime.getTime()) / (1000 * 60)),
+          instructorId: defaultInstructorId,
+          institutionId: null,
+          courseId: course.id,
+          isPublic: true,
+          isRecorded: false,
+          allowChat: true,
+          allowScreenShare: true,
+          allowRecording: false,
+          isAutoGenerated: true,
+          isRecurring: true,
+          sessionNumber: index + 1,
+          status: 'SCHEDULED'
+        }
+      });
+    }
+
+    console.log(`✅ Created ${sessions.length} sessions for ${course.title}`);
+    totalCreated += sessions.length;
+  }
+
+  console.log(`\n✅ Done. Deleted: ${totalDeleted}, Created: ${totalCreated}`);
+}
+
+main().catch((err) => {
+  console.error('❌ Fatal error:', err);
+  process.exit(1);
+});
+
+

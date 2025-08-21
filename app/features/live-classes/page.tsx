@@ -295,6 +295,30 @@ export default function VideoConferencingFeaturePage() {
     fetchLiveClassesData();
   }, [canAccessLiveClasses]);
 
+  // Compute a diversified set of up to 3 classes across sources, ensuring variety by course
+  const featuredClasses = (() => {
+    const combined = [...readyToJoinClasses, ...upcomingClassesData];
+    const seen = new Set<string>();
+    const result: UpcomingClass[] = [];
+    for (const item of combined) {
+      const key = item?.course?.id ? `course:${item.course.id}` : `session:${item.id}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push(item);
+      }
+      if (result.length >= 3) break;
+    }
+    if (result.length < 3) {
+      for (const item of combined) {
+        if (!result.includes(item)) {
+          result.push(item);
+          if (result.length >= 3) break;
+        }
+      }
+    }
+    return result.slice(0, 3);
+  })();
+
   const toggleLiveLike = async (classId: string) => {
     try {
       setTogglingLikeId(classId);
@@ -698,7 +722,7 @@ export default function VideoConferencingFeaturePage() {
            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[...readyToJoinClasses, ...upcomingClassesData].slice(0, 3).map((cls) => (
+            {featuredClasses.map((cls) => (
               <Card key={cls.id} className="hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">

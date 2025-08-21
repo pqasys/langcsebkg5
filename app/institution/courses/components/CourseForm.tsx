@@ -451,6 +451,7 @@ export function CourseForm({
                     <SelectValue placeholder="Select frequency" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="DAILY">Daily</SelectItem>
                     <SelectItem value="WEEKLY">Weekly</SelectItem>
                     <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
                     <SelectItem value="MONTHLY">Monthly</SelectItem>

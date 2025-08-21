@@ -101,6 +101,7 @@ interface CourseFormProps {
   onPricingManagement?: (type: 'WEEKLY' | 'MONTHLY') => void;
   onClose?: () => void;
   institutions?: Institution[];
+  uiWarning?: string;
 }
 
 // Add timeout constant
@@ -115,7 +116,8 @@ export function AdminCourseForm({
   onUnsavedChangesChange,
   onPricingManagement,
   onClose,
-  institutions = []
+  institutions = [],
+  uiWarning
 }: CourseFormProps) {
   const [errors, setErrors] = useState<Partial<Record<keyof CourseFormData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -345,6 +347,23 @@ export function AdminCourseForm({
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
+      {(formData.isPlatformCourse && formData.hasLiveClasses && formData.marketingType === 'LIVE_ONLINE') && (
+        <div className="p-3 rounded-md border border-yellow-300 bg-yellow-50 text-yellow-900">
+          <div className="text-sm font-medium">Live class governance</div>
+          <div className="text-xs mt-1">
+            Changes to Start/End Dates or Live Class Frequency may be blocked if any auto-generated session has enrollments or is not in SCHEDULED status.
+          </div>
+          <ul className="list-disc pl-5 text-xs mt-2 space-y-1">
+            <li>If blocked, cancel or migrate affected sessions, or unenroll participants, then try again.</li>
+            <li>Extending dates will add new sessions; shrinking dates may remove future/earlier sessions when allowed.</li>
+          </ul>
+          {uiWarning && (
+            <div className="mt-2 p-2 rounded border border-red-300 bg-red-50 text-red-800 text-xs">
+              <span className="font-semibold">Blocked:</span> {uiWarning}
+            </div>
+          )}
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="institution">Institution</Label>
@@ -488,6 +507,7 @@ export function AdminCourseForm({
                 <SelectValue placeholder="Select live class frequency" />
               </SelectTrigger>
               <SelectContent className="bg-white">
+                <SelectItem value="DAILY">Daily</SelectItem>
                 <SelectItem value="WEEKLY">Weekly</SelectItem>
                 <SelectItem value="BIWEEKLY">Bi-weekly</SelectItem>
                 <SelectItem value="MONTHLY">Monthly</SelectItem>

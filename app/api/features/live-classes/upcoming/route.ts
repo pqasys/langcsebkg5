@@ -104,8 +104,31 @@ export async function GET(request: NextRequest) {
       })
     );
 
+    // Ensure diversity by course: return unique by courseId first
+    const byCourse = new Map<string, any[]>();
+    for (const c of formattedClasses) {
+      const key = c?.course?.id || `__no_course__:${c.id}`;
+      if (!byCourse.has(key)) byCourse.set(key, []);
+      byCourse.get(key)!.push(c);
+    }
+    const diversified: any[] = [];
+    // Round-robin across courses to avoid dominance
+    let index = 0;
+    while (diversified.length < Math.min(10, formattedClasses.length)) {
+      let added = false;
+      for (const arr of byCourse.values()) {
+        if (arr[index]) {
+          diversified.push(arr[index]);
+          if (diversified.length >= 10) break;
+          added = true;
+        }
+      }
+      if (!added) break;
+      index++;
+    }
+
     return NextResponse.json({
-      upcomingClasses: formattedClasses,
+      upcomingClasses: diversified.slice(0, 10),
     });
   } catch (error) {
     console.error('Error fetching upcoming classes:', error);

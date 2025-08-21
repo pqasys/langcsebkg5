@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+    const groupByCourse = (searchParams.get('groupByCourse') || 'false').toLowerCase() === 'true';
+    const capPerCourse = parseInt(searchParams.get('capPerCourse') || '0');
     const status = searchParams.get('status');
     const language = searchParams.get('language');
     const level = searchParams.get('level');
@@ -31,6 +33,7 @@ export async function GET(request: NextRequest) {
     const courseId = searchParams.get('courseId');
 
     const skip = (page - 1) * limit;
+    const effectiveFetchLimit = (groupByCourse || capPerCourse > 0) ? limit * 5 : limit;
 
     // Get student's subscription and institution enrollment
     let studentSubscription, user;
@@ -135,7 +138,7 @@ export async function GET(request: NextRequest) {
           where,
           orderBy: { startTime: 'asc' },
           skip,
-          take: limit,
+          take: effectiveFetchLimit,
         })
       ]);
     } catch (dbError) {
@@ -204,12 +207,49 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
 
+    // Optional grouping/capping to avoid list domination by high-frequency courses
+    let processed = liveClassesWithEnrollment;
+    if (groupByCourse) {
+      const byCourse = new Map<string, typeof liveClassesWithEnrollment>();
+      for (const c of liveClassesWithEnrollment) {
+        const key = c.courseId || `__no_course__:${c.id}`;
+        if (!byCourse.has(key)) byCourse.set(key, [] as any);
+        (byCourse.get(key) as any).push(c);
+      }
+      const grouped: any[] = [];
+      for (const [key, arr] of byCourse.entries()) {
+        if (key.startsWith('__no_course__')) {
+          grouped.push(arr[0]);
+        } else {
+          const sorted = [...arr].sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+          const first = sorted[0];
+          const nextTwo = sorted.slice(1, 3).map(s => s.startTime);
+          grouped.push({ ...first, upcomingFromCourseCount: sorted.length, nextTimes: nextTwo });
+        }
+      }
+      // Sort by nearest start time
+      processed = grouped.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    } else if (capPerCourse > 0) {
+      const counts = new Map<string, number>();
+      const capped: any[] = [];
+      for (const c of liveClassesWithEnrollment) {
+        const key = c.courseId || `__no_course__:${c.id}`;
+        const count = counts.get(key) || 0;
+        if (count < capPerCourse) {
+          capped.push(c);
+          counts.set(key, count + 1);
+        }
+        if (capped.length >= limit) break;
+      }
+      processed = capped;
+    }
+
     // Filter based on type if specified
-    let filteredClasses = liveClassesWithEnrollment;
+    let filteredClasses = processed;
     if (type === 'enrolled') {
-      filteredClasses = liveClassesWithEnrollment.filter(c => c.isEnrolled);
+      filteredClasses = processed.filter(c => c.isEnrolled);
     } else if (type === 'available') {
-      filteredClasses = liveClassesWithEnrollment.filter(c => !c.isEnrolled);
+      filteredClasses = processed.filter(c => !c.isEnrolled);
     }
 
     return NextResponse.json({

@@ -1079,9 +1079,15 @@ function AdminCoursesContent() {
       toast.success(selectedCourse ? 'Course updated successfully' : 'Course created successfully');
     } catch (error) {
             console.error('Error occurred:', error);
-      toast.error(`Failed to in handleFormSubmit. Please try again or contact support if the problem persists.`);
-      setError(error instanceof Error ? error.message : 'An error occurred while saving the course');
-      toast.error('Failed to save course');
+      const message = error instanceof Error ? error.message : 'An error occurred while saving the course';
+      setError(message);
+      if (/Cannot (change Live Class Frequency|move start date forward|shorten end date)/i.test(message)) {
+        toast.error(message);
+        toast.info('Tip: Cancel or migrate locked sessions (enrolled or not SCHEDULED) before making this change.');
+      } else {
+        toast.error(`Failed to in handleFormSubmit. Please try again or contact support if the problem persists.`);
+        toast.error('Failed to save course');
+      }
       setIsFormSubmitting(false);
       formSubmissionRef.current = false;
     } finally {
@@ -1723,6 +1729,7 @@ function AdminCoursesContent() {
             onPricingManagement={handlePricingManagement}
             onClose={() => handleDialogOpenChange(false)}
             institutions={institutions}
+            uiWarning={error || undefined}
           />
         </DialogContent>
       </UnsavedChangesDialog>

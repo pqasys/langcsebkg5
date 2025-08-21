@@ -107,8 +107,29 @@ export async function GET(request: NextRequest) {
       })
     );
 
+    // Ensure diversity by course: prefer unique course entries first
+    const byCourse = new Map<string, any[]>();
+    for (const c of formattedClasses) {
+      const key = c?.course?.id || `__no_course__:${c.id}`;
+      if (!byCourse.has(key)) byCourse.set(key, []);
+      byCourse.get(key)!.push(c);
+    }
+    const diversified: any[] = [];
+    let index = 0;
+    while (diversified.length < formattedClasses.length) {
+      let added = false;
+      for (const arr of byCourse.values()) {
+        if (arr[index]) {
+          diversified.push(arr[index]);
+          added = true;
+        }
+      }
+      if (!added) break;
+      index++;
+    }
+
     return NextResponse.json({
-      readyToJoinClasses: formattedClasses,
+      readyToJoinClasses: diversified,
     });
   } catch (error) {
     console.error('Error fetching ready to join classes:', error);
