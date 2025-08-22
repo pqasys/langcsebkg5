@@ -2,23 +2,21 @@
 
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useNavigation } from '@/lib/navigation'
-import { BookOpen, Building2, LayoutDashboard, Menu, X, Search, Palette } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
-import { SimpleNotifications } from '@/components/SimpleNotifications'
 import { Button } from '@/components/ui/button'
-import { useInstitutionContext } from '@/components/providers/InstitutionProvider'
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 
 const Navbar = () => {
   const { data: session, status } = useSession()
-  const { institution, loading: institutionLoading } = useInstitutionContext()
+  // Role-specific links moved to SecondaryNav
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
-  const pathname = usePathname()
+  
   const navigate = useNavigation()
 
   useEffect(() => {
@@ -38,7 +36,7 @@ const Navbar = () => {
     }
   }, [session, status]);
 
-  // Note: Admin pages will show navbar but without duplicate links (handled by conditional logic below)
+  // Note: Role-specific links have been moved to SecondaryNav
 
   const getDashboardLink = () => {
     if (!session?.user) return null;
@@ -55,118 +53,21 @@ const Navbar = () => {
     }
   }
 
-  const getInstitutionsLink = () => {
-    if (!session?.user) return null;
-    
-    switch (session.user.role) {
-      case 'ADMIN':
-        return { href: '/admin/institutions', label: 'Institutions' };
-      case 'INSTITUTION':
-        return { href: '/institution/profile', label: 'Profile' };
-      default:
-        return null;
-    }
-  }
+  // Removed role-specific helpers; SecondaryNav will render them
 
-  const getCoursesLink = () => {
-    if (!session?.user) return null;
-    
-    switch (session.user.role) {
-      case 'STUDENT':
-        return { href: '/student/courses', label: 'My Courses' };
-      case 'INSTITUTION':
-        return { href: '/institution/courses', label: 'Courses' };
-      case 'ADMIN':
-        return null; // Don't show Courses link for admin users since it's in the sidebar
-      default:
-        return null;
-    }
-  }
+  
 
-  const getVideoSessionsLink = () => {
-    if (!session?.user) return null;
-    
-    switch (session.user.role) {
-      case 'INSTITUTION':
-        return { href: '/video-sessions/create', label: 'Create Session' };
-      case 'ADMIN':
-        return { href: '/video-sessions/create', label: 'Create Session' };
-      default:
-        return null;
-    }
-  }
+  
 
-  const getStudentsLink = () => {
-    if (!session?.user) return null;
-    
-    switch (session.user.role) {
-      case 'INSTITUTION':
-        return { href: '/institution/students', label: 'Students' };
-      case 'ADMIN':
-        return { href: '/admin/users', label: 'Users' };
-      default:
-        return null;
-    }
-  }
+  
 
-  const getInstructorsLink = () => {
-    if (!session?.user) return null;
-    
-    switch (session.user.role) {
-      case 'INSTITUTION':
-        return { href: '/institution/instructors', label: 'Instructors' };
-      case 'ADMIN':
-        return { href: '/admin/instructors', label: 'Instructors' };
-      default:
-        return null;
-    }
-  }
+  
 
-  const getSettingsLink = () => {
-    if (!session?.user) return null;
-    
-    switch (session.user.role) {
-      case 'STUDENT':
-        return { href: '/student/settings', label: 'Settings' };
-      case 'INSTITUTION':
-        return { href: '/institution/settings', label: 'Settings' };
-      case 'ADMIN':
-        return { href: '/admin/settings', label: 'Settings' };
-      default:
-        return null;
-    }
-  }
+  
 
-  const getDesignToolkitLink = () => {
-    if (!session?.user) return null;
-    
-    switch (session.user.role) {
-      case 'INSTITUTION':
-        return { href: '/admin/design-configs', label: 'Design Toolkit' };
-      case 'ADMIN':
-        return { href: '/admin/design-configs', label: 'Design Toolkit' };
-      default:
-        return null;
-    }
-  }
+  
 
-  const getAdminLinks = () => {
-    if (session?.user?.role !== 'ADMIN') return [];
-    
-    return [
-      { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/admin/users', label: 'Users', icon: Building2 },
-      { href: '/admin/instructors', label: 'Instructors', icon: Building2 },
-      { href: '/admin/courses', label: 'Courses', icon: BookOpen },
-      { href: '/admin/institutions', label: 'Institutions', icon: Building2 },
-      { href: '/admin/categories', label: 'Categories', icon: BookOpen },
-      { href: '/admin/tags', label: 'Tags', icon: BookOpen },
-      { href: '/admin/design-configs', label: 'Design Toolkit', icon: Palette },
-      { href: '/admin/performance', label: 'Performance', icon: LayoutDashboard },
-      { href: '/admin/stats', label: 'Stats', icon: LayoutDashboard },
-      { href: '/admin/settings', label: 'Settings', icon: LayoutDashboard },
-    ];
-  }
+  
 
   const handleSignOut = async () => {
     console.log('Navbar - handleSignOut called');
@@ -269,83 +170,12 @@ const Navbar = () => {
           
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {/* Desktop Actions - Full on large screens */}
                  <div className="hidden 2xl:flex items-center space-x-4 flex-shrink-0">
-            <Link
-              href="/search"
-              className="text-gray-500 hover:text-gray-700 p-2 rounded-md text-sm font-medium flex-shrink-0"
-              title="Search"
-            >
-              <Search className="h-5 w-5" />
-            </Link>
-            {getCoursesLink() && (
-              <Link
-                href={getCoursesLink()!.href}
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                {getCoursesLink()!.label}
-              </Link>
-            )}
-            {getVideoSessionsLink() && (
-              <Link
-                href={getVideoSessionsLink()!.href}
-                className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                {getVideoSessionsLink()!.label}
-              </Link>
-            )}
+            {/* Actions moved to SecondaryNav */}
             {status === 'authenticated' && session ? (
               <div className="flex items-center space-x-4">
-                {/* Notifications for authenticated users (except admin) */}
-                {session.user.role !== 'ADMIN' && <SimpleNotifications />}
-                
-                {session.user.role === 'INSTITUTION' ? (
-                  (session.user.institutionApproved || institution?.isApproved) ? (
-                    <>
-                      <Link
-                        href="/institution/dashboard"
-                        className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                      >
-                        Dashboard
-                      </Link>
-                      {getDesignToolkitLink() && (
-                        <Link
-                          href={getDesignToolkitLink()!.href}
-                          className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                          {getDesignToolkitLink()!.label}
-                        </Link>
-                      )}
-                    </>
-                  ) : (
-                    <Link
-                      href="/awaiting-approval"
-                      className="bg-yellow-100 text-yellow-800 px-3 py-2 rounded-md text-sm font-medium hover:bg-yellow-200"
-                    >
-                      Awaiting Approval
-                    </Link>
-                  )
-                ) : (
-                  <>
-                    <Link
-                      href={getDashboardLink()}
-                      className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Dashboard
-                    </Link>
-                    {getDesignToolkitLink() && (
-                      <Link
-                        href={getDesignToolkitLink()!.href}
-                        className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                      >
-                        {getDesignToolkitLink()!.label}
-                      </Link>
-                    )}
-                  </>
-                )}
-                <Button onClick={handleSignOut} variant="outline" size="sm" data-testid="sign-out-button">
-                  Sign Out
-                </Button>
+                <Button onClick={handleSignOut} variant="outline" size="sm" data-testid="sign-out-button">Sign Out</Button>
               </div>
-                          ) : mounted ? (
+            ) : mounted ? (
               <div className="flex items-center space-x-4">
                 <Button variant="outline" size="sm" onClick={handleSignIn}>
                   Sign In
@@ -461,61 +291,10 @@ const Navbar = () => {
             <div className="pt-4 pb-3 border-t border-gray-200">
               {status === 'authenticated' && session ? (
                 <div className="space-y-2">
-                  {/* Real-time notifications for authenticated users (except admin) */}
                   {session.user.role !== 'ADMIN' && (
                     <div className="px-3 py-2">
                       <SimpleNotifications />
                     </div>
-                  )}
-                  
-                  {session.user.role === 'INSTITUTION' ? (
-                    (session.user.institutionApproved || institution?.isApproved) ? (
-                      <>
-                        <Link
-                          href="/institution/dashboard"
-                          className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                          onClick={closeMobileMenu}
-                        >
-                          Dashboard
-                        </Link>
-                        {getDesignToolkitLink() && (
-                          <Link
-                            href={getDesignToolkitLink()!.href}
-                            className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                            onClick={closeMobileMenu}
-                          >
-                            {getDesignToolkitLink()!.label}
-                          </Link>
-                        )}
-                      </>
-                    ) : (
-                      <Link
-                        href="/awaiting-approval"
-                        className="block px-3 py-2 text-base font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 rounded-md"
-                        onClick={closeMobileMenu}
-                      >
-                        Awaiting Approval
-                      </Link>
-                    )
-                  ) : (
-                    <>
-                      <Link
-                        href={getDashboardLink()}
-                        className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                        onClick={closeMobileMenu}
-                      >
-                        Dashboard
-                      </Link>
-                      {getDesignToolkitLink() && (
-                        <Link
-                          href={getDesignToolkitLink()!.href}
-                          className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                          onClick={closeMobileMenu}
-                        >
-                          {getDesignToolkitLink()!.label}
-                        </Link>
-                      )}
-                    </>
                   )}
                   <Button 
                     onClick={() => {

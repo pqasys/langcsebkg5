@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster as SonnerToaster } from 'sonner';
 import { generateOrganizationStructuredData } from "@/lib/seo-config";
+import SecondaryNav from "../components/SecondaryNav";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -153,6 +154,7 @@ export default function RootLayout({
           <AuthProvider>
             <InstitutionProvider>
               <Navbar />
+              <SecondaryNav />
               <main className="min-h-screen">
                 {children}
               </main>
