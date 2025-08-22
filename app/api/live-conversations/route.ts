@@ -44,45 +44,10 @@ export async function GET(request: NextRequest) {
       whereClause.isFree = isFree === 'true';
     }
 
-    // Get conversations
+    // Get conversations (base rows only)
     const [conversations, total] = await Promise.all([
       prisma.liveConversation.findMany({
         where: whereClause,
-        include: {
-          instructor: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
-          host: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              image: true,
-            },
-          },
-          participants: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  image: true,
-                },
-              },
-            },
-          },
-          _count: {
-            select: {
-              participants: true,
-              bookings: true,
-            },
-          },
-        },
         orderBy: [
           { startTime: 'asc' },
           { createdAt: 'desc' },
@@ -95,26 +60,79 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
+    // Collect IDs for batch queries
+    const conversationIds = conversations.map((c) => c.id);
+    const hostIds = conversations.map((c) => c.hostId);
+    const instructorIds = conversations
+      .map((c) => c.instructorId)
+      .filter((id): id is string => !!id);
+
+    // Fetch participants across all conversations
+    const participantRows = await prisma.liveConversationParticipant.findMany({
+      where: { conversationId: { in: conversationIds } },
+    });
+    const participantUserIds = Array.from(new Set(participantRows.map((p) => p.userId)));
+
+    // Fetch user records for hosts, instructors, and participants in one go
+    const userIds = Array.from(new Set([...hostIds, ...instructorIds, ...participantUserIds]));
+    const users = userIds.length
+      ? await prisma.user.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, name: true, email: true, image: true },
+        })
+      : [];
+    const userById = new Map(users.map((u) => [u.id, u]));
+
+    // Compute counts via groupBy
+    const [participantsCounts, bookingsCounts] = await Promise.all([
+      prisma.liveConversationParticipant.groupBy({
+        by: ['conversationId'],
+        where: { conversationId: { in: conversationIds } },
+        _count: { id: true },
+      }),
+      prisma.liveConversationBooking.groupBy({
+        by: ['conversationId'],
+        where: { conversationId: { in: conversationIds } },
+        _count: { id: true },
+      }),
+    ]);
+    const participantsCountByConv = new Map(participantsCounts.map((r) => [r.conversationId, r._count.id]));
+    const bookingsCountByConv = new Map(bookingsCounts.map((r) => [r.conversationId, r._count.id]));
+
     // Check if user is booked and map DTO shape
     const conversationsWithBookingStatus = await Promise.all(
       conversations.map(async (conversation) => {
-        const userBooking = await prisma.liveConversationBooking.findUnique({
-          where: {
-            conversationId_userId: {
-              conversationId: conversation.id,
-              userId: session.user.id,
-            },
-          },
+        const userBooking = await prisma.liveConversationBooking.findFirst({
+          where: { conversationId: conversation.id, userId: session.user.id },
         });
 
-        const dto = mapConversationRow(conversation);
+        const dto = mapConversationRow(conversation as any);
+
+        const instructor = conversation.instructorId ? userById.get(conversation.instructorId) || null : null;
+        const host = userById.get(conversation.hostId) || null;
+
+        const participantsForConversation = participantRows
+          .filter((p) => p.conversationId === conversation.id)
+          .map((p) => ({
+            ...p,
+            user: userById.get(p.userId)
+              ? {
+                  id: userById.get(p.userId)!.id,
+                  name: userById.get(p.userId)!.name,
+                  image: userById.get(p.userId)!.image,
+                }
+              : null,
+          }));
 
         return {
           ...dto,
-          instructor: conversation.instructor || null,
-          host: conversation.host,
-          participants: conversation.participants,
-          _count: conversation._count,
+          instructor,
+          host,
+          participants: participantsForConversation,
+          _count: {
+            participants: participantsCountByConv.get(conversation.id) || 0,
+            bookings: bookingsCountByConv.get(conversation.id) || 0,
+          },
           isBooked: !!userBooking,
           bookingStatus: userBooking?.status || null,
         };
@@ -167,6 +185,9 @@ export async function POST(request: NextRequest) {
       grammarPoints,
       conversationPrompts,
       instructorId,
+      requiresSubscription,
+      allowedStudentTiers,
+      allowedInstitutionTiers,
     } = body;
 
     // Validate required fields
@@ -236,6 +257,10 @@ export async function POST(request: NextRequest) {
         instructorId: instructorId || null,
         hostId: session.user.id,
         status: 'SCHEDULED',
+        // Optional gating fields persisted if present in schema
+        requiresSubscription: !!requiresSubscription,
+        allowedStudentTiers: Array.isArray(allowedStudentTiers) ? allowedStudentTiers : undefined,
+        allowedInstitutionTiers: Array.isArray(allowedInstitutionTiers) ? allowedInstitutionTiers : undefined,
       },
       include: {
         instructor: {

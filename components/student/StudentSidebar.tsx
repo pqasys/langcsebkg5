@@ -18,7 +18,8 @@ import {
   Award,
   Calendar,
   Play,
-  Video
+  Video,
+  MessageCircle
 } from 'lucide-react';
 
 const menuItems = [
@@ -33,6 +34,12 @@ const menuItems = [
     href: '/student/courses',
     icon: BookOpen,
     description: 'Browse and access your enrolled courses'
+  },
+  {
+    title: 'Live Conversations',
+    href: '/live-conversations',
+    icon: MessageCircle,
+    description: 'Practice in real-time with peers and instructors'
   },
   {
     title: 'Live Classes',

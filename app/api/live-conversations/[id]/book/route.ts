@@ -22,27 +22,12 @@ export async function POST(
     }
 
     const conversationId = params.id;
-    const body = await request.json();
-    const { notes } = body;
+    const body = await request.json().catch(() => ({}));
+    const { notes } = body || {};
 
-    // Get the conversation
+    // Get the conversation (base row)
     const conversation = await prisma.liveConversation.findUnique({
       where: { id: conversationId },
-      include: {
-        host: true,
-        instructor: true,
-        participants: {
-          include: {
-            user: true
-          }
-        },
-        bookings: {
-          where: {
-            studentId: session.user.id,
-            status: { not: 'CANCELLED' }
-          }
-        }
-      }
     });
 
     if (!conversation) {
@@ -55,7 +40,10 @@ export async function POST(
     }
 
     // Check if user is already booked
-    if (conversation.bookings.length > 0) {
+    const existingBooking = await prisma.liveConversationBooking.findFirst({
+      where: { conversationId, userId: session.user.id, status: { not: 'CANCELLED' } },
+    });
+    if (existingBooking) {
       return NextResponse.json({ error: 'You are already booked for this conversation' }, { status: 400 });
     }
 
@@ -81,26 +69,14 @@ export async function POST(
     const booking = await prisma.liveConversationBooking.create({
       data: {
         conversationId,
-        studentId: session.user.id,
-        instructorId: conversation.instructorId || conversation.hostId,
-        scheduledAt: conversation.startTime,
-        duration: conversation.duration,
-        status: 'PENDING',
-        price: conversation.price,
-        currency: 'USD',
+        userId: session.user.id,
+        status: conversation.isFree ? 'CONFIRMED' : 'PENDING',
+        bookedAt: new Date(),
         paymentStatus: conversation.isFree ? 'PAID' : 'PENDING',
-        notes: notes || null
+        amount: Number(conversation.price || 0),
+        currency: 'USD',
+        metadata: notes ? { notes } : undefined,
       },
-      include: {
-        conversation: {
-          include: {
-            host: true,
-            instructor: true
-          }
-        },
-        student: true,
-        instructor: true
-      }
     });
 
     // Update conversation participant count
@@ -120,7 +96,7 @@ export async function POST(
         userId: session.user.id,
         status: 'JOINED',
         isHost: false,
-        isInstructor: false
+        isInstructor: false,
       }
     });
 
@@ -157,12 +133,9 @@ export async function DELETE(
     const booking = await prisma.liveConversationBooking.findFirst({
       where: {
         conversationId,
-        studentId: session.user.id,
-        status: { not: 'CANCELLED' }
+        userId: session.user.id,
+        status: { not: 'CANCELLED' },
       },
-      include: {
-        conversation: true
-      }
     });
 
     if (!booking) {
@@ -171,7 +144,11 @@ export async function DELETE(
 
     // Check if conversation is too close to start time (e.g., within 24 hours)
     const now = new Date();
-    const timeUntilStart = booking.conversation.startTime.getTime() - now.getTime();
+    const convo = await prisma.liveConversation.findUnique({ where: { id: conversationId } });
+    if (!convo) {
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+    }
+    const timeUntilStart = convo.startTime.getTime() - now.getTime();
     const hoursUntilStart = timeUntilStart / (1000 * 60 * 60);
 
     if (hoursUntilStart < 24) {
@@ -186,8 +163,7 @@ export async function DELETE(
       data: {
         status: 'CANCELLED',
         cancelledAt: new Date(),
-        cancelledBy: session.user.id
-      }
+      },
     });
 
     // Update conversation participant count
@@ -280,9 +256,39 @@ async function checkEntitlementsForBooking(
   details?: Record<string, any>;
 }> {
   try {
+    // 0) Per-session gating overrides
+    if (conversation?.requiresSubscription) {
+      const subscription = await prisma.studentSubscription.findUnique({ where: { studentId: userId } })
+      const planType = subscription?.planType || null
+      if (!planType) {
+        return { allowed: false, reason: 'Subscription required to book this session', redirectUrl: '/subscription-signup', statusCode: 402 }
+      }
+      if (Array.isArray(conversation.allowedStudentTiers) && conversation.allowedStudentTiers.length > 0) {
+        if (!conversation.allowedStudentTiers.includes(planType)) {
+          return { allowed: false, reason: 'Your plan does not include access to this session', redirectUrl: '/subscription-signup', statusCode: 402, details: { allowed: conversation.allowedStudentTiers } }
+        }
+      }
+      // Institution gating
+      if (Array.isArray(conversation.allowedInstitutionTiers) && conversation.allowedInstitutionTiers.length > 0) {
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { institutionId: true } })
+        if (user?.institutionId) {
+          try {
+            const instStatus = await SubscriptionCommissionService.getSubscriptionStatus(user.institutionId)
+            const instPlan = instStatus.currentPlan as string | undefined
+            if (!instPlan || !conversation.allowedInstitutionTiers.includes(instPlan)) {
+              return { allowed: false, reason: 'Your institution plan does not allow this session', redirectUrl: '/subscription-signup', statusCode: 402, details: { allowed: conversation.allowedInstitutionTiers } }
+            }
+          } catch {}
+        } else {
+          // Not institution-linked but session expects institution tiers
+          return { allowed: false, reason: 'Institution plan required to access this session', redirectUrl: '/subscription-signup', statusCode: 402 }
+        }
+      }
+    }
+
     // 1) Resolve student subscription plan type (if any)
     const subscription = await prisma.studentSubscription.findUnique({
-      where: { studentId: userId }
+      where: { studentId: userId },
     });
     const studentPlanType = subscription?.planType || 'BASIC';
     const studentEnt = getStudentLiveConversationEntitlements(studentPlanType);
@@ -290,7 +296,7 @@ async function checkEntitlementsForBooking(
     // 2) Resolve institution tier defaults (if enrolled)
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { institutionId: true }
+      select: { institutionId: true },
     });
     let instEnt: LiveConversationsEntitlements = {
       groupSessionsPerMonth: 0,
@@ -339,27 +345,29 @@ async function checkEntitlementsForBooking(
 
     const bookings = await prisma.liveConversationBooking.findMany({
       where: {
-        studentId: userId,
+        userId,
         status: { not: 'CANCELLED' },
-        scheduledAt: { gte: cycleStart, lte: cycleEnd }
+        bookedAt: { gte: cycleStart, lte: cycleEnd },
       },
-      include: {
-        conversation: true
-      }
+      select: { conversationId: true },
     });
+
+    const bookedConversationIds = Array.from(new Set(bookings.map((b) => b.conversationId)));
+    const bookedConversations = bookedConversationIds.length
+      ? await prisma.liveConversation.findMany({ where: { id: { in: bookedConversationIds } } })
+      : [];
 
     let groupCount = 0;
     let oneToOneCount = 0;
     let minutesConsumed = 0;
-
-    for (const b of bookings) {
-      const bIsOneToOne = (b.conversation?.maxParticipants ?? 0) <= 2 || b.conversation?.conversationType === 'PRIVATE';
+    for (const conv of bookedConversations) {
+      const bIsOneToOne = (conv.maxParticipants ?? 0) <= 2 || conv.conversationType === 'PRIVATE';
       if (bIsOneToOne) {
         oneToOneCount += 1;
       } else {
         groupCount += 1;
       }
-      minutesConsumed += b.duration || 0;
+      minutesConsumed += conv.duration || 0;
     }
 
     // 7) Enforce caps

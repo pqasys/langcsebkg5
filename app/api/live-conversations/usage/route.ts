@@ -39,21 +39,28 @@ export async function GET(request: NextRequest) {
 
     const bookings = await prisma.liveConversationBooking.findMany({
       where: {
-        studentId: userId,
+        userId: userId,
         status: { not: 'CANCELLED' },
-        scheduledAt: { gte: cycleStart, lte: cycleEnd },
       },
-      include: { conversation: true },
+      select: { conversationId: true },
     })
+
+    const convIds = Array.from(new Set(bookings.map(b => b.conversationId)))
+    const conversations = convIds.length
+      ? await prisma.liveConversation.findMany({
+          where: { id: { in: convIds }, startTime: { gte: cycleStart, lte: cycleEnd } },
+          select: { id: true, maxParticipants: true, conversationType: true, duration: true },
+        })
+      : []
 
     let group = 0
     let oneToOne = 0
     let minutes = 0
-    for (const b of bookings) {
-      const isOneToOne = (b.conversation?.maxParticipants ?? 0) <= 2 || b.conversation?.conversationType === 'PRIVATE'
+    for (const c of conversations) {
+      const isOneToOne = (c.maxParticipants ?? 0) <= 2 || c.conversationType === 'PRIVATE'
       if (isOneToOne) oneToOne += 1
       else group += 1
-      minutes += b.duration || 0
+      minutes += c.duration || 0
     }
 
     return NextResponse.json({

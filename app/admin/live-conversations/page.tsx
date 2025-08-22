@@ -37,7 +37,7 @@ export default function AdminLiveConversationsPage() {
     const load = async () => {
       try {
         setLoading(true)
-        const res = await fetch('/api/live-conversations')
+        const res = await fetch('/api/admin/live-conversations', { cache: 'no-store' })
         const data = await res.json()
         if (data.success) setItems(data.conversations)
       } finally {
@@ -64,8 +64,18 @@ export default function AdminLiveConversationsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((c) => (
             <Card key={c.id}>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg">{c.title}</CardTitle>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => router.push(`/admin/live-conversations/${c.id}/edit`)}>Edit</Button>
+                  <Button size="sm" variant="destructive" onClick={async () => {
+                    if (!confirm('Cancel this conversation?')) return
+                    const res = await fetch(`/api/admin/live-conversations/${c.id}/cancel`, { method: 'POST' })
+                    if (res.ok) {
+                      router.refresh()
+                    }
+                  }}>Cancel</Button>
+                </div>
               </CardHeader>
               <CardContent className="text-sm text-gray-700 space-y-1">
                 <div className="flex items-center gap-2"><Calendar className="w-4 h-4" />{new Date(c.startTime).toLocaleString()}</div>

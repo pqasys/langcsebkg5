@@ -90,8 +90,19 @@ export default function LiveConversationDetailPage({ params }: { params: { id: s
         try {
           const res = await fetch(`/api/live-conversations/${conversation.id}/book`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
           const data = await res.json()
-          if (data.success) {
+          if (res.ok && data.success) {
             router.push('/live-conversations')
+          } else {
+            if (data?.redirectUrl) {
+              // Use toast + CTA before redirect
+              try { (await import('sonner')).toast?.info('This session requires an upgraded plan.', { action: { label: 'Upgrade', onClick: () => router.push(data.redirectUrl) } }) } catch {}
+              router.push(data.redirectUrl)
+              return
+            }
+            // Fallback: show reason inline if available and link to docs
+            const reason = data?.error || 'Unable to book this session under your current plan.'
+            try { (await import('sonner')).toast?.error(reason, { action: { label: 'Why?', onClick: () => router.push('/subscription-signup') } }) } catch {}
+            alert(reason + '\nSee: Live Conversations access — subscription limits.')
           }
         } finally {
           setJoining(false)

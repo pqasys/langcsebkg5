@@ -43,6 +43,9 @@ interface ConversationForm {
   vocabularyList: string[]
   grammarPoints: string[]
   conversationPrompts: string[]
+  requiresSubscription?: boolean
+  allowedStudentTiers?: string[]
+  allowedInstitutionTiers?: string[]
 }
 
 export default function CreateConversationPage() {
@@ -67,6 +70,9 @@ export default function CreateConversationPage() {
     vocabularyList: [],
     grammarPoints: [],
     conversationPrompts: []
+    ,requiresSubscription: false
+    ,allowedStudentTiers: []
+    ,allowedInstitutionTiers: []
   })
 
   const languages = [
@@ -453,6 +459,77 @@ export default function CreateConversationPage() {
                   onCheckedChange={(checked) => setForm({ ...form, isPublic: checked })}
                 />
                 <Label htmlFor="isPublic">Public Session (visible to all users)</Label>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Access & Subscription Gating */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <GraduationCap className="w-5 h-5" />
+                Access & Subscription
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="requiresSubscription"
+                  checked={!!form.requiresSubscription}
+                  onCheckedChange={(checked) => setForm({ ...form, requiresSubscription: checked })}
+                />
+                <Label htmlFor="requiresSubscription">Requires active subscription to book</Label>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label className="mb-2 block">Allowed Student Tiers</Label>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {['BASIC','PREMIUM','PRO'].map((tier) => {
+                      const checked = form.allowedStudentTiers?.includes(tier) || false
+                      return (
+                        <label key={tier} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => {
+                              const next = new Set(form.allowedStudentTiers)
+                              if (e.target.checked) next.add(tier)
+                              else next.delete(tier)
+                              setForm({ ...form, allowedStudentTiers: Array.from(next) })
+                            }}
+                          />
+                          <span>{tier}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Leave empty to allow all student tiers (if subscription is required).</p>
+                </div>
+                <div>
+                  <Label className="mb-2 block">Allowed Institution Tiers</Label>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    {['STARTER','PROFESSIONAL','ENTERPRISE'].map((tier) => {
+                      const checked = form.allowedInstitutionTiers?.includes(tier) || false
+                      return (
+                        <label key={tier} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => {
+                              const next = new Set(form.allowedInstitutionTiers)
+                              if (e.target.checked) next.add(tier)
+                              else next.delete(tier)
+                              setForm({ ...form, allowedInstitutionTiers: Array.from(next) })
+                            }}
+                          />
+                          <span>{tier}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Leave empty to allow all institution tiers.</p>
+                </div>
               </div>
             </CardContent>
           </Card>

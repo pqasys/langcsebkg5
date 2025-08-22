@@ -1,6 +1,9 @@
 import { Suspense } from 'react';
 import AdminSidebar from '@/components/admin/Sidebar';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function AdminLayout({
   children,
 }: {

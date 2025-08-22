@@ -761,6 +761,11 @@ model LiveConversation {
   updatedAt           DateTime @default(now()) @updatedAt
   metadata            Json?
 
+  // Per-session subscription gating
+  requiresSubscription   Boolean @default(false)
+  allowedStudentTiers    Json?
+  allowedInstitutionTiers Json?
+
   @@index([instructorId])
   @@index([hostId])
   @@index([startTime])
