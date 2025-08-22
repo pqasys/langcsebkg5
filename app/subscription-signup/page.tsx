@@ -102,6 +102,7 @@ export default function SubscriptionSignupPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [showEnrollmentConfirmation, setShowEnrollmentConfirmation] = useState(false);
   const [pendingCourseData, setPendingCourseData] = useState<any>(null);
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
 
   // Handle URL parameters
   useEffect(() => {
@@ -112,6 +113,7 @@ export default function SubscriptionSignupPage() {
       const billing = urlParams.get('billing');
       const courseId = urlParams.get('courseId');
       const fromEnrollment = urlParams.get('fromEnrollment');
+      const next = urlParams.get('next');
 
       if (type === 'institution') {
         setIsInstitution(true);
@@ -122,6 +124,9 @@ export default function SubscriptionSignupPage() {
       if (plan) {
         setSelectedPlan(plan);
         setShowPaymentForm(true);
+      }
+      if (next) {
+        setNextUrl(next);
       }
       
       // Store course ID and enrollment flag for later use
@@ -281,6 +286,15 @@ export default function SubscriptionSignupPage() {
         planName: plan?.name
       });
       
+      // Redirect to nextUrl if provided (e.g., /live-conversations?view=calendar or /live-conversations/{id}/enter)
+      if (nextUrl) {
+        sessionStorage.removeItem('fromEnrollment');
+        sessionStorage.removeItem('pendingCourseEnrollment');
+        router.push(nextUrl);
+        toast.success(successMessage);
+        return;
+      }
+
       if (fromEnrollment === 'true' && pendingCourseId) {
         console.log('User came from course enrollment, fetching course details...');
         console.log('🔍 About to fetch course:', pendingCourseId);

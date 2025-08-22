@@ -92,6 +92,7 @@ model Course {
   courseTags CourseTag[]
   videoSessions VideoSession[]
   enrollments StudentCourseEnrollment[]
+  completions StudentCourseCompletion[]
 
   @@unique([title, institutionId], map: "Course_title_institutionId_key")
   @@index([categoryId], map: "Course_categoryId_fkey")
@@ -126,6 +127,8 @@ model user {
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   videoSessions VideoSession[]
+  liveConversationsHosted     LiveConversation[]        @relation("LiveConversationHost")
+  liveConversationsInstructed LiveConversation[]        @relation("LiveConversationInstructor")
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -300,6 +303,9 @@ model StudentCourseCompletion {
   status    String   @db.VarChar(20)
   studentId String   @db.VarChar(36)
   updatedAt DateTime @default(now()) @updatedAt
+
+  // Relations
+  course    Course   @relation(fields: [courseId], references: [id])
 
   @@index([studentId], map: "StudentCourseCompletion_studentId_fkey")
   @@index([courseId], map: "StudentCourseCompletion_courseId_fkey")
@@ -766,6 +772,12 @@ model LiveConversation {
   allowedStudentTiers    Json?
   allowedInstitutionTiers Json?
 
+  // Relations
+  host       user     @relation("LiveConversationHost", fields: [hostId], references: [id])
+  instructor user?    @relation("LiveConversationInstructor", fields: [instructorId], references: [id])
+  participants LiveConversationParticipant[]
+  bookings     LiveConversationBooking[]
+
   @@index([instructorId])
   @@index([hostId])
   @@index([startTime])
@@ -791,6 +803,9 @@ model LiveConversationParticipant {
   messageCount   Int       @default(0)
   feedback       Json?
   metadata       Json?
+
+  // Relations
+  conversation LiveConversation @relation(fields: [conversationId], references: [id])
 
   @@unique([conversationId, userId])
   @@index([conversationId])
@@ -835,6 +850,9 @@ model LiveConversationBooking {
   transactionId  String?   @db.VarChar(255)
   refundReason   String?   @db.Text
   metadata       Json?
+
+  // Relations
+  conversation LiveConversation @relation(fields: [conversationId], references: [id])
 
   @@unique([conversationId, userId])
   @@index([conversationId])

@@ -39,12 +39,12 @@ export async function POST(
       return NextResponse.json({ error: 'Conversation is not available for booking' }, { status: 400 });
     }
 
-    // Check if user is already booked
+    // Check if user is already booked (idempotent success)
     const existingBooking = await prisma.liveConversationBooking.findFirst({
       where: { conversationId, userId: session.user.id, status: { not: 'CANCELLED' } },
     });
     if (existingBooking) {
-      return NextResponse.json({ error: 'You are already booked for this conversation' }, { status: 400 });
+      return NextResponse.json({ success: true, booking: existingBooking, message: 'Already booked' });
     }
 
     // Check if conversation is full

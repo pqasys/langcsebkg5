@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useSubscription } from '@/hooks/useSubscription'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -107,9 +108,12 @@ type UsageSummary = {
   ent: { groupCap: number; oneToOneCap: number; minutesCap: number }
 }
 
-export default function LiveConversationsPage() {
+function LiveConversationsInner() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isCalendarView = (searchParams?.get('view') || '').toLowerCase() === 'calendar'
+  const { canAccessLiveClasses } = useSubscription()
   const [conversations, setConversations] = useState<LiveConversation[]>([])
   const [loading, setLoading] = useState(true)
   const [bookingLoading, setBookingLoading] = useState<string | null>(null)
@@ -207,21 +211,14 @@ export default function LiveConversationsPage() {
 
     try {
       setBookingLoading(conversationId)
-      const response = await fetch(`/api/live-conversations/${conversationId}/book`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          paymentMethod: 'FREE',
-        }),
-      })
+      const response = await fetch(`/api/live-conversations/${conversationId}/join`, { method: 'POST' })
 
       const data = await response.json()
 
-      if (data.success) {
-        toast.success('Successfully booked conversation!')
-        fetchConversations() // Refresh the list
+      if (data.success && data.videoSessionId) {
+        toast.success('Opening session...')
+        router.push(`/video-session/${data.videoSessionId}`)
+        return
       } else {
         toast.error(data.error || 'Failed to book conversation')
       }
@@ -377,6 +374,12 @@ export default function LiveConversationsPage() {
                 <BookOpen className="w-4 h-4 mr-2" />
                 My Bookings
               </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push(isCalendarView ? '/live-conversations' : '/live-conversations?view=calendar')}
+              >
+                {isCalendarView ? 'List View' : 'Calendar View'}
+              </Button>
             </div>
           </div>
         </div>
@@ -468,6 +471,46 @@ export default function LiveConversationsPage() {
               <Plus className="w-4 h-4 mr-2" />
               Create Conversation
             </Button>
+          </div>
+        ) : isCalendarView ? (
+          // Calendar view: group sessions by date with simple day cards
+          <div className="space-y-6">
+            {Object.entries(
+              conversations.reduce((acc: Record<string, LiveConversation[]>, conv) => {
+                const d = new Date(conv.startTime)
+                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+                acc[key] = acc[key] || []
+                acc[key].push(conv)
+                return acc
+              }, {})
+            ).sort(([a],[b]) => (a > b ? 1 : -1)).map(([dateKey, items]) => (
+              <div key={dateKey}>
+                <div className="text-sm font-semibold text-gray-700 mb-2">
+                  {new Date(dateKey).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {items.map((conversation) => (
+                    <Card key={conversation.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-base line-clamp-2">{conversation.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm text-gray-700 space-y-2">
+                        <div className="flex items-center"><Clock className="w-4 h-4 mr-2" />{formatDateTime(conversation.startTime)}</div>
+                        <div className="flex items-center"><Users className="w-4 h-4 mr-2" />{conversation.currentParticipants}/{conversation.maxParticipants}</div>
+                        <div className="flex gap-2 pt-2">
+                          <Button size="sm" className="flex-1" onClick={() => handleBookConversation(conversation.id)}>
+                            <Play className="w-4 h-4 mr-1" /> Join
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => router.push(`/live-conversations/${conversation.id}`)}>
+                            Details
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -566,21 +609,30 @@ export default function LiveConversationsPage() {
 
                   <div className="flex gap-2 pt-2">
                     {conversation.isBooked ? (
-                      <Button
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => handleCancelBooking(conversation.id)}
-                        disabled={bookingLoading === conversation.id}
-                      >
-                        {bookingLoading === conversation.id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
-                        ) : (
-                          <>
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Cancel Booking
-                          </>
-                        )}
-                      </Button>
+                      <>
+                        <Button
+                          className="flex-1"
+                          onClick={() => router.push(`/live-conversations/${conversation.id}`)}
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          Open Session
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handleCancelBooking(conversation.id)}
+                          disabled={bookingLoading === conversation.id}
+                        >
+                          {bookingLoading === conversation.id ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                          ) : (
+                            <>
+                              <XCircle className="w-4 h-4 mr-2" />
+                              Cancel Booking
+                            </>
+                          )}
+                        </Button>
+                      </>
                     ) : (
                       (() => {
                         const isOneToOne = (conversation.maxParticipants ?? 0) <= 2 || conversation.conversationType === 'PRIVATE'
@@ -591,34 +643,44 @@ export default function LiveConversationsPage() {
                         const reached = (left <= 0) || (minutesLeft <= 0)
 
                         const btn = (
-                          <Button
-                            className="flex-1"
-                            onClick={() => handleBookConversation(conversation.id)}
-                            disabled={
-                              bookingLoading === conversation.id ||
-                              conversation.currentParticipants >= conversation.maxParticipants ||
-                              reached
-                            }
-                          >
-                            {bookingLoading === conversation.id ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            ) : conversation.currentParticipants >= conversation.maxParticipants ? (
-                              <>
-                                <AlertCircle className="w-4 h-4 mr-2" />
-                                Full
-                              </>
-                            ) : reached ? (
-                              <>
-                                <AlertCircle className="w-4 h-4 mr-2" />
-                                Limit Reached
-                              </>
-                            ) : (
-                              <>
-                                <Play className="w-4 h-4 mr-2" />
-                                Join Session
-                              </>
-                            )}
-                          </Button>
+                          canAccessLiveClasses ? (
+                            <Button
+                              className="flex-1"
+                              onClick={() => handleBookConversation(conversation.id)}
+                              disabled={
+                                bookingLoading === conversation.id ||
+                                conversation.currentParticipants >= conversation.maxParticipants ||
+                                reached
+                              }
+                            >
+                              {bookingLoading === conversation.id ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              ) : conversation.currentParticipants >= conversation.maxParticipants ? (
+                                <>
+                                  <AlertCircle className="w-4 h-4 mr-2" />
+                                  Full
+                                </>
+                              ) : reached ? (
+                                <>
+                                  <AlertCircle className="w-4 h-4 mr-2" />
+                                  Limit Reached
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="w-4 h-4 mr-2" />
+                                  Book Session
+                                </>
+                              )}
+                            </Button>
+                          ) : (
+                            <Button
+                              className="flex-1"
+                              onClick={() => router.push(`/subscription-signup?next=${encodeURIComponent(`/live-conversations/${conversation.id}/enter`)}&context=live-conversations`)}
+                            >
+                              <Play className="w-4 h-4 mr-2" />
+                              Start Trial to Join
+                            </Button>
+                          )
                         )
 
                         if (reached) {
@@ -663,3 +725,11 @@ export default function LiveConversationsPage() {
     </div>
   )
 } 
+
+export default function LiveConversationsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"><div className="text-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div><p className="mt-4 text-gray-600">Loading...</p></div></div>}>
+      <LiveConversationsInner />
+    </Suspense>
+  )
+}

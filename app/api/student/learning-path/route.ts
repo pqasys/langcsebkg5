@@ -183,11 +183,7 @@ async function getCourseRecommendations(studentId: string, currentCourseId: stri
       where: { studentId },
       include: {
         course: {
-          select: {
-            id: true,
-            title: true,
-            categoryId: true
-          }
+          select: { id: true, title: true, categoryId: true }
         }
       }
     });

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useSubscription } from '@/hooks/useSubscription'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -35,6 +36,7 @@ interface ConversationDetail {
 export default function LiveConversationDetailPage({ params }: { params: { id: string } }) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { canAccessLiveClasses } = useSubscription()
   const [conversation, setConversation] = useState<ConversationDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [usageSummary, setUsageSummary] = useState<{ group: number; oneToOne: number; minutes: number; ent: { groupCap: number; oneToOneCap: number; minutesCap: number } } | null>(null)
@@ -84,14 +86,43 @@ export default function LiveConversationDetailPage({ params }: { params: { id: s
   const reached = (left <= 0) || (minutesLeft <= 0)
 
   const joinBtn = (
+    canAccessLiveClasses ? (
+      <Button
+        onClick={async () => {
+          setJoining(true)
+          try {
+            router.push(`/live-conversations/${conversation.id}/enter`)
+            return
+          } finally {
+            setJoining(false)
+          }
+        }}
+        disabled={joining}
+      >
+        <>
+          <Play className="w-4 h-4 mr-2" />
+          Join Session
+        </>
+      </Button>
+    ) : (
+      <Button
+        onClick={() => router.push(`/subscription-signup?next=${encodeURIComponent(`/live-conversations/${conversation.id}/enter`)}&context=live-conversations`)}
+      >
+        <Play className="w-4 h-4 mr-2" />
+        Start Trial to Join
+      </Button>
+    )
+  )
+
+  const legacyJoinBtn = (
     <Button
       onClick={async () => {
         setJoining(true)
         try {
-          const res = await fetch(`/api/live-conversations/${conversation.id}/book`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+          const res = await fetch(`/api/live-conversations/${conversation.id}/join`, { method: 'POST' })
           const data = await res.json()
-          if (res.ok && data.success) {
-            router.push('/live-conversations')
+          if (res.ok && data.success && data.videoSessionId) {
+            router.push(`/video-session/${data.videoSessionId}`)
           } else {
             if (data?.redirectUrl) {
               // Use toast + CTA before redirect

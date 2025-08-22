@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -29,6 +30,7 @@ import {
 import { getAllStudentTiers } from '@/lib/subscription-pricing'
 
 export default function LiveConversationsFeaturePage() {
+  const router = useRouter()
   const { data: session } = useSession()
   const { 
     userType,
@@ -421,11 +423,11 @@ export default function LiveConversationsFeaturePage() {
                       </>
                     ) : canAccessLiveClasses ? (
                       <>
-                        <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                        <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => router.push('/subscription-signup?next=/live-conversations?view=calendar&context=live-conversations')}>
                           <FaPlay className="w-4 h-4 mr-2" />
-                          {userType === 'INSTITUTION_STUDENT' ? 'Join Institution Session' : 'Join Session'}
+                          {userType === 'INSTITUTION_STUDENT' ? 'Browse Institution Sessions' : 'Browse Sessions'}
                         </Button>
-                        <Button variant="outline" className="px-3">
+                        <Button variant="outline" className="px-3" onClick={() => router.push('/live-conversations?view=calendar')}>
                           <FaCalendarAlt className="w-4 h-4" />
                         </Button>
                       </>

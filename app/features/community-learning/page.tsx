@@ -219,7 +219,7 @@ export default function CommunityLearningFeaturePage() {
               "Where fluency meets friendship" - Join study groups, language exchanges, and global communities of learners
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/subscription/trial?context=community">
+              <Link href="/subscription/trial?context=community&next=%2Ffeatures%2Fcommunity-learning">
                 <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
                   <FaUsers className="w-5 h-5 mr-2" />
                   Join Free Community
@@ -233,6 +233,27 @@ export default function CommunityLearningFeaturePage() {
           </div>
         </div>
       </section>
+
+      {/* Compact Access Banner for unauthenticated users */}
+      {!session?.user && (
+        <section className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="text-sm text-gray-700">
+                Sign in or start a free trial to access premium community features.
+              </div>
+              <div className="flex gap-2">
+                <Link href="/auth/signin?callbackUrl=%2Ffeatures%2Fcommunity-learning">
+                  <Button variant="outline" size="sm">Sign In</Button>
+                </Link>
+                <Link href="/subscription/trial?context=community&next=%2Ffeatures%2Fcommunity-learning">
+                  <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">Start Free Trial</Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Access Status Banner */}
       {session?.user && !subscriptionLoading && (
@@ -252,7 +273,7 @@ export default function CommunityLearningFeaturePage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Link href="/subscription-signup">
+                  <Link href="/subscription-signup?next=%2Ffeatures%2Fcommunity-learning&context=community">
                     <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
                       Subscribe
                     </Button>
@@ -446,7 +467,7 @@ export default function CommunityLearningFeaturePage() {
                       </>
                     ) : (
                       <>
-                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+                        <Button className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => window.location.assign('/subscription-signup?next=%2Ffeatures%2Fcommunity-learning&context=community')}>
                           Join Community
                         </Button>
                         <Button variant="outline" className="px-3">

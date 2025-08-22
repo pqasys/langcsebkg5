@@ -217,6 +217,8 @@ async function main() {
   }
   console.log('Users seeded successfully');
 
+  // Note: live conversations are seeded via a separate one-off script to avoid touching other tables
+
   // Seed students first
   const students = [
     {

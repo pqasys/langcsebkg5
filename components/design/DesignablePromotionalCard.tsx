@@ -322,7 +322,9 @@ export function DesignablePromotionalCard({
       } ${className}`}
       style={(() => {
         const styles = generateStyles();
-        console.log('🎨 Card styles applied:', styles);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('🎨 Card styles applied:', styles);
+        }
         return styles;
       })()}
       onClick={onClick}

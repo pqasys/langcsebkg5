@@ -19,11 +19,15 @@ async function performWarmup(): Promise<void> {
 
   warmupPromise = (async () => {
     try {
-      console.log('🔥 Warming up database connection on server start...');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🔥 Warming up database connection on server start...');
+      }
       
       // Test basic connection
       await prisma.$queryRaw`SELECT 1`;
-      console.log('✅ Basic connection established');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('✅ Basic connection established');
+      }
 
       // Preload common queries
       await Promise.all([
@@ -52,9 +56,13 @@ async function performWarmup(): Promise<void> {
         })
       ]);
 
-      console.log('✅ Common queries preloaded');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('✅ Common queries preloaded');
+      }
       isWarmedUp = true;
-      console.log('🎉 Database warmup completed successfully');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🎉 Database warmup completed successfully');
+      }
     } catch (error) {
       console.error('❌ Database warmup failed:', error);
       throw error;

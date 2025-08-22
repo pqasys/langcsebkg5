@@ -28,7 +28,8 @@ export default function VideoSessionPage({ params }: VideoSessionPageProps) {
     if (status === 'loading') return
 
     if (!session?.user?.id) {
-      router.push('/auth/signin')
+      const next = encodeURIComponent(`/video-session/${params.id}`)
+      router.push(`/auth/signin?callbackUrl=${next}`)
       return
     }
 
@@ -47,11 +48,15 @@ export default function VideoSessionPage({ params }: VideoSessionPageProps) {
 
       if (!response.ok) {
         if (response.status === 404) {
-          setError('Video session not found')
+          setError('This session link is invalid or no longer available.')
         } else if (response.status === 403) {
-          setError('You do not have permission to join this session')
+          setError('You don\'t have access to this session. Please upgrade or check your subscription.')
+        } else if (response.status === 410) {
+          setError('This session has ended.')
+        } else if (response.status === 423) {
+          setError('This session is not open yet. Please try again closer to the start time.')
         } else {
-          setError('Failed to join video session')
+          setError('We couldn\'t connect you to the session. Please try again.')
         }
         return
       }
@@ -66,7 +71,8 @@ export default function VideoSessionPage({ params }: VideoSessionPageProps) {
   }
 
   const handleLeave = () => {
-    router.push('/dashboard')
+    // Prefer returning to live conversations calendar
+    router.push('/live-conversations?view=calendar')
   }
 
   if (status === 'loading' || isLoading) {

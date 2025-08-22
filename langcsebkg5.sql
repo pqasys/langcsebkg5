@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 22, 2025 at 12:37 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 22, 2025 at 08:32 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -1669,7 +1669,7 @@ CREATE TABLE IF NOT EXISTS `live_conversations` (
 --
 
 INSERT INTO `live_conversations` (`id`, `title`, `description`, `conversationType`, `language`, `level`, `startTime`, `endTime`, `duration`, `maxParticipants`, `currentParticipants`, `price`, `isPublic`, `isFree`, `status`, `meetingUrl`, `meetingId`, `meetingPassword`, `instructorId`, `hostId`, `topic`, `culturalNotes`, `vocabularyList`, `grammarPoints`, `conversationPrompts`, `createdAt`, `updatedAt`, `metadata`, `allowedInstitutionTiers`, `allowedStudentTiers`, `requiresSubscription`) VALUES
-('conv-001', 'Beginner Spanish Conversation', 'Practice basic Spanish conversation skills with fellow beginners. We\'ll cover greetings, introductions, and everyday topics.', 'GROUP', 'es', 'CEFR_A1', '2025-07-29 01:38:20.000', '2025-07-29 02:38:20.000', 60, 8, 3, 0, 1, 1, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Basic Introductions', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-07-28 23:38:20.264', NULL, NULL, NULL, 0),
+('conv-001', 'Beginner Spanish Conversation', 'Practice basic Spanish conversation skills with fellow beginners. We\'ll cover greetings, introductions, and everyday topics.', 'GROUP', 'es', 'CEFR_A1', '2025-08-22 18:40:41.732', '2025-08-22 19:40:41.732', 60, 8, 4, 0, 1, 1, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Basic Introductions', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-08-22 18:55:39.057', NULL, NULL, NULL, 0),
 ('conv-002', 'Business English Practice', 'Improve your business English skills through role-playing exercises and professional discussions.', 'PRACTICE', 'en', 'CEFR_B2', '2025-07-29 02:38:00.000', '2025-07-29 03:38:00.000', 60, 6, 2, 15.99, 1, 0, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Business Meetings', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-08-21 23:28:48.958', NULL, NULL, NULL, 0),
 ('conv-003', 'French Cultural Exchange', 'Learn about French culture while practicing your French language skills. We\'ll discuss traditions, food, and daily life.', 'CULTURAL', 'fr', 'CEFR_B1', '2025-07-29 23:38:20.000', '2025-07-30 00:38:20.000', 60, 10, 1, 0, 1, 1, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'French Culture', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-07-28 23:38:20.264', NULL, NULL, NULL, 0);
 
@@ -1708,7 +1708,10 @@ CREATE TABLE IF NOT EXISTS `live_conversation_bookings` (
 
 INSERT INTO `live_conversation_bookings` (`id`, `conversationId`, `userId`, `status`, `bookedAt`, `cancelledAt`, `paymentStatus`, `amount`, `currency`, `paymentMethod`, `transactionId`, `refundReason`, `metadata`) VALUES
 ('booking-001', 'conv-001', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'CONFIRMED', '2025-07-28 23:38:20.267', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL),
-('booking-002', 'conv-002', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'CONFIRMED', '2025-07-28 23:38:20.267', NULL, 'PAID', 15.99, 'USD', NULL, NULL, NULL, NULL);
+('booking-002', 'conv-002', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'CONFIRMED', '2025-07-28 23:38:20.267', NULL, 'PAID', 15.99, 'USD', NULL, NULL, NULL, NULL),
+('7df7e6c3-ef97-473d-bc66-209f9ad2832b', 'conv-001', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'CONFIRMED', '2025-08-22 17:18:19.054', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL),
+('fa82fb84-9a2c-4dc4-b607-7e2ad077e20f', 'conv-001', '0339a71c-92d8-4e75-9c28-62d394d041af', 'CONFIRMED', '2025-08-22 17:40:41.810', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL),
+('09df4f33-2be3-4636-ad4f-128510a3dead', 'conv-001', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'CONFIRMED', '2025-08-22 18:55:39.050', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1765,6 +1768,14 @@ CREATE TABLE IF NOT EXISTS `live_conversation_participants` (
   KEY `live_conversation_participants_userId_idx` (`userId`),
   KEY `live_conversation_participants_status_idx` (`status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `live_conversation_participants`
+--
+
+INSERT INTO `live_conversation_participants` (`id`, `conversationId`, `userId`, `joinedAt`, `leftAt`, `duration`, `isInstructor`, `isHost`, `status`, `speakingTime`, `messageCount`, `feedback`, `metadata`) VALUES
+('27352ed7-1a90-4b14-9bdc-f3d77c9259d1', 'conv-001', '140e3f04-f4f1-47f9-b001-70f50459d3cb', '2025-08-22 17:18:19.303', NULL, 0, 0, 0, 'JOINED', 0, 0, NULL, NULL),
+('a5826910-1ae4-444b-a828-2622209180ec', 'conv-001', 'd47324a8-c823-49bc-b2dc-c567727ebafd', '2025-08-22 18:55:39.065', NULL, 0, 0, 0, 'JOINED', 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 

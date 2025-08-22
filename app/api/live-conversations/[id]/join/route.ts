@@ -1,183 +1,111 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
+// POST /api/live-conversations/[id]/join
+// Ensures a booking exists, checks time window, creates/loads a VideoSession, and returns a session id to open
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const conversationId = params.id;
+    const conversationId = params.id
 
-    // Get the conversation
     const conversation = await prisma.liveConversation.findUnique({
       where: { id: conversationId },
-      include: {
-        host: true,
-        instructor: true,
-        participants: {
-          include: {
-            user: true
-          }
-        }
-      }
-    });
+    })
 
     if (!conversation) {
-      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
     }
 
-    // Check if conversation is active
-    if (conversation.status !== 'ACTIVE') {
-      return NextResponse.json({ error: 'Conversation is not active' }, { status: 400 });
-    }
+    // Ensure booking exists (idempotent)
+    let booking = await prisma.liveConversationBooking.findFirst({
+      where: { conversationId, userId: session.user.id, status: { not: 'CANCELLED' } },
+    })
 
-    // Check if user is already a participant
-    const existingParticipant = conversation.participants.find(
-      p => p.userId === session.user.id
-    );
+    if (!booking) {
+      // Minimal capacity check before auto-booking
+      if (conversation.currentParticipants >= conversation.maxParticipants) {
+        return NextResponse.json({ error: 'Conversation is full' }, { status: 400 })
+      }
 
-    if (existingParticipant) {
-      // Update participant status to joined
-      await prisma.liveConversationParticipant.update({
-        where: { id: existingParticipant.id },
+      booking = await prisma.liveConversationBooking.create({
         data: {
-          joinedAt: new Date(),
-          status: 'JOINED'
-        }
-      });
+          conversationId,
+          userId: session.user.id,
+          status: conversation.isFree ? 'CONFIRMED' : 'PENDING',
+          bookedAt: new Date(),
+          paymentStatus: conversation.isFree ? 'PAID' : 'PENDING',
+          amount: Number(conversation.price || 0),
+          currency: 'USD',
+        },
+      })
 
-      return NextResponse.json({
-        success: true,
-        message: 'Rejoined conversation',
-        participant: existingParticipant
-      });
+      // Increment participants count
+      await prisma.liveConversation.update({
+        where: { id: conversationId },
+        data: { currentParticipants: { increment: 1 } },
+      })
     }
 
-    // Check if conversation is full
-    if (conversation.currentParticipants >= conversation.maxParticipants) {
-      return NextResponse.json({ error: 'Conversation is full' }, { status: 400 });
+    // Time gating: allow join within 15 minutes before start until end
+    const now = new Date()
+    const joinOpensAt = new Date(conversation.startTime)
+    joinOpensAt.setMinutes(joinOpensAt.getMinutes() - 15)
+    const joinClosesAt = new Date(conversation.endTime)
+
+    if (now < joinOpensAt) {
+      return NextResponse.json({ error: 'Session not started yet. Please return closer to the start time.' }, { status: 403 })
+    }
+    if (now > joinClosesAt) {
+      return NextResponse.json({ error: 'Session has ended.' }, { status: 410 })
     }
 
-    // Check if user has access to join conversations
-    const hasAccess = await checkUserJoinAccess(session.user.id, conversation);
-    if (!hasAccess) {
-      return NextResponse.json({ 
-        error: 'You need a subscription or institution enrollment to join conversations' 
-      }, { status: 403 });
+    // Ensure a VideoSession exists for this conversation
+    let video = await prisma.videoSession.findFirst({ where: { meetingId: conversationId } })
+    if (!video) {
+      video = await prisma.videoSession.create({
+        data: {
+          title: conversation.title,
+          description: conversation.description || undefined,
+          sessionType: 'LIVE_CONVERSATION',
+          language: conversation.language,
+          level: conversation.level,
+          startTime: conversation.startTime,
+          endTime: conversation.endTime,
+          duration: conversation.duration,
+          status: 'SCHEDULED',
+          instructorId: conversation.instructorId || conversation.hostId,
+          meetingId: conversationId,
+          isPublic: false,
+        },
+      })
     }
 
-    // Create participant
-    const participant = await prisma.liveConversationParticipant.create({
-      data: {
-        conversationId,
-        userId: session.user.id,
-        joinedAt: new Date(),
-        status: 'JOINED',
-        isHost: conversation.hostId === session.user.id,
-        isInstructor: conversation.instructorId === session.user.id
+    // Ensure participant record exists for this user in the video session
+    await prisma.videoSessionParticipant.upsert({
+      where: {
+        sessionId_userId: { sessionId: video.id, userId: session.user.id },
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true
-          }
-        }
-      }
-    });
+      update: { isActive: false },
+      create: {
+        sessionId: video.id,
+        userId: session.user.id,
+        role: 'PARTICIPANT',
+        isActive: false,
+      },
+    })
 
-    // Update conversation participant count
-    await prisma.liveConversation.update({
-      where: { id: conversationId },
-      data: {
-        currentParticipants: {
-          increment: 1
-        }
-      }
-    });
-
-    logger.info(`User ${session.user.id} joined conversation ${conversationId}`);
-
-    return NextResponse.json({
-      success: true,
-      participant,
-      message: 'Successfully joined conversation'
-    });
-
+    return NextResponse.json({ success: true, videoSessionId: video.id })
   } catch (error) {
-    logger.error('Failed to join conversation:', error);
-    return NextResponse.json(
-      { error: 'Failed to join conversation' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to join session' }, { status: 500 })
   }
 }
 
-async function checkUserJoinAccess(userId: string, conversation: any): Promise<boolean> {
-  try {
-    // Host and instructor can always join
-    if (conversation.hostId === userId || conversation.instructorId === userId) {
-      return true;
-    }
-
-    // Check if user has active subscription
-    const subscription = await prisma.studentSubscription.findFirst({
-      where: {
-        studentId: userId,
-        status: 'ACTIVE'
-      }
-    });
-
-    if (subscription) {
-      return true;
-    }
-
-    // Check if user has institution enrollment
-    const userWithInstitution = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { institutionId: true }
-    });
-    const enrollment = userWithInstitution?.institutionId ? { institution_id: userWithInstitution.institutionId } : null;
-
-    if (enrollment) {
-      return true;
-    }
-
-    // Check if user is institution staff
-    const user = await prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (user?.role === 'INSTITUTION') {
-      return true;
-    }
-
-    // Check if user has a booking for this conversation
-    const booking = await prisma.liveConversationBooking.findFirst({
-      where: {
-        conversationId: conversation.id,
-        studentId: userId,
-        status: { not: 'CANCELLED' }
-      }
-    });
-
-    if (booking) {
-      return true;
-    }
-
-    return false;
-  } catch (error) {
-    logger.error('Error checking user join access:', error);
-    return false;
-  }
-} 

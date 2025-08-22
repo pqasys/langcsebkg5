@@ -8,6 +8,9 @@ import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import InstitutionSidebar from '@/components/institution/InstitutionSidebar';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function InstitutionLayout({
   children,
 }: {

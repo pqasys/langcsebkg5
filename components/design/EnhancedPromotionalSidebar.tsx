@@ -222,18 +222,22 @@ export function EnhancedPromotionalSidebar({
 
   // Debug logging
   useEffect(() => {
-    console.log('🔐 Design Toolkit Access Control:', {
-      propShowDesignToolkit,
-      userRole,
-      canAccessDesignToolkit,
-      showDesignToolkit
-    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔐 Design Toolkit Access Control:', {
+        propShowDesignToolkit,
+        userRole,
+        canAccessDesignToolkit,
+        showDesignToolkit
+      });
+    }
   }, [propShowDesignToolkit, userRole, canAccessDesignToolkit, showDesignToolkit]);
 
   // Ensure Design Toolkit is hidden if user doesn't have access
   useEffect(() => {
     if (!canAccessDesignToolkit && showDesignToolkit) {
-      console.log('🚫 Hiding Design Toolkit - user does not have access');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🚫 Hiding Design Toolkit - user does not have access');
+      }
       setShowDesignToolkit(false);
     }
   }, [canAccessDesignToolkit, showDesignToolkit]);
@@ -303,7 +307,9 @@ export function EnhancedPromotionalSidebar({
         
         if (response.ok) {
           const data = await response.json();
-          console.log('📥 Raw database response:', data);
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('📥 Raw database response:', data);
+          }
           const configsMap: IndividualDesignConfig = {};
           
           // Convert array to map by config name and transform database format to DesignConfig format
@@ -340,7 +346,9 @@ export function EnhancedPromotionalSidebar({
             configsMap[itemId] = transformDatabaseConfig(mostRecentConfig);
           });
           
-          console.log('🔄 Transformed configs map:', Object.keys(configsMap));
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('🔄 Transformed configs map:', Object.keys(configsMap));
+          }
           setIndividualDesignConfigs(configsMap);
         } else {
           console.error('❌ Failed to load design configs:', response.status, response.statusText);
@@ -362,11 +370,15 @@ export function EnhancedPromotionalSidebar({
       return;
     }
 
-    console.log('💾 Saving design config for item:', itemId);
-    console.log('💾 Original config:', config);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('💾 Saving design config for item:', itemId);
+      console.log('💾 Original config:', config);
+    }
     
     const sanitized = sanitizeDesignConfig(config);
-    console.log('💾 Sanitized config:', sanitized);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('💾 Sanitized config:', sanitized);
+    }
     
     const updated = { ...individualDesignConfigs, [itemId]: sanitized };
     setIndividualDesignConfigs(updated);
@@ -411,11 +423,15 @@ export function EnhancedPromotionalSidebar({
       isDefault: false
     };
     
-    console.log('💾 Flattened config for database:', flattenedConfig);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('💾 Flattened config for database:', flattenedConfig);
+    }
     
          try {
        // Save to database
-       console.log('🔄 Sending to database:', flattenedConfig);
+       if (process.env.NODE_ENV !== 'production') {
+         console.log('🔄 Sending to database:', flattenedConfig);
+       }
        const response = await fetch('/api/design-configs', {
          method: 'POST',
          headers: {
@@ -426,7 +442,9 @@ export function EnhancedPromotionalSidebar({
 
        if (response.ok) {
          const responseData = await response.json();
-         console.log(`✅ Saved design config for item: ${itemId} to database`, responseData);
+         if (process.env.NODE_ENV !== 'production') {
+           console.log(`✅ Saved design config for item: ${itemId} to database`, responseData);
+         }
          
          // Also save to localStorage as backup
          try {
@@ -440,7 +458,9 @@ export function EnhancedPromotionalSidebar({
          // Fallback to localStorage only
          try {
            localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
-           console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+           if (process.env.NODE_ENV !== 'production') {
+             console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+           }
          } catch (localStorageError) {
            console.error('Error saving to localStorage fallback:', localStorageError);
          }
@@ -450,7 +470,9 @@ export function EnhancedPromotionalSidebar({
        // Fallback to localStorage only
        try {
          localStorage.setItem('individualDesignConfigs', JSON.stringify(updated));
-         console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+         if (process.env.NODE_ENV !== 'production') {
+           console.log(`✅ Fallback: Saved design config for item: ${itemId} to localStorage`);
+         }
        } catch (localStorageError) {
          console.error('Error saving to localStorage fallback:', localStorageError);
        }
@@ -600,7 +622,9 @@ export function EnhancedPromotionalSidebar({
   };
 
   const handleEditItem = (itemId: string) => {
-    console.log('🎨 Edit item clicked:', itemId);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🎨 Edit item clicked:', itemId);
+    }
     setEditingItemId(itemId);
     setSelectedItemId(itemId);
     if (canAccessDesignToolkit) {
@@ -610,7 +634,9 @@ export function EnhancedPromotionalSidebar({
 
   const handleSaveItemDesign = (config: DesignConfig) => {
     if (editingItemId) {
-      console.log('🎨 Saving design config for item:', editingItemId, config);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('🎨 Saving design config for item:', editingItemId, config);
+      }
       saveIndividualConfig(editingItemId, config);
       // Clear unsaved changes flag
       setUnsavedChanges(prev => {
