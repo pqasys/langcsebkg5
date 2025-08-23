@@ -290,10 +290,7 @@ export default function StudentProgressPage() {
             <Award className="h-4 w-4" />
             Achievements
           </TabsTrigger>
-          <TabsTrigger value="calendar" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Study Calendar
-          </TabsTrigger>
+          {/* Calendar moved to dedicated page */}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -504,23 +501,7 @@ export default function StudentProgressPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="calendar" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Study Calendar
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Study Calendar feature coming soon!</p>
-                <p className="text-sm">Plan your study sessions and track your learning schedule.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* Calendar tab placeholder removed; use /student/calendar */}
       </Tabs>
     </div>
   );

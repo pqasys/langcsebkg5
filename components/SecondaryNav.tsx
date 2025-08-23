@@ -10,6 +10,7 @@ import {
   LayoutDashboard, BookOpen, Users, GraduationCap, Settings as SettingsIcon, 
   PlusCircle, Calendar, Search as SearchIcon, Menu, X
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 type NavItem = { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
 
@@ -19,7 +20,10 @@ function RoleLinks(role: string | undefined): NavItem[] {
       return [
         { href: '/student', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/student/courses', label: 'My Courses', icon: BookOpen },
-        { href: '/live-conversations?view=calendar', label: 'My Bookings', icon: Calendar },
+        { href: '/student/calendar', label: 'Study Calendar', icon: Calendar },
+        { href: '/community', label: 'Community', icon: Users },
+        { href: '/community/circles', label: 'Circles', icon: Users },
+        { href: '/community/clubs', label: 'Clubs', icon: Calendar },
         { href: '/student/settings', label: 'Settings', icon: SettingsIcon },
       ]
     case 'INSTITUTION':
@@ -29,6 +33,9 @@ function RoleLinks(role: string | undefined): NavItem[] {
         { href: '/institution/instructors', label: 'Instructors', icon: GraduationCap },
         { href: '/institution/students', label: 'Students', icon: Users },
         { href: '/video-sessions/create', label: 'Create Session', icon: PlusCircle },
+        { href: '/community', label: 'Community', icon: Users },
+        { href: '/community/circles', label: 'Circles', icon: Users },
+        { href: '/community/clubs', label: 'Clubs', icon: Calendar },
         { href: '/institution/settings', label: 'Settings', icon: SettingsIcon },
       ]
     case 'ADMIN':
@@ -37,10 +44,18 @@ function RoleLinks(role: string | undefined): NavItem[] {
         { href: '/admin/users', label: 'Users', icon: Users },
         { href: '/admin/institutions', label: 'Institutions', icon: Users },
         { href: '/admin/performance', label: 'Performance', icon: LayoutDashboard },
+        { href: '/community', label: 'Community', icon: Users },
+        { href: '/community/circles', label: 'Circles', icon: Users },
+        { href: '/community/clubs', label: 'Clubs', icon: Calendar },
         { href: '/admin/settings', label: 'Settings', icon: SettingsIcon },
       ]
     default:
-      return []
+      // Guest/default links
+      return [
+        { href: '/community', label: 'Community', icon: Users },
+        { href: '/community/circles', label: 'Circles', icon: Users },
+        { href: '/community/clubs', label: 'Clubs', icon: Calendar },
+      ]
   }
 }
 
@@ -50,10 +65,9 @@ export default function SecondaryNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  if (status !== 'authenticated' || !session?.user) return null
-
-  const items = RoleLinks(session.user.role)
-  const isInstitutionAwaitingApproval = session.user.role === 'INSTITUTION' && !(session.user as any).institutionApproved && !institution?.isApproved
+  const role = session?.user?.role as string | undefined
+  const items = RoleLinks(role)
+  const isInstitutionAwaitingApproval = role === 'INSTITUTION' && !(session?.user as any)?.institutionApproved && !institution?.isApproved
 
   return (
     <nav className="sticky top-16 z-40 bg-gray-900 text-gray-100 border-b border-gray-800">
@@ -96,8 +110,17 @@ export default function SecondaryNav() {
               })}
             </div>
           </div>
-          {/* Right actions: Search and Notifications */}
+          {/* Right actions: Community CTAs, Search and Notifications */}
           <div className="flex items-center gap-2">
+            <Link href="/language-proficiency-test">
+              <Button size="sm" className="h-7 py-0 px-2 text-[11px]">Free Test</Button>
+            </Link>
+            <Link href="/community/circles">
+              <Button size="sm" variant="outline" className="h-7 py-0 px-2 text-[11px]">Join a Circle</Button>
+            </Link>
+            <Link href="/community/clubs">
+              <Button size="sm" className="h-7 py-0 px-2 text-[11px]">RSVP a Club</Button>
+            </Link>
             <Link
               href="/search"
               className="inline-flex items-center justify-center rounded p-1.5 text-gray-300 hover:text-white hover:bg-gray-800"
@@ -105,7 +128,7 @@ export default function SecondaryNav() {
             >
               <SearchIcon className="h-4 w-4" />
             </Link>
-            {session.user.role !== 'ADMIN' && (
+            {session?.user && session?.user?.role !== 'ADMIN' && (
               <div className="-mr-1">
                 <SimpleNotifications />
               </div>

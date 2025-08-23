@@ -148,6 +148,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="mask-icon" href="/mask-icon.svg" color="#2563eb" />
+        {/* FullCalendar CSS via CDN to avoid CSS import ordering issues */}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.15/index.global.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.15/index.global.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.15/index.global.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.15/index.global.min.css" />
       </head>
       <body className={`${inter.className} ${poppins.variable}`} suppressHydrationWarning>
         <ServiceWorkerProvider>

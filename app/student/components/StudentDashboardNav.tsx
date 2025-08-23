@@ -51,7 +51,7 @@ const navItems = [
   },
   {
     title: 'Study Calendar',
-    href: '/student/progress?view=calendar',
+    href: '/student/calendar',
     icon: Calendar,
     description: 'Plan your study sessions'
   },

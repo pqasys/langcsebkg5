@@ -6,6 +6,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* FullCalendar styles are imported in the client component to avoid @import order issues */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

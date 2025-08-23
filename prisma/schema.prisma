@@ -1920,3 +1920,39 @@ model DesignTemplate {
   
   @@map("design_templates")
 }
+
+// Community Circles (lightweight groups for free-tier engagement)
+model CommunityCircle {
+  id          String   @id @default(cuid())
+  name        String   @db.VarChar(100)
+  slug        String   @unique @db.VarChar(120)
+  language    String?  @db.VarChar(10)
+  level       String?  @db.VarChar(20)
+  description String?  @db.Text
+  ownerId     String?  @db.VarChar(36)
+  isPublic    Boolean  @default(true)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members CommunityCircleMembership[]
+
+  @@index([language])
+  @@index([level])
+  @@index([isPublic])
+  @@map("community_circles")
+}
+
+model CommunityCircleMembership {
+  id        String   @id @default(cuid())
+  circleId  String   @db.VarChar(36)
+  userId    String   @db.VarChar(36)
+  role      String   @default("MEMBER") @db.VarChar(20)
+  joinedAt  DateTime @default(now())
+
+  circle CommunityCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, userId], name: "unique_circle_membership")
+  @@index([userId])
+  @@map("community_circle_memberships")
+}

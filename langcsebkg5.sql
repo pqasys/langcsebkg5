@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 22, 2025 at 10:04 PM
--- Server version: 8.0.31
--- PHP Version: 8.1.13
+-- Generation Time: Aug 23, 2025 at 03:02 AM
+-- Server version: 9.1.0
+-- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -265,6 +265,50 @@ INSERT INTO `commission_tiers` (`id`, `planType`, `commissionRate`, `features`, 
 ('cmcjo5f2b0000man3v5b54dxt', 'STARTER', 25, '{\"apiAccess\": false, \"maxCourses\": 5, \"whiteLabel\": false, \"maxStudents\": 50, \"maxTeachers\": 2, \"emailSupport\": true, \"mobileAccess\": true, \"basicAnalytics\": true, \"customBranding\": false, \"marketingTools\": false, \"prioritySupport\": false, \"studentProgress\": true, \"courseManagement\": true, \"advancedAnalytics\": false, \"paymentProcessing\": true, \"videoConferencing\": false, \"certificateGeneration\": true}', 1, '2025-06-30 22:26:59.075', '2025-07-28 19:53:13.667', 'Starter Plan', 'Perfect for small language schools getting started online', 99, 'USD', 'MONTHLY', 50, 5, 2),
 ('cmcjo5f2n0001man32g2nxct8', 'PROFESSIONAL', 15, '{\"apiAccess\": false, \"maxCourses\": 15, \"whiteLabel\": false, \"maxStudents\": 200, \"maxTeachers\": 5, \"emailSupport\": true, \"mobileAccess\": true, \"basicAnalytics\": true, \"customBranding\": true, \"marketingTools\": true, \"prioritySupport\": true, \"revenueTracking\": true, \"studentProgress\": true, \"courseManagement\": true, \"advancedAnalytics\": true, \"paymentProcessing\": true, \"studentManagement\": true, \"videoConferencing\": \"limited\", \"advancedCertificates\": true, \"multiLanguageSupport\": true, \"certificateGeneration\": true}', 1, '2025-06-30 22:26:59.087', '2025-07-28 19:53:13.669', 'Professional Plan', 'Ideal for growing institutions with multiple courses', 299, 'USD', 'MONTHLY', 200, 15, 5),
 ('cmcjo5f2s0002man3kimifkjj', 'ENTERPRISE', 10, '{\"apiAccess\": true, \"maxCourses\": 50, \"whiteLabel\": true, \"maxStudents\": 1000, \"maxTeachers\": 20, \"emailSupport\": true, \"mobileAccess\": true, \"basicAnalytics\": true, \"customBranding\": true, \"marketingTools\": true, \"customReporting\": true, \"prioritySupport\": true, \"revenueTracking\": true, \"studentProgress\": true, \"advancedSecurity\": true, \"courseManagement\": true, \"advancedAnalytics\": true, \"paymentProcessing\": true, \"studentManagement\": true, \"videoConferencing\": \"unlimited\", \"customIntegrations\": true, \"advancedCertificates\": true, \"multiLanguageSupport\": true, \"multiLocationSupport\": true, \"certificateGeneration\": true, \"dedicatedAccountManager\": true}', 1, '2025-06-30 22:26:59.092', '2025-07-28 19:53:13.670', 'Enterprise Plan', 'Complete solution for large language organizations', 799, 'USD', 'MONTHLY', 1000, 50, 20);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `community_circles`
+--
+
+DROP TABLE IF EXISTS `community_circles`;
+CREATE TABLE IF NOT EXISTS `community_circles` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `level` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `ownerId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isPublic` tinyint(1) NOT NULL DEFAULT '1',
+  `isActive` tinyint(1) NOT NULL DEFAULT '1',
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `community_circles_slug_key` (`slug`),
+  KEY `community_circles_language_idx` (`language`),
+  KEY `community_circles_level_idx` (`level`),
+  KEY `community_circles_isPublic_idx` (`isPublic`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `community_circle_memberships`
+--
+
+DROP TABLE IF EXISTS `community_circle_memberships`;
+CREATE TABLE IF NOT EXISTS `community_circle_memberships` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `circleId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'MEMBER',
+  `joinedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `community_circle_memberships_circleId_userId_key` (`circleId`,`userId`),
+  KEY `community_circle_memberships_userId_idx` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1670,7 +1714,7 @@ CREATE TABLE IF NOT EXISTS `live_conversations` (
 
 INSERT INTO `live_conversations` (`id`, `title`, `description`, `conversationType`, `language`, `level`, `startTime`, `endTime`, `duration`, `maxParticipants`, `currentParticipants`, `price`, `isPublic`, `isFree`, `status`, `meetingUrl`, `meetingId`, `meetingPassword`, `instructorId`, `hostId`, `topic`, `culturalNotes`, `vocabularyList`, `grammarPoints`, `conversationPrompts`, `createdAt`, `updatedAt`, `metadata`, `allowedInstitutionTiers`, `allowedStudentTiers`, `requiresSubscription`) VALUES
 ('conv-001', 'Beginner Spanish Conversation', 'Practice basic Spanish conversation skills with fellow beginners. We\'ll cover greetings, introductions, and everyday topics.', 'GROUP', 'es', 'CEFR_A1', '2025-08-22 18:40:41.732', '2025-08-22 19:40:41.732', 60, 8, 4, 0, 1, 1, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Basic Introductions', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-08-22 18:55:39.057', NULL, NULL, NULL, 0),
-('conv-002', 'Business English Practice', 'Improve your business English skills through role-playing exercises and professional discussions.', 'PRACTICE', 'en', 'CEFR_B2', '2025-07-29 02:38:00.000', '2025-07-29 03:38:00.000', 60, 6, 2, 15.99, 1, 0, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Business Meetings', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-08-21 23:28:48.958', NULL, NULL, NULL, 0),
+('conv-002', 'Business English Practice', 'Improve your business English skills through role-playing exercises and professional discussions.', 'PRACTICE', 'en', 'CEFR_B2', '2025-07-29 02:38:00.000', '2025-07-29 03:38:00.000', 60, 6, 3, 15.99, 1, 0, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Business Meetings', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-08-22 23:24:57.947', NULL, NULL, NULL, 0),
 ('conv-003', 'French Cultural Exchange', 'Learn about French culture while practicing your French language skills. We\'ll discuss traditions, food, and daily life.', 'CULTURAL', 'fr', 'CEFR_B1', '2025-07-29 23:38:20.000', '2025-07-30 00:38:20.000', 60, 10, 1, 0, 1, 1, 'SCHEDULED', NULL, NULL, NULL, NULL, '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'French Culture', NULL, NULL, NULL, NULL, '2025-07-28 23:38:20.264', '2025-07-28 23:38:20.264', NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
@@ -1711,7 +1755,8 @@ INSERT INTO `live_conversation_bookings` (`id`, `conversationId`, `userId`, `sta
 ('booking-002', 'conv-002', '0e971fe1-d22a-446e-9fb9-f52149e29df3', 'CONFIRMED', '2025-07-28 23:38:20.267', NULL, 'PAID', 15.99, 'USD', NULL, NULL, NULL, NULL),
 ('7df7e6c3-ef97-473d-bc66-209f9ad2832b', 'conv-001', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'CONFIRMED', '2025-08-22 17:18:19.054', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL),
 ('fa82fb84-9a2c-4dc4-b607-7e2ad077e20f', 'conv-001', '0339a71c-92d8-4e75-9c28-62d394d041af', 'CONFIRMED', '2025-08-22 17:40:41.810', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL),
-('09df4f33-2be3-4636-ad4f-128510a3dead', 'conv-001', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'CONFIRMED', '2025-08-22 18:55:39.050', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL);
+('09df4f33-2be3-4636-ad4f-128510a3dead', 'conv-001', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'CONFIRMED', '2025-08-22 18:55:39.050', NULL, 'PAID', 0, 'USD', NULL, NULL, NULL, NULL),
+('f12a4da6-fc95-454c-b0af-879eada56655', 'conv-002', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'PENDING', '2025-08-22 23:24:57.944', NULL, 'PENDING', 15.99, 'USD', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3230,7 +3275,8 @@ INSERT INTO `student_billing_history` (`id`, `subscriptionId`, `billingDate`, `a
 ('cmeasi401000x49m9cn3v16dr', 'cmeasi3zv000v49m9oy6kkqjf', '2025-08-14 02:38:18.809', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755139098817', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 02:38:18.818'),
 ('cmeaswfxc001149m9qk00wwql', 'cmeaswfx2000z49m981oqmynv', '2025-08-14 02:49:27.444', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755139767455', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 02:49:27.456'),
 ('cmeat16ou001549m9xt8b1die', 'cmeat16op001349m9b8vhe604', '2025-08-14 02:53:08.758', 24.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755139988765', 'Trial subscription for PREMIUM plan', NULL, '2025-08-14 02:53:08.767'),
-('cmej3sgwd000412uhyy881ath', 'cmej3sgw4000212uhhzq21kgl', '2025-08-19 22:16:27.265', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1755641787277', 'Initial payment for PREMIUM plan', NULL, '2025-08-19 22:16:27.277');
+('cmej3sgwd000412uhyy881ath', 'cmej3sgw4000212uhhzq21kgl', '2025-08-19 22:16:27.265', 24.99, 'USD', 'PAID', 'MANUAL', NULL, 'STU-INV-1755641787277', 'Initial payment for PREMIUM plan', NULL, '2025-08-19 22:16:27.277'),
+('cmengj97y0003ldjdmwxifvuq', 'cmeat16op001349m9b8vhe604', '2025-08-22 23:24:17.120', 12.99, 'USD', 'TRIAL', 'MANUAL', NULL, 'STU-INV-1755905057133', 'Trial subscription for BASIC plan', NULL, '2025-08-22 23:24:17.134');
 
 -- --------------------------------------------------------
 
@@ -3463,7 +3509,7 @@ INSERT INTO `student_subscriptions` (`id`, `studentId`, `status`, `startDate`, `
 ('cmd0rq6de000qp73dn3b3o498', 'c98a0b89-011b-482f-843e-a5522de40b1e', 'ACTIVE', '2025-07-12 21:39:11.423', '2026-07-14 13:58:54.404', 1, NULL, NULL, '{\"isTrial\": true, \"billingCycle\": \"MONTHLY\", \"trialEndDate\": \"2025-07-19T21:39:11.423Z\"}', '2025-07-12 21:39:11.427', '2025-08-05 16:23:06.150', 'basic-tier', 10, 0, 0, 0, 0, 3, 1, 3, 0, 0, 'BASIC'),
 ('0c20dc4a-afa5-4c40-a041-5fa049fc6725', 'bdcbbab6-9436-43d1-80e6-b9543b48dd06', 'ACTIVE', '2025-07-14 13:58:54.344', '2026-07-14 13:58:54.344', 1, NULL, NULL, NULL, '2025-07-14 13:58:54.346', '2025-08-05 16:23:06.166', 'premium-tier', 30, 0, 0, 0, 0, 10, 1, 10, 0, 0, 'BASIC'),
 ('cmearlq9x000149m9k2ki9u2g', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'TRIAL', '2025-08-14 02:13:08.035', '2025-08-21 02:13:08.035', 1, NULL, NULL, '{\"isTrial\": true, \"trialEndDate\": \"2025-08-21T02:13:08.035Z\"}', '2025-08-14 02:13:08.037', '2025-08-14 02:13:08.037', 'premium-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'PREMIUM'),
-('cmeat16op001349m9b8vhe604', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'TRIAL', '2025-08-14 02:53:08.758', '2025-08-21 02:53:08.758', 1, NULL, NULL, '{\"isTrial\": true, \"trialEndDate\": \"2025-08-21T02:53:08.758Z\"}', '2025-08-14 02:53:08.761', '2025-08-14 02:53:08.761', 'premium-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'PREMIUM'),
+('cmeat16op001349m9b8vhe604', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'TRIAL', '2025-08-14 02:53:08.758', '2025-08-29 23:24:17.120', 1, NULL, NULL, '{\"isTrial\": true, \"trialEndDate\": \"2025-08-29T23:24:17.120Z\"}', '2025-08-14 02:53:08.761', '2025-08-22 23:24:17.125', 'basic-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'BASIC'),
 ('cmej3sgw4000212uhhzq21kgl', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'ACTIVE', '2025-08-19 22:16:27.265', '2025-09-19 22:16:27.265', 1, NULL, NULL, '{}', '2025-08-19 22:16:27.268', '2025-08-19 22:16:27.268', 'premium-tier', 10, 0, 0, 0, 0, 1, 1, 1, 0, 0, 'PREMIUM');
 
 -- --------------------------------------------------------
@@ -3558,7 +3604,8 @@ INSERT INTO `subscription_logs` (`id`, `subscriptionId`, `action`, `oldPlan`, `n
 ('cmeasi3zy000w49m93u4rrcmc', 'cmeasi3zv000v49m9oy6kkqjf', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'Trial subscription created', NULL, '2025-08-14 02:38:18.815'),
 ('cmeaswfx6001049m91cajxccc', 'cmeaswfx2000z49m981oqmynv', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'Trial subscription created', NULL, '2025-08-14 02:49:27.451'),
 ('cmeat16os001449m9xc0p5mgv', 'cmeat16op001349m9b8vhe604', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'Trial subscription created', NULL, '2025-08-14 02:53:08.765'),
-('cmej3sgwa000312uh2kexm1vs', 'cmej3sgw4000212uhhzq21kgl', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'New subscription created', NULL, '2025-08-19 22:16:27.274');
+('cmej3sgwa000312uh2kexm1vs', 'cmej3sgw4000212uhhzq21kgl', 'CREATE', NULL, 'PREMIUM', 0, 24.99, 'MONTHLY', 'MONTHLY', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'New subscription created', NULL, '2025-08-19 22:16:27.274'),
+('cmengj97v0002ldjdt814sc70', 'cmeat16op001349m9b8vhe604', 'UPGRADE', 'PREMIUM', 'BASIC', 0, 12.99, 'MONTHLY', 'MONTHLY', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'Plan upgrade', NULL, '2025-08-22 23:24:17.131');
 
 -- --------------------------------------------------------
 
