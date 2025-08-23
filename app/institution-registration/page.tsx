@@ -51,7 +51,7 @@ export default function InstitutionRegistrationPage() {
     institutionEmail: '',
     website: '',
     description: '',
-    country: '',
+    country: 'United States',
     state: '',
     city: '',
     address: '',

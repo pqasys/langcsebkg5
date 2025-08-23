@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 23, 2025 at 03:02 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 23, 2025 at 06:03 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -269,18 +269,61 @@ INSERT INTO `commission_tiers` (`id`, `planType`, `commissionRate`, `features`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `community_announcements`
+--
+
+DROP TABLE IF EXISTS `community_announcements`;
+CREATE TABLE IF NOT EXISTS `community_announcements` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cefrLevel` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `likes` int NOT NULL DEFAULT '0',
+  `isPublic` tinyint(1) NOT NULL DEFAULT '1',
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  `certificateId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `community_announcements_userId_idx` (`userId`),
+  KEY `community_announcements_language_idx` (`language`),
+  KEY `community_announcements_isPublic_idx` (`isPublic`),
+  KEY `community_announcements_createdAt_idx` (`createdAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `community_announcement_likes`
+--
+
+DROP TABLE IF EXISTS `community_announcement_likes`;
+CREATE TABLE IF NOT EXISTS `community_announcement_likes` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `announcementId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `community_announcement_likes_announcementId_userId_key` (`announcementId`,`userId`),
+  KEY `community_announcement_likes_userId_idx` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `community_circles`
 --
 
 DROP TABLE IF EXISTS `community_circles`;
 CREATE TABLE IF NOT EXISTS `community_circles` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `language` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `level` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `ownerId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `ownerId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isPublic` tinyint(1) NOT NULL DEFAULT '1',
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -289,7 +332,8 @@ CREATE TABLE IF NOT EXISTS `community_circles` (
   UNIQUE KEY `community_circles_slug_key` (`slug`),
   KEY `community_circles_language_idx` (`language`),
   KEY `community_circles_level_idx` (`level`),
-  KEY `community_circles_isPublic_idx` (`isPublic`)
+  KEY `community_circles_isPublic_idx` (`isPublic`),
+  KEY `community_circles_ownerId_fkey` (`ownerId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -300,10 +344,10 @@ CREATE TABLE IF NOT EXISTS `community_circles` (
 
 DROP TABLE IF EXISTS `community_circle_memberships`;
 CREATE TABLE IF NOT EXISTS `community_circle_memberships` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `circleId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'MEMBER',
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `circleId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'MEMBER',
   `joinedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`id`),
   UNIQUE KEY `community_circle_memberships_circleId_userId_key` (`circleId`,`userId`),

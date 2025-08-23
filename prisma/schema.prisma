@@ -129,6 +129,8 @@ model user {
   videoSessions VideoSession[]
   liveConversationsHosted     LiveConversation[]        @relation("LiveConversationHost")
   liveConversationsInstructed LiveConversation[]        @relation("LiveConversationInstructor")
+  communityAnnouncements CommunityAnnouncement[]
+  communityCircles CommunityCircle[]
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@map("user")
@@ -1936,6 +1938,7 @@ model CommunityCircle {
   updatedAt   DateTime @updatedAt
 
   members CommunityCircleMembership[]
+  owner user? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
 
   @@index([language])
   @@index([level])
@@ -1952,7 +1955,50 @@ model CommunityCircleMembership {
 
   circle CommunityCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
 
-  @@unique([circleId, userId], name: "unique_circle_membership")
+  @@unique([circleId, userId], name: "circleId_userId")
   @@index([userId])
   @@map("community_circle_memberships")
+}
+
+// Community Announcements (achievement sharing and community engagement)
+model CommunityAnnouncement {
+  id          String   @id @default(cuid())
+  userId      String   @db.VarChar(36)
+  title       String   @db.VarChar(200)
+  message     String   @db.Text
+  language    String   @db.VarChar(10)
+  cefrLevel   String   @db.VarChar(10)
+  likes       Int      @default(0)
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Certificate reference (optional)
+  certificateId String? @db.VarChar(36)
+  
+  // User relation
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Likes relation
+  likes_relation CommunityAnnouncementLike[]
+
+  @@index([userId])
+  @@index([language])
+  @@index([isPublic])
+  @@index([createdAt])
+  @@map("community_announcements")
+}
+
+// Community Announcement Likes
+model CommunityAnnouncementLike {
+  id             String   @id @default(cuid())
+  announcementId String   @db.VarChar(36)
+  userId         String   @db.VarChar(36)
+  createdAt      DateTime @default(now())
+
+  announcement CommunityAnnouncement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId], name: "announcementId_userId")
+  @@index([userId])
+  @@map("community_announcement_likes")
 }

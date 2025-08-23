@@ -29,7 +29,16 @@ export async function GET(request: NextRequest) {
       where,
       orderBy: { createdAt: 'desc' },
       take: limit,
-      include: { members: true },
+      include: { 
+        members: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          }
+        }
+      },
     })
 
     const result = circles.map(c => ({
@@ -42,6 +51,7 @@ export async function GET(request: NextRequest) {
       membersCount: c.members.length,
       isPublic: c.isPublic,
       createdAt: c.createdAt,
+      owner: c.owner,
     }))
 
     return NextResponse.json(result)

@@ -143,8 +143,8 @@ export function CourseForm({
     title: '',
     description: '',
     categoryId: '',
-    framework: '',
-    level: '',
+    framework: 'CEFR',
+    level: 'A1',
     startDate: '',
     endDate: '',
     maxStudents: '',
@@ -154,8 +154,8 @@ export function CourseForm({
     tags: [],
     // Simplified course classification fields
     hasLiveClasses: false,
-    liveClassType: '',
-    liveClassFrequency: '',
+    liveClassType: 'CONVERSATION',
+    liveClassFrequency: 'WEEKLY',
     liveClassSchedule: undefined,
     isPlatformCourse: false,
     // Institution courses cannot be subscription-based - only platform courses (institutionId = null) can be
@@ -209,7 +209,7 @@ export function CourseForm({
       setFormData(prev => ({
         ...prev,
         framework: value,
-        level: levels.length > 0 ? levels[0].value : ''
+        level: levels.length > 0 ? levels[0].value : 'A1'
       }));
     } else if (field === 'startDate' || field === 'endDate') {
       // Update the specific date field
@@ -485,14 +485,14 @@ export function CourseForm({
             <div className="space-y-2">
               <Label htmlFor="subscriptionTier" className="text-gray-500">Subscription Tier</Label>
               <Select
-                value=""
+                value="na"
                 disabled
               >
                 <SelectTrigger className="bg-gray-100">
                   <SelectValue placeholder="Not applicable" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">N/A</SelectItem>
+                  <SelectItem value="na">N/A</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-gray-500">

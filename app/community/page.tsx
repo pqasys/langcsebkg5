@@ -1,11 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   Trophy, 
   Star, 
@@ -16,7 +21,9 @@ import {
   Globe,
   Award,
   Calendar,
-  MessageCircle
+  MessageCircle,
+  Plus,
+  Filter
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -33,20 +40,25 @@ interface Announcement {
     name: string;
     image?: string;
   };
-  certificate: {
-    certificateId: string;
-    language: string;
-    languageName: string;
-    cefrLevel: string;
-    score: number;
-    totalQuestions: number;
-  };
+  certificateId?: string;
 }
 
 export default function CommunityPage() {
   const { data: session } = useSession();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [filters, setFilters] = useState({
+    language: 'all',
+    level: 'all'
+  });
+  const [newAnnouncement, setNewAnnouncement] = useState({
+    title: '',
+    message: '',
+    language: 'en',
+    cefrLevel: 'A1'
+  });
   const [stats, setStats] = useState({
     totalMembers: 0,
     totalCertificates: 0,
@@ -54,18 +66,20 @@ export default function CommunityPage() {
     activeToday: 0
   });
 
-  useEffect(() => {
-    fetchAnnouncements();
-    fetchStats();
-  }, []);
-
-  const fetchAnnouncements = async () => {
+  const fetchAnnouncements = useCallback(async () => {
     try {
-      const response = await fetch('/api/community/announcements?limit=50');
+      const params = new URLSearchParams();
+      if (filters.language && filters.language !== 'all') params.append('language', filters.language);
+      if (filters.level && filters.level !== 'all') params.append('level', filters.level);
+      
+      const response = await fetch(`/api/community/announcements?${params.toString()}`);
       const data = await response.json();
       
       if (data.success) {
-        setAnnouncements(data.data);
+        setAnnouncements(data.data || []);
+      } else {
+        console.error('API returned error:', data.error);
+        setAnnouncements([]);
       }
     } catch (error) {
       console.error('Error fetching announcements:', error);
@@ -73,9 +87,9 @@ export default function CommunityPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     // Mock stats for now - in real app, this would come from API
     setStats({
       totalMembers: 1247,
@@ -83,7 +97,12 @@ export default function CommunityPage() {
       totalAchievements: 1893,
       activeToday: 156
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAnnouncements();
+    fetchStats();
+  }, [fetchAnnouncements, fetchStats]);
 
   const handleLike = async (announcementId: string) => {
     try {
@@ -106,23 +125,35 @@ export default function CommunityPage() {
     }
   };
 
-  const handleShare = async (certificateId: string) => {
+  const handleCreateAnnouncement = async () => {
+    if (!newAnnouncement.title || !newAnnouncement.message || !newAnnouncement.language || !newAnnouncement.cefrLevel) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setCreating(true);
     try {
       const response = await fetch('/api/community/announcements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ certificateId, isPublic: true })
+        body: JSON.stringify(newAnnouncement)
       });
       
       const data = await response.json();
       
       if (data.success) {
-        toast.success('Certificate shared with community!');
+        toast.success('Achievement shared with community!');
+        setShowCreateDialog(false);
+        setNewAnnouncement({ title: '', message: '', language: 'en', cefrLevel: 'A1' });
         fetchAnnouncements(); // Refresh the list
+      } else {
+        toast.error(data.error || 'Failed to share achievement');
       }
     } catch (error) {
-      console.error('Error sharing certificate:', error);
-      toast.error('Failed to share certificate');
+      console.error('Error creating announcement:', error);
+      toast.error('Failed to share achievement');
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -169,9 +200,28 @@ export default function CommunityPage() {
         <div className="container mx-auto px-6 py-16">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">FluentShip Community</h1>
-            <p className="text-xl text-blue-100">
+            <p className="text-xl text-blue-100 mb-6">
               Celebrate language learning achievements and connect with fellow learners
             </p>
+            <div className="flex justify-center space-x-4">
+              <Link href="/community/circles">
+                <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <Users className="h-4 w-4 mr-2" />
+                  Join Study Circles
+                </Button>
+              </Link>
+              <Link href="/community/clubs">
+                <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  RSVP to Clubs
+                </Button>
+              </Link>
+              <Link href="/features/community-learning">
+                <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  Learn More
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -212,6 +262,128 @@ export default function CommunityPage() {
           </Card>
         </div>
 
+        {/* Filters and Create Button */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <Select value={filters.language} onValueChange={(value) => setFilters(prev => ({ ...prev, language: value }))}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Languages</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Spanish</SelectItem>
+                  <SelectItem value="fr">French</SelectItem>
+                  <SelectItem value="de">German</SelectItem>
+                  <SelectItem value="it">Italian</SelectItem>
+                  <SelectItem value="pt">Portuguese</SelectItem>
+                  <SelectItem value="ru">Russian</SelectItem>
+                  <SelectItem value="zh">Chinese</SelectItem>
+                  <SelectItem value="ja">Japanese</SelectItem>
+                  <SelectItem value="ko">Korean</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Select value={filters.level} onValueChange={(value) => setFilters(prev => ({ ...prev, level: value }))}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                <SelectItem value="A1">A1</SelectItem>
+                <SelectItem value="A2">A2</SelectItem>
+                <SelectItem value="B1">B1</SelectItem>
+                <SelectItem value="B2">B2</SelectItem>
+                <SelectItem value="C1">C1</SelectItem>
+                <SelectItem value="C2">C2</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {session?.user && (
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Share Achievement
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Share Your Achievement</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Title</label>
+                    <Input
+                      placeholder="e.g., Passed B2 Spanish Test!"
+                      value={newAnnouncement.title}
+                      onChange={(e) => setNewAnnouncement(prev => ({ ...prev, title: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Message</label>
+                    <Textarea
+                      placeholder="Share your learning journey..."
+                      value={newAnnouncement.message}
+                      onChange={(e) => setNewAnnouncement(prev => ({ ...prev, message: e.target.value }))}
+                      rows={3}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">Language</label>
+                      <Select value={newAnnouncement.language} onValueChange={(value) => setNewAnnouncement(prev => ({ ...prev, language: value }))}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">English</SelectItem>
+                          <SelectItem value="es">Spanish</SelectItem>
+                          <SelectItem value="fr">French</SelectItem>
+                          <SelectItem value="de">German</SelectItem>
+                          <SelectItem value="it">Italian</SelectItem>
+                          <SelectItem value="pt">Portuguese</SelectItem>
+                          <SelectItem value="ru">Russian</SelectItem>
+                          <SelectItem value="zh">Chinese</SelectItem>
+                          <SelectItem value="ja">Japanese</SelectItem>
+                          <SelectItem value="ko">Korean</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">CEFR Level</label>
+                      <Select value={newAnnouncement.cefrLevel} onValueChange={(value) => setNewAnnouncement(prev => ({ ...prev, cefrLevel: value }))}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="A1">A1</SelectItem>
+                          <SelectItem value="A2">A2</SelectItem>
+                          <SelectItem value="B1">B1</SelectItem>
+                          <SelectItem value="B2">B2</SelectItem>
+                          <SelectItem value="C1">C1</SelectItem>
+                          <SelectItem value="C2">C2</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleCreateAnnouncement} disabled={creating}>
+                      {creating ? 'Sharing...' : 'Share'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
+
         {/* Recent Achievements */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
@@ -246,16 +418,12 @@ export default function CommunityPage() {
                       <div className="flex items-center space-x-4 mb-4">
                         <div className="flex items-center space-x-2">
                           <span className="text-2xl">{getLanguageFlag(announcement.language)}</span>
-                          <span className="font-medium">{announcement.certificate.languageName}</span>
+                          <span className="font-medium">{announcement.language.toUpperCase()}</span>
                         </div>
                         
-                        <Badge className={getLevelColor(announcement.certificate.cefrLevel)}>
-                          {announcement.certificate.cefrLevel}
+                        <Badge className={getLevelColor(announcement.cefrLevel)}>
+                          {announcement.cefrLevel}
                         </Badge>
-                        
-                        <div className="text-sm text-gray-600">
-                          Score: {announcement.certificate.score}/{announcement.certificate.totalQuestions}
-                        </div>
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -284,11 +452,10 @@ export default function CommunityPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleShare(announcement.certificate.certificateId)}
                             className="flex items-center space-x-1"
                           >
                             <Share2 className="h-4 w-4" />
-                            <span>Share</span>
+                            <span>Edit</span>
                           </Button>
                         )}
                       </div>
@@ -327,8 +494,8 @@ export default function CommunityPage() {
                 <Button onClick={() => window.location.href = '/language-proficiency-test'}>
                   Take a Test
                 </Button>
-                <Button variant="outline" onClick={() => window.location.href = '/certificates'}>
-                  View My Certificates
+                <Button variant="outline" onClick={() => setShowCreateDialog(true)}>
+                  Share Achievement
                 </Button>
               </div>
             </CardContent>

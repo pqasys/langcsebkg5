@@ -57,10 +57,10 @@ export function VideoSessionList({ userType, canCreateSessions }: VideoSessionLi
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
-    status: '',
-    language: '',
-    level: '',
-    sessionType: '',
+    status: 'all',
+    language: 'all',
+    level: 'all',
+    sessionType: 'all',
     search: ''
   });
 

@@ -97,8 +97,8 @@ export default function InstitutionQuizzesPage() {
   // Course selection modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourseForQuiz, setSelectedCourseForQuiz] = useState<string>('');
-  const [selectedModuleForQuiz, setSelectedModuleForQuiz] = useState<string>('');
+  const [selectedCourseForQuiz, setSelectedCourseForQuiz] = useState<string>('all');
+  const [selectedModuleForQuiz, setSelectedModuleForQuiz] = useState<string>('all');
   const [loadingCourses, setLoadingCourses] = useState(false);
 
   useEffect(() => {

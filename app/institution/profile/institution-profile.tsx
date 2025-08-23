@@ -26,8 +26,8 @@ export function InstitutionProfile() {
   const [loading, setLoading] = useState(true);
   const [institution, setInstitution] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedState, setSelectedState] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('United States');
+  const [selectedState, setSelectedState] = useState('Alabama');
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
@@ -187,11 +187,11 @@ export function InstitutionProfile() {
 
   const handleCountryChange = (value: string) => {
     setSelectedCountry(value);
-    setSelectedState('');
+    setSelectedState('Alabama');
     setFormData(prev => ({
       ...prev,
       country: value,
-      state: '',
+      state: 'Alabama',
       city: ''
     }));
   };

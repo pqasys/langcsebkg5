@@ -712,9 +712,11 @@ export default function CommunityLearningFeaturePage() {
               </>
             ) : (
               <>
-                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
-                  Join Free Community
-                </Button>
+                <Link href="/community">
+                  <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 text-gray-900">
+                    Join Free Community
+                  </Button>
+                </Link>
                 <Link href="/">
                   <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-600 font-semibold shadow-lg">
                     Back to Home

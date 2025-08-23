@@ -30,8 +30,8 @@ export default function SearchPageClient() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState<'all' | 'courses' | 'institutions'>('all');
   const [location, setLocation] = useState('');
-  const [level, setLevel] = useState('');
-  const [priceRange, setPriceRange] = useState('');
+  const [level, setLevel] = useState('all');
+  const [priceRange, setPriceRange] = useState('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);

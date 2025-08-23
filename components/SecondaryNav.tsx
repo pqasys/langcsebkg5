@@ -112,15 +112,15 @@ export default function SecondaryNav() {
           </div>
           {/* Right actions: Community CTAs, Search and Notifications */}
           <div className="flex items-center gap-2">
-            <Link href="/language-proficiency-test">
-              <Button size="sm" className="h-7 py-0 px-2 text-[11px]">Free Test</Button>
-            </Link>
-            <Link href="/community/circles">
-              <Button size="sm" variant="outline" className="h-7 py-0 px-2 text-[11px]">Join a Circle</Button>
-            </Link>
-            <Link href="/community/clubs">
-              <Button size="sm" className="h-7 py-0 px-2 text-[11px]">RSVP a Club</Button>
-            </Link>
+            <Button asChild className="h-5 min-h-0 px-2 py-0 text-[11px] font-medium">
+              <Link href="/language-proficiency-test">Free Test</Link>
+            </Button>
+            <Button asChild variant="outline" className="h-5 min-h-0 px-2 py-0 text-[11px] font-medium">
+              <Link href="/community/circles">Join a Circle</Link>
+            </Button>
+            <Button asChild className="h-5 min-h-0 px-2 py-0 text-[11px] font-medium">
+              <Link href="/community/clubs">RSVP a Club</Link>
+            </Button>
             <Link
               href="/search"
               className="inline-flex items-center justify-center rounded p-1.5 text-gray-300 hover:text-white hover:bg-gray-800"

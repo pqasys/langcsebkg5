@@ -68,8 +68,8 @@ export default function StudentLiveClassesPage() {
   const [liveClasses, setLiveClasses] = useState<LiveClass[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [languageFilter, setLanguageFilter] = useState('');
-  const [levelFilter, setLevelFilter] = useState('');
+  const [languageFilter, setLanguageFilter] = useState('all');
+  const [levelFilter, setLevelFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [accessLevel, setAccessLevel] = useState<AccessLevel>({

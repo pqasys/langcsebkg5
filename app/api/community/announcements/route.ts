@@ -1,15 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { CertificateService } from '@/lib/services/certificate-service';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50);
     const page = parseInt(searchParams.get('page') || '1');
+    const offset = (page - 1) * limit;
 
-    const announcements = await CertificateService.getPublicAnnouncements(limit);
+    const where: any = { isPublic: true };
+    const language = searchParams.get('language');
+    const level = searchParams.get('level');
+    
+    if (language) where.language = language;
+    if (level) where.cefrLevel = level;
+
+    const announcements = await prisma.communityAnnouncement.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          }
+        }
+      }
+    });
+
+    const total = await prisma.communityAnnouncement.count({
+      where
+    });
 
     return NextResponse.json({
       success: true,
@@ -17,7 +43,8 @@ export async function GET(request: NextRequest) {
       pagination: {
         page,
         limit,
-        total: announcements.length
+        total,
+        pages: Math.ceil(total / limit)
       }
     });
 
@@ -38,29 +65,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { certificateId, isPublic } = await request.json();
+    const { title, message, language, cefrLevel, certificateId } = await request.json();
 
-    if (!certificateId) {
-      return NextResponse.json({ error: 'Certificate ID is required' }, { status: 400 });
+    if (!title || !message || !language || !cefrLevel) {
+      return NextResponse.json({ 
+        error: 'Title, message, language, and CEFR level are required' 
+      }, { status: 400 });
     }
 
-    // Share certificate and create announcement
-    const result = await CertificateService.shareCertificate(
-      certificateId,
-      session.user.id,
-      isPublic
-    );
+    const announcement = await prisma.communityAnnouncement.create({
+      data: {
+        userId: session.user.id,
+        title,
+        message,
+        language,
+        cefrLevel,
+        certificateId: certificateId || null,
+        isPublic: true,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          }
+        }
+      }
+    });
 
     return NextResponse.json({
       success: true,
-      data: result,
-      message: isPublic ? 'Certificate shared with community!' : 'Certificate made private'
+      data: announcement,
+      message: 'Achievement shared with community!'
     });
 
   } catch (error) {
-    console.error('Error sharing certificate:', error);
+    console.error('Error creating announcement:', error);
     return NextResponse.json(
-      { error: 'Failed to share certificate' },
+      { error: 'Failed to share achievement' },
       { status: 500 }
     );
   }

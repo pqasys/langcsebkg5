@@ -33,7 +33,7 @@ export default function ContactPageClient() {
     email: '',
     subject: '',
     message: '',
-    category: ''
+    category: 'general'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -63,7 +63,7 @@ export default function ContactPageClient() {
           email: '',
           subject: '',
           message: '',
-          category: ''
+          category: 'general'
         });
       } else {
         setSubmitStatus('error');

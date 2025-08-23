@@ -1,28 +1,77 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic'
-
-export async function POST(_req: NextRequest, { params }: { params: { clubId: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { clubId: string } }
+) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    const sessionObj = await prisma.videoSession.findUnique({ where: { id: params.clubId } })
-    if (!sessionObj || sessionObj.status !== 'SCHEDULED') return NextResponse.json({ error: 'Club not found' }, { status: 404 })
+    const clubId = params.clubId;
 
-    // Upsert participant RSVP
-    await prisma.videoSessionParticipant.upsert({
-      where: { sessionId_userId: { sessionId: params.clubId, userId: session.user.id } },
-      update: { isActive: true },
-      create: { sessionId: params.clubId, userId: session.user.id, role: 'PARTICIPANT', isActive: true },
-    })
+    // Check if video session exists and is public
+    const videoSession = await prisma.videoSession.findUnique({
+      where: { id: clubId },
+      include: {
+        participants: true
+      }
+    });
 
-    return NextResponse.redirect(new URL('/community/clubs', process.env.NEXTAUTH_URL || 'http://localhost:3000'))
-  } catch (e) {
-    return NextResponse.json({ error: 'Failed to RSVP' }, { status: 500 })
+    if (!videoSession) {
+      return NextResponse.json({ error: 'Club not found' }, { status: 404 });
+    }
+
+    if (!videoSession.isPublic) {
+      return NextResponse.json({ error: 'This club is not public' }, { status: 403 });
+    }
+
+    // Check if session is in the future
+    if (new Date(videoSession.startTime) <= new Date()) {
+      return NextResponse.json({ error: 'Cannot RSVP to past sessions' }, { status: 400 });
+    }
+
+    // Check if user is already a participant
+    const existingParticipation = videoSession.participants.find(
+      p => p.userId === session.user.id
+    );
+
+    if (existingParticipation) {
+      return NextResponse.json({ error: 'Already RSVPed to this club' }, { status: 400 });
+    }
+
+    // Check capacity
+    if (videoSession.participants.length >= videoSession.maxParticipants) {
+      return NextResponse.json({ error: 'Club is at full capacity' }, { status: 400 });
+    }
+
+    // Add user as participant
+    await prisma.videoSessionParticipant.create({
+      data: {
+        sessionId: clubId,
+        userId: session.user.id,
+        role: 'PARTICIPANT',
+        status: 'CONFIRMED'
+      }
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Successfully RSVPed to club'
+    });
+
+  } catch (error) {
+    console.error('Error RSVPing to club:', error);
+    return NextResponse.json(
+      { error: 'Failed to RSVP to club' },
+      { status: 500 }
+    );
   }
 }
 

@@ -81,7 +81,7 @@ export default function InstitutionQuestionBanksPage() {
   const [questionTemplates, setQuestionTemplates] = useState<QuestionTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showTemplateDialog, setShowTemplateDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
