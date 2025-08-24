@@ -167,7 +167,7 @@ export class CertificateService {
       });
 
       if (!existingAchievement && criteria.condition(certificate, userHistory)) {
-        // Create achievement
+        // Create achievement using the UserAchievement model
         await prisma.userAchievement.create({
           data: {
             userId: certificate.userId,
@@ -185,32 +185,37 @@ export class CertificateService {
   }
 
   static async shareCertificate(certificateId: string, userId: string, isPublic: boolean = true): Promise<any> {
-    const certificate = await prisma.certificate.findFirst({
-      where: {
-        certificateId,
-        userId
+    try {
+      const certificate = await prisma.certificate.findFirst({
+        where: {
+          certificateId,
+          userId
+        }
+      });
+
+      if (!certificate) {
+        throw new Error('Certificate not found');
       }
-    });
 
-    if (!certificate) {
-      throw new Error('Certificate not found');
-    }
+      // Update certificate visibility
+      const updatedCertificate = await prisma.certificate.update({
+        where: { id: certificate.id },
+        data: {
+          isPublic,
+          sharedAt: isPublic ? new Date() : null
+        }
+      });
 
-    // Update certificate visibility
-    const updatedCertificate = await prisma.certificate.update({
-      where: { id: certificate.id },
-      data: {
-        isPublic,
-        sharedAt: isPublic ? new Date() : null
+      // If making public, create community announcement
+      if (isPublic) {
+        await this.createCommunityAnnouncement(certificate);
       }
-    });
 
-    // If making public, create community announcement
-    if (isPublic) {
-      await this.createCommunityAnnouncement(certificate);
+      return updatedCertificate;
+    } catch (error) {
+      console.error('Error sharing certificate:', error);
+      throw new Error('Failed to share certificate');
     }
-
-    return updatedCertificate;
   }
 
   static async createCommunityAnnouncement(certificate: any): Promise<void> {
@@ -238,14 +243,19 @@ export class CertificateService {
   }
 
   static async getUserCertificates(userId: string): Promise<any[]> {
-    return await prisma.certificate.findMany({
-      where: { userId },
-      include: {
-        achievements: true,
-        announcements: true
-      },
-      orderBy: { completionDate: 'desc' }
-    });
+    try {
+      return await prisma.certificate.findMany({
+        where: { userId },
+        include: {
+          achievements: true,
+          announcements: true
+        },
+        orderBy: { completionDate: 'desc' }
+      });
+    } catch (error) {
+      console.error('Error fetching user certificates:', error);
+      return [];
+    }
   }
 
   static async getUserAchievements(userId: string): Promise<any[]> {
@@ -258,7 +268,7 @@ export class CertificateService {
           }
         }
       },
-      orderBy: { earnedAt: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
   }
 
@@ -301,17 +311,22 @@ export class CertificateService {
   }
 
   static async verifyCertificate(certificateId: string): Promise<any> {
-    return await prisma.certificate.findUnique({
-      where: { certificateId },
-      include: {
-        user: {
-          select: {
-            name: true
-          }
-        },
-        achievements: true
-      }
-    });
+    try {
+      return await prisma.certificate.findUnique({
+        where: { certificateId },
+        include: {
+          user: {
+            select: {
+              name: true
+            }
+          },
+          achievements: true
+        }
+      });
+    } catch (error) {
+      console.error('Error verifying certificate:', error);
+      return null;
+    }
   }
 
   static async getCertificateStats(userId: string): Promise<any> {

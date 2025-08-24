@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-// import { toast } from 'sonner';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -131,6 +131,8 @@ export function SimpleNotifications() {
         return '📦';
       case 'security':
         return '🔒';
+      case 'connection':
+        return '👥';
       default:
         return '🔔';
     }
@@ -228,16 +230,22 @@ export function SimpleNotifications() {
             </div>
           )}
         </ScrollArea>
-        {notifications.length > 0 && (
-          <div className="p-4 border-t">
+        <div className="p-4 border-t space-y-2">
+          {notifications.length > 0 && (
             <Link
               href="/notifications"
               className="block text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
             >
               View all notifications
             </Link>
-          </div>
-        )}
+          )}
+          <Link
+            href="/connections/requests"
+            className="block text-center text-sm text-green-600 hover:text-green-800 font-medium"
+          >
+            Connection Requests
+          </Link>
+        </div>
       </PopoverContent>
     </Popover>
   );

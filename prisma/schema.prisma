@@ -123,6 +123,8 @@ model user {
   updatedAt          DateTime  @default(now()) @updatedAt
   status             String    @default("ACTIVE") @db.VarChar(20)
   forcePasswordReset Boolean   @default(false)
+  profileVisibility  SocialVisibility @default(PUBLIC)
+  lastLoginAt        DateTime?
 
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
@@ -131,8 +133,26 @@ model user {
   liveConversationsInstructed LiveConversation[]        @relation("LiveConversationInstructor")
   communityAnnouncements CommunityAnnouncement[]
   communityCircles CommunityCircle[]
+  
+  // Connection relations
+  sentConnectionRequests     ConnectionRequest[] @relation("ConnectionRequestSender")
+  receivedConnectionRequests ConnectionRequest[] @relation("ConnectionRequestReceiver")
+  connectionsAsUser1         UserConnection[]    @relation("UserConnectionUser1")
+  connectionsAsUser2         UserConnection[]    @relation("UserConnectionUser2")
+  
+  // Connection incentives
+  connectionPoints           ConnectionPoints[]
+  connectionAchievements     ConnectionAchievement[]
+  userRewards               UserReward[]
+  
+  // Certificate system
+  certificates               Certificate[]
+  userAchievements           UserAchievement[]
+  languageProficiencyTestAttempts LanguageProficiencyTestAttempt[]
 
   @@index([institutionId], map: "user_institutionId_fkey")
+  @@index([profileVisibility])
+  @@index([lastLoginAt])
   @@map("user")
 }
 
@@ -1727,6 +1747,10 @@ model LanguageProficiencyTestAttempt {
   completedAt  DateTime @default(now())
   createdAt    DateTime @default(now())
 
+  // Relations
+  user         user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  certificate  Certificate?
+
   @@index([userId])
   @@index([languageCode])
   @@index([completedAt])
@@ -1964,6 +1988,8 @@ model CommunityCircleMembership {
 model CommunityAnnouncement {
   id          String   @id @default(cuid())
   userId      String   @db.VarChar(36)
+  certificateId String? @db.VarChar(36)
+  type        String   @db.VarChar(50)
   title       String   @db.VarChar(200)
   message     String   @db.Text
   language    String   @db.VarChar(10)
@@ -1973,16 +1999,15 @@ model CommunityAnnouncement {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Certificate reference (optional)
-  certificateId String? @db.VarChar(36)
-  
-  // User relation
+  // Relations
   user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  certificate Certificate? @relation(fields: [certificateId], references: [id], onDelete: SetNull)
   
   // Likes relation
   likes_relation CommunityAnnouncementLike[]
 
   @@index([userId])
+  @@index([type])
   @@index([language])
   @@index([isPublic])
   @@index([createdAt])
@@ -2002,3 +2027,160 @@ model CommunityAnnouncementLike {
   @@index([userId])
   @@map("community_announcement_likes")
 }
+
+// User Connection Models
+model ConnectionRequest {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  senderId    String   @db.VarChar(36)
+  receiverId  String   @db.VarChar(36)
+  message     String?  @db.Text
+  status      ConnectionRequestStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  respondedAt DateTime?
+
+  // Relations
+  sender   user @relation("ConnectionRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver user @relation("ConnectionRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("connection_requests")
+}
+
+model UserConnection {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  user1Id   String   @db.VarChar(36)
+  user2Id   String   @db.VarChar(36)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user1 user @relation("UserConnectionUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 user @relation("UserConnectionUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([createdAt])
+  @@map("user_connections")
+}
+
+enum ConnectionRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+// Connection Incentives System
+model ConnectionPoints {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  userId      String   @db.VarChar(36)
+  activityType String  @db.VarChar(50)
+  points      Int
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([activityType])
+  @@index([createdAt])
+  @@map("connection_points")
+}
+
+model ConnectionAchievement {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  userId          String   @db.VarChar(36)
+  achievementType String   @db.VarChar(50)
+  title           String   @db.VarChar(100)
+  description     String?  @db.Text
+  icon            String   @db.VarChar(10)
+  points          Int
+  earnedAt        DateTime @default(now())
+
+  // Relations
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([achievementType])
+  @@index([earnedAt])
+  @@map("connection_achievements")
+}
+
+model UserReward {
+  id          String    @id @default(uuid()) @db.VarChar(36)
+  userId      String    @db.VarChar(36)
+  rewardType  String    @db.VarChar(50)
+  description String?   @db.Text
+  redeemedAt  DateTime  @default(now())
+  expiresAt   DateTime?
+
+  // Relations
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([rewardType])
+  @@index([redeemedAt])
+  @@map("user_rewards")
+}
+
+// Certificate System Models
+model Certificate {
+  id              String   @id @default(uuid()) @db.VarChar(36)
+  certificateId   String   @unique @db.VarChar(100)
+  userId          String   @db.VarChar(36)
+  testAttemptId   String   @unique @db.VarChar(36)
+  language        String   @db.VarChar(10)
+  languageName    String   @db.VarChar(50)
+  cefrLevel       String   @db.VarChar(10)
+  score           Int
+  totalQuestions  Int
+  completionDate  DateTime
+  certificateUrl  String?  @db.Text
+  isPublic        Boolean  @default(false)
+  sharedAt        DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testAttempt     LanguageProficiencyTestAttempt @relation(fields: [testAttemptId], references: [id], onDelete: Cascade)
+  achievements    UserAchievement[]
+  announcements   CommunityAnnouncement[]
+
+  @@index([userId])
+  @@index([certificateId])
+  @@index([language])
+  @@index([cefrLevel])
+  @@index([completionDate])
+  @@map("certificates")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid()) @db.VarChar(36)
+  userId        String   @db.VarChar(36)
+  certificateId String?  @db.VarChar(36)
+  type          String   @db.VarChar(50)
+  title         String   @db.VarChar(100)
+  description   String?  @db.Text
+  icon          String   @db.VarChar(10)
+  color         String   @db.VarChar(20)
+  isPublic      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  // Relations
+  user          user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  certificate   Certificate? @relation(fields: [certificateId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("user_achievements")
+}
+

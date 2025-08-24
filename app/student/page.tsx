@@ -331,6 +331,42 @@ export default function StudentDashboard() {
         </Button>
       </div>
 
+      {/* Community CTA Bar */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Users className="h-5 w-5 text-blue-600" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Join the FluentShip Community</h3>
+                  <p className="text-sm text-gray-600">Connect with fellow learners, share achievements, and find study partners</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => router.push('/features/community-learning')}
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Explore Community
+              </Button>
+              <Button 
+                size="sm"
+                onClick={() => router.push('/features/community-learning')}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Trophy className="h-4 w-4 mr-2" />
+                Share Achievement
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Subscription Status Section - Always Visible */}
       {subscriptionData && (
         <Card className="border-l-4 border-l-blue-500">

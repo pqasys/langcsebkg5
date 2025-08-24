@@ -32,10 +32,22 @@ function LoginContent() {
       // Check if there's a callback URL in the URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const callbackUrl = urlParams.get('callbackUrl');
+      const connectUserId = urlParams.get('connect');
+      const message = urlParams.get('message');
       
       if (callbackUrl) {
-        // Use the callback URL if provided
-        router.push(callbackUrl);
+        // If there's a connection request, preserve the parameters
+        if (connectUserId) {
+          const redirectUrl = new URL(callbackUrl, window.location.origin);
+          redirectUrl.searchParams.set('connect', connectUserId);
+          if (message) {
+            redirectUrl.searchParams.set('message', message);
+          }
+          router.push(redirectUrl.toString());
+        } else {
+          // Use the callback URL if provided
+          router.push(callbackUrl);
+        }
       } else {
         // Fall back to role-based redirects
         if (session.user.role === 'INSTITUTION') {

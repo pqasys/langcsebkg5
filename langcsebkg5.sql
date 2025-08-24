@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 23, 2025 at 06:03 PM
+-- Generation Time: Aug 24, 2025 at 08:11 PM
 -- Server version: 8.0.31
 -- PHP Version: 8.1.13
 
@@ -213,6 +213,39 @@ INSERT INTO `category` (`id`, `name`, `description`, `createdAt`, `updatedAt`, `
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `certificates`
+--
+
+DROP TABLE IF EXISTS `certificates`;
+CREATE TABLE IF NOT EXISTS `certificates` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `certificateId` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `testAttemptId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `languageName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cefrLevel` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `score` int NOT NULL,
+  `totalQuestions` int NOT NULL,
+  `completionDate` datetime(3) NOT NULL,
+  `certificateUrl` text COLLATE utf8mb4_unicode_ci,
+  `isPublic` tinyint(1) NOT NULL DEFAULT '0',
+  `sharedAt` datetime(3) DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `certificates_certificateId_key` (`certificateId`),
+  UNIQUE KEY `certificates_testAttemptId_key` (`testAttemptId`),
+  KEY `certificates_userId_idx` (`userId`),
+  KEY `certificates_certificateId_idx` (`certificateId`),
+  KEY `certificates_language_idx` (`language`),
+  KEY `certificates_cefrLevel_idx` (`cefrLevel`),
+  KEY `certificates_completionDate_idx` (`completionDate`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `commissionratelog`
 --
 
@@ -285,11 +318,14 @@ CREATE TABLE IF NOT EXISTS `community_announcements` (
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
   `certificateId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `community_announcements_userId_idx` (`userId`),
   KEY `community_announcements_language_idx` (`language`),
   KEY `community_announcements_isPublic_idx` (`isPublic`),
-  KEY `community_announcements_createdAt_idx` (`createdAt`)
+  KEY `community_announcements_createdAt_idx` (`createdAt`),
+  KEY `community_announcements_type_idx` (`type`),
+  KEY `community_announcements_certificateId_fkey` (`certificateId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -336,6 +372,13 @@ CREATE TABLE IF NOT EXISTS `community_circles` (
   KEY `community_circles_ownerId_fkey` (`ownerId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `community_circles`
+--
+
+INSERT INTO `community_circles` (`id`, `name`, `slug`, `language`, `level`, `description`, `ownerId`, `isPublic`, `isActive`, `createdAt`, `updatedAt`) VALUES
+('cmepqd5by0001yzkfj4maa5xc', 'Beginners English Conversation Group', 'beginners-english-conversation-group', 'en', 'Beginner', 'This group aim to improve your listening, speaking and fluency skills. You will learn new vocabulary, idioms and expressions. \n\nA great opportunity for adults learning English as a second language to connect, practice speaking skills, and build confidence in a friendly and inclusive environment. \n\nMeet online in a real life setting, make friends from around the world, and discover new cultures', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 1, 1, '2025-08-24 13:35:00.309', '2025-08-24 13:35:00.309');
+
 -- --------------------------------------------------------
 
 --
@@ -352,6 +395,79 @@ CREATE TABLE IF NOT EXISTS `community_circle_memberships` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `community_circle_memberships_circleId_userId_key` (`circleId`,`userId`),
   KEY `community_circle_memberships_userId_idx` (`userId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `community_circle_memberships`
+--
+
+INSERT INTO `community_circle_memberships` (`id`, `circleId`, `userId`, `role`, `joinedAt`) VALUES
+('cmepqd5po0003yzkff5njyryf', 'cmepqd5by0001yzkfj4maa5xc', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'OWNER', '2025-08-24 13:35:01.164');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `connection_achievements`
+--
+
+DROP TABLE IF EXISTS `connection_achievements`;
+CREATE TABLE IF NOT EXISTS `connection_achievements` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `achievementType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `points` int NOT NULL,
+  `earnedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`),
+  KEY `connection_achievements_userId_idx` (`userId`),
+  KEY `connection_achievements_achievementType_idx` (`achievementType`),
+  KEY `connection_achievements_earnedAt_idx` (`earnedAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `connection_points`
+--
+
+DROP TABLE IF EXISTS `connection_points`;
+CREATE TABLE IF NOT EXISTS `connection_points` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activityType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `points` int NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`),
+  KEY `connection_points_userId_idx` (`userId`),
+  KEY `connection_points_activityType_idx` (`activityType`),
+  KEY `connection_points_createdAt_idx` (`createdAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `connection_requests`
+--
+
+DROP TABLE IF EXISTS `connection_requests`;
+CREATE TABLE IF NOT EXISTS `connection_requests` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `senderId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `receiverId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci,
+  `status` enum('PENDING','ACCEPTED','DECLINED','BLOCKED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  `respondedAt` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `connection_requests_senderId_receiverId_key` (`senderId`,`receiverId`),
+  KEY `connection_requests_senderId_idx` (`senderId`),
+  KEY `connection_requests_receiverId_idx` (`receiverId`),
+  KEY `connection_requests_status_idx` (`status`),
+  KEY `connection_requests_createdAt_idx` (`createdAt`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -2534,7 +2650,9 @@ INSERT INTO `notification_templates` (`id`, `name`, `type`, `subject`, `title`, 
 ('fa020a36-a804-46cf-bd1d-06b00edcd9b2', 'subscription_payment_failed', 'email', 'Subscription Payment Failed - {{institutionName}}', 'Subscription Payment Failed', '\n      <h1>Subscription Payment Failed</h1>\n      <p>Dear {{institutionName}},</p>\n      <p>We were unable to process your subscription payment.</p>\n      <p>Payment details:</p>\n      <ul>\n        <li>Plan: {{planName}}</li>\n        <li>Amount: {{amount}}</li>\n        <li>Due Date: {{dueDate}}</li>\n        <li>Error: {{error}}</li>\n      </ul>\n      <p>Please update your payment method to avoid service interruption.</p>\n      <p>Best regards,<br>The Platform Team</p>\n    ', NULL, 1, 1, 'subscription', '2025-07-06 21:59:17.898', '2025-07-07 01:47:00.150', '0e971fe1-d22a-446e-9fb9-f52149e29df3', NULL),
 ('6ac7abc6-cba0-4ddc-8a5d-5895dafbbf63', 'quiz_passed', 'email', 'Quiz Passed!', 'Quiz Passed!', '\n      <h1>Congratulations! You Passed the Quiz</h1>\n      <p>Dear {{name}},</p>\n      <p>Great job! You\'ve successfully passed the quiz: <strong>{{quizName}}</strong></p>\n      <p>Quiz details:</p>\n      <ul>\n        <li>Module: {{moduleName}}</li>\n        <li>Course: {{courseName}}</li>\n        <li>Score: {{score}}</li>\n        <li>Questions: {{totalQuestions}}</li>\n        <li>Correct Answers: {{correctAnswers}}</li>\n        <li>Time Taken: {{timeTaken}}</li>\n      </ul>\n      <p>Keep up the excellent work!</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'course', '2025-07-12 21:58:25.087', '2025-07-12 21:58:25.087', 'SYSTEM', NULL),
 ('71e30019-0fcf-45df-8bd6-757fa6b872de', 'quiz_failed', 'email', 'Quiz Result - Keep Learning!', 'Quiz Result - Keep Learning!', '\n      <h1>Quiz Result</h1>\n      <p>Dear {{name}},</p>\n      <p>You\'ve completed the quiz: <strong>{{quizName}}</strong></p>\n      <p>Quiz details:</p>\n      <ul>\n        <li>Module: {{moduleName}}</li>\n        <li>Course: {{courseName}}</li>\n        <li>Score: {{score}}</li>\n        <li>Questions: {{totalQuestions}}</li>\n        <li>Correct Answers: {{correctAnswers}}</li>\n        <li>Time Taken: {{timeTaken}}</li>\n      </ul>\n      <p>Don\'t worry! You can retake the quiz to improve your score. Review the module content and try again.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'course', '2025-07-12 21:58:25.113', '2025-07-12 21:58:25.113', 'SYSTEM', NULL),
-('cbda2c5c-9bc9-4a9c-85cf-45cab06b087a', 'achievement_unlocked', 'email', 'Achievement Unlocked!', 'Achievement Unlocked!', '\n      <h1>🎉 Achievement Unlocked!</h1>\n      <p>Dear {{name}},</p>\n      <p>Congratulations! You\'ve earned a new achievement:</p>\n      <div style=\"background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n        <h2 style=\"color: #0066cc; margin-top: 0;\">{{achievementName}}</h2>\n        <p><strong>Description:</strong> {{achievementDescription}}</p>\n        <p><strong>Type:</strong> {{type}}</p>\n        <p><strong>Points Earned:</strong> {{points}}</p>\n      </div>\n      <p>Keep up the great work and continue your learning journey!</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'achievement', '2025-07-12 21:58:25.126', '2025-07-12 21:58:25.126', 'SYSTEM', NULL),
+('cbda2c5c-9bc9-4a9c-85cf-45cab06b087a', 'achievement_unlocked', 'email', 'Achievement Unlocked!', 'Achievement Unlocked! 🎉', 'Congratulations! You\'ve unlocked the \"{achievementTitle}\" achievement and earned {points} points!', '[\"achievementTitle\", \"achievementDescription\", \"points\"]', 1, 1, 'achievement', '2025-07-12 21:58:25.126', '2025-08-24 19:23:27.540', 'SYSTEM', NULL),
+('200b8a80-55d5-4efa-9fb3-09eb4134df22', 'reward_redeemed', 'SYSTEM', NULL, 'Reward Redeemed! 🎁', 'You\'ve successfully redeemed \"{rewardTitle}\"! Check your account for details.', '[\"rewardTitle\", \"rewardDescription\"]', 1, 0, 'reward', '2025-08-24 19:23:27.623', '2025-08-24 19:23:27.623', 'system', NULL),
+('2a8f404c-cc1d-4802-84b4-52b79e84c271', 'points_earned', 'SYSTEM', NULL, 'Points Earned! ⭐', 'You\'ve earned {points} points for {activity}! Keep up the great work!', '[\"points\", \"activity\", \"description\"]', 1, 0, 'points', '2025-08-24 19:23:27.630', '2025-08-24 19:23:27.630', 'system', NULL),
 ('bae24e98-3834-4288-a5b1-6ef9b7094e2e', 'subscription_activated', 'email', 'Subscription Activated', 'Subscription Activated', '\n      <h1>Subscription Activated</h1>\n      <p>Dear {{name}},</p>\n      <p>Your subscription has been successfully activated!</p>\n      <p>Subscription details:</p>\n      <ul>\n        <li>Plan: {{planName}}</li>\n        <li>Status: {{newStatus}}</li>\n        <li>Effective Date: {{effectiveDate}}</li>\n      </ul>\n      <p>You now have access to all the features included in your plan.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'subscription', '2025-07-12 21:58:25.135', '2025-07-12 21:58:25.135', 'SYSTEM', NULL),
 ('bc65ff3c-9a67-41f1-bc97-dc59015da1b5', 'subscription_cancelled', 'email', 'Subscription Cancelled', 'Subscription Cancelled', '\n      <h1>Subscription Cancelled</h1>\n      <p>Dear {{name}},</p>\n      <p>Your subscription has been cancelled as requested.</p>\n      <p>Subscription details:</p>\n      <ul>\n        <li>Plan: {{planName}}</li>\n        <li>Previous Status: {{oldStatus}}</li>\n        <li>New Status: {{newStatus}}</li>\n        <li>Effective Date: {{effectiveDate}}</li>\n        <li>Reason: {{reason}}</li>\n      </ul>\n      <p>You will continue to have access until the end of your current billing period.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'subscription', '2025-07-12 21:58:25.148', '2025-07-12 21:58:25.148', 'SYSTEM', NULL),
 ('521fe38b-38fd-442a-9e68-8ff6a16b353b', 'subscription_past_due', 'email', 'Payment Past Due', 'Payment Past Due', '\n      <h1>Payment Past Due</h1>\n      <p>Dear {{name}},</p>\n      <p>Your subscription payment is past due.</p>\n      <p>Subscription details:</p>\n      <ul>\n        <li>Plan: {{planName}}</li>\n        <li>Previous Status: {{oldStatus}}</li>\n        <li>New Status: {{newStatus}}</li>\n        <li>Effective Date: {{effectiveDate}}</li>\n      </ul>\n      <p>Please update your payment method to avoid service interruption.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'subscription', '2025-07-12 21:58:25.171', '2025-07-12 21:58:25.171', 'SYSTEM', NULL),
@@ -2545,7 +2663,12 @@ INSERT INTO `notification_templates` (`id`, `name`, `type`, `subject`, `title`, 
 ('bf4101d1-72bd-41eb-ac02-44376a303e12', 'subscription_payment_reminder', 'email', 'Subscription Payment Reminder', 'Subscription Payment Reminder', '\n      <h1>Subscription Payment Reminder</h1>\n      <p>Dear {{name}},</p>\n      <p>This is a reminder that your subscription payment is due.</p>\n      <p>Payment details:</p>\n      <ul>\n        <li>Plan: {{subscriptionPlan}}</li>\n        <li>Amount: {{amount}}</li>\n        <li>Due Date: {{dueDate}}</li>\n        <li>Days Remaining: {{daysRemaining}}</li>\n      </ul>\n      <p>Please update your payment method to avoid service interruption.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'payment', '2025-07-12 21:58:25.255', '2025-07-12 21:58:25.255', 'SYSTEM', NULL),
 ('f313c30f-dc81-497e-ad4b-c361af5f128e', 'module_completion', 'email', 'Module Completed!', 'Module Completed!', '\n      <h1>Module Completed!</h1>\n      <p>Dear {{name}},</p>\n      <p>Congratulations! You\'ve completed the module: <strong>{{moduleName}}</strong></p>\n      <p>Module details:</p>\n      <ul>\n        <li>Course: {{courseName}}</li>\n        <li>Progress: {{progress}}</li>\n        <li>Content Completed: {{completedContent}}/{{totalContent}}</li>\n      </ul>\n      <p>Keep up the great work!</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'course', '2025-07-12 21:58:25.261', '2025-07-12 21:58:25.261', 'SYSTEM', NULL),
 ('0c6917cb-65e9-419b-8fee-56fb1c2b2ef8', 'learning_streak', 'email', 'Learning Streak Milestone!', 'Learning Streak Milestone!', '\n      <h1>🔥 Learning Streak Milestone!</h1>\n      <p>Dear {{name}},</p>\n      <p>Amazing! You\'ve reached a learning streak milestone!</p>\n      <p>Streak details:</p>\n      <ul>\n        <li>Current Streak: {{currentStreak}} days</li>\n        <li>Previous Best: {{previousStreak}} days</li>\n        <li>Milestone: {{milestone}} days</li>\n      </ul>\n      <p>Keep the momentum going! Consistency is key to learning success.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'achievement', '2025-07-12 21:58:25.269', '2025-07-12 21:58:25.269', 'SYSTEM', NULL),
-('24171c30-3a8b-4c2f-9fe2-1cc04246bf9e', 'refund_confirmation', 'email', 'Refund Confirmation', 'Refund Confirmation', '\n      <h1>Refund Confirmation</h1>\n      <p>Dear {{name}},</p>\n      <p>Your refund has been processed successfully.</p>\n      <p>Refund details:</p>\n      <ul>\n        <li>Original Amount: {{originalAmount}}</li>\n        <li>Refund Amount: {{refundAmount}}</li>\n        <li>Reference: {{referenceNumber}}</li>\n        <li>Course: {{courseName}}</li>\n        <li>Refund Date: {{refundedAt}}</li>\n      </ul>\n      <p>The refund will be credited to your original payment method within 5-10 business days.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'payment', '2025-07-12 22:07:45.534', '2025-07-12 22:07:45.534', 'SYSTEM', NULL);
+('24171c30-3a8b-4c2f-9fe2-1cc04246bf9e', 'refund_confirmation', 'email', 'Refund Confirmation', 'Refund Confirmation', '\n      <h1>Refund Confirmation</h1>\n      <p>Dear {{name}},</p>\n      <p>Your refund has been processed successfully.</p>\n      <p>Refund details:</p>\n      <ul>\n        <li>Original Amount: {{originalAmount}}</li>\n        <li>Refund Amount: {{refundAmount}}</li>\n        <li>Reference: {{referenceNumber}}</li>\n        <li>Course: {{courseName}}</li>\n        <li>Refund Date: {{refundedAt}}</li>\n      </ul>\n      <p>The refund will be credited to your original payment method within 5-10 business days.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'payment', '2025-07-12 22:07:45.534', '2025-07-12 22:07:45.534', 'SYSTEM', NULL),
+('b5a5ce52-18a7-4650-8062-4bec6315dda4', 'connection_request_received', 'email', 'New Connection Request from {{senderName}}', 'New Connection Request', '\n      <h1>You have a new connection request!</h1>\n      <p>Dear {{receiverName}},</p>\n      <p><strong>{{senderName}}</strong> would like to connect with you on FluentShip.</p>\n      <p>Message: {{message}}</p>\n      <p>Click the link below to view and respond to this request:</p>\n      <p><a href=\"{{connectionRequestUrl}}\" style=\"background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;\">View Connection Request</a></p>\n      <p>Best regards,<br>The FluentShip Team</p>\n    ', NULL, 1, 1, 'connection', '2025-08-24 18:33:10.659', '2025-08-24 18:33:10.659', 'SYSTEM', NULL),
+('38d87438-1b97-4d68-bfef-1cb91dca4c45', 'connection_request_accepted', 'email', '{{receiverName}} accepted your connection request!', 'Connection Request Accepted', '\n      <h1>Great news! Your connection request was accepted</h1>\n      <p>Dear {{senderName}},</p>\n      <p><strong>{{receiverName}}</strong> has accepted your connection request on FluentShip.</p>\n      <p>You can now:</p>\n      <ul>\n        <li>Send messages to each other</li>\n        <li>See each other\'s learning progress</li>\n        <li>Join study groups together</li>\n        <li>Practice languages together</li>\n      </ul>\n      <p>Click the link below to view their profile:</p>\n      <p><a href=\"{{receiverProfileUrl}}\" style=\"background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;\">View Profile</a></p>\n      <p>Best regards,<br>The FluentShip Team</p>\n    ', NULL, 1, 1, 'connection', '2025-08-24 18:33:10.687', '2025-08-24 18:33:10.687', 'SYSTEM', NULL),
+('db5a7596-a82b-4eff-9334-27af1a666fca', 'connection_request_declined', 'email', 'Connection request update', 'Connection Request Declined', '\n      <h1>Connection Request Update</h1>\n      <p>Dear {{senderName}},</p>\n      <p>Unfortunately, <strong>{{receiverName}}</strong> has declined your connection request on FluentShip.</p>\n      <p>Don\'t worry! You can still:</p>\n      <ul>\n        <li>Connect with other language learners</li>\n        <li>Join study groups and clubs</li>\n        <li>Participate in community discussions</li>\n        <li>Continue your language learning journey</li>\n      </ul>\n      <p>Keep learning and connecting with the FluentShip community!</p>\n      <p>Best regards,<br>The FluentShip Team</p>\n    ', NULL, 1, 1, 'connection', '2025-08-24 18:33:10.701', '2025-08-24 18:33:10.701', 'SYSTEM', NULL),
+('f66c37ea-4fab-4b80-8f82-715b3fe26d3b', 'new_connection_notification', 'system', NULL, 'New Connection: {{connectionName}}', '\n      <p>You are now connected with <strong>{{connectionName}}</strong>!</p>\n      <p>You can now send messages, see each other\'s learning progress, and join study groups together.</p>\n      <p><a href=\"{{connectionProfileUrl}}\">View Profile</a></p>\n    ', NULL, 1, 1, 'connection', '2025-08-24 18:33:10.728', '2025-08-24 18:33:10.728', 'SYSTEM', NULL),
+('bcc85af8-d3cc-483e-ba7c-b09a9b47aa5c', 'connection_milestone', 'SYSTEM', NULL, 'Connection Milestone! 🌟', 'You\'ve reached {milestone} connections! You\'re building an amazing learning network!', '[\"milestone\", \"totalConnections\"]', 1, 0, 'connection', '2025-08-24 19:23:27.640', '2025-08-24 19:23:27.640', 'system', NULL);
 
 -- --------------------------------------------------------
 
@@ -3772,39 +3895,108 @@ CREATE TABLE IF NOT EXISTS `user` (
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `forcePasswordReset` tinyint(1) NOT NULL DEFAULT '0',
+  `lastLoginAt` datetime(3) DEFAULT NULL,
+  `profileVisibility` enum('PUBLIC','PRIVATE','FRIENDS_ONLY') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PUBLIC',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_email_key` (`email`),
-  KEY `user_institutionId_fkey` (`institutionId`)
+  KEY `user_institutionId_fkey` (`institutionId`),
+  KEY `user_profileVisibility_idx` (`profileVisibility`),
+  KEY `user_lastLoginAt_idx` (`lastLoginAt`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`, `role`, `institutionId`, `createdAt`, `updatedAt`, `status`, `forcePasswordReset`) VALUES
-('0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Admin User', 'pqasys@yahoo.com', NULL, NULL, '$2b$10$J4a67NQWfZdybMW2lMyf2OJbPzIBs3L2ENavPwV0PpN/04siIGEQC', 'ADMIN', NULL, '2025-06-05 23:48:39.235', '2025-06-25 14:01:40.593', 'ACTIVE', 0),
-('45396883-3706-4911-82a7-440ea99655df', 'Joe Bloggs', 'jbloggs@xyz.com', NULL, NULL, '$2b$10$Gt/d1xcYXIfkSvEbgB.AP.DTjpWbPPCZ9Yb7aA3xYcan.aQaub6eK', 'INSTITUTION', '42308252-a934-4eef-b663-37a7076bb177', '2025-06-05 23:50:18.379', '2025-06-05 23:50:19.156', 'ACTIVE', 0),
-('6eb107bf-b7bc-4f20-a625-a9613e0b3433', 'Tom Jones', 'tjones@abc.ac.uk', NULL, NULL, '$2b$10$BI9zqx9R6Ne5OchrGUdgX.HbdKQHJ64jVH617KpW4qa95KPPglJiu', 'INSTITUTION', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-06-05 23:50:57.130', '2025-06-05 23:50:57.145', 'ACTIVE', 0),
-('5b5fbd13-8776-4f96-ada9-091973974873', 'James Maybank', 'patrickmorgan001@gmail.com', NULL, '/uploads/profiles/5b5fbd13-8776-4f96-ada9-091973974873_1753302598374.jpg', '$2b$10$96BG0UkutzZF.bkxgjKQMOTlKxC/AgIHYcerN5be3TaumuKEuclcW', 'STUDENT', NULL, '2025-06-05 23:51:22.597', '2025-07-24 10:30:13.056', 'ACTIVE', 0),
-('b1c0e68c-31c0-45c6-9745-4481ce5e6045', 'Grace Jones', 'grace@ges.ac.uk', NULL, NULL, '$2b$10$qdok6/a/wo9IWZcsnw2Y3On3hDBVTiAc7TTDE9X.mr6vV.8zgZABm', 'INSTITUTION', '9f71efc3-7b31-4953-b398-29f2197af202', '2025-07-01 22:02:16.480', '2025-07-01 22:02:17.507', 'ACTIVE', 0),
-('c98a0b89-011b-482f-843e-a5522de40b1e', 'Nisha Test', 'nisha@sterlingcollegelondon.com', NULL, NULL, '$2b$10$270rbxzD7QcM.Csbl71mROab8x4i3hJmAPYyoLBo3Fq.GIn9VAsQq', 'STUDENT', NULL, '2025-07-12 21:39:11.400', '2025-07-12 21:39:11.400', 'ACTIVE', 0),
-('ccb77175-fa66-4d1f-bbb9-0701df84384d', 'Student4', 'rodrigo@amitycollege.co.uk', NULL, NULL, '$2b$10$Y1xb73MSRSoxH/8Iyk5ch.CN3SK8YrAFX4ZmVsWuSPxl4dHT69tjG', 'STUDENT', NULL, '2025-07-12 21:13:08.978', '2025-07-12 21:13:08.978', 'ACTIVE', 0),
-('5c39be61-c09b-4fb0-b6da-fad403dd2470', 'Admin User', 'admin@example.com', NULL, NULL, '$2b$10$FoPDZ6moKaZnRFy.e95wXeHjtzZB1svOepg0ms4a9K7pNDKfCfkRK', 'ADMIN', NULL, '2025-07-14 11:19:57.030', '2025-07-14 11:19:57.030', 'ACTIVE', 0),
-('d00a7d05-f380-46f1-8cb4-344f0d04c0f2', 'Sarah Johnson', 'sarah.johnson@example.com', NULL, NULL, '$2b$10$LrsxTIhW3TEmcjGVM1Ce0.GAgC8iQFOcJFoPRY9hnfm6MhRvbOqau', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.380', '2025-08-02 02:28:34.380', 'ACTIVE', 0),
-('4bbffaa9-d10a-446b-a837-ce9fbf5b9e4b', 'Michael Chen', 'michael.chen@example.com', NULL, NULL, '$2b$10$A22lepI2Mzy8UrokQlH5SuaLQk7GuQzOSyumjxTvag.jdDssrYdYq', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.460', '2025-08-02 02:28:34.460', 'ACTIVE', 0),
-('1cd8b0b9-7976-4fb4-bff8-a47982da2d8a', 'Emma Rodriguez', 'emma.rodriguez@example.com', NULL, NULL, '$2b$10$FP35FMCtoCTFCNnXhSFjk.KtZfmjUmPkMIHC80ga7cbVEfjASPi.C', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.530', '2025-08-02 02:28:34.530', 'ACTIVE', 0),
-('57e9928e-4118-4563-aea4-57b0136c52cd', 'Dr. Maria Garcia', 'maria.garcia@example.com', NULL, NULL, '$2b$10$jI640yfalClNogPqPLAKiuPptasY33GVOb.b2loVuyGMGzc.HopRi', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.085', '2025-08-02 02:36:48.085', 'ACTIVE', 0),
-('94dfaf16-10eb-4918-a129-185e8da28473', 'Prof. David Kim', 'david.kim@example.com', NULL, NULL, '$2b$10$dvWH82LLeOqqghNy5CNZvu9ECoWgY.w2gUFBq9rdeltXjH7VHXypm', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.164', '2025-08-02 02:36:48.164', 'ACTIVE', 0),
-('0339a71c-92d8-4e75-9c28-62d394d041af', 'Dr. Lisa Thompson', 'lisa.thompson@example.com', NULL, NULL, '$2b$10$UTmAQ7w5Hevq460xirr/M.SVsB2VqC5a67Yyc20lk/BzqC3ztq.Ce', 'INSTRUCTOR', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-08-02 02:36:48.235', '2025-08-02 02:36:48.235', 'ACTIVE', 0),
-('16fbfb4b-3854-4091-bbbe-5355e5ec2b3c', 'Test Admin', 'integration.test.admin@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'ADMIN', NULL, '2025-08-08 00:09:00.359', '2025-08-08 00:09:00.359', 'ACTIVE', 0),
-('be41ba5f-4ebf-4f8e-9344-009646ab3283', 'Test Student', 'integration.test.student@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.366', '2025-08-08 00:09:00.366', 'ACTIVE', 0),
-('5b56f446-0ec4-415d-b8b1-c2dd86ba0958', 'Test Institution', 'test@institution.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.368', '2025-08-16 16:22:20.748', 'ACTIVE', 0),
-('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, '$2b$10$ry/cwlk4lG.xN4tdojVYn.6SUPHeqrj8IkWqMVXLc.DskM7.h1g22', 'STUDENT', NULL, '2025-08-09 17:14:07.747', '2025-08-10 18:03:21.914', 'ACTIVE', 0),
-('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', NULL, NULL, '$2b$10$UffTVPwN9KxKPEWNBGaMKO9Arz9cuQD9kbKR.yelgtHLPlF7kMW0i', 'STUDENT', NULL, '2025-08-14 02:37:19.933', '2025-08-14 02:37:19.933', 'ACTIVE', 0),
-('bc4f00ee-c835-45f2-9738-e636750bcb5c', 'Test Admin', 'admin@test.com', NULL, NULL, 'hashedpassword', 'ADMIN', NULL, '2025-08-16 15:54:23.188', '2025-08-16 15:54:23.188', 'ACTIVE', 0),
-('547f05f7-a4fb-4fe3-bb46-fcb984cabdef', 'Test Institution', 'institution@test.com', NULL, NULL, 'hashedpassword', 'INSTITUTION_STAFF', NULL, '2025-08-16 15:54:24.230', '2025-08-16 15:54:24.230', 'ACTIVE', 0),
-('a7d8265d-f2f5-4b3d-969b-d90c4a7064bf', 'Test Suspended User', 'test@suspended.com', NULL, NULL, 'hashedpassword', 'STUDENT', NULL, '2025-08-16 16:09:09.920', '2025-08-16 16:09:09.989', 'ACTIVE', 0),
-('140e3f04-f4f1-47f9-b001-70f50459d3cb', 'Student Three', 'student3@test.com', NULL, NULL, '$2b$10$TgcV3B.NpH80lfl0cfbeCu3Ti0zNR2ZMnOlSb9dj/XBtGjm6d8UVi', 'STUDENT', NULL, '2025-08-19 21:42:58.835', '2025-08-19 21:42:58.835', 'ACTIVE', 0);
+INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`, `role`, `institutionId`, `createdAt`, `updatedAt`, `status`, `forcePasswordReset`, `lastLoginAt`, `profileVisibility`) VALUES
+('0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Admin User', 'pqasys@yahoo.com', NULL, NULL, '$2b$10$J4a67NQWfZdybMW2lMyf2OJbPzIBs3L2ENavPwV0PpN/04siIGEQC', 'ADMIN', NULL, '2025-06-05 23:48:39.235', '2025-06-25 14:01:40.593', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('45396883-3706-4911-82a7-440ea99655df', 'Joe Bloggs', 'jbloggs@xyz.com', NULL, NULL, '$2b$10$Gt/d1xcYXIfkSvEbgB.AP.DTjpWbPPCZ9Yb7aA3xYcan.aQaub6eK', 'INSTITUTION', '42308252-a934-4eef-b663-37a7076bb177', '2025-06-05 23:50:18.379', '2025-06-05 23:50:19.156', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('6eb107bf-b7bc-4f20-a625-a9613e0b3433', 'Tom Jones', 'tjones@abc.ac.uk', NULL, NULL, '$2b$10$BI9zqx9R6Ne5OchrGUdgX.HbdKQHJ64jVH617KpW4qa95KPPglJiu', 'INSTITUTION', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-06-05 23:50:57.130', '2025-06-05 23:50:57.145', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('5b5fbd13-8776-4f96-ada9-091973974873', 'James Maybank', 'patrickmorgan001@gmail.com', NULL, '/uploads/profiles/5b5fbd13-8776-4f96-ada9-091973974873_1753302598374.jpg', '$2b$10$96BG0UkutzZF.bkxgjKQMOTlKxC/AgIHYcerN5be3TaumuKEuclcW', 'STUDENT', NULL, '2025-06-05 23:51:22.597', '2025-07-24 10:30:13.056', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('b1c0e68c-31c0-45c6-9745-4481ce5e6045', 'Grace Jones', 'grace@ges.ac.uk', NULL, NULL, '$2b$10$qdok6/a/wo9IWZcsnw2Y3On3hDBVTiAc7TTDE9X.mr6vV.8zgZABm', 'INSTITUTION', '9f71efc3-7b31-4953-b398-29f2197af202', '2025-07-01 22:02:16.480', '2025-07-01 22:02:17.507', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('c98a0b89-011b-482f-843e-a5522de40b1e', 'Nisha Test', 'nisha@sterlingcollegelondon.com', NULL, NULL, '$2b$10$270rbxzD7QcM.Csbl71mROab8x4i3hJmAPYyoLBo3Fq.GIn9VAsQq', 'STUDENT', NULL, '2025-07-12 21:39:11.400', '2025-07-12 21:39:11.400', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('ccb77175-fa66-4d1f-bbb9-0701df84384d', 'Student4', 'rodrigo@amitycollege.co.uk', NULL, NULL, '$2b$10$Y1xb73MSRSoxH/8Iyk5ch.CN3SK8YrAFX4ZmVsWuSPxl4dHT69tjG', 'STUDENT', NULL, '2025-07-12 21:13:08.978', '2025-07-12 21:13:08.978', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('5c39be61-c09b-4fb0-b6da-fad403dd2470', 'Admin User', 'admin@example.com', NULL, NULL, '$2b$10$FoPDZ6moKaZnRFy.e95wXeHjtzZB1svOepg0ms4a9K7pNDKfCfkRK', 'ADMIN', NULL, '2025-07-14 11:19:57.030', '2025-07-14 11:19:57.030', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('d00a7d05-f380-46f1-8cb4-344f0d04c0f2', 'Sarah Johnson', 'sarah.johnson@example.com', NULL, NULL, '$2b$10$LrsxTIhW3TEmcjGVM1Ce0.GAgC8iQFOcJFoPRY9hnfm6MhRvbOqau', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.380', '2025-08-02 02:28:34.380', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('4bbffaa9-d10a-446b-a837-ce9fbf5b9e4b', 'Michael Chen', 'michael.chen@example.com', NULL, NULL, '$2b$10$A22lepI2Mzy8UrokQlH5SuaLQk7GuQzOSyumjxTvag.jdDssrYdYq', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.460', '2025-08-02 02:28:34.460', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('1cd8b0b9-7976-4fb4-bff8-a47982da2d8a', 'Emma Rodriguez', 'emma.rodriguez@example.com', NULL, NULL, '$2b$10$FP35FMCtoCTFCNnXhSFjk.KtZfmjUmPkMIHC80ga7cbVEfjASPi.C', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.530', '2025-08-02 02:28:34.530', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('57e9928e-4118-4563-aea4-57b0136c52cd', 'Dr. Maria Garcia', 'maria.garcia@example.com', NULL, NULL, '$2b$10$jI640yfalClNogPqPLAKiuPptasY33GVOb.b2loVuyGMGzc.HopRi', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.085', '2025-08-02 02:36:48.085', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('94dfaf16-10eb-4918-a129-185e8da28473', 'Prof. David Kim', 'david.kim@example.com', NULL, NULL, '$2b$10$dvWH82LLeOqqghNy5CNZvu9ECoWgY.w2gUFBq9rdeltXjH7VHXypm', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.164', '2025-08-02 02:36:48.164', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('0339a71c-92d8-4e75-9c28-62d394d041af', 'Dr. Lisa Thompson', 'lisa.thompson@example.com', NULL, NULL, '$2b$10$UTmAQ7w5Hevq460xirr/M.SVsB2VqC5a67Yyc20lk/BzqC3ztq.Ce', 'INSTRUCTOR', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-08-02 02:36:48.235', '2025-08-02 02:36:48.235', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('16fbfb4b-3854-4091-bbbe-5355e5ec2b3c', 'Test Admin', 'integration.test.admin@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'ADMIN', NULL, '2025-08-08 00:09:00.359', '2025-08-08 00:09:00.359', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('be41ba5f-4ebf-4f8e-9344-009646ab3283', 'Test Student', 'integration.test.student@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.366', '2025-08-08 00:09:00.366', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('5b56f446-0ec4-415d-b8b1-c2dd86ba0958', 'Test Institution', 'test@institution.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.368', '2025-08-16 16:22:20.748', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, '$2b$10$ry/cwlk4lG.xN4tdojVYn.6SUPHeqrj8IkWqMVXLc.DskM7.h1g22', 'STUDENT', NULL, '2025-08-09 17:14:07.747', '2025-08-10 18:03:21.914', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', NULL, NULL, '$2b$10$UffTVPwN9KxKPEWNBGaMKO9Arz9cuQD9kbKR.yelgtHLPlF7kMW0i', 'STUDENT', NULL, '2025-08-14 02:37:19.933', '2025-08-14 02:37:19.933', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('bc4f00ee-c835-45f2-9738-e636750bcb5c', 'Test Admin', 'admin@test.com', NULL, NULL, 'hashedpassword', 'ADMIN', NULL, '2025-08-16 15:54:23.188', '2025-08-16 15:54:23.188', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('547f05f7-a4fb-4fe3-bb46-fcb984cabdef', 'Test Institution', 'institution@test.com', NULL, NULL, 'hashedpassword', 'INSTITUTION_STAFF', NULL, '2025-08-16 15:54:24.230', '2025-08-16 15:54:24.230', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('a7d8265d-f2f5-4b3d-969b-d90c4a7064bf', 'Test Suspended User', 'test@suspended.com', NULL, NULL, 'hashedpassword', 'STUDENT', NULL, '2025-08-16 16:09:09.920', '2025-08-16 16:09:09.989', 'ACTIVE', 0, NULL, 'PUBLIC'),
+('140e3f04-f4f1-47f9-b001-70f50459d3cb', 'Student Three', 'student3@test.com', NULL, NULL, '$2b$10$TgcV3B.NpH80lfl0cfbeCu3Ti0zNR2ZMnOlSb9dj/XBtGjm6d8UVi', 'STUDENT', NULL, '2025-08-19 21:42:58.835', '2025-08-19 21:42:58.835', 'ACTIVE', 0, NULL, 'PUBLIC');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_achievements`
+--
+
+DROP TABLE IF EXISTS `user_achievements`;
+CREATE TABLE IF NOT EXISTS `user_achievements` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `certificateId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `isPublic` tinyint(1) NOT NULL DEFAULT '0',
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`id`),
+  KEY `user_achievements_userId_idx` (`userId`),
+  KEY `user_achievements_type_idx` (`type`),
+  KEY `user_achievements_createdAt_idx` (`createdAt`),
+  KEY `user_achievements_certificateId_fkey` (`certificateId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_connections`
+--
+
+DROP TABLE IF EXISTS `user_connections`;
+CREATE TABLE IF NOT EXISTS `user_connections` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user1Id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user2Id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_connections_user1Id_user2Id_key` (`user1Id`,`user2Id`),
+  KEY `user_connections_user1Id_idx` (`user1Id`),
+  KEY `user_connections_user2Id_idx` (`user2Id`),
+  KEY `user_connections_createdAt_idx` (`createdAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_rewards`
+--
+
+DROP TABLE IF EXISTS `user_rewards`;
+CREATE TABLE IF NOT EXISTS `user_rewards` (
+  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rewardType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `redeemedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `expiresAt` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_rewards_userId_idx` (`userId`),
+  KEY `user_rewards_rewardType_idx` (`rewardType`),
+  KEY `user_rewards_redeemedAt_idx` (`redeemedAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
