@@ -133,6 +133,8 @@ model user {
   liveConversationsInstructed LiveConversation[]        @relation("LiveConversationInstructor")
   communityAnnouncements CommunityAnnouncement[]
   communityCircles CommunityCircle[]
+  circlePosts CommunityCirclePost[]
+  circleEvents CommunityCircleEvent[]
   
   // Connection relations
   sentConnectionRequests     ConnectionRequest[] @relation("ConnectionRequestSender")
@@ -1962,6 +1964,8 @@ model CommunityCircle {
   updatedAt   DateTime @updatedAt
 
   members CommunityCircleMembership[]
+  posts CommunityCirclePost[]
+  events CommunityCircleEvent[]
   owner user? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
 
   @@index([language])
@@ -1982,6 +1986,50 @@ model CommunityCircleMembership {
   @@unique([circleId, userId], name: "circleId_userId")
   @@index([userId])
   @@map("community_circle_memberships")
+}
+
+// Community Circle Posts (discussions within circles)
+model CommunityCirclePost {
+  id        String   @id @default(cuid())
+  circleId  String   @db.VarChar(36)
+  authorId  String   @db.VarChar(36)
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  circle CommunityCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  author user @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([circleId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("community_circle_posts")
+}
+
+// Community Circle Events (study sessions, workshops, etc.)
+model CommunityCircleEvent {
+  id           String   @id @default(cuid())
+  circleId     String   @db.VarChar(36)
+  createdBy    String   @db.VarChar(36)
+  title        String   @db.VarChar(200)
+  description  String   @db.Text
+  date         DateTime
+  time         String   @db.VarChar(10) // HH:MM format
+  duration     Int      // in minutes
+  type         String   @db.VarChar(50) // study-session, conversation, workshop, social
+  maxAttendees Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  circle CommunityCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  creator user @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([circleId])
+  @@index([createdBy])
+  @@index([date])
+  @@map("community_circle_events")
 }
 
 // Community Announcements (achievement sharing and community engagement)

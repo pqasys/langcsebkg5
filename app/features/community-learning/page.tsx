@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -59,9 +60,27 @@ interface Announcement {
   certificateId?: string;
 }
 
+interface Circle {
+  id: string;
+  name: string;
+  slug: string;
+  language: string;
+  level: string;
+  description: string;
+  membersCount: number;
+  isPublic: boolean;
+  createdAt: string;
+  owner: {
+    id: string;
+    name: string;
+    image?: string;
+  };
+}
+
 export default function CommunityLearningFeaturePage() {
   const { data: session } = useSession()
   const { loading: subscriptionLoading } = useSubscription()
+  const router = useRouter()
 
   // Slider state
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -90,6 +109,12 @@ export default function CommunityLearningFeaturePage() {
     totalAchievements: 0,
     activeToday: 0
   })
+
+  // Circles state
+  const [circles, setCircles] = useState<Circle[]>([])
+  const [circlesLoading, setCirclesLoading] = useState(true)
+  const [showSubscriptionReminder, setShowSubscriptionReminder] = useState(false)
+  const [joinedCircleName, setJoinedCircleName] = useState('')
 
   // Placeholder visible profiles data
   const visibleProfiles = [
@@ -146,6 +171,69 @@ export default function CommunityLearningFeaturePage() {
       achievements: 6
     }
   ]
+
+  // Placeholder circles for fallback
+  const placeholderCircles = [
+    {
+      id: 'placeholder-1',
+      name: 'Spanish Conversation Circle',
+      language: 'Spanish',
+      level: 'B1-B2',
+      membersCount: 12,
+      maxMembers: 20,
+      description: 'Practice Spanish conversation with native speakers and fellow learners',
+      createdBy: 'Maria Rodriguez',
+      createdAt: '2 days ago',
+      isPublic: true,
+      isPlaceholder: true
+    },
+    {
+      id: 'placeholder-2',
+      name: 'German Grammar Study Group',
+      language: 'German',
+      level: 'A2-B1',
+      membersCount: 8,
+      maxMembers: 15,
+      description: 'Focus on German grammar rules and sentence structure',
+      createdBy: 'Hans Mueller',
+      createdAt: '3 days ago',
+      isPublic: true,
+      isPlaceholder: true
+    },
+    {
+      id: 'placeholder-3',
+      name: 'French Literature Club',
+      language: 'French',
+      level: 'C1-C2',
+      membersCount: 6,
+      maxMembers: 12,
+      description: 'Read and discuss French literature and poetry',
+      createdBy: 'Sophie Dubois',
+      createdAt: '5 days ago',
+      isPublic: false,
+      isPlaceholder: true
+    }
+  ]
+
+  const fetchCircles = useCallback(async () => {
+    try {
+      setCirclesLoading(true)
+      const response = await fetch('/api/community/circles?limit=10')
+      const data = await response.json()
+      
+      if (Array.isArray(data)) {
+        setCircles(data)
+      } else {
+        console.error('API returned invalid data:', data)
+        setCircles([])
+      }
+    } catch (error) {
+      console.error('Error fetching circles:', error)
+      setCircles([])
+    } finally {
+      setCirclesLoading(false)
+    }
+  }, [])
 
   const fetchAnnouncements = useCallback(async () => {
     try {
@@ -272,7 +360,8 @@ export default function CommunityLearningFeaturePage() {
   useEffect(() => {
     fetchAnnouncements()
     fetchStats()
-  }, [fetchAnnouncements, fetchStats])
+    fetchCircles()
+  }, [fetchAnnouncements, fetchStats, fetchCircles])
 
   const handleLike = async (announcementId: string) => {
     try {
@@ -326,6 +415,47 @@ export default function CommunityLearningFeaturePage() {
     }
   }
 
+  const handleJoinCircle = async (circleId: string) => {
+    // Check if user is authenticated
+    if (!session?.user) {
+      // Find the circle to get its slug
+      const circle = circles.find(c => c.id === circleId)
+      if (circle) {
+        // Store the circle context in localStorage for after login
+        localStorage.setItem('pendingCircleJoin', circle.slug)
+        // Redirect to sign in page with return URL
+        router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/community/circles/${circle.slug}`)}`)
+      }
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/community/circles/${circleId}/join`, {
+        method: 'POST'
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        toast.success('Joined study circle successfully!')
+        
+        // Show subscription reminder if needed
+        if (data.showSubscriptionReminder) {
+          setJoinedCircleName(data.circleName)
+          setShowSubscriptionReminder(true)
+        }
+        
+        // Refresh circles to update member count
+        fetchCircles()
+      } else {
+        const data = await response.json()
+        toast.error(data.error || 'Failed to join study circle')
+      }
+    } catch (error) {
+      console.error('Error joining circle:', error)
+      toast.error('Failed to join study circle')
+    }
+  }
+
   const getLanguageFlag = (language: string) => {
     const flags: { [key: string]: string } = {
       'en': '🇺🇸',
@@ -352,6 +482,26 @@ export default function CommunityLearningFeaturePage() {
       'C2': 'bg-purple-100 text-purple-800'
     }
     return colors[level] || 'bg-gray-100 text-gray-800'
+  }
+
+  // Prepare circles for display - combine live circles with placeholders to maintain 3 circles
+  const displayCircles = () => {
+    const liveCircles = circles.slice(0, 3) // Take up to 3 live circles
+    const neededPlaceholders = Math.max(0, 3 - liveCircles.length)
+    const selectedPlaceholders = placeholderCircles.slice(0, neededPlaceholders)
+    
+    return [...liveCircles, ...selectedPlaceholders]
+  }
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+    
+    if (diffInHours < 1) return 'Just now'
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`
+    const diffInDays = Math.floor(diffInHours / 24)
+    return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`
   }
 
   if (loading) {
@@ -1004,50 +1154,22 @@ export default function CommunityLearningFeaturePage() {
 
               {/* Study Circles Section */}
               <section id="circles">
-                <h2 className="text-2xl font-bold mb-6 flex items-center">
-                  <Users className="h-6 w-6 mr-2 text-blue-600" />
-                  Popular Study Circles
-                </h2>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <h2 className="text-2xl font-bold flex items-center">
+                    <Users className="h-6 w-6 mr-2 text-blue-600" />
+                    Popular Study Circles
+                  </h2>
+                  
+                  {circlesLoading && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                      Loading live circles...
+                    </div>
+                  )}
+                </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    {
-                      id: '1',
-                      name: 'Spanish Conversation Circle',
-                      language: 'Spanish',
-                      level: 'B1-B2',
-                      members: 12,
-                      maxMembers: 20,
-                      description: 'Practice Spanish conversation with native speakers and fellow learners',
-                      createdBy: 'Maria Rodriguez',
-                      createdAt: '2 days ago',
-                      isPublic: true
-                    },
-                    {
-                      id: '2',
-                      name: 'German Grammar Study Group',
-                      language: 'German',
-                      level: 'A2-B1',
-                      members: 8,
-                      maxMembers: 15,
-                      description: 'Focus on German grammar rules and sentence structure',
-                      createdBy: 'Hans Mueller',
-                      createdAt: '3 days ago',
-                      isPublic: true
-                    },
-                    {
-                      id: '3',
-                      name: 'French Literature Club',
-                      language: 'French',
-                      level: 'C1-C2',
-                      members: 6,
-                      maxMembers: 12,
-                      description: 'Read and discuss French literature and poetry',
-                      createdBy: 'Sophie Dubois',
-                      createdAt: '5 days ago',
-                      isPublic: false
-                    }
-                  ].map((circle) => (
+                  {displayCircles().map((circle) => (
                     <Card key={circle.id} className="hover:shadow-lg transition-shadow duration-200">
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between mb-3">
@@ -1065,6 +1187,11 @@ export default function CommunityLearningFeaturePage() {
                                   Private
                                 </Badge>
                               )}
+                              {circle.isPlaceholder && (
+                                <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
+                                  Demo
+                                </Badge>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1076,31 +1203,75 @@ export default function CommunityLearningFeaturePage() {
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center text-sm text-gray-500">
                             <Users className="h-4 w-4 mr-1" />
-                            <span>{circle.members}/{circle.maxMembers} members</span>
+                            <span>
+                              {circle.isPlaceholder 
+                                ? `${circle.membersCount}/${circle.maxMembers} members`
+                                : `${circle.membersCount} members`
+                              }
+                            </span>
                           </div>
                           <div className="text-xs text-gray-500">
-                            Created {circle.createdAt}
+                            Created {circle.isPlaceholder ? circle.createdAt : formatTimeAgo(circle.createdAt)}
                           </div>
                         </div>
                         
                         <div className="flex items-center justify-between">
                           <div className="text-xs text-gray-500">
-                            by {circle.createdBy}
+                            by {circle.isPlaceholder ? circle.createdBy : circle.owner.name}
                           </div>
-                          <Button size="sm" variant="outline" className="text-xs">
-                            Join Circle
-                          </Button>
+                                                     <div className="flex space-x-2">
+                             {!circle.isPlaceholder && (
+                               <Link href={`/community/circles/${circle.slug}`}>
+                                 <Button 
+                                   size="sm" 
+                                   variant="outline" 
+                                   className="text-xs"
+                                 >
+                                   View Circle
+                                 </Button>
+                               </Link>
+                             )}
+                             <Button 
+                               size="sm" 
+                               variant="outline" 
+                               className="text-xs"
+                               disabled={circle.isPlaceholder}
+                               onClick={() => {
+                                 if (!circle.isPlaceholder) {
+                                   handleJoinCircle(circle.id)
+                                 }
+                               }}
+                             >
+                               {circle.isPlaceholder ? 'Demo Circle' : 'Join Circle'}
+                             </Button>
+                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
                 
-                <div className="mt-6 text-center">
-                  <Button variant="outline" onClick={() => window.location.href = '/community/circles'}>
-                    <Users className="h-4 w-4 mr-2" />
-                    View All Circles
-                  </Button>
+                <div className="mt-6 text-center space-y-4">
+                  {circles.length > 0 && (
+                    <div className="text-sm text-green-600 bg-green-50 px-4 py-2 rounded-lg inline-block">
+                      ✓ Showing {Math.min(circles.length, 3)} live circles from the community
+                    </div>
+                  )}
+                  
+                  {circles.length === 0 && !circlesLoading && (
+                    <div className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg inline-block">
+                      Demo circles shown - join the community to see live circles!
+                    </div>
+                  )}
+                  
+                                     <div>
+                     <Link href="/community/circles">
+                       <Button variant="outline">
+                         <Users className="h-4 w-4 mr-2" />
+                         View All Circles
+                       </Button>
+                     </Link>
+                   </div>
                 </div>
               </section>
 
@@ -1269,6 +1440,51 @@ export default function CommunityLearningFeaturePage() {
           </section>
         </div>
       </div>
+
+      {/* Subscription Reminder Dialog */}
+      <Dialog open={showSubscriptionReminder} onOpenChange={setShowSubscriptionReminder}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="p-2 bg-green-100 rounded-full">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              Welcome to {joinedCircleName}!
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-4">
+                You've successfully joined the circle! 🎉
+              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">Unlock Premium Features</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Create unlimited study circles</li>
+                  <li>• Access advanced analytics and insights</li>
+                  <li>• Priority support and early access to features</li>
+                  <li>• Ad-free experience across all features</li>
+                  <li>• Exclusive premium study materials</li>
+                </ul>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowSubscriptionReminder(false)}>
+                Maybe Later
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowSubscriptionReminder(false);
+                  router.push('/pricing');
+                }}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                View Plans
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Suspense>
   )
 }

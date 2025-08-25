@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +20,8 @@ import {
   Calendar,
   MessageCircle,
   Star,
-  Crown
+  Crown,
+  CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
@@ -43,6 +45,7 @@ interface Circle {
 
 export default function CommunityCirclesPage() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [circles, setCircles] = useState<Circle[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -58,6 +61,8 @@ export default function CommunityCirclesPage() {
     level: 'Beginner',
     description: ''
   });
+  const [showSubscriptionReminder, setShowSubscriptionReminder] = useState(false);
+  const [joinedCircleName, setJoinedCircleName] = useState('');
 
   useEffect(() => {
     fetchCircles();
@@ -117,13 +122,34 @@ export default function CommunityCirclesPage() {
   };
 
   const handleJoinCircle = async (circleId: string) => {
+    // Check if user is authenticated
+    if (!session?.user) {
+      // Find the circle to get its slug
+      const circle = circles.find(c => c.id === circleId);
+      if (circle) {
+        // Store the circle context in localStorage for after login
+        localStorage.setItem('pendingCircleJoin', circle.slug);
+        // Redirect to sign in page with return URL
+        router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/community/circles/${circle.slug}`)}`);
+      }
+      return;
+    }
+
     try {
       const response = await fetch(`/api/community/circles/${circleId}/join`, {
         method: 'POST'
       });
       
       if (response.ok) {
+        const data = await response.json();
         toast.success('Joined study circle successfully!');
+        
+        // Show subscription reminder if needed
+        if (data.showSubscriptionReminder) {
+          setJoinedCircleName(data.circleName);
+          setShowSubscriptionReminder(true);
+        }
+        
         fetchCircles(); // Refresh to update member count
       } else {
         const data = await response.json();
@@ -368,13 +394,14 @@ export default function CommunityCirclesPage() {
                   >
                     Join Circle
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => window.location.href = `/community/circles/${circle.slug}`}
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
+                  <Link href={`/community/circles/${circle.slug}`}>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -402,6 +429,51 @@ export default function CommunityCirclesPage() {
           </Card>
         )}
       </div>
+
+      {/* Subscription Reminder Dialog */}
+      <Dialog open={showSubscriptionReminder} onOpenChange={setShowSubscriptionReminder}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="p-2 bg-green-100 rounded-full">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              Welcome to {joinedCircleName}!
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-4">
+                You've successfully joined the circle! 🎉
+              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">Unlock Premium Features</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Create unlimited study circles</li>
+                  <li>• Access advanced analytics and insights</li>
+                  <li>• Priority support and early access to features</li>
+                  <li>• Ad-free experience across all features</li>
+                  <li>• Exclusive premium study materials</li>
+                </ul>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowSubscriptionReminder(false)}>
+                Maybe Later
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowSubscriptionReminder(false);
+                  router.push('/pricing');
+                }}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                View Plans
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

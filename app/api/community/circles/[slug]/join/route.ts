@@ -3,9 +3,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(
   request: NextRequest,
-  { params }: { params: { circleId: string } }
+  { params }: { params: { slug: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,11 +16,11 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const circleId = params.circleId;
+    const slug = params.slug;
 
     // Check if circle exists
     const circle = await prisma.communityCircle.findUnique({
-      where: { id: circleId }
+      where: { slug: slug }
     });
 
     if (!circle) {
@@ -29,7 +31,7 @@ export async function POST(
     const existingMembership = await prisma.communityCircleMembership.findUnique({
       where: {
         circleId_userId: {
-          circleId,
+          circleId: circle.id,
           userId: session.user.id
         }
       }
@@ -42,15 +44,25 @@ export async function POST(
     // Create membership
     await prisma.communityCircleMembership.create({
       data: {
-        circleId,
+        circleId: circle.id,
         userId: session.user.id,
         role: 'MEMBER'
       }
     });
 
+    // Check if user has a paid subscription
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { subscriptionStatus: true }
+    });
+
+    const hasPaidSubscription = user?.subscriptionStatus === 'ACTIVE';
+
     return NextResponse.json({
       success: true,
-      message: 'Successfully joined circle'
+      message: 'Successfully joined circle',
+      showSubscriptionReminder: !hasPaidSubscription,
+      circleName: circle.name
     });
 
   } catch (error) {

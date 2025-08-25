@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 25, 2025 at 12:00 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 25, 2025 at 07:01 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -382,6 +382,32 @@ INSERT INTO `community_circles` (`id`, `name`, `slug`, `language`, `level`, `des
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `community_circle_events`
+--
+
+DROP TABLE IF EXISTS `community_circle_events`;
+CREATE TABLE IF NOT EXISTS `community_circle_events` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `circleId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdBy` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date` datetime(3) NOT NULL,
+  `time` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duration` int NOT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `maxAttendees` int DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `community_circle_events_circleId_idx` (`circleId`),
+  KEY `community_circle_events_createdBy_idx` (`createdBy`),
+  KEY `community_circle_events_date_idx` (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `community_circle_memberships`
 --
 
@@ -403,6 +429,26 @@ CREATE TABLE IF NOT EXISTS `community_circle_memberships` (
 
 INSERT INTO `community_circle_memberships` (`id`, `circleId`, `userId`, `role`, `joinedAt`) VALUES
 ('cmepqd5po0003yzkff5njyryf', 'cmepqd5by0001yzkfj4maa5xc', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'OWNER', '2025-08-24 13:35:01.164');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `community_circle_posts`
+--
+
+DROP TABLE IF EXISTS `community_circle_posts`;
+CREATE TABLE IF NOT EXISTS `community_circle_posts` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `circleId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `authorId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `community_circle_posts_circleId_idx` (`circleId`),
+  KEY `community_circle_posts_authorId_idx` (`authorId`),
+  KEY `community_circle_posts_createdAt_idx` (`createdAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
