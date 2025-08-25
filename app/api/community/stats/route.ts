@@ -34,14 +34,21 @@ export async function GET() {
 
     try {
       // Total active community members (students + institutions)
-      totalMembers = await prisma.user.count({
-        where: {
-          OR: [
-            { role: 'STUDENT', status: 'ACTIVE' },
-            { role: 'INSTITUTION', status: 'ACTIVE', isApproved: true }
-          ]
-        }
-      });
+      const [studentCount, institutionCount] = await Promise.all([
+        prisma.user.count({
+          where: {
+            role: 'STUDENT',
+            status: 'ACTIVE'
+          }
+        }),
+        prisma.institution.count({
+          where: {
+            status: 'ACTIVE',
+            isApproved: true
+          }
+        })
+      ]);
+      totalMembers = studentCount + institutionCount;
     } catch (error) {
       console.error('Error fetching total members:', error);
     }
@@ -70,17 +77,27 @@ export async function GET() {
 
     try {
       // Users active today (based on last login or activity)
-      activeToday = await prisma.user.count({
-        where: {
-          OR: [
-            { role: 'STUDENT', status: 'ACTIVE' },
-            { role: 'INSTITUTION', status: 'ACTIVE', isApproved: true }
-          ],
-          lastLoginAt: {
-            gte: today
+      const [studentActiveCount, institutionActiveCount] = await Promise.all([
+        prisma.user.count({
+          where: {
+            role: 'STUDENT',
+            status: 'ACTIVE',
+            lastLoginAt: {
+              gte: today
+            }
           }
-        }
-      });
+        }),
+        prisma.institution.count({
+          where: {
+            status: 'ACTIVE',
+            isApproved: true,
+            updatedAt: {
+              gte: today
+            }
+          }
+        })
+      ]);
+      activeToday = studentActiveCount + institutionActiveCount;
     } catch (error) {
       console.error('Error fetching active today:', error);
     }

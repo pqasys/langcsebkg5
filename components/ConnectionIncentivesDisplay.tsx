@@ -151,14 +151,7 @@ export function ConnectionIncentivesDisplay() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="benefits" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="benefits">Learning Benefits</TabsTrigger>
-          <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="rewards">Rewards</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="benefits" className="space-y-6">
+      <div className="space-y-6">
           {/* Social Learning Benefits */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -229,9 +222,10 @@ export function ConnectionIncentivesDisplay() {
               </Button>
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="achievements" className="space-y-4">
+        {/* Achievements Section */}
+        <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {achievements.map((achievement) => (
               <Card key={achievement.id} className="hover:shadow-lg transition-shadow">
@@ -255,9 +249,10 @@ export function ConnectionIncentivesDisplay() {
               </div>
             )}
           </div>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="rewards" className="space-y-4">
+        {/* Rewards Section */}
+        <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {availableRewards.map((reward, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">

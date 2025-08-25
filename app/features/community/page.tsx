@@ -307,4 +307,84 @@ export default function CommunityFeaturesPage() {
                       <p className="text-sm text-gray-600">Join language events</p>
                     </div>
                   </div>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span>Local meetups</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span>Virtual events</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span>Cultural celebrations</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2" />
+                  Community Stats
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Total Members</span>
+                    <span className="font-semibold">2,847</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Active Today</span>
+                    <span className="font-semibold text-green-600">342</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Study Groups</span>
+                    <span className="font-semibold">156</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Events This Week</span>
+                    <span className="font-semibold">23</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Rocket className="h-5 w-5 mr-2" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button className="w-full" size="sm">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Find Study Partners
+                </Button>
+                <Button variant="outline" className="w-full" size="sm">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Browse Events
+                </Button>
+                <Button variant="outline" className="w-full" size="sm">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Start Conversation
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 

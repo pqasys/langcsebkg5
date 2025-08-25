@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 24, 2025 at 08:11 PM
--- Server version: 8.0.31
--- PHP Version: 8.1.13
+-- Generation Time: Aug 25, 2025 at 12:00 AM
+-- Server version: 9.1.0
+-- PHP Version: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -218,17 +218,17 @@ INSERT INTO `category` (`id`, `name`, `description`, `createdAt`, `updatedAt`, `
 
 DROP TABLE IF EXISTS `certificates`;
 CREATE TABLE IF NOT EXISTS `certificates` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `certificateId` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `testAttemptId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `language` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `languageName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cefrLevel` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `certificateId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `testAttemptId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `languageName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cefrLevel` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `score` int NOT NULL,
   `totalQuestions` int NOT NULL,
   `completionDate` datetime(3) NOT NULL,
-  `certificateUrl` text COLLATE utf8mb4_unicode_ci,
+  `certificateUrl` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `isPublic` tinyint(1) NOT NULL DEFAULT '0',
   `sharedAt` datetime(3) DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -307,18 +307,18 @@ INSERT INTO `commission_tiers` (`id`, `planType`, `commissionRate`, `features`, 
 
 DROP TABLE IF EXISTS `community_announcements`;
 CREATE TABLE IF NOT EXISTS `community_announcements` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `language` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cefrLevel` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cefrLevel` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `likes` int NOT NULL DEFAULT '0',
   `isPublic` tinyint(1) NOT NULL DEFAULT '1',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
-  `certificateId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `certificateId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `community_announcements_userId_idx` (`userId`),
   KEY `community_announcements_language_idx` (`language`),
@@ -336,9 +336,9 @@ CREATE TABLE IF NOT EXISTS `community_announcements` (
 
 DROP TABLE IF EXISTS `community_announcement_likes`;
 CREATE TABLE IF NOT EXISTS `community_announcement_likes` (
-  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `announcementId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `announcementId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`id`),
   UNIQUE KEY `community_announcement_likes_announcementId_userId_key` (`announcementId`,`userId`),
@@ -412,12 +412,12 @@ INSERT INTO `community_circle_memberships` (`id`, `circleId`, `userId`, `role`, 
 
 DROP TABLE IF EXISTS `connection_achievements`;
 CREATE TABLE IF NOT EXISTS `connection_achievements` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `achievementType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `icon` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `achievementType` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `points` int NOT NULL,
   `earnedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`id`),
@@ -434,11 +434,11 @@ CREATE TABLE IF NOT EXISTS `connection_achievements` (
 
 DROP TABLE IF EXISTS `connection_points`;
 CREATE TABLE IF NOT EXISTS `connection_points` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `activityType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activityType` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `points` int NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`id`),
   KEY `connection_points_userId_idx` (`userId`),
@@ -454,11 +454,11 @@ CREATE TABLE IF NOT EXISTS `connection_points` (
 
 DROP TABLE IF EXISTS `connection_requests`;
 CREATE TABLE IF NOT EXISTS `connection_requests` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `senderId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `receiverId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `message` text COLLATE utf8mb4_unicode_ci,
-  `status` enum('PENDING','ACCEPTED','DECLINED','BLOCKED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `senderId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `receiverId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` enum('PENDING','ACCEPTED','DECLINED','BLOCKED') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
   `respondedAt` datetime(3) DEFAULT NULL,
@@ -3896,7 +3896,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `forcePasswordReset` tinyint(1) NOT NULL DEFAULT '0',
   `lastLoginAt` datetime(3) DEFAULT NULL,
-  `profileVisibility` enum('PUBLIC','PRIVATE','FRIENDS_ONLY') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PUBLIC',
+  `profileVisibility` enum('PUBLIC','PRIVATE','FRIENDS_ONLY') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PUBLIC',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_email_key` (`email`),
   KEY `user_institutionId_fkey` (`institutionId`),
@@ -3941,14 +3941,14 @@ INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`,
 
 DROP TABLE IF EXISTS `user_achievements`;
 CREATE TABLE IF NOT EXISTS `user_achievements` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `certificateId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `icon` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `color` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `certificateId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `isPublic` tinyint(1) NOT NULL DEFAULT '0',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   PRIMARY KEY (`id`),
@@ -3966,9 +3966,9 @@ CREATE TABLE IF NOT EXISTS `user_achievements` (
 
 DROP TABLE IF EXISTS `user_connections`;
 CREATE TABLE IF NOT EXISTS `user_connections` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user1Id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user2Id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user1Id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user2Id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
   PRIMARY KEY (`id`),
@@ -3986,10 +3986,10 @@ CREATE TABLE IF NOT EXISTS `user_connections` (
 
 DROP TABLE IF EXISTS `user_rewards`;
 CREATE TABLE IF NOT EXISTS `user_rewards` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `rewardType` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rewardType` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `redeemedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `expiresAt` datetime(3) DEFAULT NULL,
   PRIMARY KEY (`id`),
