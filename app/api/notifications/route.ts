@@ -3,9 +3,30 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { cache } from '@/lib/cache';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json({
+        notifications: [],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 0,
+          pages: 0
+        },
+        stats: {
+          total: 0,
+          read: 0,
+          unread: 0,
+          sent: 0,
+          failed: 0
+        }
+      });
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

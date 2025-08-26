@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -8,6 +9,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // Check if we're in a build context (no headers available)
     if (!request.headers.get('authorization') && !request.headers.get('cookie')) {
       // During static generation, return empty data instead of error

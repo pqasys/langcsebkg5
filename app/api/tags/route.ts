@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import slugify from 'slugify';
@@ -7,6 +8,12 @@ import slugify from 'slugify';
 // GET /api/tags - Get all tags
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const session = await getServerSession(authOptions);
     console.log('Session check:', {
       hasSession: !!session,

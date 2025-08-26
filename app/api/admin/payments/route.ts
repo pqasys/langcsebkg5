@@ -2,9 +2,15 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {

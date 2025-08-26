@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { SubscriptionManagementService } from '@/lib/subscription-management-service';
@@ -8,6 +9,12 @@ export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {

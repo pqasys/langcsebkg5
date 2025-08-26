@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server'
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma'
 import { logger, logError } from '../../../../lib/logger';
 
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // Get all approved courses with enhanced prioritization
     const courses = await prisma.course.findMany({
       where: {

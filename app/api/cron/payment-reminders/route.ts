@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server';
 import { ReminderScheduler } from '@/lib/payment/reminder-scheduler';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 // This route should be called by a cron job service (e.g., Vercel Cron Jobs)
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // Verify the request is from an authorized source
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET_KEY}`) {

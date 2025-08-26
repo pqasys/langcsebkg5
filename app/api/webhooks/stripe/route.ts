@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import PaymentService from '@/lib/payment-service';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { SubscriptionPaymentService } from '@/lib/subscription-payment-service';
 
 if (!process.env.STRIPE_SECRET_KEY) {

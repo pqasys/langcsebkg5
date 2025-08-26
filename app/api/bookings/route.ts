@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { Prisma } from '@prisma/client'
 import Stripe from 'stripe'
 import { authOptions } from '@/lib/auth';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma'
 import { logger, logError } from '../../../lib/logger';
 
@@ -105,6 +106,12 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const session = await getServerSession(authOptions)
 
     if (!session) {

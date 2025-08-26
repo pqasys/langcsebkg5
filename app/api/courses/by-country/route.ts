@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma, performWarmup } from '@/lib/server-warmup';
 
 // Force dynamic rendering
@@ -6,6 +7,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // Ensure database is warmed up
     await performWarmup();
     

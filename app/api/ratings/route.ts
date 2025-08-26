@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -55,6 +56,12 @@ export async function POST(request: NextRequest) {
 // Fetch aggregate rating for a target
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const { searchParams } = new URL(request.url);
     const targetType = searchParams.get('targetType');
     const targetId = searchParams.get('targetId');

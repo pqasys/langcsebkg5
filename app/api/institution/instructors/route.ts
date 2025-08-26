@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -9,6 +10,12 @@ import { notificationService } from '@/lib/notification';
 // GET - Fetch institution's instructors
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'INSTITUTION') {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });

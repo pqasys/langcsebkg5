@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -91,6 +92,12 @@ const handleError = (error: unknown) => {
 // GET /api/student/notifications
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.id) {

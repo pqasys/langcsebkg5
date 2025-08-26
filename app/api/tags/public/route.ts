@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const { searchParams } = new URL(request.url);
     const featured = searchParams.get('featured') === 'true';
     const limit = parseInt(searchParams.get('limit') || '50');

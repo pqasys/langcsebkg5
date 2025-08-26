@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { isBuildTime } from '@/lib/build-error-handler';
 import { revalidatePath } from 'next/cache'
 import { logger, logError } from '../../../lib/logger';
 
@@ -7,6 +8,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const searchParams = request.nextUrl.searchParams
     const path = searchParams.get('path')
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma';
 
 export async function PUT(request: Request) {
@@ -76,6 +77,12 @@ export async function PUT(request: Request) {
 
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json(

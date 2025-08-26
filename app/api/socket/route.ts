@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // This endpoint is used to initialize the WebSocket server
     // The actual WebSocket connection is handled by the socket.io server
     return NextResponse.json({ 

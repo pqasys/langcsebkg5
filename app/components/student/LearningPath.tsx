@@ -275,7 +275,7 @@ export default function LearningPath({ studentId }: LearningPathProps) {
             )}
 
             {/* Learning Path Timeline */}
-            {data.currentCourse && data.modules.length > 0 ? (
+            {data.currentCourse && data.modules && data.modules.length > 0 ? (
               <div className="space-y-4">
                 <h4 className="font-medium">Your Learning Journey</h4>
                 <div className="relative">
@@ -370,7 +370,7 @@ export default function LearningPath({ studentId }: LearningPathProps) {
               </Button>
             </div>
             
-            {data.learningGoals.length === 0 ? (
+                          {!data.learningGoals || data.learningGoals.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No learning goals set yet.</p>
@@ -411,7 +411,7 @@ export default function LearningPath({ studentId }: LearningPathProps) {
           <div className="space-y-4">
             <h4 className="font-medium">Recommended Next Steps</h4>
             
-            {data.nextRecommendations.length === 0 ? (
+                          {!data.nextRecommendations || data.nextRecommendations.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No recommendations available yet.</p>

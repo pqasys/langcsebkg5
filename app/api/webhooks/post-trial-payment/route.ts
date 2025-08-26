@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { stripe } from '@/lib/stripe';
 import { PostTrialPaymentService } from '@/lib/post-trial-payment-service';
 import { logger } from '@/lib/logger';

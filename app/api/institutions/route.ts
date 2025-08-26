@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { logger, logError } from '../../../lib/logger';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -9,6 +10,11 @@ const prisma = new PrismaClient()
 
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json({ institutions: [] });
+    }
+
     const { searchParams } = new URL(request.url);
     const featured = searchParams.get('featured') === 'true';
     const limit = parseInt(searchParams.get('limit') || '0');

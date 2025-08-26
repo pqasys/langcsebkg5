@@ -32,3 +32,15 @@ Run in two terminals:
 Terminal A: npm run dev:signaling
 Terminal B: $env:TURBOPACK="1"; npx next dev
 Visit http://localhost:3000
+
+Even better still
+--------------------
+# Enhanced production script (recommended)
+npm run start:prod
+# Simple production script (alternative)
+#npm run start:prod:simple
+
+#Enhanced development script (recommended)
+npm run dev:all
+# Simple development script (alternative)
+#npm run dev:all:simple

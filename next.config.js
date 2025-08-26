@@ -54,8 +54,6 @@ const nextConfig = {
     return config;
   },
 
-
-
   // Headers for better caching
   async headers() {
     return [
@@ -86,34 +84,21 @@ const nextConfig = {
           },
         ],
       },
-      {
-        source: '/api/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
-          },
-        ],
-      },
     ];
   },
 
-  // Redirects for better SEO and performance
-  async redirects() {
-    return [
-      // Removed automatic redirect from /courses to /courses/search
-      // Users should be able to access the main courses page directly
-    ];
+  // Add build-time error handling
+  onDemandEntries: {
+    // Period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // Number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
   },
 
-  // Rewrites for API optimization
-  async rewrites() {
-    return [
-      {
-        source: '/api/cache/:path*',
-        destination: '/api/cache/:path*',
-      },
-    ];
+  // Add experimental features for better error handling
+  experimental: {
+    // Enable better error handling during build
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
 };
 

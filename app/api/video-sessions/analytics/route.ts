@@ -7,6 +7,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // Check if we're in a build context
     if (isBuildTime(request)) {
       // During static generation, return empty data instead of error

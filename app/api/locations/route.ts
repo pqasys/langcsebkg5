@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 // This is a simplified version - you might want to use a proper location database or API
 const countries = [
@@ -43,6 +44,12 @@ const citiesByState: Record<string, { code: string; name: string }[]> = {
 
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

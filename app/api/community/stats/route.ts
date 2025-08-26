@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma';
 
 // Force dynamic rendering
@@ -22,6 +23,12 @@ const FALLBACK_STATS = {
 
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // Get current date for "active today" calculation
     const today = new Date();
     today.setHours(0, 0, 0, 0);

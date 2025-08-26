@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma'
 import slugify from 'slugify'
 import { getServerSession } from 'next-auth'
@@ -9,6 +10,12 @@ export const dynamic = 'force-dynamic'
 // GET /api/community/circles?search=&language=&level=&limit=20
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || undefined
     const language = searchParams.get('language') || undefined

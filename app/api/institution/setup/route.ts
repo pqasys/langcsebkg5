@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma';
 import { v4 as uuidv4 } from 'uuid';
 

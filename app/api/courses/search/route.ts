@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { queryOptimizer } from '@/lib/enhanced-database-optimizer';
 import { performanceUtils } from '@/lib/performance-monitor';
 
@@ -6,6 +7,12 @@ export async function GET(request: Request) {
   const startTime = Date.now();
   
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('query') || '';
     const category = searchParams.get('category');

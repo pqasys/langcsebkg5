@@ -165,6 +165,14 @@ export default function ProgressVisualization({ studentId, timeRange = '30d' }: 
     );
   }
 
+  // Ensure all data properties exist with fallbacks
+  const safeData = {
+    dailyProgress: data.dailyProgress || [],
+    weeklyStats: data.weeklyStats || [],
+    subjectBreakdown: data.subjectBreakdown || [],
+    milestones: data.milestones || []
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -215,25 +223,25 @@ export default function ProgressVisualization({ studentId, timeRange = '30d' }: 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
-                  {data.dailyProgress.length > 0 ? formatTime(data.dailyProgress[data.dailyProgress.length - 1].timeSpent) : '0m'}
+                  {safeData.dailyProgress && safeData.dailyProgress.length > 0 ? formatTime(safeData.dailyProgress[safeData.dailyProgress.length - 1].timeSpent) : '0m'}
                 </div>
                 <div className="text-sm text-muted-foreground">Today's Study Time</div>
               </div>
               <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
-                  {data.dailyProgress.length > 0 ? data.dailyProgress[data.dailyProgress.length - 1].modulesCompleted : 0}
+                  {safeData.dailyProgress && safeData.dailyProgress.length > 0 ? safeData.dailyProgress[safeData.dailyProgress.length - 1].modulesCompleted : 0}
                 </div>
                 <div className="text-sm text-muted-foreground">Modules Completed</div>
               </div>
               <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
                 <div className="text-2xl font-bold text-purple-600">
-                  {data.dailyProgress.length > 0 ? data.dailyProgress[data.dailyProgress.length - 1].quizzesTaken : 0}
+                  {safeData.dailyProgress && safeData.dailyProgress.length > 0 ? safeData.dailyProgress[safeData.dailyProgress.length - 1].quizzesTaken : 0}
                 </div>
                 <div className="text-sm text-muted-foreground">Quizzes Taken</div>
               </div>
               <div className="text-center p-4 bg-orange-50 dark:bg-orange-950 rounded-lg">
                 <div className="text-2xl font-bold text-orange-600">
-                  {data.dailyProgress.length > 0 ? data.dailyProgress[data.dailyProgress.length - 1].score : 0}%
+                  {safeData.dailyProgress && safeData.dailyProgress.length > 0 ? safeData.dailyProgress[safeData.dailyProgress.length - 1].score : 0}%
                 </div>
                 <div className="text-sm text-muted-foreground">Average Score</div>
               </div>
@@ -242,7 +250,7 @@ export default function ProgressVisualization({ studentId, timeRange = '30d' }: 
             <div className="space-y-4">
               <h4 className="font-medium">Daily Progress Trend</h4>
               <div className="space-y-3">
-                {data.dailyProgress.slice(-7).map((day, index) => (
+                {safeData.dailyProgress.slice(-7).map((day, index) => (
                   <div key={day.date} className="flex items-center space-x-4">
                     <div className="w-20 text-sm text-muted-foreground">
                       {formatDate(day.date)}
@@ -271,19 +279,19 @@ export default function ProgressVisualization({ studentId, timeRange = '30d' }: 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
-                  {formatTime(data.weeklyStats.reduce((sum, week) => sum + week.totalTime, 0))}
+                  {formatTime(safeData.weeklyStats.reduce((sum, week) => sum + week.totalTime, 0))}
                 </div>
                 <div className="text-sm text-muted-foreground">Total Study Time</div>
               </div>
               <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
-                  {Math.round(data.weeklyStats.reduce((sum, week) => sum + week.averageScore, 0) / data.weeklyStats.length)}%
+                  {safeData.weeklyStats && safeData.weeklyStats.length > 0 ? Math.round(safeData.weeklyStats.reduce((sum, week) => sum + week.averageScore, 0) / safeData.weeklyStats.length) : 0}%
                 </div>
                 <div className="text-sm text-muted-foreground">Average Score</div>
               </div>
               <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
                 <div className="text-2xl font-bold text-purple-600">
-                  {Math.max(...data.weeklyStats.map(w => w.streak))}
+                  {safeData.weeklyStats.length > 0 ? Math.max(...safeData.weeklyStats.map(w => w.streak)) : 0}
                 </div>
                 <div className="text-sm text-muted-foreground">Best Streak</div>
               </div>
@@ -292,7 +300,7 @@ export default function ProgressVisualization({ studentId, timeRange = '30d' }: 
             <div className="space-y-4">
               <h4 className="font-medium">Weekly Performance</h4>
               <div className="space-y-3">
-                {data.weeklyStats.map((week, index) => (
+                {safeData.weeklyStats.map((week, index) => (
                   <div key={week.week} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <h5 className="font-medium">Week {week.week}</h5>
@@ -320,7 +328,7 @@ export default function ProgressVisualization({ studentId, timeRange = '30d' }: 
         {selectedChart === 'subjects' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {data.subjectBreakdown.map((subject) => (
+              {safeData.subjectBreakdown.map((subject) => (
                 <div key={subject.subject} className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <h5 className="font-medium">{subject.subject}</h5>
@@ -347,7 +355,7 @@ export default function ProgressVisualization({ studentId, timeRange = '30d' }: 
         {selectedChart === 'milestones' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {data.milestones.map((milestone) => (
+              {safeData.milestones.map((milestone) => (
                 <div key={milestone.id} className={`p-4 border rounded-lg ${milestone.achieved ? 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-900'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">

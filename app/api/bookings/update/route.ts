@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { isBuildTime } from '@/lib/build-error-handler';
 import Stripe from 'stripe'
 import { prisma } from '@/lib/prisma'
 import { logger, logError } from '../../../../lib/logger';

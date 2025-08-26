@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { prisma } from '@/lib/prisma';
 
 // Force dynamic rendering
@@ -20,6 +21,12 @@ const FALLBACK_COUNTS = {
 
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const { searchParams } = new URL(request.url);
     const role = searchParams.get('role') || 'GUEST';
 

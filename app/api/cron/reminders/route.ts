@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import { ReminderScheduler } from '@/lib/payment/reminder-scheduler';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: Request) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     // Verify cron secret
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

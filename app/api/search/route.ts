@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchService, SearchOptions } from '@/lib/search';
+import { isBuildTime } from '@/lib/build-error-handler';
 import { z } from 'zod';
 
 const searchQuerySchema = z.object({
@@ -23,6 +24,12 @@ const searchQuerySchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const { searchParams } = new URL(request.url);
     const queryParams = Object.fromEntries(searchParams.entries());
     

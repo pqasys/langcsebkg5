@@ -157,30 +157,21 @@ interface BillingHistoryItem {
 }
 
 export default function StudentDashboard() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  // Immediate session guards to avoid flashing dashboard after sign-out
-  if (typeof window !== 'undefined') {
-    // If unauthenticated, redirect synchronously and render nothing
-    // NextAuth status can change asynchronously; this guard prevents UI flicker
-    // Note: we intentionally avoid setting local loading here to unmount quickly
-    // eslint-disable-next-line no-restricted-globals
-  }
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
-  // Render-time guard: if session is loading or unauthenticated, do not render content
-  if ((typeof window !== 'undefined' && !session) && loading === false) {
-    // If session is missing but our loading finished (e.g., after sign-out), push to signin
-    router.replace('/auth/signin');
-    return null;
-  }
+  // Session state management
   const [courses, setCourses] = useState<CourseProgress[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalCourses: 0,
+    activeCourses: 0,
     completedCourses: 0,
     inProgressCourses: 0,
-    averageProgress: 0,
-    activeCourses: 0
+    averageProgress: 0
   });
 
   // New state for enhanced progress tracking
@@ -195,69 +186,197 @@ export default function StudentDashboard() {
   // Subscription state
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionStatus | null>(null);
 
+  // Handle session loading and authentication
   useEffect(() => {
-    // If no session, redirect early to avoid dashboard flash
-    if (!session) {
+    if (status === 'loading') {
+      return; // Still loading, wait
+    }
+
+    if (status === 'unauthenticated' || !session) {
+      console.log('StudentDashboard: No session, redirecting to signin');
       router.replace('/auth/signin');
       return;
     }
+
+    // Check if user is actually a student
+    if (session.user?.role !== 'STUDENT') {
+      console.log('StudentDashboard: User is not a student, redirecting');
+      router.replace('/dashboard');
+      return;
+    }
+
+    // Session is valid, fetch dashboard data
     fetchDashboardData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  }, [session, status, router]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      setError(null);
       
-      // Fetch existing dashboard data
-      const dashboardResponse = await fetch('/api/student/dashboard');
+      console.log('StudentDashboard: Fetching dashboard data...');
+      
+      // Fetch existing dashboard data with retry logic
+      const dashboardResponse = await fetch('/api/student/dashboard', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication
+      });
+
+      console.log('StudentDashboard: Dashboard API response status:', dashboardResponse.status);
+
       if (dashboardResponse.ok) {
         const dashboardData = await dashboardResponse.json();
-        setCourses(dashboardData.courses);
-        setStats(dashboardData.stats);
+        console.log('StudentDashboard: Dashboard data received:', dashboardData);
+        
+        setCourses(dashboardData.courses || []);
+        setStats(dashboardData.stats || {
+          totalCourses: 0,
+          activeCourses: 0,
+          completedCourses: 0,
+          inProgressCourses: 0,
+          averageProgress: 0
+        });
+      } else {
+        const errorData = await dashboardResponse.json().catch(() => ({}));
+        console.error('StudentDashboard: Dashboard API error:', dashboardResponse.status, errorData);
+        
+        if (dashboardResponse.status === 401) {
+          // Unauthorized - session might be invalid
+          setError('Session expired. Please sign in again.');
+          router.replace('/auth/signin');
+          return;
+        } else if (dashboardResponse.status === 404) {
+          // Student not found
+          setError('Student profile not found. Please contact support.');
+        } else {
+          // Other server error
+          setError('Failed to load dashboard data. Please try again.');
+        }
+        
+        // Set fallback stats if API call fails
+        setStats({
+          totalCourses: 0,
+          activeCourses: 0,
+          completedCourses: 0,
+          inProgressCourses: 0,
+          averageProgress: 0
+        });
       }
 
-      // Fetch new progress tracking data
-      const [statsRes, achievementsRes, modulesRes, quizStatsRes, subscriptionRes] = await Promise.all([
-        fetch('/api/student/dashboard/stats'),
-        fetch('/api/student/dashboard/achievements'),
-        fetch('/api/student/dashboard/recent-modules'),
-        fetch('/api/student/dashboard/quiz-stats'),
-        fetch('/api/student/subscription')
+      // Fetch additional data with individual error handling
+      const fetchWithFallback = async (url: string, fallbackData: any, endpointName: string) => {
+        try {
+          console.log(`StudentDashboard: Fetching ${endpointName}...`);
+          const response = await fetch(url, {
+            credentials: 'include',
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            console.log(`StudentDashboard: ${endpointName} data received:`, data);
+            return data || fallbackData;
+          } else {
+            console.warn(`StudentDashboard: ${endpointName} failed with status:`, response.status);
+            return fallbackData;
+          }
+        } catch (error) {
+          console.warn(`StudentDashboard: ${endpointName} fetch error:`, error);
+          return fallbackData;
+        }
+      };
+
+      // Fetch all additional data in parallel
+      const [statsData, achievementsData, modulesData, quizData, subscriptionData] = await Promise.all([
+        fetchWithFallback('/api/student/dashboard/stats', getFallbackData('learningStats'), 'stats'),
+        fetchWithFallback('/api/student/dashboard/achievements', [], 'achievements'),
+        fetchWithFallback('/api/student/dashboard/recent-modules', [], 'recent-modules'),
+        fetchWithFallback('/api/student/dashboard/quiz-stats', { stats: getFallbackData('quizStats'), recentAttempts: [] }, 'quiz-stats'),
+        fetchWithFallback('/api/student/subscription', { subscriptionStatus: getFallbackData('subscriptionStatus') }, 'subscription')
       ]);
 
-      if (statsRes.ok) {
-        const statsData = await statsRes.json();
-        setLearningStats(statsData);
-      }
-
-      if (achievementsRes.ok) {
-        const achievementsData = await achievementsRes.json();
-        setAchievements(achievementsData);
-      }
-
-      if (modulesRes.ok) {
-        const modulesData = await modulesRes.json();
-        setRecentModules(modulesData);
-      }
-
-      if (quizStatsRes.ok) {
-        const quizData = await quizStatsRes.json();
-        setQuizStats(quizData.stats);
-        setRecentQuizAttempts(quizData.recentAttempts);
-      }
-
-      if (subscriptionRes.ok) {
-        const subscriptionData = await subscriptionRes.json();
-        setSubscriptionData(subscriptionData.subscriptionStatus);
-      }
+      // Set the data from the fetch results
+      setLearningStats(statsData);
+      setAchievements(achievementsData);
+      setRecentModules(modulesData);
+      setQuizStats(quizData.stats);
+      setRecentQuizAttempts(quizData.recentAttempts);
+      setSubscriptionData(subscriptionData.subscriptionStatus);
+      
+      console.log('StudentDashboard: All data loaded successfully');
+      
     } catch (error) {
-      console.error('Error occurred:', error);
-      toast.error(`Failed to load dashboard data. Please try again or contact support if the problem persists.`);
+      console.error('StudentDashboard: Error occurred:', error);
+      
+      // Retry logic for transient errors
+      if (retryCount < maxRetries) {
+        console.log(`StudentDashboard: Retrying... (${retryCount + 1}/${maxRetries})`);
+        setRetryCount(prev => prev + 1);
+        setTimeout(() => {
+          fetchDashboardData();
+        }, 1000 * (retryCount + 1)); // Exponential backoff
+        return;
+      }
+      
+      setError('Failed to load dashboard data. Please refresh the page or contact support if the problem persists.');
       toast.error('Failed to load dashboard data');
+      
+      // Set fallback data on error
+      setStats({
+        totalCourses: 0,
+        activeCourses: 0,
+        completedCourses: 0,
+        inProgressCourses: 0,
+        averageProgress: 0
+      });
+      setLearningStats(getFallbackData('learningStats') as LearningStats);
+      setAchievements([]);
+      setRecentModules([]);
+      setQuizStats(getFallbackData('quizStats') as QuizStats);
+      setRecentQuizAttempts([]);
+      setSubscriptionData(getFallbackData('subscriptionStatus') as SubscriptionStatus);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to get fallback data
+  const getFallbackData = (type: string): any => {
+    const fallbackData = {
+      learningStats: {
+        totalTimeSpent: 0,
+        averageSessionTime: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        totalSessions: 0,
+        thisWeekSessions: 0,
+        averageScore: 0
+      },
+      quizStats: {
+        totalAttempts: 0,
+        completedQuizzes: 0,
+        averageScore: 0,
+        totalTimeSpent: 0,
+        currentStreak: 0,
+        bestScore: 0,
+        quizzesPassed: 0,
+        totalQuizzes: 0
+      },
+      subscriptionStatus: {
+        hasActiveSubscription: false,
+        currentPlan: null,
+        features: {},
+        subscriptionEndDate: null,
+        canUpgrade: false,
+        canDowngrade: false,
+        canCancel: false,
+        nextBillingDate: null,
+        billingHistory: []
+      }
+    };
+    return fallbackData[type as keyof typeof fallbackData] || {};
   };
 
   const formatTime = (seconds: number) => {
@@ -308,10 +427,61 @@ export default function StudentDashboard() {
     }
   };
 
-  if (loading) {
+  // Show loading state
+  if (status === 'loading' || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <FaSpinner className="animate-spin h-8 w-8 text-blue-500" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <FaSpinner className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600 dark:text-gray-300">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="mb-4">
+            <Activity className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Dashboard Error</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
+          </div>
+          <div className="space-y-2">
+            <Button 
+              onClick={() => {
+                setError(null);
+                setRetryCount(0);
+                fetchDashboardData();
+              }}
+              variant="primary-high"
+              size="mobile-lg"
+            >
+              Try Again
+            </Button>
+            <Button 
+              onClick={() => router.push('/auth/signin')}
+              variant="outline"
+              size="mobile-lg"
+            >
+              Sign In Again
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show unauthenticated state
+  if (status === 'unauthenticated' || !session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <FaSpinner className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600 dark:text-gray-300">Redirecting to sign in...</p>
+        </div>
       </div>
     );
   }
@@ -595,7 +765,7 @@ export default function StudentDashboard() {
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats.totalCourses}</div>
+                <div className="text-xl sm:text-2xl font-bold">{stats?.totalCourses || 0}</div>
               </CardContent>
             </Card>
             <Card className="hover:shadow-md transition-shadow">
@@ -604,7 +774,7 @@ export default function StudentDashboard() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats.activeCourses}</div>
+                <div className="text-xl sm:text-2xl font-bold">{stats?.activeCourses || 0}</div>
               </CardContent>
             </Card>
             <Card className="hover:shadow-md transition-shadow">
@@ -613,7 +783,7 @@ export default function StudentDashboard() {
                 <GraduationCap className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats.completedCourses}</div>
+                <div className="text-xl sm:text-2xl font-bold">{stats?.completedCourses || 0}</div>
               </CardContent>
             </Card>
             <Card className="hover:shadow-md transition-shadow">
@@ -622,7 +792,7 @@ export default function StudentDashboard() {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats.inProgressCourses}</div>
+                <div className="text-xl sm:text-2xl font-bold">{stats?.inProgressCourses || 0}</div>
               </CardContent>
             </Card>
             <Card className="hover:shadow-md transition-shadow">
@@ -631,7 +801,7 @@ export default function StudentDashboard() {
                 <Award className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats.averageProgress}%</div>
+                <div className="text-xl sm:text-2xl font-bold">{stats?.averageProgress || 0}%</div>
               </CardContent>
             </Card>
             <Card className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500">

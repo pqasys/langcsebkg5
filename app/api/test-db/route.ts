@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 // Helper function to handle BigInt serialization
 function serializeForJSON(obj: any): any {
@@ -28,6 +29,12 @@ function serializeForJSON(obj: any): any {
 
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
+
     const startTime = Date.now();
     
     // Simple database query to test connectivity

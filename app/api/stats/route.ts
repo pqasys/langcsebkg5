@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma, performWarmup } from '@/lib/server-warmup';
 import { apiCache, APICache } from '@/lib/api-cache';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -56,6 +57,18 @@ async function getStatsWithRetry(maxRetries = 3, delay = 1000) {
 
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json({
+        students: 0,
+        institutions: 0,
+        courses: 0,
+        languages: 0,
+        _fallback: true,
+        _buildTime: true
+      });
+    }
+
     // Check cache first
     const cacheKey = APICache.getStatsKey();
     const cachedStats = apiCache.get(cacheKey);

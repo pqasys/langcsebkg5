@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 export async function GET() {
   return NextResponse.json({ status: 'ok', timestamp: new Date().toISOString() });

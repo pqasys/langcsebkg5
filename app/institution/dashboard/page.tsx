@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { DashboardClient } from './DashboardClient';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic'
@@ -12,6 +13,21 @@ export default async function InstitutionDashboardPage() {
 
   if (!session?.user?.institutionId) {
     redirect('/auth/signin');
+  }
+
+  // During build time, return fallback data
+  if (isBuildTime()) {
+    return (
+      <DashboardClient
+        totalCourses={0}
+        totalEnrollments={0}
+        totalCompletions={0}
+        totalRevenue={0}
+        pendingPayments={0}
+        recentEnrollments={[]}
+        recentStudents={[]}
+      />
+    );
   }
 
   // Get statistics

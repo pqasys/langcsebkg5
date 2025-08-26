@@ -132,11 +132,13 @@ export default function PersonalizedRecommendations({
     }
   };
 
+  const safeRecommendations = recommendations || [];
+  
   const filteredRecommendations = selectedCategory === 'all' 
-    ? recommendations 
-    : recommendations.filter(rec => rec.category === selectedCategory);
+    ? safeRecommendations 
+    : safeRecommendations.filter(rec => rec.category === selectedCategory);
 
-  const categories = ['all', ...new Set(recommendations.map(rec => rec.category))];
+  const categories = ['all', ...new Set(safeRecommendations.map(rec => rec.category))];
 
   if (loading) {
     return (
@@ -192,7 +194,7 @@ export default function PersonalizedRecommendations({
         </div>
 
         {/* Recommendations Grid */}
-        {filteredRecommendations.length === 0 ? (
+                    {!filteredRecommendations || filteredRecommendations.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>No recommendations available.</p>
@@ -288,14 +290,14 @@ export default function PersonalizedRecommendations({
                   </div>
 
                   {/* Tags */}
-                  {recommendation.tags.length > 0 && (
+                  {recommendation.tags && recommendation.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-2 sm:mb-3">
                       {recommendation.tags.slice(0, 2).map((tag, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {tag}
                         </Badge>
                       ))}
-                      {recommendation.tags.length > 2 && (
+                      {recommendation.tags && recommendation.tags.length > 2 && (
                         <Badge variant="outline" className="text-xs">
                           +{recommendation.tags.length - 2}
                         </Badge>
@@ -338,7 +340,7 @@ export default function PersonalizedRecommendations({
               </div>
               <div>
                 <p className="text-muted-foreground">Completed Courses</p>
-                <p className="font-semibold">{learningProfile.completedCourses.length}</p>
+                <p className="font-semibold">{learningProfile.completedCourses ? learningProfile.completedCourses.length : 0}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Preferred Difficulty</p>

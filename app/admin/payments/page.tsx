@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { isClientBuildTime, getFallbackData } from '@/lib/client-error-handler';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -112,6 +113,16 @@ export default function AdminPaymentsPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
+        
+        // During build time, use fallback data
+        if (isClientBuildTime()) {
+          setPayments(getFallbackData('payments'));
+          setInstitutions(getFallbackData('institutions'));
+          setPaymentSettings(getFallbackData('settings'));
+          setLoading(false);
+          return;
+        }
+        
         const [paymentsRes, institutionsRes, settingsRes] = await Promise.all([
           fetch('/api/admin/payments'),
           fetch('/api/admin/institutions'),

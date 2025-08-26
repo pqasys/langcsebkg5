@@ -2,9 +2,15 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import slugify from 'slugify';
 import { cache } from '@/lib/cache';
+import { isBuildTime } from '@/lib/build-error-handler';
 
 export async function GET() {
   try {
+    // During build time, return fallback data immediately
+    if (isBuildTime()) {
+      return NextResponse.json([]);
+    }
+
     // Try to get cached data first
     const cacheKey = 'categories:all';
     const cachedData = await cache.get(cacheKey);
