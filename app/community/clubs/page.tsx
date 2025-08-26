@@ -154,7 +154,7 @@ export default function CommunityClubsPage() {
               Join weekly language practice sessions and connect with learners
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href="/community">
+              <Link href="/features/community-learning">
                 <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
                   Back to Community
                 </Button>

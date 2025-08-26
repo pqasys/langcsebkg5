@@ -85,7 +85,7 @@ const AVAILABLE_LANGUAGES: Language[] = [
     code: 'it',
     name: 'Italian',
     flag: '🇮🇹',
-    status: 'coming-soon',
+    status: 'available',
     description: 'Proficiency Test'
   },
   {
@@ -201,23 +201,8 @@ export default function LanguageProficiencyTestPage() {
     setTestResults(results);
     setShowTest(false);
     
-    try {
-      const response = await fetch('/api/language-proficiency-test/email-results', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: session?.user?.id,
-          results: results,
-          language: selectedLanguage
-        })
-      });
-      
-      if (response.ok) {
-        toast.success('Test results have been sent to your email!');
-      }
-    } catch (error) {
-      console.error('Failed to send email:', error);
-    }
+    // The modal now handles email sending automatically
+    toast.success('Test completed! Check your email for the certificate.');
   };
 
   const handleExitTest = () => {

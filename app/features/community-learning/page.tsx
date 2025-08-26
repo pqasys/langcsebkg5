@@ -88,6 +88,12 @@ export default function CommunityLearningFeaturePage() {
   const [autoPlayProgress, setAutoPlayProgress] = useState(0)
   const [isCarouselTransition, setIsCarouselTransition] = useState(false)
 
+  // Achievements carousel state
+  const [currentAchievementSlide, setCurrentAchievementSlide] = useState(0)
+  const [isAchievementTransitioning, setIsAchievementTransitioning] = useState(false)
+  const [achievementAutoPlayProgress, setAchievementAutoPlayProgress] = useState(0)
+  const [isAchievementCarouselTransition, setIsAchievementCarouselTransition] = useState(false)
+
   // Community announcements state
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [loading, setLoading] = useState(true)
@@ -116,10 +122,15 @@ export default function CommunityLearningFeaturePage() {
   const [showSubscriptionReminder, setShowSubscriptionReminder] = useState(false)
   const [joinedCircleName, setJoinedCircleName] = useState('')
 
-  // Placeholder visible profiles data
-  const visibleProfiles = [
+  // Community members state
+  const [communityMembers, setCommunityMembers] = useState<any[]>([])
+  const [membersLoading, setMembersLoading] = useState(true)
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
+
+  // Placeholder profiles for fallback
+  const placeholderProfiles = [
     {
-      id: '1',
+      id: 'placeholder-1',
       name: 'Sarah Chen',
       avatar: '/api/placeholder/60/60',
       location: 'Toronto, Canada',
@@ -129,10 +140,11 @@ export default function CommunityLearningFeaturePage() {
       isOnline: true,
       lastActive: '2 minutes ago',
       mutualConnections: 3,
-      achievements: 12
+      achievements: 12,
+      isPlaceholder: true
     },
     {
-      id: '2',
+      id: 'placeholder-2',
       name: 'Miguel Rodriguez',
       avatar: '/api/placeholder/60/60',
       location: 'Madrid, Spain',
@@ -142,10 +154,11 @@ export default function CommunityLearningFeaturePage() {
       isOnline: false,
       lastActive: '1 hour ago',
       mutualConnections: 1,
-      achievements: 8
+      achievements: 8,
+      isPlaceholder: true
     },
     {
-      id: '3',
+      id: 'placeholder-3',
       name: 'Emma Thompson',
       avatar: '/api/placeholder/60/60',
       location: 'London, UK',
@@ -155,10 +168,11 @@ export default function CommunityLearningFeaturePage() {
       isOnline: true,
       lastActive: '5 minutes ago',
       mutualConnections: 5,
-      achievements: 15
+      achievements: 15,
+      isPlaceholder: true
     },
     {
-      id: '4',
+      id: 'placeholder-4',
       name: 'Yuki Tanaka',
       avatar: '/api/placeholder/60/60',
       location: 'Tokyo, Japan',
@@ -168,7 +182,8 @@ export default function CommunityLearningFeaturePage() {
       isOnline: false,
       lastActive: '3 hours ago',
       mutualConnections: 2,
-      achievements: 6
+      achievements: 6,
+      isPlaceholder: true
     }
   ]
 
@@ -232,6 +247,31 @@ export default function CommunityLearningFeaturePage() {
       setCircles([])
     } finally {
       setCirclesLoading(false)
+    }
+  }, [])
+
+  const fetchCommunityMembers = useCallback(async (forceRefresh = false) => {
+    try {
+      setMembersLoading(true)
+      const url = forceRefresh 
+        ? '/api/community/members?limit=4&refresh=true'
+        : '/api/community/members?limit=4'
+      
+      const response = await fetch(url)
+      const data = await response.json()
+      
+      if (Array.isArray(data)) {
+        setCommunityMembers(data)
+        setLastRefresh(new Date())
+      } else {
+        console.error('API returned invalid data:', data)
+        setCommunityMembers([])
+      }
+    } catch (error) {
+      console.error('Error fetching community members:', error)
+      setCommunityMembers([])
+    } finally {
+      setMembersLoading(false)
     }
   }, [])
 
@@ -321,6 +361,38 @@ export default function CommunityLearningFeaturePage() {
     setAutoPlayProgress(0)
   }, [currentSlide])
 
+  // Achievements carousel auto-play effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isAchievementTransitioning && !isAchievementCarouselTransition && announcements.length > 0) {
+        setCurrentAchievementSlide((prev) => (prev === Math.min(announcements.length - 1, 2) ? 0 : prev + 1))
+      }
+    }, 4000) // 4 seconds delay for achievements
+
+    return () => clearInterval(interval)
+  }, [isAchievementTransitioning, isAchievementCarouselTransition, announcements.length])
+
+  // Achievements carousel progress effect
+  useEffect(() => {
+    const progressInterval = setInterval(() => {
+      if (!isAchievementTransitioning && !isAchievementCarouselTransition && announcements.length > 0) {
+        setAchievementAutoPlayProgress((prev) => {
+          if (prev >= 100) {
+            return 0
+          }
+          return prev + (100 / 40) // 4 seconds = 40 intervals of 100ms
+        })
+      }
+    }, 100)
+
+    return () => clearInterval(progressInterval)
+  }, [isAchievementTransitioning, isAchievementCarouselTransition, announcements.length])
+
+  // Reset achievements progress when slide changes
+  useEffect(() => {
+    setAchievementAutoPlayProgress(0)
+  }, [currentAchievementSlide])
+
   // Handle slide transitions with carousel effect
   const handleSlideChange = (newSlide: number) => {
     if (isTransitioning || isCarouselTransition) return
@@ -332,6 +404,19 @@ export default function CommunityLearningFeaturePage() {
     setTimeout(() => {
       setIsTransitioning(false)
     }, 700) // Match the CSS transition duration
+  }
+
+  // Handle achievements carousel slide transitions
+  const handleAchievementSlideChange = (newSlide: number) => {
+    if (isAchievementTransitioning || isAchievementCarouselTransition || announcements.length === 0) return
+    
+    setIsAchievementTransitioning(true)
+    setCurrentAchievementSlide(newSlide)
+    
+    // Reset transition state after animation completes
+    setTimeout(() => {
+      setIsAchievementTransitioning(false)
+    }, 600) // Slightly faster transition for achievements
   }
 
   // Handle carousel loop effect
@@ -361,7 +446,29 @@ export default function CommunityLearningFeaturePage() {
     fetchAnnouncements()
     fetchStats()
     fetchCircles()
-  }, [fetchAnnouncements, fetchStats, fetchCircles])
+    fetchCommunityMembers()
+  }, [fetchAnnouncements, fetchStats, fetchCircles, fetchCommunityMembers])
+
+  // Periodic refresh for community members (every 5 minutes)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchCommunityMembers(true) // Force refresh for diversity rotation
+    }, 5 * 60 * 1000) // 5 minutes
+
+    return () => clearInterval(interval)
+  }, [fetchCommunityMembers])
+
+  // Handle post-login redirect for pending circle joins
+  useEffect(() => {
+    if (session?.user) {
+      const pendingCircleJoin = localStorage.getItem('pendingCircleJoin')
+      if (pendingCircleJoin) {
+        // Clear the pending join and redirect to the specific circle
+        localStorage.removeItem('pendingCircleJoin')
+        router.push(`/community/circles/${pendingCircleJoin}`)
+      }
+    }
+  }, [session, router])
 
   const handleLike = async (announcementId: string) => {
     try {
@@ -430,7 +537,14 @@ export default function CommunityLearningFeaturePage() {
     }
 
     try {
-      const response = await fetch(`/api/community/circles/${circleId}/join`, {
+      // Find the circle to get its slug for the API call
+      const circle = circles.find(c => c.id === circleId)
+      if (!circle) {
+        toast.error('Circle not found')
+        return
+      }
+
+      const response = await fetch(`/api/community/circles/${circle.slug}/join`, {
         method: 'POST'
       })
       
@@ -491,6 +605,15 @@ export default function CommunityLearningFeaturePage() {
     const selectedPlaceholders = placeholderCircles.slice(0, neededPlaceholders)
     
     return [...liveCircles, ...selectedPlaceholders]
+  }
+
+  // Prepare visible profiles - combine real members with placeholders to maintain 4 members
+  const displayMembers = () => {
+    const realMembers = communityMembers.slice(0, 4) // Take up to 4 real members
+    const neededPlaceholders = Math.max(0, 4 - realMembers.length)
+    const selectedPlaceholders = placeholderProfiles.slice(0, neededPlaceholders)
+    
+    return [...realMembers, ...selectedPlaceholders]
   }
 
   const formatTimeAgo = (dateString: string) => {
@@ -1061,89 +1184,156 @@ export default function CommunityLearningFeaturePage() {
                   )}
                 </div>
                 
-                <div className="space-y-4">
-                  {announcements.map((announcement) => (
-                    <Card key={announcement.id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={announcement.user.image} />
-                            <AvatarFallback>
-                              {announcement.user.name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <span className="font-semibold">{announcement.user.name}</span>
-                              <span className="text-gray-500">•</span>
-                              <span className="text-sm text-gray-500">
-                                {new Date(announcement.createdAt).toLocaleDateString()}
-                              </span>
-                            </div>
-                            
-                            <h3 className="font-semibold text-lg mb-2">{announcement.title}</h3>
-                            <p className="text-gray-600 mb-4">{announcement.message}</p>
-                            
-                            <div className="flex items-center space-x-4 mb-4">
-                              <div className="flex items-center space-x-2">
-                                <span className="text-2xl">{getLanguageFlag(announcement.language)}</span>
-                                <span className="font-medium">{announcement.language.toUpperCase()}</span>
-                              </div>
-                              
-                              <Badge className={getLevelColor(announcement.cefrLevel)}>
-                                {announcement.cefrLevel}
-                              </Badge>
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-4">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleLike(announcement.id)}
-                                  className="flex items-center space-x-1"
-                                >
-                                  <Heart className="h-4 w-4" />
-                                  <span>{announcement.likes}</span>
-                                </Button>
+                {/* Achievements Carousel */}
+                <div className="relative overflow-hidden">
+                  {announcements.length > 0 ? (
+                    <>
+                      <div 
+                        className={`flex gap-6 ${isAchievementTransitioning ? 'transition-none' : 'transition-all duration-600 ease-in-out'}`}
+                        style={{ 
+                          transform: `translateX(-${currentAchievementSlide * 400}px)`,
+                          filter: isAchievementTransitioning ? 'brightness(0.9)' : 'brightness(1)'
+                        }}
+                      >
+                        {announcements.slice(0, 3).map((announcement, index) => (
+                          <div key={announcement.id} className="w-96 flex-shrink-0">
+                            <Card className={`h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 ${
+                              index === currentAchievementSlide 
+                                ? 'bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 ring-2 ring-yellow-200' 
+                                : 'bg-gradient-to-br from-gray-50 to-gray-100'
+                            }`}>
+                              <CardContent className="p-8">
+                                <div className="flex items-start space-x-4 mb-6">
+                                  <div className="relative">
+                                    <Avatar className="h-16 w-16 ring-4 ring-yellow-200">
+                                      <AvatarImage src={announcement.user.image} />
+                                      <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-bold text-lg">
+                                        {announcement.user.name.charAt(0).toUpperCase()}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="absolute -top-2 -right-2 bg-yellow-500 text-white rounded-full p-1">
+                                      <Trophy className="h-4 w-4" />
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="flex-1">
+                                    <div className="flex items-center space-x-2 mb-2">
+                                      <span className="font-bold text-lg text-gray-900">{announcement.user.name}</span>
+                                      <span className="text-gray-400">•</span>
+                                      <span className="text-sm text-gray-500">
+                                        {new Date(announcement.createdAt).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                    
+                                    <div className="flex items-center space-x-3 mb-3">
+                                      <div className="flex items-center space-x-2 bg-white px-3 py-1 rounded-full shadow-sm">
+                                        <span className="text-2xl">{getLanguageFlag(announcement.language)}</span>
+                                        <span className="font-semibold text-sm">{announcement.language.toUpperCase()}</span>
+                                      </div>
+                                      
+                                      <Badge className={`${getLevelColor(announcement.cefrLevel)} font-bold text-sm px-3 py-1`}>
+                                        {announcement.cefrLevel}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
                                 
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="flex items-center space-x-1"
-                                >
-                                  <MessageCircle className="h-4 w-4" />
-                                  <span>Comment</span>
-                                </Button>
-                              </div>
-                              
-                              {session?.user?.id === announcement.user.id && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="flex items-center space-x-1"
-                                >
-                                  <Share2 className="h-4 w-4" />
-                                  <span>Edit</span>
-                                </Button>
-                              )}
-                            </div>
+                                <h3 className="font-bold text-xl mb-3 text-gray-900 leading-tight">{announcement.title}</h3>
+                                <p className="text-gray-700 mb-6 leading-relaxed">{announcement.message}</p>
+                                
+                                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                                  <div className="flex items-center space-x-4">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleLike(announcement.id)}
+                                      className="flex items-center space-x-2 hover:bg-yellow-100 hover:text-yellow-700 transition-colors"
+                                    >
+                                      <Heart className="h-5 w-5" />
+                                      <span className="font-semibold">{announcement.likes}</span>
+                                    </Button>
+                                    
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="flex items-center space-x-2 hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                                    >
+                                      <MessageCircle className="h-5 w-5" />
+                                      <span>Comment</span>
+                                    </Button>
+                                  </div>
+                                  
+                                  {session?.user?.id === announcement.user.id && (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="flex items-center space-x-2 border-yellow-300 text-yellow-700 hover:bg-yellow-50"
+                                    >
+                                      <Share2 className="h-4 w-4" />
+                                      <span>Edit</span>
+                                    </Button>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
                           </div>
+                        ))}
+                      </div>
+
+                      {/* Achievements Carousel Navigation */}
+                      <div className="flex justify-center items-center space-x-4 mt-8">
+                        <button
+                          onClick={() => handleAchievementSlideChange(currentAchievementSlide === 0 ? Math.min(announcements.length - 1, 2) : currentAchievementSlide - 1)}
+                          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white p-3 rounded-full transition-all duration-300 hover:scale-110 shadow-lg"
+                        >
+                          <ChevronLeft className="h-6 w-6" />
+                        </button>
+                        
+                        {/* Progress Bar */}
+                        <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-100 ease-linear"
+                            style={{ width: `${achievementAutoPlayProgress}%` }}
+                          />
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                  
-                  {announcements.length === 0 && (
-                    <Card>
-                      <CardContent className="p-8 text-center">
-                        <Globe className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                        <h3 className="text-lg font-semibold mb-2">No achievements yet</h3>
-                        <p className="text-gray-600 mb-4">
+                        
+                        {/* Dots */}
+                        <div className="flex space-x-2">
+                          {[0, 1, 2].slice(0, Math.min(announcements.length, 3)).map((index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleAchievementSlideChange(index)}
+                              className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 ${
+                                currentAchievementSlide === index 
+                                  ? 'bg-gradient-to-r from-yellow-500 to-orange-500 scale-125' 
+                                  : 'bg-gray-300 hover:bg-gray-400'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        
+                        <button
+                          onClick={() => handleAchievementSlideChange(currentAchievementSlide === Math.min(announcements.length - 1, 2) ? 0 : currentAchievementSlide + 1)}
+                          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white p-3 rounded-full transition-all duration-300 hover:scale-110 shadow-lg"
+                        >
+                          <ChevronRight className="h-6 w-6" />
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-0 shadow-xl">
+                      <CardContent className="p-12 text-center">
+                        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mb-6">
+                          <Trophy className="h-10 w-10 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-4 text-gray-900">No achievements yet</h3>
+                        <p className="text-gray-600 mb-6 text-lg">
                           Be the first to share your language learning achievements!
                         </p>
-                        <Button onClick={() => window.location.href = '/language-proficiency-test'}>
+                        <Button 
+                          onClick={() => window.location.href = '/language-proficiency-test'}
+                          className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                        >
                           Take Your First Test
                         </Button>
                       </CardContent>
@@ -1168,103 +1358,103 @@ export default function CommunityLearningFeaturePage() {
                   )}
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {displayCircles().map((circle) => (
-                    <Card key={circle.id} className="hover:shadow-lg transition-shadow duration-200">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg text-gray-900 mb-1">{circle.name}</h3>
-                            <div className="flex items-center space-x-2 mb-2">
-                              <Badge variant="outline" className="text-xs">
-                                {circle.language}
-                              </Badge>
-                              <Badge variant="secondary" className="text-xs">
-                                {circle.level}
-                              </Badge>
-                              {!circle.isPublic && (
-                                <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
-                                  Private
-                                </Badge>
-                              )}
-                              {circle.isPlaceholder && (
-                                <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
-                                  Demo
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                          {circle.description}
-                        </p>
-                        
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Users className="h-4 w-4 mr-1" />
-                            <span>
-                              {circle.isPlaceholder 
-                                ? `${circle.membersCount}/${circle.maxMembers} members`
-                                : `${circle.membersCount} members`
-                              }
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            Created {circle.isPlaceholder ? circle.createdAt : formatTimeAgo(circle.createdAt)}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs text-gray-500">
-                            by {circle.isPlaceholder ? circle.createdBy : circle.owner.name}
-                          </div>
-                                                     <div className="flex space-x-2">
-                             {!circle.isPlaceholder && (
-                               <Link href={`/community/circles/${circle.slug}`}>
-                                 <Button 
-                                   size="sm" 
-                                   variant="outline" 
-                                   className="text-xs"
-                                 >
-                                   View Circle
-                                 </Button>
-                               </Link>
-                             )}
-                             <Button 
-                               size="sm" 
-                               variant="outline" 
-                               className="text-xs"
-                               disabled={circle.isPlaceholder}
-                               onClick={() => {
-                                 if (!circle.isPlaceholder) {
-                                   handleJoinCircle(circle.id)
-                                 }
-                               }}
-                             >
-                               {circle.isPlaceholder ? 'Demo Circle' : 'Join Circle'}
-                             </Button>
+                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                   {displayCircles().map((circle) => (
+                     <Card key={circle.id} className="hover:shadow-lg transition-shadow duration-200">
+                       <CardContent className="p-6 flex flex-col h-full">
+                         <div className="flex-1">
+                           <div className="flex items-start justify-between mb-3">
+                             <div className="flex-1">
+                               <h3 className="font-semibold text-lg text-gray-900 mb-1">{circle.name}</h3>
+                               <div className="flex items-center space-x-2 mb-2">
+                                 <Badge variant="outline" className="text-xs">
+                                   {circle.language}
+                                 </Badge>
+                                 <Badge variant="secondary" className="text-xs">
+                                   {circle.level}
+                                 </Badge>
+                                 {!circle.isPublic && (
+                                   <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
+                                     Private
+                                   </Badge>
+                                 )}
+                                 {circle.isPlaceholder && (
+                                   <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200">
+                                     Demo
+                                   </Badge>
+                                 )}
+                               </div>
+                             </div>
                            </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                           
+                           <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                             {circle.description}
+                           </p>
+                           
+                           <div className="flex items-center justify-between mb-4">
+                             <div className="flex items-center text-sm text-gray-500">
+                               <Users className="h-4 w-4 mr-1" />
+                               <span>
+                                 {circle.isPlaceholder 
+                                   ? `${circle.membersCount}/${circle.maxMembers} members`
+                                   : `${circle.membersCount} members`
+                                 }
+                               </span>
+                             </div>
+                             <div className="text-xs text-gray-500">
+                               Created {circle.isPlaceholder ? circle.createdAt : formatTimeAgo(circle.createdAt)}
+                             </div>
+                           </div>
+                           
+                           <div className="flex items-center space-x-2 mb-4">
+                             <Avatar className="h-6 w-6">
+                               <AvatarImage src={circle.isPlaceholder ? '' : circle.owner?.image || ''} />
+                               <AvatarFallback className="text-xs">
+                                 {circle.isPlaceholder 
+                                   ? circle.createdBy?.charAt(0).toUpperCase() 
+                                   : circle.owner?.name?.charAt(0).toUpperCase() || 'U'
+                                 }
+                               </AvatarFallback>
+                             </Avatar>
+                             <div className="text-xs text-gray-500">
+                               by {circle.isPlaceholder ? circle.createdBy : circle.owner?.name || 'Unknown'}
+                             </div>
+                           </div>
+                         </div>
+                         
+                         <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                           {!circle.isPlaceholder && (
+                             <Link href={`/community/circles/${circle.slug}`} className="flex-1">
+                               <Button 
+                                 size="sm" 
+                                 variant="outline" 
+                                 className="text-xs w-full"
+                               >
+                                 View Circle
+                               </Button>
+                             </Link>
+                           )}
+                           <Button 
+                             size="sm" 
+                             variant="outline" 
+                             className={`text-xs ${!circle.isPlaceholder ? 'flex-1' : 'w-full'}`}
+                             disabled={circle.isPlaceholder}
+                             onClick={() => {
+                               if (!circle.isPlaceholder) {
+                                 handleJoinCircle(circle.id)
+                               }
+                             }}
+                           >
+                             {circle.isPlaceholder ? 'Demo Circle' : 'Join Circle'}
+                           </Button>
+                         </div>
+                       </CardContent>
+                     </Card>
+                   ))}
+                 </div>
                 
-                <div className="mt-6 text-center space-y-4">
-                  {circles.length > 0 && (
-                    <div className="text-sm text-green-600 bg-green-50 px-4 py-2 rounded-lg inline-block">
-                      ✓ Showing {Math.min(circles.length, 3)} live circles from the community
-                    </div>
-                  )}
-                  
-                  {circles.length === 0 && !circlesLoading && (
-                    <div className="text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg inline-block">
-                      Demo circles shown - join the community to see live circles!
-                    </div>
-                  )}
-                  
-                                     <div>
+                                 <div className="mt-6 text-center">
+                   <div>
                      <Link href="/community/circles">
                        <Button variant="outline">
                          <Users className="h-4 w-4 mr-2" />
@@ -1272,7 +1462,7 @@ export default function CommunityLearningFeaturePage() {
                        </Button>
                      </Link>
                    </div>
-                </div>
+                 </div>
               </section>
 
               {/* Success Stories Section */}
@@ -1357,8 +1547,14 @@ export default function CommunityLearningFeaturePage() {
                   <div className="h-32 bg-gray-200 rounded-lg"></div>
                 </div>
               }>
-                <CommunityFeaturesWrapper visibleProfiles={visibleProfiles} />
+                <CommunityFeaturesWrapper 
+                  visibleProfiles={displayMembers()} 
+                  onRefresh={() => fetchCommunityMembers(true)}
+                  isLoading={membersLoading}
+                />
               </Suspense>
+
+
 
               {/* Profile Visibility Opt-in */}
               {session?.user && (

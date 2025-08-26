@@ -146,6 +146,16 @@ export class CertificateService {
     // Check and create achievements
     await this.checkAndCreateAchievements(certificate);
 
+    // Check if user has opted in to public achievements and create community announcement
+    const user = await prisma.user.findUnique({
+      where: { id: testAttempt.userId },
+      select: { achievementsPublic: true }
+    });
+
+    if (user?.achievementsPublic) {
+      await this.createCommunityAnnouncement(certificate);
+    }
+
     return certificate;
   }
 

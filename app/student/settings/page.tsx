@@ -50,6 +50,21 @@ function getInitials(name: string) {
   return parts[0][0] + parts[parts.length - 1][0];
 }
 
+// Utility function to get the current profile picture URL
+function getProfilePictureUrl(previewUrl: string, profile: StudentProfile | null, session: any) {
+  const imageUrl = previewUrl || profile?.profilePicture || session?.user?.image || '';
+  
+  // Debug logging to understand what's happening
+  console.log('getProfilePictureUrl called:', {
+    previewUrl,
+    profilePicture: profile?.profilePicture,
+    sessionImage: session?.user?.image,
+    finalImageUrl: imageUrl
+  });
+  
+  return imageUrl;
+}
+
 export default function StudentSettingsPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(true);
@@ -64,10 +79,42 @@ export default function StudentSettingsPage() {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [uploadingPicture, setUploadingPicture] = useState(false);
   const [removingPicture, setRemovingPicture] = useState(false);
+  const [imageUpdateTrigger, setImageUpdateTrigger] = useState(0); // Force re-render when image changes
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>(''); // Track current image URL
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    if (session?.user) {
+      fetchProfile();
+    }
+  }, [session]);
+
+  // Refetch profile when session updates, but only if the image has changed
+  useEffect(() => {
+    if (session?.user && profile) {
+      const sessionImage = session.user.image;
+      const profileImage = profile.profilePicture;
+      
+      // Only refetch if the session image is different from the profile image
+      // and the session image is not null (meaning it was updated)
+      if (sessionImage !== profileImage && sessionImage !== null) {
+        console.log('Session image changed, refreshing profile:', {
+          sessionImage,
+          profileImage
+        });
+        fetchProfile();
+      }
+    }
+  }, [session?.user?.image]);
+
+  // Monitor preview URL changes for debugging
+  useEffect(() => {
+    console.log('Preview URL changed:', previewUrl);
+  }, [previewUrl]);
+
+  // Monitor current image URL changes for debugging
+  useEffect(() => {
+    console.log('Current image URL changed:', currentImageUrl);
+  }, [currentImageUrl]);
 
   const fetchProfile = async () => {
     try {
@@ -77,10 +124,58 @@ export default function StudentSettingsPage() {
         throw new Error(`Failed to fetch profile - Context: throw new Error('Failed to fetch profile');...`);
       }
       const data = await response.json();
-      setProfile(data);
-      if (data.profilePicture) {
-        setPreviewUrl(data.profilePicture);
-      }
+      
+      console.log('Frontend received profile data:', {
+        profilePicture: data.profilePicture,
+        hasProfilePicture: !!data.profilePicture,
+        sessionUserImage: session?.user?.image,
+        hasSessionImage: !!session?.user?.image
+      });
+      
+      // Ensure all profile fields have default values to prevent undefined
+      const sanitizedProfile = {
+        ...data,
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        address: data.address || '',
+        bio: data.bio || '',
+        profilePicture: data.profilePicture || null,
+        status: data.status || '',
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || '',
+        last_active: data.last_active || '',
+        native_language: data.native_language || '',
+        spoken_languages: data.spoken_languages || [],
+        learning_goals: data.learning_goals || '',
+        interests: data.interests || '',
+        social_visibility: data.social_visibility || 'PRIVATE',
+        timezone: data.timezone || '',
+        date_of_birth: data.date_of_birth || '',
+        gender: data.gender || '',
+        location: data.location || '',
+        website: data.website || '',
+        social_links: data.social_links || []
+      };
+      
+      setProfile(sanitizedProfile);
+      
+      // Set preview URL from profile picture or session user image
+      // Prioritize profile picture from API over session image
+      const imageUrl = sanitizedProfile.profilePicture || session?.user?.image || '';
+      setPreviewUrl(imageUrl);
+      setCurrentImageUrl(imageUrl); // Also set current image URL
+      
+      console.log('Setting preview URL:', {
+        profilePicture: sanitizedProfile.profilePicture,
+        sessionImage: session?.user?.image,
+        finalImageUrl: imageUrl
+      });
+      
+      console.log('Frontend set preview URL:', {
+        previewUrl: sanitizedProfile.profilePicture || session?.user?.image || '',
+        finalPreviewUrl: sanitizedProfile.profilePicture || session?.user?.image || ''
+      });
     } catch (error) {
       console.error('Error occurred:', error);
       toast.error(`Failed to load profile. Please try again or contact support if the problem persists.`);
@@ -177,56 +272,92 @@ export default function StudentSettingsPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
+      // Show preview immediately
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
-    }
-  };
-
-  const handleUploadPicture = async () => {
-    if (!selectedFile) return;
-
-    try {
-      setUploadingPicture(true);
-      const formData = new FormData();
-      formData.append('profilePicture', selectedFile);
-
-      const response = await fetch('/api/student/profile/picture', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload profile picture');
-      }
-
-      const data = await response.json();
-      setPreviewUrl(data.imageUrl);
-      setSelectedFile(null);
       
-      // Update session with new image
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          image: data.imageUrl,
-        },
-      });
+      // Automatically upload the file
+      try {
+        setUploadingPicture(true);
+        const formData = new FormData();
+        formData.append('profilePicture', file);
 
-      toast.success('Profile picture updated successfully');
-    } catch (error) {
-      console.error('Error uploading profile picture:', error);
-      toast.error('Failed to upload profile picture');
-    } finally {
-      setUploadingPicture(false);
+        console.log('Auto-uploading file:', {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        });
+
+        const response = await fetch('/api/student/profile/picture', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error('Upload failed:', data);
+          throw new Error(data.error || 'Failed to upload profile picture');
+        }
+
+        console.log('Auto-upload successful:', data);
+        
+        // Update all state immediately in sequence
+        console.log('Setting state updates:', {
+          imageUrl: data.imageUrl,
+          currentImageUrl: data.imageUrl
+        });
+        
+        setSelectedFile(null);
+        setPreviewUrl(data.imageUrl);
+        setCurrentImageUrl(data.imageUrl); // Set current image URL immediately
+        
+        console.log('Frontend updating profile state with new image:', data.imageUrl);
+        
+        // Update profile state with new image
+        if (profile) {
+          setProfile(prevProfile => ({
+            ...prevProfile,
+            profilePicture: data.imageUrl
+          }));
+        }
+        
+        // Force a re-render by incrementing the trigger
+        setImageUpdateTrigger(prev => prev + 1);
+        
+        console.log('Frontend updating session with new image:', data.imageUrl);
+        
+        // Update session with new image
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            image: data.imageUrl,
+          },
+        });
+
+        toast.success('Profile picture updated successfully');
+        
+      } catch (error) {
+        console.error('Error auto-uploading profile picture:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to upload profile picture';
+        toast.error(errorMessage);
+        // Reset the preview if upload failed
+        setPreviewUrl('');
+        setSelectedFile(null);
+      } finally {
+        setUploadingPicture(false);
+      }
     }
   };
+
+
 
   const handleRemovePicture = async () => {
     try {
@@ -239,8 +370,21 @@ export default function StudentSettingsPage() {
         throw new Error('Failed to remove profile picture');
       }
 
-      setPreviewUrl('');
+      // Update all state immediately in sequence
       setSelectedFile(null);
+      setPreviewUrl('');
+      setCurrentImageUrl(''); // Clear current image URL immediately
+      
+      // Update profile state to remove image
+      if (profile) {
+        setProfile(prevProfile => ({
+          ...prevProfile,
+          profilePicture: null
+        }));
+      }
+      
+      // Force a re-render by incrementing the trigger
+      setImageUpdateTrigger(prev => prev + 1);
       
       // Update session to remove image
       await update({
@@ -252,6 +396,9 @@ export default function StudentSettingsPage() {
       });
 
       toast.success('Profile picture removed successfully');
+      
+      // Don't call fetchProfile() immediately as it might reset the previewUrl
+      // The profile data will be refreshed on the next page load or component mount
     } catch (error) {
       console.error('Error removing profile picture:', error);
       toast.error('Failed to remove profile picture');
@@ -327,55 +474,84 @@ export default function StudentSettingsPage() {
                     <Label className="text-sm font-medium">Profile Picture</Label>
                     <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
                       <div className="relative group">
-                        <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300 hover:border-primary transition-colors">
-                          {previewUrl ? (
-                            <img
-                              src={previewUrl}
-                              alt="Profile"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
+                                                 <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300 hover:border-primary transition-colors relative ${uploadingPicture ? 'opacity-75' : ''}`}>
+                                                     {(() => {
+                             const imageUrl = currentImageUrl || getProfilePictureUrl(previewUrl, profile, session);
+                             console.log('Rendering profile picture:', {
+                               imageUrl,
+                               currentImageUrl,
+                               hasImage: !!imageUrl,
+                               previewUrl,
+                               profilePicture: profile?.profilePicture,
+                               sessionImage: session?.user?.image,
+                               imageUpdateTrigger
+                             });
+                             return imageUrl ? (
+                             <img
+                               key={`${imageUrl}-${imageUpdateTrigger}`} // Force re-render when URL changes or trigger updates
+                               src={imageUrl}
+                               alt="Profile"
+                               className="w-full h-full object-cover"
+                               onError={(e) => {
+                                 // Fallback to initials if image fails to load
+                                 const target = e.target as HTMLImageElement;
+                                 target.style.display = 'none';
+                                 target.nextElementSibling?.classList.remove('hidden');
+                               }}
+                             />
+                           ) : null;
+                           })()}
+                          {!currentImageUrl && !getProfilePictureUrl(previewUrl, profile, session) && (
                             <div className="w-full h-full flex flex-col items-center justify-center text-center p-2">
                               <User className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mb-1" />
                               <span className="text-xs text-gray-500 hidden sm:block">No photo</span>
                             </div>
                           )}
-                        </div>
-                        
-                        {/* Upload overlay */}
-                        <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <label
-                            htmlFor="profilePicture"
-                            className="cursor-pointer text-white hover:text-primary-foreground transition-colors"
-                          >
-                            <div className="text-center">
-                              <Camera className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1" />
-                              <span className="text-xs font-medium">Change Photo</span>
+                          
+                          {/* Loading overlay during upload */}
+                          {uploadingPicture && (
+                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center rounded-full z-10">
+                              <Loader2 className="w-6 h-6 text-white animate-spin" />
                             </div>
-                            <input
-                              type="file"
-                              id="profilePicture"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleFileChange}
-                            />
-                          </label>
+                          )}
                         </div>
                         
-                        {/* Camera icon for mobile */}
-                        <label
-                          htmlFor="profilePicture"
-                          className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer hover:bg-primary/90 transition-colors shadow-lg sm:hidden"
-                        >
-                          <Camera className="w-4 h-4" />
-                          <input
-                            type="file"
-                            id="profilePicture"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleFileChange}
-                          />
-                        </label>
+                                                 {/* Upload overlay */}
+                         <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                           <label
+                             htmlFor="profilePictureDesktop"
+                             className="cursor-pointer text-white hover:text-primary-foreground transition-colors"
+                           >
+                             <div className="text-center">
+                               <Camera className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-1" />
+                               <span className="text-xs font-medium">Change Photo</span>
+                             </div>
+                             <input
+                               type="file"
+                               id="profilePictureDesktop"
+                               accept="image/*"
+                               className="hidden"
+                               onChange={handleFileChange}
+                               disabled={uploadingPicture}
+                             />
+                           </label>
+                         </div>
+                         
+                         {/* Camera icon for mobile */}
+                         <label
+                           htmlFor="profilePictureMobile"
+                           className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full cursor-pointer hover:bg-primary/90 transition-colors shadow-lg sm:hidden"
+                         >
+                           <Camera className="w-4 h-4" />
+                           <input
+                             type="file"
+                             id="profilePictureMobile"
+                             accept="image/*"
+                             className="hidden"
+                             onChange={handleFileChange}
+                             disabled={uploadingPicture}
+                           />
+                         </label>
                       </div>
                       
                       <div className="flex-1 space-y-3">
@@ -388,40 +564,20 @@ export default function StudentSettingsPage() {
                             </span>
                           </p>
                           
-                          {/* Upload button for selected file */}
-                          {selectedFile && (
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
-                                <FileImage className="w-4 h-4 text-blue-600" />
-                                <span className="text-sm text-blue-800 flex-1 truncate">
-                                  {selectedFile.name}
-                                </span>
-                                <span className="text-xs text-blue-600">
-                                  {(selectedFile.size / 1024 / 1024).toFixed(1)}MB
-                                </span>
-                              </div>
-                              <Button
-                                onClick={handleUploadPicture}
-                                disabled={uploadingPicture}
-                                className="w-full sm:w-auto"
-                              >
-                                {uploadingPicture ? (
-                                  <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Uploading...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Upload className="w-4 h-4 mr-2" />
-                                    Upload Picture
-                                  </>
-                                )}
-                              </Button>
-                            </div>
-                          )}
+                                                     {/* Upload status indicator */}
+                           {uploadingPicture && (
+                             <div className="space-y-2">
+                               <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-200">
+                                 <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+                                 <span className="text-sm text-blue-800">
+                                   Uploading profile picture...
+                                 </span>
+                               </div>
+                             </div>
+                           )}
                           
-                          {/* Remove button for existing picture */}
-                          {previewUrl && !selectedFile && (
+                                                                                {/* Remove button for existing picture */}
+                            {(currentImageUrl || getProfilePictureUrl(previewUrl, profile, session)) && (
                             <Button
                               onClick={handleRemovePicture}
                               disabled={removingPicture}
@@ -451,27 +607,27 @@ export default function StudentSettingsPage() {
                       <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
                       <div className="flex items-center gap-2 mt-1">
                         <User className="w-4 h-4 text-gray-400" />
-                        <Input
-                          id="name"
-                          type="text"
-                          value={profile.name}
-                          onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                          className="h-10 sm:h-11"
-                          required
-                        />
+                                                 <Input
+                           id="name"
+                           type="text"
+                           value={profile.name || ''}
+                           onChange={(e) => setProfile({ ...profile, name: e.target.value || '' })}
+                           className="h-10 sm:h-11"
+                           required
+                         />
                       </div>
                     </div>
                     <div>
                       <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                       <div className="flex items-center gap-2 mt-1">
                         <Mail className="w-4 h-4 text-gray-400" />
-                        <Input
-                          id="email"
-                          type="email"
-                          value={profile.email}
-                          disabled
-                          className="h-10 sm:h-11 bg-gray-50"
-                        />
+                                                 <Input
+                           id="email"
+                           type="email"
+                           value={profile.email || ''}
+                           disabled
+                           className="h-10 sm:h-11 bg-gray-50"
+                         />
                       </div>
                     </div>
                   </div>
@@ -479,37 +635,37 @@ export default function StudentSettingsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={profile.phone || ''}
-                        onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                        className="mt-1 h-10 sm:h-11"
-                        placeholder="+1 (555) 000-0000"
-                      />
+                                               <Input
+                           id="phone"
+                           type="tel"
+                           value={profile.phone || ''}
+                           onChange={(e) => setProfile({ ...profile, phone: e.target.value || '' })}
+                           className="mt-1 h-10 sm:h-11"
+                           placeholder="+1 (555) 000-0000"
+                         />
                     </div>
                     <div>
                       <Label htmlFor="address" className="text-sm font-medium">Address</Label>
-                      <Input
-                        id="address"
-                        type="text"
-                        value={profile.address || ''}
-                        onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                        className="mt-1 h-10 sm:h-11"
-                        placeholder="Enter your address"
-                      />
+                                             <Input
+                         id="address"
+                         type="text"
+                         value={profile.address || ''}
+                         onChange={(e) => setProfile({ ...profile, address: e.target.value || '' })}
+                         className="mt-1 h-10 sm:h-11"
+                         placeholder="Enter your address"
+                       />
                     </div>
                   </div>
 
                   <div>
                     <Label htmlFor="bio" className="text-sm font-medium">Bio</Label>
-                    <Textarea
-                      id="bio"
-                      value={profile.bio || ''}
-                      onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                      className="mt-1 min-h-[80px] sm:min-h-[100px]"
-                      placeholder="Tell us a bit about yourself..."
-                    />
+                                         <Textarea
+                       id="bio"
+                       value={profile.bio || ''}
+                       onChange={(e) => setProfile({ ...profile, bio: e.target.value || '' })}
+                       className="mt-1 min-h-[80px] sm:min-h-[100px]"
+                       placeholder="Tell us a bit about yourself..."
+                     />
                   </div>
 
                   <div className="flex justify-end">
@@ -647,26 +803,26 @@ export default function StudentSettingsPage() {
 
                   <div>
                     <Label htmlFor="location" className="text-sm font-medium">Location</Label>
-                    <Input
-                      id="location"
-                      type="text"
-                      value={profile.location || ''}
-                      onChange={(e) => setProfile({ ...profile, location: e.target.value })}
-                      className="mt-1 h-10 sm:h-11"
-                      placeholder="City, Country"
-                    />
+                                         <Input
+                       id="location"
+                       type="text"
+                       value={profile.location || ''}
+                       onChange={(e) => setProfile({ ...profile, location: e.target.value || '' })}
+                       className="mt-1 h-10 sm:h-11"
+                       placeholder="City, Country"
+                     />
                   </div>
 
                   <div>
                     <Label htmlFor="website" className="text-sm font-medium">Website</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={profile.website || ''}
-                      onChange={(e) => setProfile({ ...profile, website: e.target.value })}
-                      className="mt-1 h-10 sm:h-11"
-                      placeholder="https://yourwebsite.com"
-                    />
+                                         <Input
+                       id="website"
+                       type="url"
+                       value={profile.website || ''}
+                       onChange={(e) => setProfile({ ...profile, website: e.target.value || '' })}
+                       className="mt-1 h-10 sm:h-11"
+                       placeholder="https://yourwebsite.com"
+                     />
                   </div>
 
                   <div>
@@ -690,13 +846,13 @@ export default function StudentSettingsPage() {
 
                   <div>
                     <Label htmlFor="date_of_birth" className="text-sm font-medium">Date of Birth</Label>
-                    <Input
-                      id="date_of_birth"
-                      type="date"
-                      value={profile.date_of_birth || ''}
-                      onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
-                      className="mt-1 h-10 sm:h-11"
-                    />
+                                         <Input
+                       id="date_of_birth"
+                       type="date"
+                       value={profile.date_of_birth || ''}
+                       onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value || '' })}
+                       className="mt-1 h-10 sm:h-11"
+                     />
                   </div>
 
                   <div>
@@ -728,24 +884,24 @@ export default function StudentSettingsPage() {
 
                 <div className="mt-4 sm:mt-6">
                   <Label htmlFor="learning_goals" className="text-sm font-medium">Learning Goals</Label>
-                  <Textarea
-                    id="learning_goals"
-                    value={profile.learning_goals || ''}
-                    onChange={(e) => setProfile({ ...profile, learning_goals: e.target.value })}
-                    className="mt-1 min-h-[80px] sm:min-h-[100px]"
-                    placeholder="What are your language learning goals? (e.g., 'I want to become fluent in Spanish for work' or 'I'm learning French to travel')"
-                  />
+                                     <Textarea
+                     id="learning_goals"
+                     value={profile.learning_goals || ''}
+                     onChange={(e) => setProfile({ ...profile, learning_goals: e.target.value || '' })}
+                     className="mt-1 min-h-[80px] sm:min-h-[100px]"
+                     placeholder="What are your language learning goals? (e.g., 'I want to become fluent in Spanish for work' or 'I'm learning French to travel')"
+                   />
                 </div>
 
                 <div className="mt-4 sm:mt-6">
                   <Label htmlFor="interests" className="text-sm font-medium">Interests & Hobbies</Label>
-                  <Textarea
-                    id="interests"
-                    value={profile.interests || ''}
-                    onChange={(e) => setProfile({ ...profile, interests: e.target.value })}
-                    className="mt-1 min-h-[80px] sm:min-h-[100px]"
-                    placeholder="Share your interests and hobbies (e.g., 'Reading, hiking, cooking, photography')"
-                  />
+                                     <Textarea
+                     id="interests"
+                     value={profile.interests || ''}
+                     onChange={(e) => setProfile({ ...profile, interests: e.target.value || '' })}
+                     className="mt-1 min-h-[80px] sm:min-h-[100px]"
+                     placeholder="Share your interests and hobbies (e.g., 'Reading, hiking, cooking, photography')"
+                   />
                 </div>
 
                 <div className="mt-4 sm:mt-6">

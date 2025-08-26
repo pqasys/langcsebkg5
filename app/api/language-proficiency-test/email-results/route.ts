@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
 
             <div style="text-align: center; margin: 30px 0;">
               <a href="${process.env.NEXTAUTH_URL}/certificates" class="btn">View All Certificates</a>
-              <a href="${process.env.NEXTAUTH_URL}/community" class="btn">Join Community</a>
+              <a href="${process.env.NEXTAUTH_URL}/features/community-learning" class="btn">Join Community</a>
             </div>
           </div>
 

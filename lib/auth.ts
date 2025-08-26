@@ -60,6 +60,7 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          image: user.image,
           role: user.role,
           institutionId: user.institution?.id || null,
           status: user.status,
@@ -74,6 +75,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
+        token.image = user.image;
         token.role = user.role;
         token.institutionId = user.institutionId;
         token.status = user.status;
@@ -94,6 +96,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id as string,
           name: token.name as string,
           email: token.email as string,
+          image: token.image as string | null,
           role: token.role as string,
           institutionId: token.institutionId as string | null,
           status: token.status as string,

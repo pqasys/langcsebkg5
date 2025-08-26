@@ -303,6 +303,23 @@ export class LanguageProficiencyService {
       return questions.slice(0, filters?.limit || questions.length);
     }
 
+    if (languageCode === 'it') {
+      const { ITALIAN_PROFICIENCY_QUESTIONS } = require('@/lib/data/italian-proficiency-questions');
+      let questions = ITALIAN_PROFICIENCY_QUESTIONS;
+
+      if (filters?.level) {
+        questions = questions.filter(q => q.level === filters.level);
+      }
+      if (filters?.category) {
+        questions = questions.filter(q => q.category === filters.category);
+      }
+      if (filters?.difficulty) {
+        questions = questions.filter(q => q.difficulty === filters.difficulty);
+      }
+
+      return questions.slice(0, filters?.limit || questions.length);
+    }
+
     // Return empty array for other languages (to be implemented)
     return [];
   }

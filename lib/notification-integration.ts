@@ -411,6 +411,54 @@ export class NotificationIntegrationService {
 
     return results;
   }
+
+  /**
+   * Trigger notifications for language proficiency test completion
+   */
+  static async triggerTestCompletion(
+    studentId: string,
+    testData: {
+      language: string;
+      score: number;
+      level: string;
+      timeSpent: number;
+    }
+  ) {
+    try {
+      const student = await prisma.student.findUnique({
+        where: { id: studentId }
+      });
+
+      if (!student) {
+        throw new Error('Student not found');
+      }
+
+      // Send test completion notification
+      await notificationService.sendNotificationWithTemplate(
+        'test_completion',
+        student.id,
+        {
+          name: student.name,
+          language: testData.language,
+          score: testData.score,
+          level: testData.level,
+          timeSpent: Math.floor(testData.timeSpent / 60), // Convert to minutes
+          completionDate: new Date().toLocaleDateString()
+        },
+        {
+          testType: 'language_proficiency',
+          language: testData.language,
+          score: testData.score,
+          level: testData.level
+        },
+        'SYSTEM'
+      );
+
+      logger.info(`Test completion notification sent for student ${studentId}`);
+    } catch (error) {
+      logger.error('Failed to trigger test completion notification:', error);
+    }
+  }
 }
 
 export default NotificationIntegrationService; 

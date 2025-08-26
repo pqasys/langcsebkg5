@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
-    "dev:next": "TURBOPACK=1 next dev",
-    "dev:turbo": "TURBOPACK=1 node --env-file=.env --loader=./node_modules/next/dist/esm-loader.js ./node_modules/next/dist/cli/next-dev.js",
+    "dev:next": "cross-env TURBOPACK=1 next dev",
+    "dev:turbo": "cross-env TURBOPACK=1 node --env-file=.env --loader=./node_modules/next/dist/esm-loader.js ./node_modules/next/dist/cli/next-dev.js",
     "dev:signaling": "node scripts/start-signaling-dev.js",
     "dev:turbo:all": "node scripts/dev-turbo-all.js",
     "dev:all": "node scripts/start-development.js",
@@ -181,6 +181,7 @@
     "@typescript-eslint/parser": "^8.36.0",
     "artillery": "^2.0.21",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^10.0.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.1.0",
     "eslint-plugin-unused-imports": "^4.1.4",

@@ -105,6 +105,20 @@ export function LanguageProficiencyTestInterface({ onComplete, onExit, language 
             category: q.category,
             difficulty: q.difficulty
           }));
+        } else if (language === 'it') {
+          // Use Italian questions
+          const { getBalancedQuestionSet } = await import('@/lib/data/italian-proficiency-questions');
+          const italianQuestions = getBalancedQuestionSet(80);
+          staticQuestions = italianQuestions.map(q => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation,
+            level: q.level,
+            category: q.category,
+            difficulty: q.difficulty
+          }));
         } else {
           // Default to English questions
           const { getBalancedQuestionSet } = await import('@/lib/data/english-proficiency-questions');

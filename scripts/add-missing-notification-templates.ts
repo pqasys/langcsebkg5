@@ -398,6 +398,31 @@ const missingTemplates = [
     `,
     category: 'course',
     isDefault: true
+  },
+  {
+    name: 'test_completion',
+    type: 'email',
+    subject: '🎉 Language Proficiency Test Completed!',
+    title: 'Test Completion Achievement',
+    content: `
+      <h1>🎉 Congratulations on Completing Your Test!</h1>
+      <p>Dear {{name}},</p>
+      <p>You've successfully completed your {{language}} language proficiency test!</p>
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2>Your Results:</h2>
+        <ul>
+          <li><strong>Score:</strong> {{score}}/80</li>
+          <li><strong>CEFR Level:</strong> {{level}}</li>
+          <li><strong>Time Taken:</strong> {{timeSpent}} minutes</li>
+          <li><strong>Completion Date:</strong> {{completionDate}}</li>
+        </ul>
+      </div>
+      <p>Your certificate has been generated and is attached to this email. You can also view it in your dashboard.</p>
+      <p>Keep up the great work and continue your language learning journey!</p>
+      <p>Best regards,<br>The FluentShip Team</p>
+    `,
+    category: 'achievement',
+    isDefault: true
   }
 ];
 

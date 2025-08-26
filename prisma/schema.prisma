@@ -124,7 +124,9 @@ model user {
   status             String    @default("ACTIVE") @db.VarChar(20)
   forcePasswordReset Boolean   @default(false)
   profileVisibility  SocialVisibility @default(PUBLIC)
+  achievementsPublic Boolean   @default(false)
   lastLoginAt        DateTime?
+  subscriptionStatus String    @default("FREE") @db.VarChar(20)
 
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
@@ -135,6 +137,7 @@ model user {
   communityCircles CommunityCircle[]
   circlePosts CommunityCirclePost[]
   circleEvents CommunityCircleEvent[]
+  communityCircleMemberships CommunityCircleMembership[]
   
   // Connection relations
   sentConnectionRequests     ConnectionRequest[] @relation("ConnectionRequestSender")
@@ -1981,7 +1984,9 @@ model CommunityCircleMembership {
   role      String   @default("MEMBER") @db.VarChar(20)
   joinedAt  DateTime @default(now())
 
+  // Relations
   circle CommunityCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([circleId, userId], name: "circleId_userId")
   @@index([userId])

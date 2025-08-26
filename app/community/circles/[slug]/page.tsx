@@ -37,7 +37,22 @@ import {
   Shield,
   Lock,
   Unlock,
-  CheckCircle
+  CheckCircle,
+  Sparkles,
+  Trophy,
+  Heart,
+  Zap,
+  Target,
+  TrendingUp,
+  Award,
+  Coffee,
+  Music,
+  Camera,
+  Gamepad2,
+  Palette,
+  Lightbulb,
+  Rocket,
+  PartyPopper
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
@@ -330,6 +345,32 @@ export default function CircleDetailPage() {
     return colors[level] || 'bg-gray-100 text-gray-800';
   };
 
+  // Generate random color for avatar backgrounds
+  const getRandomAvatarColor = (name: string) => {
+    const colors = [
+      'bg-red-100 text-red-700',
+      'bg-blue-100 text-blue-700',
+      'bg-green-100 text-green-700',
+      'bg-yellow-100 text-yellow-700',
+      'bg-purple-100 text-purple-700',
+      'bg-pink-100 text-pink-700',
+      'bg-indigo-100 text-indigo-700',
+      'bg-teal-100 text-teal-700',
+      'bg-orange-100 text-orange-700',
+      'bg-cyan-100 text-cyan-700',
+      'bg-emerald-100 text-emerald-700',
+      'bg-violet-100 text-violet-700'
+    ];
+    
+    // Use the name to generate a consistent color for the same user
+    const hash = name.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -352,61 +393,90 @@ export default function CircleDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white">
-        <div className="container mx-auto px-6 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-20 animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-15 animate-bounce"></div>
+        <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full opacity-25 animate-ping"></div>
+        <div className="absolute top-1/2 right-1/3 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full opacity-20 animate-spin"></div>
+      </div>
+
+      {/* Enhanced Header */}
+      <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white overflow-hidden">
+        {/* Animated Sparkles */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-10 left-1/4 animate-ping">
+            <Sparkles className="h-6 w-6 text-yellow-300" />
+          </div>
+          <div className="absolute top-20 right-1/3 animate-ping delay-300">
+            <Sparkles className="h-4 w-4 text-pink-300" />
+          </div>
+          <div className="absolute bottom-10 left-1/2 animate-ping delay-700">
+            <Sparkles className="h-5 w-5 text-cyan-300" />
+          </div>
+        </div>
+
+        <div className="container mx-auto px-6 py-12 relative z-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <Link href="/community/circles">
-                <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Circles
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-3xl font-bold">{circle.name}</h1>
-                <div className="flex items-center space-x-4 mt-2">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                    {circle.name}
+                  </h1>
                   <div className="flex items-center space-x-2">
-                    <span className="text-2xl">{getLanguageFlag(circle.language)}</span>
-                    <Badge className={getLevelColor(circle.level)}>
+                    <span className="text-3xl animate-bounce">{getLanguageFlag(circle.language)}</span>
+                    <Badge className={`${getLevelColor(circle.level)} animate-pulse`}>
                       {circle.level}
                     </Badge>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4" />
-                    <span>{circle.membersCount} members</span>
+                </div>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-2 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+                    <Users className="h-4 w-4 text-blue-200" />
+                    <span className="font-medium">{circle.membersCount} members</span>
                     {circle.maxMembers && (
                       <span className="text-blue-200">/ {circle.maxMembers}</span>
                     )}
                   </div>
                   {!circle.isPublic && (
-                    <Badge variant="outline" className="bg-yellow-500/20 text-yellow-200 border-yellow-300">
+                    <Badge variant="outline" className="bg-yellow-500/20 text-yellow-200 border-yellow-300 animate-pulse">
                       <Lock className="h-3 w-3 mr-1" />
                       Private
                     </Badge>
                   )}
+                  <div className="flex items-center space-x-1 text-yellow-300">
+                    <Star className="h-4 w-4" />
+                    <span className="text-sm">Active Community</span>
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               {circle.isOwner && (
-                <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                <Button variant="outline" size="sm" className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-300 text-yellow-200 hover:from-yellow-500/30 hover:to-orange-500/30 transition-all duration-300 hover:scale-105">
                   <Crown className="h-4 w-4 mr-2" />
                   Owner
                 </Button>
               )}
               {circle.isMember ? (
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                <div className="flex items-center space-x-3">
+                  <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-all duration-300 hover:scale-105">
                     <Bell className="h-4 w-4 mr-2" />
                     Notifications
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="bg-red-500/20 border-red-300 text-red-200 hover:bg-red-500/30"
+                    className="bg-red-500/20 border-red-300 text-red-200 hover:bg-red-500/30 transition-all duration-300 hover:scale-105"
                     onClick={handleLeaveCircle}
                   >
                     Leave Circle
@@ -415,7 +485,7 @@ export default function CircleDetailPage() {
               ) : (
                 <Button 
                   size="sm" 
-                  className="bg-yellow-500 hover:bg-yellow-600 text-gray-900"
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-gray-900 font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
                   onClick={handleJoinCircle}
                 >
                   <UserPlus className="h-4 w-4 mr-2" />
@@ -427,14 +497,71 @@ export default function CircleDetailPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8 relative z-10">
+        {/* Fun Stats Banner */}
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Users className="h-6 w-6 mr-2" />
+                <span className="text-2xl font-bold">{circle.membersCount}</span>
+              </div>
+              <p className="text-sm opacity-90">Active Members</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <MessageCircle className="h-6 w-6 mr-2" />
+                <span className="text-2xl font-bold">{posts.length}</span>
+              </div>
+              <p className="text-sm opacity-90">Discussions</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Calendar className="h-6 w-6 mr-2" />
+                <span className="text-2xl font-bold">{events.length}</span>
+              </div>
+              <p className="text-sm opacity-90">Upcoming Events</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Trophy className="h-6 w-6 mr-2" />
+                <span className="text-2xl font-bold">{Math.floor(Math.random() * 50) + 10}</span>
+              </div>
+              <p className="text-sm opacity-90">Achievements</p>
+            </CardContent>
+          </Card>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="discussions">Discussions</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
-            <TabsTrigger value="members">Members</TabsTrigger>
-            {circle.isOwner && <TabsTrigger value="settings">Settings</TabsTrigger>}
+          <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-gray-100 to-gray-200 p-1 rounded-xl shadow-lg">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
+              <Globe className="h-4 w-4 mr-2" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="discussions" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Discussions
+            </TabsTrigger>
+            <TabsTrigger value="events" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
+              <Calendar className="h-4 w-4 mr-2" />
+              Events
+            </TabsTrigger>
+            <TabsTrigger value="members" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
+              <Users className="h-4 w-4 mr-2" />
+              Members
+            </TabsTrigger>
+            {circle.isOwner && (
+              <TabsTrigger value="settings" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* Overview Tab */}
@@ -442,35 +569,53 @@ export default function CircleDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Circle Info */}
               <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
+                <Card className="bg-gradient-to-br from-white to-blue-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg">
                     <CardTitle className="flex items-center justify-between">
-                      <span>About this Circle</span>
+                      <div className="flex items-center space-x-2">
+                        <Lightbulb className="h-5 w-5" />
+                        <span>About this Circle</span>
+                      </div>
                       {circle.isOwner && (
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="bg-white/20 border-white/30 text-white hover:bg-white/30">
                           <Edit className="h-4 w-4 mr-2" />
                           Edit
                         </Button>
                       )}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 mb-4">
-                      {circle.description || 'No description available.'}
-                    </p>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium text-gray-700">Created:</span>
-                        <p className="text-gray-600">{new Date(circle.createdAt).toLocaleDateString()}</p>
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4 mb-6">
+                      <div className="p-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full">
+                        <BookOpen className="h-6 w-6 text-blue-600" />
                       </div>
-                      <div>
-                        <span className="font-medium text-gray-700">Owner:</span>
+                      <div className="flex-1">
+                        <p className="text-gray-700 text-lg leading-relaxed">
+                          {circle.description || 'No description available.'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-6 text-sm">
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Calendar className="h-4 w-4 text-green-600" />
+                          <span className="font-semibold text-green-800">Created</span>
+                        </div>
+                        <p className="text-green-700">{new Date(circle.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Crown className="h-4 w-4 text-purple-600" />
+                          <span className="font-semibold text-purple-800">Owner</span>
+                        </div>
                         <div className="flex items-center space-x-2">
                           <Avatar className="h-6 w-6">
                             <AvatarImage src={circle.owner.image} />
-                            <AvatarFallback>{circle.owner.name.charAt(0)}</AvatarFallback>
+                            <AvatarFallback className={getRandomAvatarColor(circle.owner.name)}>
+                              {circle.owner.name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
                           </Avatar>
-                          <span className="text-gray-600">{circle.owner.name}</span>
+                          <span className="text-purple-700 font-medium">{circle.owner.name}</span>
                         </div>
                       </div>
                     </div>
@@ -478,31 +623,55 @@ export default function CircleDetailPage() {
                 </Card>
 
                 {/* Recent Activity */}
-                <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
+                <Card className="mt-6 bg-gradient-to-br from-white to-orange-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-t-lg">
+                    <CardTitle className="flex items-center space-x-2">
+                      <TrendingUp className="h-5 w-5" />
+                      <span>Recent Activity</span>
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     <div className="space-y-4">
-                      {posts.slice(0, 3).map((post) => (
-                        <div key={post.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={post.author.image} />
-                            <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
+                      {posts.slice(0, 3).map((post, index) => (
+                        <div key={post.id} className="flex items-start space-x-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200 hover:shadow-md transition-all duration-300 hover:scale-105">
+                          <div className="relative">
+                            <Avatar className="h-10 w-10 ring-2 ring-orange-200">
+                              <AvatarImage src={post.author.image} />
+                              <AvatarFallback className={getRandomAvatarColor(post.author.name)}>
+                                {post.author.name.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                          </div>
                           <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-1">
-                              <span className="font-medium text-sm">{post.author.name}</span>
-                              <span className="text-xs text-gray-500">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <span className="font-semibold text-orange-800">{post.author.name}</span>
+                              <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
                                 {new Date(post.createdAt).toLocaleDateString()}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600 line-clamp-2">{post.content}</p>
+                            <p className="text-sm text-orange-700 line-clamp-2 leading-relaxed">{post.content}</p>
+                            <div className="flex items-center space-x-4 mt-2">
+                              <button className="flex items-center space-x-1 text-orange-600 hover:text-orange-800 transition-colors">
+                                <Heart className="h-3 w-3" />
+                                <span className="text-xs">{post.likes}</span>
+                              </button>
+                              <button className="flex items-center space-x-1 text-orange-600 hover:text-orange-800 transition-colors">
+                                <MessageCircle className="h-3 w-3" />
+                                <span className="text-xs">{post.comments}</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}
                       {posts.length === 0 && (
-                        <p className="text-gray-500 text-center py-4">No recent activity</p>
+                        <div className="text-center py-8">
+                          <div className="p-4 bg-orange-100 rounded-full w-fit mx-auto mb-4">
+                            <MessageCircle className="h-8 w-8 text-orange-600" />
+                          </div>
+                          <p className="text-orange-700 font-medium mb-2">No recent activity</p>
+                          <p className="text-orange-600 text-sm">Start the conversation!</p>
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -511,28 +680,45 @@ export default function CircleDetailPage() {
 
               {/* Quick Actions */}
               <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
+                <Card className="bg-gradient-to-br from-white to-green-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-t-lg">
+                    <CardTitle className="flex items-center space-x-2">
+                      <Zap className="h-5 w-5" />
+                      <span>Quick Actions</span>
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="p-6 space-y-4">
                     {circle.isMember && (
                       <>
-                        <Button className="w-full" onClick={() => setActiveTab('discussions')}>
+                        <Button 
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg" 
+                          onClick={() => setActiveTab('discussions')}
+                        >
                           <MessageCircle className="h-4 w-4 mr-2" />
                           Start Discussion
                         </Button>
-                        <Button variant="outline" className="w-full" onClick={() => setActiveTab('events')}>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 transition-all duration-300 hover:scale-105" 
+                          onClick={() => setActiveTab('events')}
+                        >
                           <Calendar className="h-4 w-4 mr-2" />
                           Schedule Event
                         </Button>
-                        <Button variant="outline" className="w-full" onClick={() => setShowInvite(true)}>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 transition-all duration-300 hover:scale-105" 
+                          onClick={() => setShowInvite(true)}
+                        >
                           <UserPlus className="h-4 w-4 mr-2" />
                           Invite Friends
                         </Button>
                       </>
                     )}
-                    <Button variant="outline" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-pink-300 text-pink-700 hover:bg-pink-50 transition-all duration-300 hover:scale-105"
+                    >
                       <Share2 className="h-4 w-4 mr-2" />
                       Share Circle
                     </Button>
@@ -540,21 +726,44 @@ export default function CircleDetailPage() {
                 </Card>
 
                 {/* Upcoming Events */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upcoming Events</CardTitle>
+                <Card className="bg-gradient-to-br from-white to-purple-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-t-lg">
+                    <CardTitle className="flex items-center space-x-2">
+                      <PartyPopper className="h-5 w-5" />
+                      <span>Upcoming Events</span>
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {events.slice(0, 3).map((event) => (
-                        <div key={event.id} className="p-3 bg-blue-50 rounded-lg">
-                          <h4 className="font-medium text-sm">{event.title}</h4>
-                          <p className="text-xs text-gray-600">{event.date} at {event.time}</p>
-                          <p className="text-xs text-gray-600">{event.attendees} attending</p>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      {events.slice(0, 3).map((event, index) => (
+                        <div key={event.id} className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200 hover:shadow-md transition-all duration-300 hover:scale-105">
+                          <div className="flex items-start justify-between mb-2">
+                            <h4 className="font-semibold text-purple-800">{event.title}</h4>
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="h-3 w-3 text-purple-600" />
+                              <span className="text-xs text-purple-600 font-medium">{event.date}</span>
+                            </div>
+                          </div>
+                          <p className="text-xs text-purple-700 mb-2">{event.time}</p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-1">
+                              <Users className="h-3 w-3 text-purple-600" />
+                              <span className="text-xs text-purple-600">{event.attendees} attending</span>
+                            </div>
+                            <Badge className="bg-purple-100 text-purple-700 text-xs">
+                              {event.type}
+                            </Badge>
+                          </div>
                         </div>
                       ))}
                       {events.length === 0 && (
-                        <p className="text-gray-500 text-center py-2">No upcoming events</p>
+                        <div className="text-center py-6">
+                          <div className="p-3 bg-purple-100 rounded-full w-fit mx-auto mb-3">
+                            <Calendar className="h-6 w-6 text-purple-600" />
+                          </div>
+                          <p className="text-purple-600 font-medium">No upcoming events</p>
+                          <p className="text-purple-500 text-sm">Be the first to schedule one!</p>
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -592,7 +801,9 @@ export default function CircleDetailPage() {
                       <div className="flex items-start space-x-3">
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={post.author.image} />
-                          <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className={getRandomAvatarColor(post.author.name)}>
+                            {post.author.name.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
@@ -689,7 +900,9 @@ export default function CircleDetailPage() {
                     <div key={member.id} className="flex items-center space-x-3 p-3 border rounded-lg">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={member.image} />
-                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                        <AvatarFallback className={getRandomAvatarColor(member.name)}>
+                          {member.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">

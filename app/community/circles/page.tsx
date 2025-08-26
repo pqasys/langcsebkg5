@@ -68,6 +68,18 @@ export default function CommunityCirclesPage() {
     fetchCircles();
   }, [searchTerm, filters]);
 
+  // Handle post-login redirect for pending circle joins
+  useEffect(() => {
+    if (session?.user) {
+      const pendingCircleJoin = localStorage.getItem('pendingCircleJoin');
+      if (pendingCircleJoin) {
+        // Clear the pending join and redirect to the specific circle
+        localStorage.removeItem('pendingCircleJoin');
+        router.push(`/community/circles/${pendingCircleJoin}`);
+      }
+    }
+  }, [session, router]);
+
   const fetchCircles = async () => {
     try {
       const params = new URLSearchParams();
@@ -136,7 +148,14 @@ export default function CommunityCirclesPage() {
     }
 
     try {
-      const response = await fetch(`/api/community/circles/${circleId}/join`, {
+      // Find the circle to get its slug for the API call
+      const circle = circles.find(c => c.id === circleId);
+      if (!circle) {
+        toast.error('Circle not found');
+        return;
+      }
+
+      const response = await fetch(`/api/community/circles/${circle.slug}/join`, {
         method: 'POST'
       });
       
@@ -206,7 +225,7 @@ export default function CommunityCirclesPage() {
               Join study groups and connect with fellow language learners
             </p>
             <div className="flex justify-center space-x-4">
-              <Link href="/community">
+              <Link href="/features/community-learning">
                 <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
                   Back to Community
                 </Button>
@@ -379,9 +398,17 @@ export default function CommunityCirclesPage() {
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                   <span>Created {new Date(circle.createdAt).toLocaleDateString()}</span>
                   {circle.owner && (
-                    <div className="flex items-center gap-1">
-                      <Crown className="h-3 w-3 text-yellow-500" />
-                      <span>{circle.owner.name}</span>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={circle.owner.image || ''} alt={circle.owner.name} />
+                        <AvatarFallback className="text-xs">
+                          {circle.owner.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex items-center gap-1">
+                        <Crown className="h-3 w-3 text-yellow-500" />
+                        <span>{circle.owner.name}</span>
+                      </div>
                     </div>
                   )}
                 </div>

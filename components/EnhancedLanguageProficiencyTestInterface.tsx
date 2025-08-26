@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { TestCompletionModal } from '@/components/TestCompletionModal';
 import { 
   Clock, 
   CheckCircle, 
@@ -50,6 +51,9 @@ interface TestResult {
   level: string;
   description: string;
   emailSent: boolean;
+  answers: Record<string, string>;
+  timeSpent: number;
+  questions: any[];
 }
 
 interface LanguageProficiencyTestInterfaceProps {
@@ -98,6 +102,8 @@ export function EnhancedLanguageProficiencyTestInterface({
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Set<number>>(new Set());
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [timePerQuestion, setTimePerQuestion] = useState<number[]>([]);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [testResults, setTestResults] = useState<TestResult | null>(null);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const currentQuestion = questions[currentQuestionIndex];
@@ -132,6 +138,20 @@ export function EnhancedLanguageProficiencyTestInterface({
           const { getBalancedQuestionSet } = await import('@/lib/data/spanish-proficiency-questions');
           const spanishQuestions = getBalancedQuestionSet(80);
           staticQuestions = spanishQuestions.map(q => ({
+            id: q.id,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation,
+            level: q.level,
+            category: q.category,
+            difficulty: q.difficulty
+          }));
+        } else if (language === 'it') {
+          // Use Italian questions
+          const { getBalancedQuestionSet } = await import('@/lib/data/italian-proficiency-questions');
+          const italianQuestions = getBalancedQuestionSet(80);
+          staticQuestions = italianQuestions.map(q => ({
             id: q.id,
             question: q.question,
             options: q.options,
@@ -319,7 +339,10 @@ export function EnhancedLanguageProficiencyTestInterface({
         score: Math.round(percentage),
         level,
         description: CEFR_DESCRIPTIONS[level as keyof typeof CEFR_DESCRIPTIONS],
-        emailSent: false
+        emailSent: false,
+        answers,
+        timeSpent: timeLimit * 60 - timeRemaining,
+        questions
       };
 
       // Save test attempt using the service
@@ -334,7 +357,8 @@ export function EnhancedLanguageProficiencyTestInterface({
         });
       }
 
-      onComplete(results);
+      setTestResults(results);
+      setShowCompletionModal(true);
     } catch (error) {
       console.error('Error submitting test:', error);
       toast.error('Failed to submit test. Please try again.');
@@ -553,7 +577,26 @@ export function EnhancedLanguageProficiencyTestInterface({
   };
 
   if (isCompleted) {
-    return renderResults();
+    return (
+      <>
+        {testResults && (
+          <TestCompletionModal
+            isOpen={showCompletionModal}
+            onClose={() => {
+              setShowCompletionModal(false);
+              onComplete(testResults);
+            }}
+            results={testResults}
+            language={language}
+            onOptInChange={(optedIn) => {
+              // Handle opt-in change if needed
+              console.log('User opted in to community:', optedIn);
+            }}
+          />
+        )}
+        {renderResults()}
+      </>
+    );
   }
 
   return (

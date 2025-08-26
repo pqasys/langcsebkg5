@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 26, 2025 at 02:06 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 26, 2025 at 09:38 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -328,6 +328,18 @@ CREATE TABLE IF NOT EXISTS `community_announcements` (
   KEY `community_announcements_certificateId_fkey` (`certificateId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `community_announcements`
+--
+
+INSERT INTO `community_announcements` (`id`, `userId`, `title`, `message`, `language`, `cefrLevel`, `likes`, `isPublic`, `createdAt`, `updatedAt`, `certificateId`, `type`) VALUES
+('cmet23glt0001l78ghazxumcx', 'sample-user-1', 'Achieved B2 Level in Spanish! 🇪🇸', 'Just completed the Spanish proficiency test and achieved B2 level with a score of 72/80. Excited to continue my language learning journey!', 'es', 'B2', 15, 1, '2025-07-29 13:10:42.632', '2025-07-29 13:10:42.632', NULL, 'certificate_earned'),
+('cmet23gma0003l78g4ar6129w', 'sample-user-2', 'Mastered French C1 Level! 🥖', 'Incredible journey learning French! Achieved C1 level with 78/80. Ready to tackle C2 next!', 'fr', 'C1', 23, 1, '2025-08-19 15:39:42.657', '2025-08-19 15:39:42.657', NULL, 'certificate_earned'),
+('cmet23gmg0005l78gzugxacve', 'sample-user-3', 'Italian A2 Certificate Earned! 🍕', 'Started learning Italian 3 months ago and just passed A2 level with 65/80. Grazie mille!', 'it', 'A2', 8, 1, '2025-07-29 05:40:42.662', '2025-07-29 05:40:42.662', NULL, 'certificate_earned'),
+('cmet23gmr0007l78gtieioirc', 'sample-user-4', 'English C2 Mastery Achieved! 🏆', 'After years of study, finally achieved C2 level in English with a perfect score of 80/80!', 'en', 'C2', 31, 1, '2025-07-29 03:50:42.674', '2025-07-29 03:50:42.674', NULL, 'certificate_earned'),
+('cmet23gnb0009l78g4h70aay6', 'sample-user-5', 'German B1 Success! 🥨', 'Completed German B1 test with 70/80. The grammar was challenging but worth it!', 'de', 'B1', 12, 1, '2025-08-02 20:15:42.693', '2025-08-02 20:15:42.693', NULL, 'certificate_earned'),
+('cmet23gng000bl78g5917j80d', 'sample-user-1', 'Portuguese A1 Milestone! 🏖️', 'First step in Portuguese learning journey - A1 level achieved with 58/80. Olá!', 'pt', 'A1', 5, 1, '2025-08-02 01:29:42.697', '2025-08-02 01:29:42.697', NULL, 'certificate_earned');
+
 -- --------------------------------------------------------
 
 --
@@ -382,6 +394,32 @@ INSERT INTO `community_circles` (`id`, `name`, `slug`, `language`, `level`, `des
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `community_circle_events`
+--
+
+DROP TABLE IF EXISTS `community_circle_events`;
+CREATE TABLE IF NOT EXISTS `community_circle_events` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `circleId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdBy` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date` datetime(3) NOT NULL,
+  `time` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duration` int NOT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `maxAttendees` int DEFAULT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `community_circle_events_circleId_idx` (`circleId`),
+  KEY `community_circle_events_createdBy_idx` (`createdBy`),
+  KEY `community_circle_events_date_idx` (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `community_circle_memberships`
 --
 
@@ -402,7 +440,35 @@ CREATE TABLE IF NOT EXISTS `community_circle_memberships` (
 --
 
 INSERT INTO `community_circle_memberships` (`id`, `circleId`, `userId`, `role`, `joinedAt`) VALUES
-('cmepqd5po0003yzkff5njyryf', 'cmepqd5by0001yzkfj4maa5xc', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'OWNER', '2025-08-24 13:35:01.164');
+('cmepqd5po0003yzkff5njyryf', 'cmepqd5by0001yzkfj4maa5xc', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'OWNER', '2025-08-24 13:35:01.164'),
+('cmeslpp3g00027ku9xiiyup2j', 'cmepqd5by0001yzkfj4maa5xc', '92c32677-d37b-4eab-ace4-f160f2956549', 'MEMBER', '2025-08-26 13:48:06.605');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `community_circle_posts`
+--
+
+DROP TABLE IF EXISTS `community_circle_posts`;
+CREATE TABLE IF NOT EXISTS `community_circle_posts` (
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `circleId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `authorId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updatedAt` datetime(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `community_circle_posts_circleId_idx` (`circleId`),
+  KEY `community_circle_posts_authorId_idx` (`authorId`),
+  KEY `community_circle_posts_createdAt_idx` (`createdAt`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `community_circle_posts`
+--
+
+INSERT INTO `community_circle_posts` (`id`, `circleId`, `authorId`, `content`, `createdAt`, `updatedAt`) VALUES
+('cmesmaybc0001twm2bf6potgc', 'cmepqd5by0001yzkfj4maa5xc', '92c32677-d37b-4eab-ace4-f160f2956549', '\"Affect vs. Effect\": According to an online search result, \"Affect is an action, Effect is the end result\". Members, lets have your examples of these words in everyday use please!', '2025-08-26 14:04:38.328', '2025-08-26 14:04:38.328');
 
 -- --------------------------------------------------------
 
@@ -1699,6 +1765,13 @@ CREATE TABLE IF NOT EXISTS `language_proficiency_test_attempts` (
   KEY `language_proficiency_test_attempts_completedAt_idx` (`completedAt`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `language_proficiency_test_attempts`
+--
+
+INSERT INTO `language_proficiency_test_attempts` (`id`, `userId`, `languageCode`, `score`, `level`, `answers`, `timeSpent`, `completedAt`, `createdAt`) VALUES
+('b99b5f4d-7163-4494-a9e1-ce9d3b003e0e', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'en', 69, 'C1', '{}', 0, '2025-08-26 18:55:36.199', '2025-08-26 18:55:36.199');
+
 -- --------------------------------------------------------
 
 --
@@ -2594,7 +2667,8 @@ INSERT INTO `notification_logs` (`id`, `templateId`, `recipientId`, `recipientEm
 ('bd5b28e1-129a-4349-803d-7235a86432bf', '4073a636-6f37-4061-bbeb-a589e780427b', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 'live@test.com', 'Live Tester', 'email', 'Course Enrollment Confirmation', 'Course Enrollment Confirmation', '\n          <h1>Course Enrollment Confirmation</h1>\n          <p>Dear Live Tester,</p>\n          <p>You have been successfully enrolled in the course: <strong>Global English Mastery - Live Platform Course</strong></p>\n          <p>Course details:</p>\n          <ul>\n            <li>Institution: Test Language Institute</li>\n            <li>Duration: 9 weeks</li>\n            <li>Start Date: 01/02/2024</li>\n          </ul>\n          <p>You can now access your course materials and begin learning!</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"courseId\": \"c35b2490-a08e-4c29-9d28-30735f91bd1f\", \"enrollmentId\": \"cmeascn27000r49m9wt4jyg8k\", \"institutionId\": \"f3346c7f-1b4a-4a11-8eeb-5e943c98c9ea\", \"paymentAmount\": 99.99}', '2025-08-14 02:34:03.673', 'SYSTEM'),
 ('86b0a281-93c9-417a-9cea-3923c0900e5b', '14696092-53da-4d43-a3c4-d4b4d713e7b3', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'live2@test.com', 'Live2 Tester', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Live2 Tester,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": false, \"registrationType\": \"student\", \"subscriptionPlan\": \"none\"}', '2025-08-14 02:37:19.945', 'SYSTEM'),
 ('2e251522-438a-48f7-96ff-bd76a1a94507', '4073a636-6f37-4061-bbeb-a589e780427b', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 'live2@test.com', 'Live2 Tester', 'email', 'Course Enrollment Confirmation', 'Course Enrollment Confirmation', '\n          <h1>Course Enrollment Confirmation</h1>\n          <p>Dear Live2 Tester,</p>\n          <p>You have been successfully enrolled in the course: <strong>Global English Mastery - Live Platform Course</strong></p>\n          <p>Course details:</p>\n          <ul>\n            <li>Institution: Test Language Institute</li>\n            <li>Duration: 9 weeks</li>\n            <li>Start Date: 01/02/2024</li>\n          </ul>\n          <p>You can now access your course materials and begin learning!</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"courseId\": \"c35b2490-a08e-4c29-9d28-30735f91bd1f\", \"enrollmentId\": \"cmeat1fb7001849m9xatoysda\", \"institutionId\": \"f3346c7f-1b4a-4a11-8eeb-5e943c98c9ea\", \"paymentAmount\": 99.99}', '2025-08-14 02:53:19.950', 'SYSTEM'),
-('460b0d50-591b-4061-aecb-d25f42add65a', '14696092-53da-4d43-a3c4-d4b4d713e7b3', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'student3@test.com', 'Student Three', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Student Three,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": false, \"registrationType\": \"student\", \"subscriptionPlan\": \"none\"}', '2025-08-19 21:42:58.862', 'SYSTEM');
+('460b0d50-591b-4061-aecb-d25f42add65a', '14696092-53da-4d43-a3c4-d4b4d713e7b3', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'student3@test.com', 'Student Three', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Student Three,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": false, \"registrationType\": \"student\", \"subscriptionPlan\": \"none\"}', '2025-08-19 21:42:58.862', 'SYSTEM'),
+('f36d75a6-6549-4d66-b853-175e6e6f32bb', '14696092-53da-4d43-a3c4-d4b4d713e7b3', '92c32677-d37b-4eab-ace4-f160f2956549', 'student4@test.com', 'Student Four', 'email', 'Welcome to Our Platform!', 'Welcome to Our Platform!', '\n          <h1>Welcome to Our Platform!</h1>\n          <p>Dear Student Four,</p>\n          <p>Thank you for joining our platform. We\'re excited to have you on board!</p>\n          <p>If you have any questions, feel free to reach out to our support team.</p>\n          <p>Best regards,<br>The Team</p>\n        ', 'failed', 'connect ECONNREFUSED 127.0.0.1:587', NULL, NULL, '{\"billingCycle\": \"MONTHLY\", \"hasSubscription\": false, \"registrationType\": \"student\", \"subscriptionPlan\": \"none\"}', '2025-08-26 13:29:17.800', 'SYSTEM');
 
 -- --------------------------------------------------------
 
@@ -2668,7 +2742,9 @@ INSERT INTO `notification_templates` (`id`, `name`, `type`, `subject`, `title`, 
 ('38d87438-1b97-4d68-bfef-1cb91dca4c45', 'connection_request_accepted', 'email', '{{receiverName}} accepted your connection request!', 'Connection Request Accepted', '\n      <h1>Great news! Your connection request was accepted</h1>\n      <p>Dear {{senderName}},</p>\n      <p><strong>{{receiverName}}</strong> has accepted your connection request on FluentShip.</p>\n      <p>You can now:</p>\n      <ul>\n        <li>Send messages to each other</li>\n        <li>See each other\'s learning progress</li>\n        <li>Join study groups together</li>\n        <li>Practice languages together</li>\n      </ul>\n      <p>Click the link below to view their profile:</p>\n      <p><a href=\"{{receiverProfileUrl}}\" style=\"background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;\">View Profile</a></p>\n      <p>Best regards,<br>The FluentShip Team</p>\n    ', NULL, 1, 1, 'connection', '2025-08-24 18:33:10.687', '2025-08-24 18:33:10.687', 'SYSTEM', NULL),
 ('db5a7596-a82b-4eff-9334-27af1a666fca', 'connection_request_declined', 'email', 'Connection request update', 'Connection Request Declined', '\n      <h1>Connection Request Update</h1>\n      <p>Dear {{senderName}},</p>\n      <p>Unfortunately, <strong>{{receiverName}}</strong> has declined your connection request on FluentShip.</p>\n      <p>Don\'t worry! You can still:</p>\n      <ul>\n        <li>Connect with other language learners</li>\n        <li>Join study groups and clubs</li>\n        <li>Participate in community discussions</li>\n        <li>Continue your language learning journey</li>\n      </ul>\n      <p>Keep learning and connecting with the FluentShip community!</p>\n      <p>Best regards,<br>The FluentShip Team</p>\n    ', NULL, 1, 1, 'connection', '2025-08-24 18:33:10.701', '2025-08-24 18:33:10.701', 'SYSTEM', NULL),
 ('f66c37ea-4fab-4b80-8f82-715b3fe26d3b', 'new_connection_notification', 'system', NULL, 'New Connection: {{connectionName}}', '\n      <p>You are now connected with <strong>{{connectionName}}</strong>!</p>\n      <p>You can now send messages, see each other\'s learning progress, and join study groups together.</p>\n      <p><a href=\"{{connectionProfileUrl}}\">View Profile</a></p>\n    ', NULL, 1, 1, 'connection', '2025-08-24 18:33:10.728', '2025-08-24 18:33:10.728', 'SYSTEM', NULL),
-('bcc85af8-d3cc-483e-ba7c-b09a9b47aa5c', 'connection_milestone', 'SYSTEM', NULL, 'Connection Milestone! 🌟', 'You\'ve reached {milestone} connections! You\'re building an amazing learning network!', '[\"milestone\", \"totalConnections\"]', 1, 0, 'connection', '2025-08-24 19:23:27.640', '2025-08-24 19:23:27.640', 'system', NULL);
+('bcc85af8-d3cc-483e-ba7c-b09a9b47aa5c', 'connection_milestone', 'SYSTEM', NULL, 'Connection Milestone! 🌟', 'You\'ve reached {milestone} connections! You\'re building an amazing learning network!', '[\"milestone\", \"totalConnections\"]', 1, 0, 'connection', '2025-08-24 19:23:27.640', '2025-08-24 19:23:27.640', 'system', NULL),
+('790d299c-e3e3-441c-bd73-cef73fd9af98', 'course_completion_reminder', 'email', 'Almost There! Complete Your Course', 'Almost There! Complete Your Course', '\n      <h1>You\'re Almost There!</h1>\n      <p>Dear {{name}},</p>\n      <p>Great progress! You\'re very close to completing your course.</p>\n      <p>Course details:</p>\n      <ul>\n        <li>Course: {{courseName}}</li>\n        <li>Current Progress: {{progress}}</li>\n        <li>Remaining: {{remainingContent}}</li>\n      </ul>\n      <p>Keep up the momentum! You\'re so close to earning your certificate.</p>\n      <p>Best regards,<br>The Team</p>\n    ', NULL, 1, 1, 'course', '2025-08-26 19:51:53.358', '2025-08-26 19:51:53.358', 'SYSTEM', NULL),
+('bb5ea9cf-4dfd-4447-ba1a-e3183883dbc5', 'test_completion', 'email', '🎉 Language Proficiency Test Completed!', 'Test Completion Achievement', '\n      <h1>🎉 Congratulations on Completing Your Test!</h1>\n      <p>Dear {{name}},</p>\n      <p>You\'ve successfully completed your {{language}} language proficiency test!</p>\n      <div style=\"background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n        <h2>Your Results:</h2>\n        <ul>\n          <li><strong>Score:</strong> {{score}}/80</li>\n          <li><strong>CEFR Level:</strong> {{level}}</li>\n          <li><strong>Time Taken:</strong> {{timeSpent}} minutes</li>\n          <li><strong>Completion Date:</strong> {{completionDate}}</li>\n        </ul>\n      </div>\n      <p>Your certificate has been generated and is attached to this email. You can also view it in your dashboard.</p>\n      <p>Keep up the great work and continue your language learning journey!</p>\n      <p>Best regards,<br>The FluentShip Team</p>\n    ', NULL, 1, 1, 'achievement', '2025-08-26 19:51:53.392', '2025-08-26 19:51:53.392', 'SYSTEM', NULL);
 
 -- --------------------------------------------------------
 
@@ -3361,12 +3437,13 @@ INSERT INTO `students` (`id`, `name`, `email`, `phone`, `address`, `bio`, `statu
 ('2e09fa89-ce41-47f4-9e50-28776cd92141', 'Test Student', 'test.student@example.com', NULL, NULL, NULL, 'active', '2025-07-23 22:48:24', '2025-07-23 22:48:37', '2025-07-23 22:48:24', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
 ('ee72dab2-1301-44b5-a701-0dc96801133d', 'Student One', 'student1@test.com', '+44 20 1234 5678', '789 Student Lane, London', 'Learning English for work', 'active', '2025-07-25 16:49:05', '2025-07-25 16:49:05', '2025-07-25 16:49:05', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
 ('e0712c36-0a17-425c-8a6d-83f2440ef7da', 'Student Two', 'student2@test.com', '+44 20 8765 4321', '101 Student Road, Manchester', 'Learning English for travel', 'active', '2025-07-25 16:49:05', '2025-07-25 16:49:05', '2025-07-25 16:49:05', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
-('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, NULL, 'active', '2025-08-09 16:14:08', '2025-08-10 17:03:22', '2025-08-10 17:03:22', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
-('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', NULL, NULL, NULL, 'active', '2025-08-14 01:37:20', '2025-08-14 01:37:20', '2025-08-14 01:37:20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
-('140e3f04-f4f1-47f9-b001-70f50459d3cb', 'Student Three', 'student3@test.com', NULL, NULL, NULL, 'active', '2025-08-19 20:42:59', '2025-08-19 20:42:59', '2025-08-19 20:42:59', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
+('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', '', '', '', 'active', '2025-08-09 16:14:08', '2025-08-26 16:41:42', '2025-08-26 16:41:42', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
+('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', '', '', '', 'active', '2025-08-14 01:37:20', '2025-08-26 16:13:12', '2025-08-26 16:13:12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
+('140e3f04-f4f1-47f9-b001-70f50459d3cb', 'Student Three', 'student3@test.com', '', '', '', 'active', '2025-08-19 20:42:59', '2025-08-26 16:24:21', '2025-08-26 16:24:21', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
 ('32383fb9-8764-46e0-85a1-ec29fc24c34c', 'Test Student', 'integration.test.student@example.com', NULL, NULL, NULL, 'active', '2025-08-25 21:13:11', '2025-08-25 21:13:11', '2025-08-25 21:13:11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
 ('356d653d-42b5-4795-b706-e6afe9ab692a', 'Test Institution', 'test@institution.com', NULL, NULL, NULL, 'active', '2025-08-25 21:13:11', '2025-08-25 21:13:11', '2025-08-25 21:13:11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
-('8fd00f1d-f944-46f7-a077-27a714fde87b', 'Test Suspended User', 'test@suspended.com', NULL, NULL, NULL, 'active', '2025-08-25 21:13:11', '2025-08-25 21:13:11', '2025-08-25 21:13:11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL);
+('8fd00f1d-f944-46f7-a077-27a714fde87b', 'Test Suspended User', 'test@suspended.com', NULL, NULL, NULL, 'active', '2025-08-25 21:13:11', '2025-08-25 21:13:11', '2025-08-25 21:13:11', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL),
+('92c32677-d37b-4eab-ace4-f160f2956549', 'Student Four', 'student4@test.com', '', '', '', 'active', '2025-08-26 12:29:18', '2025-08-26 16:07:19', '2025-08-26 16:07:19', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'PRIVATE', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3594,7 +3671,8 @@ INSERT INTO `student_notification_preferences` (`id`, `student_id`, `email_notif
 ('313b2d5e-12fc-4505-9c1f-9768a3b267aa', 'c98a0b89-011b-482f-843e-a5522de40b1e', 1, 1, 0, 1, 1, 1, '2025-07-12 20:40:40', '2025-07-12 20:40:40', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
 ('ee0e0fe9-12eb-437c-8407-5d47598e36e8', '25e01806-ae0f-433b-8a38-a97021e0e3b8', 1, 1, 0, 1, 1, 1, '2025-08-09 16:14:08', '2025-08-09 16:14:08', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
 ('33a7fa3c-2a47-414d-a434-26f603a67662', 'd47324a8-c823-49bc-b2dc-c567727ebafd', 1, 1, 0, 1, 1, 1, '2025-08-14 01:37:20', '2025-08-14 01:37:20', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
-('1958b25c-fcec-4d99-b493-e138ca6111b6', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 1, 1, 0, 1, 1, 1, '2025-08-19 20:42:59', '2025-08-19 20:42:59', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1);
+('1958b25c-fcec-4d99-b493-e138ca6111b6', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 1, 1, 0, 1, 1, 1, '2025-08-19 20:42:59', '2025-08-19 20:42:59', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1),
+('b4234e83-7178-4f5f-ade3-21072d065a88', '92c32677-d37b-4eab-ace4-f160f2956549', 1, 1, 0, 1, 1, 1, '2025-08-26 12:29:18', '2025-08-26 12:29:18', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 'DAILY', 1, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -3900,6 +3978,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `forcePasswordReset` tinyint(1) NOT NULL DEFAULT '0',
   `lastLoginAt` datetime(3) DEFAULT NULL,
   `profileVisibility` enum('PUBLIC','PRIVATE','FRIENDS_ONLY') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PUBLIC',
+  `subscriptionStatus` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FREE',
+  `achievementsPublic` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_email_key` (`email`),
   KEY `user_institutionId_fkey` (`institutionId`),
@@ -3911,30 +3991,36 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`, `role`, `institutionId`, `createdAt`, `updatedAt`, `status`, `forcePasswordReset`, `lastLoginAt`, `profileVisibility`) VALUES
-('0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Admin User', 'pqasys@yahoo.com', NULL, NULL, '$2b$10$J4a67NQWfZdybMW2lMyf2OJbPzIBs3L2ENavPwV0PpN/04siIGEQC', 'ADMIN', NULL, '2025-06-05 23:48:39.235', '2025-06-25 14:01:40.593', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('45396883-3706-4911-82a7-440ea99655df', 'Joe Bloggs', 'jbloggs@xyz.com', NULL, NULL, '$2b$10$Gt/d1xcYXIfkSvEbgB.AP.DTjpWbPPCZ9Yb7aA3xYcan.aQaub6eK', 'INSTITUTION', '42308252-a934-4eef-b663-37a7076bb177', '2025-06-05 23:50:18.379', '2025-06-05 23:50:19.156', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('6eb107bf-b7bc-4f20-a625-a9613e0b3433', 'Tom Jones', 'tjones@abc.ac.uk', NULL, NULL, '$2b$10$BI9zqx9R6Ne5OchrGUdgX.HbdKQHJ64jVH617KpW4qa95KPPglJiu', 'INSTITUTION', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-06-05 23:50:57.130', '2025-06-05 23:50:57.145', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('5b5fbd13-8776-4f96-ada9-091973974873', 'James Maybank', 'patrickmorgan001@gmail.com', NULL, '/uploads/profiles/5b5fbd13-8776-4f96-ada9-091973974873_1753302598374.jpg', '$2b$10$96BG0UkutzZF.bkxgjKQMOTlKxC/AgIHYcerN5be3TaumuKEuclcW', 'STUDENT', NULL, '2025-06-05 23:51:22.597', '2025-07-24 10:30:13.056', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('b1c0e68c-31c0-45c6-9745-4481ce5e6045', 'Grace Jones', 'grace@ges.ac.uk', NULL, NULL, '$2b$10$qdok6/a/wo9IWZcsnw2Y3On3hDBVTiAc7TTDE9X.mr6vV.8zgZABm', 'INSTITUTION', '9f71efc3-7b31-4953-b398-29f2197af202', '2025-07-01 22:02:16.480', '2025-07-01 22:02:17.507', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('c98a0b89-011b-482f-843e-a5522de40b1e', 'Nisha Test', 'nisha@sterlingcollegelondon.com', NULL, NULL, '$2b$10$270rbxzD7QcM.Csbl71mROab8x4i3hJmAPYyoLBo3Fq.GIn9VAsQq', 'STUDENT', NULL, '2025-07-12 21:39:11.400', '2025-07-12 21:39:11.400', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('ccb77175-fa66-4d1f-bbb9-0701df84384d', 'Student4', 'rodrigo@amitycollege.co.uk', NULL, NULL, '$2b$10$Y1xb73MSRSoxH/8Iyk5ch.CN3SK8YrAFX4ZmVsWuSPxl4dHT69tjG', 'STUDENT', NULL, '2025-07-12 21:13:08.978', '2025-07-12 21:13:08.978', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('5c39be61-c09b-4fb0-b6da-fad403dd2470', 'Admin User', 'admin@example.com', NULL, NULL, '$2b$10$FoPDZ6moKaZnRFy.e95wXeHjtzZB1svOepg0ms4a9K7pNDKfCfkRK', 'ADMIN', NULL, '2025-07-14 11:19:57.030', '2025-07-14 11:19:57.030', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('d00a7d05-f380-46f1-8cb4-344f0d04c0f2', 'Sarah Johnson', 'sarah.johnson@example.com', NULL, NULL, '$2b$10$LrsxTIhW3TEmcjGVM1Ce0.GAgC8iQFOcJFoPRY9hnfm6MhRvbOqau', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.380', '2025-08-02 02:28:34.380', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('4bbffaa9-d10a-446b-a837-ce9fbf5b9e4b', 'Michael Chen', 'michael.chen@example.com', NULL, NULL, '$2b$10$A22lepI2Mzy8UrokQlH5SuaLQk7GuQzOSyumjxTvag.jdDssrYdYq', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.460', '2025-08-02 02:28:34.460', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('1cd8b0b9-7976-4fb4-bff8-a47982da2d8a', 'Emma Rodriguez', 'emma.rodriguez@example.com', NULL, NULL, '$2b$10$FP35FMCtoCTFCNnXhSFjk.KtZfmjUmPkMIHC80ga7cbVEfjASPi.C', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.530', '2025-08-02 02:28:34.530', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('57e9928e-4118-4563-aea4-57b0136c52cd', 'Dr. Maria Garcia', 'maria.garcia@example.com', NULL, NULL, '$2b$10$jI640yfalClNogPqPLAKiuPptasY33GVOb.b2loVuyGMGzc.HopRi', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.085', '2025-08-02 02:36:48.085', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('94dfaf16-10eb-4918-a129-185e8da28473', 'Prof. David Kim', 'david.kim@example.com', NULL, NULL, '$2b$10$dvWH82LLeOqqghNy5CNZvu9ECoWgY.w2gUFBq9rdeltXjH7VHXypm', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.164', '2025-08-02 02:36:48.164', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('0339a71c-92d8-4e75-9c28-62d394d041af', 'Dr. Lisa Thompson', 'lisa.thompson@example.com', NULL, NULL, '$2b$10$UTmAQ7w5Hevq460xirr/M.SVsB2VqC5a67Yyc20lk/BzqC3ztq.Ce', 'INSTRUCTOR', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-08-02 02:36:48.235', '2025-08-02 02:36:48.235', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('16fbfb4b-3854-4091-bbbe-5355e5ec2b3c', 'Test Admin', 'integration.test.admin@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'ADMIN', NULL, '2025-08-08 00:09:00.359', '2025-08-08 00:09:00.359', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('be41ba5f-4ebf-4f8e-9344-009646ab3283', 'Test Student', 'integration.test.student@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.366', '2025-08-08 00:09:00.366', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('5b56f446-0ec4-415d-b8b1-c2dd86ba0958', 'Test Institution', 'test@institution.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.368', '2025-08-16 16:22:20.748', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, NULL, '$2b$10$ry/cwlk4lG.xN4tdojVYn.6SUPHeqrj8IkWqMVXLc.DskM7.h1g22', 'STUDENT', NULL, '2025-08-09 17:14:07.747', '2025-08-10 18:03:21.914', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', NULL, NULL, '$2b$10$UffTVPwN9KxKPEWNBGaMKO9Arz9cuQD9kbKR.yelgtHLPlF7kMW0i', 'STUDENT', NULL, '2025-08-14 02:37:19.933', '2025-08-14 02:37:19.933', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('bc4f00ee-c835-45f2-9738-e636750bcb5c', 'Test Admin', 'admin@test.com', NULL, NULL, 'hashedpassword', 'ADMIN', NULL, '2025-08-16 15:54:23.188', '2025-08-16 15:54:23.188', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('547f05f7-a4fb-4fe3-bb46-fcb984cabdef', 'Test Institution', 'institution@test.com', NULL, NULL, 'hashedpassword', 'INSTITUTION_STAFF', NULL, '2025-08-16 15:54:24.230', '2025-08-16 15:54:24.230', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('a7d8265d-f2f5-4b3d-969b-d90c4a7064bf', 'Test Suspended User', 'test@suspended.com', NULL, NULL, 'hashedpassword', 'STUDENT', NULL, '2025-08-16 16:09:09.920', '2025-08-16 16:09:09.989', 'ACTIVE', 0, NULL, 'PUBLIC'),
-('140e3f04-f4f1-47f9-b001-70f50459d3cb', 'Student Three', 'student3@test.com', NULL, NULL, '$2b$10$TgcV3B.NpH80lfl0cfbeCu3Ti0zNR2ZMnOlSb9dj/XBtGjm6d8UVi', 'STUDENT', NULL, '2025-08-19 21:42:58.835', '2025-08-19 21:42:58.835', 'ACTIVE', 0, NULL, 'PUBLIC');
+INSERT INTO `user` (`id`, `name`, `email`, `emailVerified`, `image`, `password`, `role`, `institutionId`, `createdAt`, `updatedAt`, `status`, `forcePasswordReset`, `lastLoginAt`, `profileVisibility`, `subscriptionStatus`, `achievementsPublic`) VALUES
+('0e971fe1-d22a-446e-9fb9-f52149e29df3', 'Admin User', 'pqasys@yahoo.com', NULL, NULL, '$2b$10$J4a67NQWfZdybMW2lMyf2OJbPzIBs3L2ENavPwV0PpN/04siIGEQC', 'ADMIN', NULL, '2025-06-05 23:48:39.235', '2025-06-25 14:01:40.593', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('45396883-3706-4911-82a7-440ea99655df', 'Joe Bloggs', 'jbloggs@xyz.com', NULL, NULL, '$2b$10$Gt/d1xcYXIfkSvEbgB.AP.DTjpWbPPCZ9Yb7aA3xYcan.aQaub6eK', 'INSTITUTION', '42308252-a934-4eef-b663-37a7076bb177', '2025-06-05 23:50:18.379', '2025-06-05 23:50:19.156', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('6eb107bf-b7bc-4f20-a625-a9613e0b3433', 'Tom Jones', 'tjones@abc.ac.uk', NULL, NULL, '$2b$10$BI9zqx9R6Ne5OchrGUdgX.HbdKQHJ64jVH617KpW4qa95KPPglJiu', 'INSTITUTION', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-06-05 23:50:57.130', '2025-06-05 23:50:57.145', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('5b5fbd13-8776-4f96-ada9-091973974873', 'James Maybank', 'patrickmorgan001@gmail.com', NULL, '/uploads/profiles/5b5fbd13-8776-4f96-ada9-091973974873_1753302598374.jpg', '$2b$10$96BG0UkutzZF.bkxgjKQMOTlKxC/AgIHYcerN5be3TaumuKEuclcW', 'STUDENT', NULL, '2025-06-05 23:51:22.597', '2025-07-24 10:30:13.056', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('b1c0e68c-31c0-45c6-9745-4481ce5e6045', 'Grace Jones', 'grace@ges.ac.uk', NULL, NULL, '$2b$10$qdok6/a/wo9IWZcsnw2Y3On3hDBVTiAc7TTDE9X.mr6vV.8zgZABm', 'INSTITUTION', '9f71efc3-7b31-4953-b398-29f2197af202', '2025-07-01 22:02:16.480', '2025-07-01 22:02:17.507', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('c98a0b89-011b-482f-843e-a5522de40b1e', 'Nisha Test', 'nisha@sterlingcollegelondon.com', NULL, NULL, '$2b$10$270rbxzD7QcM.Csbl71mROab8x4i3hJmAPYyoLBo3Fq.GIn9VAsQq', 'STUDENT', NULL, '2025-07-12 21:39:11.400', '2025-07-12 21:39:11.400', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('ccb77175-fa66-4d1f-bbb9-0701df84384d', 'Student4', 'rodrigo@amitycollege.co.uk', NULL, NULL, '$2b$10$Y1xb73MSRSoxH/8Iyk5ch.CN3SK8YrAFX4ZmVsWuSPxl4dHT69tjG', 'STUDENT', NULL, '2025-07-12 21:13:08.978', '2025-07-12 21:13:08.978', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('5c39be61-c09b-4fb0-b6da-fad403dd2470', 'Admin User', 'admin@example.com', NULL, NULL, '$2b$10$FoPDZ6moKaZnRFy.e95wXeHjtzZB1svOepg0ms4a9K7pNDKfCfkRK', 'ADMIN', NULL, '2025-07-14 11:19:57.030', '2025-07-14 11:19:57.030', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('d00a7d05-f380-46f1-8cb4-344f0d04c0f2', 'Sarah Johnson', 'sarah.johnson@example.com', NULL, NULL, '$2b$10$LrsxTIhW3TEmcjGVM1Ce0.GAgC8iQFOcJFoPRY9hnfm6MhRvbOqau', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.380', '2025-08-02 02:28:34.380', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('4bbffaa9-d10a-446b-a837-ce9fbf5b9e4b', 'Michael Chen', 'michael.chen@example.com', NULL, NULL, '$2b$10$A22lepI2Mzy8UrokQlH5SuaLQk7GuQzOSyumjxTvag.jdDssrYdYq', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.460', '2025-08-02 02:28:34.460', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('1cd8b0b9-7976-4fb4-bff8-a47982da2d8a', 'Emma Rodriguez', 'emma.rodriguez@example.com', NULL, NULL, '$2b$10$FP35FMCtoCTFCNnXhSFjk.KtZfmjUmPkMIHC80ga7cbVEfjASPi.C', 'INSTRUCTOR', NULL, '2025-08-02 02:28:34.530', '2025-08-02 02:28:34.530', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('57e9928e-4118-4563-aea4-57b0136c52cd', 'Dr. Maria Garcia', 'maria.garcia@example.com', NULL, NULL, '$2b$10$jI640yfalClNogPqPLAKiuPptasY33GVOb.b2loVuyGMGzc.HopRi', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.085', '2025-08-02 02:36:48.085', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('94dfaf16-10eb-4918-a129-185e8da28473', 'Prof. David Kim', 'david.kim@example.com', NULL, NULL, '$2b$10$dvWH82LLeOqqghNy5CNZvu9ECoWgY.w2gUFBq9rdeltXjH7VHXypm', 'INSTRUCTOR', '42308252-a934-4eef-b663-37a7076bb177', '2025-08-02 02:36:48.164', '2025-08-02 02:36:48.164', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('0339a71c-92d8-4e75-9c28-62d394d041af', 'Dr. Lisa Thompson', 'lisa.thompson@example.com', NULL, NULL, '$2b$10$UTmAQ7w5Hevq460xirr/M.SVsB2VqC5a67Yyc20lk/BzqC3ztq.Ce', 'INSTRUCTOR', 'c5962019-07ca-4a78-a97f-3cf394e5bf94', '2025-08-02 02:36:48.235', '2025-08-02 02:36:48.235', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('16fbfb4b-3854-4091-bbbe-5355e5ec2b3c', 'Test Admin', 'integration.test.admin@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'ADMIN', NULL, '2025-08-08 00:09:00.359', '2025-08-08 00:09:00.359', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('be41ba5f-4ebf-4f8e-9344-009646ab3283', 'Test Student', 'integration.test.student@example.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.366', '2025-08-08 00:09:00.366', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('5b56f446-0ec4-415d-b8b1-c2dd86ba0958', 'Test Institution', 'test@institution.com', NULL, NULL, '$2b$10$IFomMRJ2UCUIeF0cLFk26OoM.qECeh/XuHbbyJXDycPGy4M18Eak2', 'STUDENT', NULL, '2025-08-08 00:09:00.368', '2025-08-16 16:22:20.748', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('25e01806-ae0f-433b-8a38-a97021e0e3b8', 'Live Tester', 'live@test.com', NULL, '/uploads/profiles/25e01806-ae0f-433b-8a38-a97021e0e3b8_1756229594328.jpg', '$2b$10$ry/cwlk4lG.xN4tdojVYn.6SUPHeqrj8IkWqMVXLc.DskM7.h1g22', 'STUDENT', NULL, '2025-08-09 17:14:07.747', '2025-08-26 17:41:42.460', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('d47324a8-c823-49bc-b2dc-c567727ebafd', 'Live2 Tester', 'live2@test.com', NULL, '/uploads/profiles/d47324a8-c823-49bc-b2dc-c567727ebafd_1756228392265.jpg', '$2b$10$UffTVPwN9KxKPEWNBGaMKO9Arz9cuQD9kbKR.yelgtHLPlF7kMW0i', 'STUDENT', NULL, '2025-08-14 02:37:19.933', '2025-08-26 17:13:12.272', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('bc4f00ee-c835-45f2-9738-e636750bcb5c', 'Test Admin', 'admin@test.com', NULL, NULL, 'hashedpassword', 'ADMIN', NULL, '2025-08-16 15:54:23.188', '2025-08-16 15:54:23.188', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('547f05f7-a4fb-4fe3-bb46-fcb984cabdef', 'Test Institution', 'institution@test.com', NULL, NULL, 'hashedpassword', 'INSTITUTION_STAFF', NULL, '2025-08-16 15:54:24.230', '2025-08-16 15:54:24.230', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 0),
+('a7d8265d-f2f5-4b3d-969b-d90c4a7064bf', 'Test Suspended User', 'test@suspended.com', NULL, NULL, 'hashedpassword', 'STUDENT', NULL, '2025-08-16 16:09:09.920', '2025-08-16 16:09:09.989', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('140e3f04-f4f1-47f9-b001-70f50459d3cb', 'Student Three', 'student3@test.com', NULL, '/uploads/profiles/140e3f04-f4f1-47f9-b001-70f50459d3cb_1756229060822.jpg', '$2b$10$TgcV3B.NpH80lfl0cfbeCu3Ti0zNR2ZMnOlSb9dj/XBtGjm6d8UVi', 'STUDENT', NULL, '2025-08-19 21:42:58.835', '2025-08-26 17:24:20.825', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('92c32677-d37b-4eab-ace4-f160f2956549', 'Student Four', 'student4@test.com', NULL, '/uploads/profiles/92c32677-d37b-4eab-ace4-f160f2956549_1756228039411.jpg', '$2b$10$GU4bY4qyJshDQsf.CIlOweJqURBNaPFxKSTNE.VvZG9GskKs8VhKW', 'STUDENT', NULL, '2025-08-26 13:29:17.731', '2025-08-26 17:07:19.416', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('sample-user-1', 'Maria Rodriguez', 'maria.rodriguez@example.com', NULL, NULL, 'sample-password-hash', 'STUDENT', NULL, '2025-08-26 21:26:42.572', '2025-08-26 21:26:42.572', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('sample-user-2', 'Alex Chen', 'alex.chen@example.com', NULL, NULL, 'sample-password-hash', 'STUDENT', NULL, '2025-08-26 21:26:42.611', '2025-08-26 21:26:42.611', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('sample-user-3', 'Sophie Dubois', 'sophie.dubois@example.com', NULL, NULL, 'sample-password-hash', 'STUDENT', NULL, '2025-08-26 21:26:42.619', '2025-08-26 21:26:42.619', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('sample-user-4', 'Luca Bianchi', 'luca.bianchi@example.com', NULL, NULL, 'sample-password-hash', 'STUDENT', NULL, '2025-08-26 21:26:42.626', '2025-08-26 21:26:42.626', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1),
+('sample-user-5', 'Emma Wilson', 'emma.wilson@example.com', NULL, NULL, 'sample-password-hash', 'STUDENT', NULL, '2025-08-26 21:26:42.630', '2025-08-26 21:26:42.630', 'ACTIVE', 0, NULL, 'PUBLIC', 'FREE', 1);
 
 -- --------------------------------------------------------
 

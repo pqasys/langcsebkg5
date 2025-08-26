@@ -125,12 +125,26 @@ export async function GET() {
       select: { image: true }
     });
 
+    console.log('Profile data:', {
+      userId: session.user.id,
+      userImage: user?.image,
+      studentId: student?.id,
+      hasUserImage: !!user?.image,
+      userImageLength: user?.image?.length || 0
+    });
+
     const profile = {
       ...student,
-      profilePicture: user?.image,
+      profilePicture: user?.image || null,
       preferences: formattedPreferences,
       enrollments,
     };
+
+    console.log('Final profile response:', {
+      profilePicture: profile.profilePicture,
+      hasProfilePicture: !!profile.profilePicture,
+      profilePictureLength: profile.profilePicture?.length || 0
+    });
 
     return NextResponse.json(profile);
   } catch (error) {
@@ -172,7 +186,8 @@ export async function PUT(req: Request) {
       gender,
       location,
       website,
-      social_links
+      social_links,
+      achievementsPublic
     } = data;
 
     // Validate required fields
@@ -206,6 +221,7 @@ export async function PUT(req: Request) {
         data: {
           name,
           email,
+          achievementsPublic: achievementsPublic !== undefined ? achievementsPublic : undefined,
           updatedAt: new Date()
         }
       }),

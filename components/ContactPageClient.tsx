@@ -346,7 +346,7 @@ export default function ContactPageClient() {
               </a>
             </Button>
             <Button variant="outline" asChild>
-              <a href="/community" target="_blank" rel="noopener noreferrer">
+              <a href="/features/community-learning" target="_blank" rel="noopener noreferrer">
                 Community Forum
               </a>
             </Button>
