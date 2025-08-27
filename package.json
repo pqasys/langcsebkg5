@@ -90,7 +90,9 @@
     "test:display": "tsx scripts/test-frontend-display.ts",
     "test:zero-flash": "tsx scripts/test-zero-flash.ts",
     "fix:search-bars": "tsx scripts/fix-search-bars.ts",
-    "fix:search-bars-css": "tsx scripts/implement-css-search-fix.ts"
+    "fix:search-bars-css": "tsx scripts/implement-css-search-fix.ts",
+    "test:secure-pdf": "tsx scripts/test-secure-certificate.ts",
+    "migrate:pdf": "tsx scripts/migrate-to-secure-pdf.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -135,8 +137,6 @@
     "date-fns": "^4.1.0",
     "fullcalendar": "^6.1.19",
     "isomorphic-dompurify": "^2.25.0",
-    "jspdf": "^3.0.1",
-    "jspdf-autotable": "^5.0.2",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.503.0",

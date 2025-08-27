@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { CertificateService } from '@/lib/services/certificate-service';
+import { CertificateServiceSecure as CertificateService } from '@/lib/services/certificate-service-secure';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);

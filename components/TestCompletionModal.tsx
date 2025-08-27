@@ -30,7 +30,7 @@ import {
   Globe,
   Zap,
   Bell,
-  Certificate,
+  FileText,
   ChevronRight,
   ExternalLink,
   Settings,
@@ -448,7 +448,7 @@ export function TestCompletionModal({
           </h3>
           <div className="space-y-3 text-sm text-gray-700">
             <div className="flex items-center gap-2">
-              <Certificate className="h-4 w-4 text-green-500" />
+                              <FileText className="h-4 w-4 text-green-500" />
               <span>View and download your certificate</span>
             </div>
             <div className="flex items-center gap-2">
@@ -474,7 +474,7 @@ export function TestCompletionModal({
           variant="outline"
           className="w-full"
         >
-          <Certificate className="h-4 w-4 mr-2" />
+                          <FileText className="h-4 w-4 mr-2" />
           View Certificate
         </Button>
         <Button 

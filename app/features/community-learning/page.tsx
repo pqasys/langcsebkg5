@@ -659,24 +659,45 @@ export default function CommunityLearningFeaturePage() {
               </div>
               
               <div className="flex flex-wrap justify-center gap-4 mb-8">
-                <Link href="#benefits">
-                  <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-lg px-8 py-3 transition-all duration-300 hover:scale-105">
-                    <Users className="h-5 w-5 mr-2" />
-                    Community Benefits
-                  </Button>
-                </Link>
-                <Link href="#achievements">
-                  <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-lg px-8 py-3 transition-all duration-300 hover:scale-105">
-                    <Trophy className="h-5 w-5 mr-2" />
-                    Recent Achievements
-                  </Button>
-                </Link>
-                <Link href="#circles">
-                  <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-lg px-8 py-3 transition-all duration-300 hover:scale-105">
-                    <MessageCircle className="h-5 w-5 mr-2" />
-                    Study Circles
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-lg px-8 py-3 transition-all duration-300 hover:scale-105"
+                  onClick={() => {
+                    const element = document.getElementById('benefits');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                >
+                  <Users className="h-5 w-5 mr-2" />
+                  Community Benefits
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-lg px-8 py-3 transition-all duration-300 hover:scale-105"
+                  onClick={() => {
+                    const element = document.getElementById('achievements');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                >
+                  <Trophy className="h-5 w-5 mr-2" />
+                  Recent Achievements
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-lg px-8 py-3 transition-all duration-300 hover:scale-105"
+                  onClick={() => {
+                    const element = document.getElementById('circles');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Study Circles
+                </Button>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isBuildTime } from '@/lib/build-error-handler';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { CertificateService } from '@/lib/services/certificate-service';
+import { CertificateServiceSecure as CertificateService } from '@/lib/services/certificate-service-secure';
 
 export const dynamic = 'force-dynamic';
 

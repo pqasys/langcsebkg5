@@ -1631,63 +1631,7 @@ export const ITALIAN_PROFICIENCY_QUESTIONS: TestQuestion[] = [
   }
 ];
 
-// Utility functions
-export function getRandomQuestions(count: number, level?: string, category?: string): TestQuestion[] {
-  let filteredQuestions = ITALIAN_PROFICIENCY_QUESTIONS;
-  
-  if (level) {
-    filteredQuestions = filteredQuestions.filter(q => q.level === level);
-  }
-  
-  if (category) {
-    filteredQuestions = filteredQuestions.filter(q => q.category === category);
-  }
-  
-  const shuffled = [...filteredQuestions].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-}
 
-export function getQuestionsByLevel(level: string): TestQuestion[] {
-  return ITALIAN_PROFICIENCY_QUESTIONS.filter(q => q.level === level);
-}
-
-export function getQuestionsByCategory(category: string): TestQuestion[] {
-  return ITALIAN_PROFICIENCY_QUESTIONS.filter(q => q.category === category);
-}
-
-export function getBalancedQuestionSet(count: number = 80): TestQuestion[] {
-  const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-  const categories = ['grammar', 'vocabulary'];
-  const questionsPerLevel = Math.floor(count / levels.length);
-  const questionsPerCategory = Math.floor(questionsPerLevel / categories.length);
-  
-  let balancedQuestions: TestQuestion[] = [];
-  
-  for (const level of levels) {
-    for (const category of categories) {
-      const levelCategoryQuestions = ITALIAN_PROFICIENCY_QUESTIONS.filter(
-        q => q.level === level && q.category === category
-      );
-      const selectedQuestions = getRandomQuestions(
-        Math.min(questionsPerCategory, levelCategoryQuestions.length),
-        level,
-        category
-      );
-      balancedQuestions.push(...selectedQuestions);
-    }
-  }
-  
-  // Fill remaining slots with random questions
-  const remaining = count - balancedQuestions.length;
-  if (remaining > 0) {
-    const usedIds = new Set(balancedQuestions.map(q => q.id));
-    const availableQuestions = ITALIAN_PROFICIENCY_QUESTIONS.filter(q => !usedIds.has(q.id));
-    const additionalQuestions = getRandomQuestions(remaining);
-    balancedQuestions.push(...additionalQuestions);
-  }
-  
-  return balancedQuestions.slice(0, count);
-}
 
 // Utility functions
 export function getRandomQuestions(count: number, level?: string, category?: string): TestQuestion[] {

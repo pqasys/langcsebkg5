@@ -20,7 +20,7 @@ export async function POST(
       )
     }
 
-    const { content } = await request.json()
+    const { content, parentId } = await request.json()
 
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       return NextResponse.json(
@@ -58,12 +58,38 @@ export async function POST(
       )
     }
 
+    // If this is a reply, validate the parent post
+    let level = 0;
+    if (parentId) {
+      const parentPost = await prisma.communityCirclePost.findUnique({
+        where: { id: parentId }
+      });
+
+      if (!parentPost) {
+        return NextResponse.json(
+          { error: 'Parent post not found' },
+          { status: 404 }
+        );
+      }
+
+      if (parentPost.circleId !== circle.id) {
+        return NextResponse.json(
+          { error: 'Parent post does not belong to this circle' },
+          { status: 400 }
+        );
+      }
+
+      level = (parentPost.level || 0) + 1;
+    }
+
     // Create the post
     const post = await prisma.communityCirclePost.create({
       data: {
         content: content.trim(),
         authorId: session.user.id,
-        circleId: circle.id
+        circleId: circle.id,
+        parentId: parentId || null,
+        level: level
       },
       include: {
         author: {
@@ -88,7 +114,10 @@ export async function POST(
         },
         createdAt: post.createdAt.toISOString(),
         likes: 0,
-        comments: 0
+        isLiked: false,
+        level: post.level,
+        parentId: post.parentId,
+        replyCount: 0
       }
     })
 

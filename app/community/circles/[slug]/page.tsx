@@ -54,8 +54,12 @@ import {
   Rocket,
   PartyPopper
 } from 'lucide-react';
+
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
+import ThreadedDiscussion from '@/components/ThreadedDiscussion';
+import { CommunityQuizCard } from '@/components/community/CommunityQuizCard';
+import { CommunityQuizInterface } from '@/components/community/CommunityQuizInterface';
 
 interface Circle {
   id: string;
@@ -98,8 +102,14 @@ interface Post {
   };
   createdAt: string;
   likes: number;
-  comments: number;
+  isLiked?: boolean;
+  replies?: Post[];
+  level: number;
+  parentId?: string;
+  replyCount: number;
 }
+
+
 
 interface Event {
   id: string;
@@ -108,9 +118,32 @@ interface Event {
   date: string;
   time: string;
   duration: number;
-  type: 'study-session' | 'conversation' | 'workshop' | 'social';
+  type: 'study-session' | 'conversation' | 'workshop' | 'social' | 'live-class';
   attendees: number;
   maxAttendees?: number;
+  creator?: {
+    id: string;
+    name: string;
+    image?: string;
+  };
+  // Live Class specific fields
+  videoPlatform?: 'zoom' | 'google-meet' | 'teams' | 'other';
+  meetingLink?: string;
+  recordingEnabled?: boolean;
+  materials?: string;
+  instructorNotes?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  language?: string;
+  // Access control info
+  accessInfo?: {
+    canJoin: boolean;
+    reason?: string;
+    upgradePrompt?: {
+      message: string;
+      cta: string;
+      planType: 'PREMIUM' | 'PRO';
+    };
+  };
 }
 
 export default function CircleDetailPage() {
@@ -135,7 +168,15 @@ export default function CircleDetailPage() {
     time: '',
     duration: 60,
     type: 'study-session' as const,
-    maxAttendees: 10
+    maxAttendees: 10,
+    // Live Class specific fields
+    videoPlatform: 'zoom' as const,
+    meetingLink: '',
+    recordingEnabled: false,
+    materials: '',
+    instructorNotes: '',
+    difficulty: 'beginner' as const,
+    language: 'en'
   });
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -143,12 +184,31 @@ export default function CircleDetailPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [showSubscriptionReminder, setShowSubscriptionReminder] = useState(false);
   const [joinedCircleName, setJoinedCircleName] = useState('');
+  
+  // Quiz states
+  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [quizUsage, setQuizUsage] = useState({ monthlyUsage: 0, totalAttempts: 0, averageScore: 0 });
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [currentQuiz, setCurrentQuiz] = useState<any>(null);
+  const [quizAttempt, setQuizAttempt] = useState<any>(null);
+  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
+  const [quizRestrictions, setQuizRestrictions] = useState<any>(null);
 
   useEffect(() => {
     if (slug) {
       fetchCircleDetails();
     }
   }, [slug]);
+
+  // Fetch quizzes when quizzes tab is active
+  useEffect(() => {
+    if (activeTab === 'quizzes' && session?.user) {
+      fetchQuizzes();
+      fetchQuizUsage();
+    }
+  }, [activeTab, session?.user]);
+
+
 
   // Handle automatic joining after authentication
   useEffect(() => {
@@ -163,6 +223,38 @@ export default function CircleDetailPage() {
     }
   }, [session, circle, slug]);
 
+  // Handle return from authentication for discussion actions
+  useEffect(() => {
+    if (session?.user && circle) {
+      const pendingDiscussionAction = localStorage.getItem('pendingDiscussionAction');
+      if (pendingDiscussionAction) {
+        try {
+          const action = JSON.parse(pendingDiscussionAction);
+          if (action.action === 'discussion' && action.circleSlug === slug) {
+            // Clear the pending action
+            localStorage.removeItem('pendingDiscussionAction');
+            
+            // If there was pending content, try to post it
+            if (action.pendingContent && circle.isMember) {
+              // Set the content and trigger the post
+              setNewPost(action.pendingContent);
+              // Use setTimeout to ensure state is updated before posting
+              setTimeout(() => {
+                handleCreatePost(action.pendingContent, action.parentId);
+              }, 100);
+            } else {
+              // Show a welcome message
+              toast.success('Welcome back! You can now contribute to the discussion.');
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing pending discussion action:', error);
+          localStorage.removeItem('pendingDiscussionAction');
+        }
+      }
+    }
+  }, [session, circle, slug]);
+
   const fetchCircleDetails = async () => {
     try {
       setLoading(true);
@@ -170,6 +262,9 @@ export default function CircleDetailPage() {
       const data = await response.json();
       
       if (response.ok) {
+        console.log('Fetched circle details:', data);
+        console.log('Posts count:', data.posts?.length || 0);
+        console.log('Posts structure:', JSON.stringify(data.posts, null, 2));
         setCircle(data.circle);
         setMembers(data.members || []);
         setPosts(data.posts || []);
@@ -246,29 +341,105 @@ export default function CircleDetailPage() {
     }
   };
 
-  const handleCreatePost = async () => {
-    if (!newPost.trim() || !circle) return;
+  const handleCreatePost = async (content: string, parentId?: string) => {
+    if (!content.trim() || !circle) return;
+    
+    // Check authentication
+    if (!session?.user) {
+      // Store the current context for after login
+      localStorage.setItem('pendingDiscussionAction', JSON.stringify({
+        action: 'discussion',
+        circleSlug: slug,
+        returnUrl: `/community/circles/${slug}`,
+        pendingContent: content,
+        parentId: parentId
+      }));
+      // Redirect to sign in page
+      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/community/circles/${slug}`)}`);
+      return;
+    }
+    
+    // Check membership
+    if (!circle.isMember) {
+      toast.error('You need to be a member of this circle to post.');
+      return;
+    }
     
     try {
+      console.log('Creating post/reply:', { content, parentId });
       const response = await fetch(`/api/community/circles/${slug}/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newPost })
+        body: JSON.stringify({ content, parentId })
       });
       
       if (response.ok) {
-        toast.success('Post created successfully!');
-        setNewPost('');
+        const data = await response.json();
+        if (!parentId) {
+          // This is a new post, not a reply
+          toast.success('Post created successfully!');
+          setNewPost('');
+        } else {
+          // This is a reply
+          toast.success('Reply posted successfully!');
+        }
         fetchCircleDetails(); // Refresh posts
       } else {
         const data = await response.json();
-        toast.error(data.error || 'Failed to create post');
+        throw new Error(data.error || 'Failed to create post');
       }
     } catch (error) {
       console.error('Error creating post:', error);
-      toast.error('Failed to create post');
+      throw error;
     }
   };
+
+  const handleLikePost = async (postId: string) => {
+    // Check authentication
+    if (!session?.user) {
+      // Store the current context for after login
+      localStorage.setItem('pendingDiscussionAction', JSON.stringify({
+        action: 'discussion',
+        circleSlug: slug,
+        returnUrl: `/community/circles/${slug}`
+      }));
+      // Redirect to sign in page
+      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/community/circles/${slug}`)}`);
+      return;
+    }
+    
+    // Check membership
+    if (!circle.isMember) {
+      toast.error('You need to be a member of this circle to like posts.');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/community/circles/${slug}/posts/${postId}/like`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Update the post in the list
+        setPosts(prev => 
+          prev.map(post => 
+            post.id === postId 
+              ? { ...post, likes: data.likeCount, isLiked: data.liked }
+              : post
+          )
+        );
+      } else {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to like post');
+      }
+    } catch (error) {
+      console.error('Error liking post:', error);
+      throw error;
+    }
+  };
+
+
 
   const handleCreateEvent = async () => {
     if (!circle) return;
@@ -290,16 +461,69 @@ export default function CircleDetailPage() {
           time: '',
           duration: 60,
           type: 'study-session',
-          maxAttendees: 10
+          maxAttendees: 10,
+          // Live Class specific fields
+          videoPlatform: 'zoom',
+          meetingLink: '',
+          recordingEnabled: false,
+          materials: '',
+          instructorNotes: '',
+          difficulty: 'beginner',
+          language: 'en'
         });
         fetchCircleDetails(); // Refresh events
       } else {
         const data = await response.json();
-        toast.error(data.error || 'Failed to create event');
+        if (data.requiresUpgrade) {
+          toast.error(data.error);
+          // You could show an upgrade modal here
+        } else {
+          toast.error(data.error || 'Failed to create event');
+        }
       }
     } catch (error) {
       console.error('Error creating event:', error);
       toast.error('Failed to create event');
+    }
+  };
+
+  const handleJoinEvent = async (eventId: string) => {
+    if (!session?.user) {
+      toast.error('Please sign in to join events');
+      return;
+    }
+    
+    if (!circle.isMember) {
+      toast.error('You need to be a member of this circle to join events');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/community/circles/${slug}/events/${eventId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        toast.success('Successfully joined the event!');
+        fetchCircleDetails(); // Refresh events
+      } else {
+        if (data.requiresUpgrade) {
+          // Show upgrade prompt
+          toast.error(data.error);
+          if (data.upgradePrompt) {
+            // You could show a modal here with the upgrade prompt
+            console.log('Upgrade prompt:', data.upgradePrompt);
+          }
+        } else {
+          toast.error(data.error || 'Failed to join event');
+        }
+      }
+    } catch (error) {
+      console.error('Error joining event:', error);
+      toast.error('Failed to join event');
     }
   };
 
@@ -325,6 +549,78 @@ export default function CircleDetailPage() {
       console.error('Error sending invitation:', error);
       toast.error('Failed to send invitation');
     }
+  };
+
+  // Quiz functions
+  const fetchQuizzes = async () => {
+    try {
+      const response = await fetch('/api/community/quizzes');
+      if (response.ok) {
+        const data = await response.json();
+        setQuizzes(data);
+      } else {
+        console.error('Failed to fetch quizzes');
+      }
+    } catch (error) {
+      console.error('Error fetching quizzes:', error);
+    }
+  };
+
+  const fetchQuizUsage = async () => {
+    try {
+      const response = await fetch('/api/community/quizzes/usage');
+      if (response.ok) {
+        const data = await response.json();
+        setQuizUsage(data);
+      } else {
+        console.error('Failed to fetch quiz usage');
+      }
+    } catch (error) {
+      console.error('Error fetching quiz usage:', error);
+    }
+  };
+
+  const handleStartQuiz = async (quizId: string) => {
+    try {
+      const response = await fetch(`/api/community/quizzes/${quizId}/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentQuiz(quizzes.find(q => q.id === quizId));
+        setQuizAttempt(data.attempt);
+        setQuizQuestions(data.questions);
+        setQuizRestrictions(data.restrictions);
+        setShowQuiz(true);
+      } else {
+        const error = await response.json();
+        if (error.requiresUpgrade) {
+          toast.error(error.error);
+          // You could show an upgrade modal here
+        } else {
+          toast.error(error.error || 'Failed to start quiz');
+        }
+      }
+    } catch (error) {
+      console.error('Error starting quiz:', error);
+      toast.error('Failed to start quiz');
+    }
+  };
+
+  const handleQuizComplete = (results: any) => {
+    toast.success(`Quiz completed! Score: ${results.summary.percentage}%`);
+    setShowQuiz(false);
+    fetchQuizUsage(); // Refresh usage stats
+  };
+
+  const handleQuizExit = () => {
+    setShowQuiz(false);
+    setCurrentQuiz(null);
+    setQuizAttempt(null);
+    setQuizQuestions([]);
+    setQuizRestrictions(null);
   };
 
   const getLanguageFlag = (language: string) => {
@@ -539,7 +835,7 @@ export default function CircleDetailPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-gray-100 to-gray-200 p-1 rounded-xl shadow-lg">
+          <TabsList className="grid w-full grid-cols-6 bg-gradient-to-r from-gray-100 to-gray-200 p-1 rounded-xl shadow-lg">
             <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
               <Globe className="h-4 w-4 mr-2" />
               Overview
@@ -551,6 +847,10 @@ export default function CircleDetailPage() {
             <TabsTrigger value="events" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
               <Calendar className="h-4 w-4 mr-2" />
               Events
+            </TabsTrigger>
+            <TabsTrigger value="quizzes" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
+              <Target className="h-4 w-4 mr-2" />
+              Practice Quizzes
             </TabsTrigger>
             <TabsTrigger value="members" className="data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-300 rounded-lg">
               <Users className="h-4 w-4 mr-2" />
@@ -779,7 +1079,7 @@ export default function CircleDetailPage() {
                 <CardTitle>Discussions</CardTitle>
               </CardHeader>
               <CardContent>
-                {circle.isMember && (
+                {circle.isMember ? (
                   <div className="mb-6">
                     <Textarea
                       placeholder="Share your thoughts, ask questions, or start a discussion..."
@@ -793,43 +1093,67 @@ export default function CircleDetailPage() {
                       Post Discussion
                     </Button>
                   </div>
+                ) : !session?.user ? (
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <MessageCircle className="h-5 w-5 text-blue-600" />
+                      <div className="flex-1">
+                        <p className="text-blue-800 font-medium">Join the discussion!</p>
+                        <p className="text-blue-600 text-sm">Sign in to contribute to this community discussion.</p>
+                      </div>
+                      <Button 
+                        onClick={() => {
+                          localStorage.setItem('pendingDiscussionAction', JSON.stringify({
+                            action: 'discussion',
+                            circleSlug: slug,
+                            returnUrl: `/community/circles/${slug}`
+                          }));
+                          router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/community/circles/${slug}`)}`);
+                        }}
+                        size="sm"
+                      >
+                        Sign In
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Users className="h-5 w-5 text-amber-600" />
+                      <div className="flex-1">
+                        <p className="text-amber-800 font-medium">Join this circle to participate</p>
+                        <p className="text-amber-600 text-sm">You need to be a member to contribute to discussions.</p>
+                      </div>
+                      <Button 
+                        onClick={handleJoinCircle}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Join Circle
+                      </Button>
+                    </div>
+                  </div>
                 )}
 
-                <div className="space-y-4">
-                  {posts.map((post) => (
-                    <div key={post.id} className="border rounded-lg p-4">
-                      <div className="flex items-start space-x-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={post.author.image} />
-                          <AvatarFallback className={getRandomAvatarColor(post.author.name)}>
-                            {post.author.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <span className="font-medium">{post.author.name}</span>
-                            <span className="text-sm text-gray-500">
-                              {new Date(post.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <p className="text-gray-700 mb-3">{post.content}</p>
-                          <div className="flex items-center space-x-4 text-sm text-gray-500">
-                            <button className="flex items-center space-x-1 hover:text-blue-600">
-                              <Star className="h-4 w-4" />
-                              <span>{post.likes}</span>
-                            </button>
-                            <button className="flex items-center space-x-1 hover:text-blue-600">
-                              <MessageCircle className="h-4 w-4" />
-                              <span>{post.comments}</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {posts.length === 0 && (
-                    <p className="text-gray-500 text-center py-8">No discussions yet. Be the first to start one!</p>
-                  )}
+                <div className="h-[600px] overflow-y-auto">
+                  <ThreadedDiscussion
+                    posts={posts}
+                    onSendPost={handleCreatePost}
+                    onLikePost={handleLikePost}
+                    currentUserId={session?.user?.id}
+                    isLoading={false}
+                    isAuthenticated={!!session?.user}
+                    onRequireAuth={() => {
+                      // Store the current context for after login
+                      localStorage.setItem('pendingDiscussionAction', JSON.stringify({
+                        action: 'discussion',
+                        circleSlug: slug,
+                        returnUrl: `/community/circles/${slug}`
+                      }));
+                      // Redirect to sign in page
+                      router.push(`/auth/signin?callbackUrl=${encodeURIComponent(`/community/circles/${slug}`)}`);
+                    }}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -855,17 +1179,56 @@ export default function CircleDetailPage() {
                     <Card key={event.id} className="hover:shadow-lg transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <Badge variant="outline">{event.type}</Badge>
+                          <Badge variant="outline" className={
+                            event.type === 'live-class' ? 'bg-blue-100 text-blue-700 border-blue-300' : ''
+                          }>
+                            {event.type === 'live-class' ? '🎥 Live Class' : event.type}
+                          </Badge>
                           <span className="text-sm text-gray-500">{event.date}</span>
                         </div>
                         <h4 className="font-medium mb-2">{event.title}</h4>
                         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{event.description}</p>
+                        
+                        {/* Live Class specific information */}
+                        {event.type === 'live-class' && (
+                          <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <span className="text-sm font-medium text-blue-800">Video Platform:</span>
+                              <span className="text-sm text-blue-600 capitalize">{event.videoPlatform || 'Not specified'}</span>
+                            </div>
+                            {event.meetingLink && (
+                              <div className="mb-2">
+                                <a 
+                                  href={event.meetingLink} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-blue-600 hover:text-blue-800 underline"
+                                >
+                                  🔗 Join Meeting
+                                </a>
+                              </div>
+                            )}
+                            {event.difficulty && (
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-medium text-blue-800">Level:</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {event.difficulty}
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-500">{event.time} ({event.duration}min)</span>
                           <span className="text-blue-600">{event.attendees} attending</span>
                         </div>
-                        <Button className="w-full mt-3" size="sm">
-                          Join Event
+                        <Button 
+                          className="w-full mt-3" 
+                          size="sm"
+                          onClick={() => handleJoinEvent(event.id)}
+                        >
+                          {event.type === 'live-class' ? 'Join Live Class' : 'Join Event'}
                         </Button>
                       </CardContent>
                     </Card>
@@ -878,6 +1241,53 @@ export default function CircleDetailPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Quizzes Tab */}
+          <TabsContent value="quizzes" className="space-y-6">
+            {showQuiz ? (
+              <CommunityQuizInterface
+                quizId={currentQuiz.id}
+                attempt={quizAttempt}
+                questions={quizQuestions}
+                restrictions={quizRestrictions}
+                onComplete={handleQuizComplete}
+                onExit={handleQuizExit}
+              />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Practice Quizzes</CardTitle>
+                    <div className="flex items-center space-x-4">
+                      <Badge variant="secondary">
+                        {quizUsage.monthlyUsage}/1 free this month
+                      </Badge>
+                      <div className="text-sm text-gray-600">
+                        Total attempts: {quizUsage.totalAttempts}
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {quizzes.map((quiz) => (
+                      <CommunityQuizCard
+                        key={quiz.id}
+                        quiz={quiz}
+                        onStartQuiz={handleStartQuiz}
+                        monthlyUsage={quizUsage.monthlyUsage}
+                      />
+                    ))}
+                  </div>
+                  {quizzes.length === 0 && (
+                    <p className="text-gray-500 text-center py-8">
+                      No quizzes available at the moment.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Members Tab */}
@@ -1001,19 +1411,35 @@ export default function CircleDetailPage() {
 
       {/* Create Event Dialog */}
       <Dialog open={showCreateEvent} onOpenChange={setShowCreateEvent}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Create New Event</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
+              <label className="text-sm font-medium">Event Type</label>
+              <select
+                value={newEvent.type}
+                onChange={(e) => setNewEvent(prev => ({ ...prev, type: e.target.value as any }))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              >
+                <option value="study-session">Study Session</option>
+                <option value="conversation">Conversation Practice</option>
+                <option value="workshop">Workshop</option>
+                <option value="social">Social Event</option>
+                <option value="live-class">🎥 Live Class</option>
+              </select>
+            </div>
+            
+            <div>
               <label className="text-sm font-medium">Event Title</label>
               <Input
                 value={newEvent.title}
                 onChange={(e) => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="e.g., Spanish Conversation Practice"
+                placeholder={newEvent.type === 'live-class' ? "e.g., Spanish Conversation Live Class" : "e.g., Spanish Conversation Practice"}
               />
             </div>
+            
             <div>
               <label className="text-sm font-medium">Description</label>
               <Textarea
@@ -1023,6 +1449,7 @@ export default function CircleDetailPage() {
                 rows={3}
               />
             </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Date</label>
@@ -1041,6 +1468,7 @@ export default function CircleDetailPage() {
                 />
               </div>
             </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Duration (minutes)</label>
@@ -1048,7 +1476,14 @@ export default function CircleDetailPage() {
                   type="number"
                   value={newEvent.duration}
                   onChange={(e) => setNewEvent(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
+                  max={newEvent.type === 'live-class' ? 30 : 120}
+                  min={15}
                 />
+                {newEvent.type === 'live-class' && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Free users: max 30 minutes. Premium: 60 minutes. Pro: 120 minutes
+                  </p>
+                )}
               </div>
               <div>
                 <label className="text-sm font-medium">Max Attendees</label>
@@ -1056,9 +1491,122 @@ export default function CircleDetailPage() {
                   type="number"
                   value={newEvent.maxAttendees}
                   onChange={(e) => setNewEvent(prev => ({ ...prev, maxAttendees: parseInt(e.target.value) }))}
+                  max={newEvent.type === 'live-class' ? 20 : 50}
+                  min={1}
                 />
+                {newEvent.type === 'live-class' && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Free users: max 20 attendees. Premium: 10 attendees. Pro: 5 attendees
+                  </p>
+                )}
               </div>
             </div>
+
+            {/* Live Class specific fields */}
+            {newEvent.type === 'live-class' && (
+              <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-900">Live Class Settings</h4>
+                
+                <div>
+                  <label className="text-sm font-medium text-blue-800">Video Platform</label>
+                  <select
+                    value={newEvent.videoPlatform}
+                    onChange={(e) => setNewEvent(prev => ({ ...prev, videoPlatform: e.target.value as any }))}
+                    className="w-full p-2 border border-blue-300 rounded-md bg-white"
+                  >
+                    <option value="zoom">Zoom</option>
+                    <option value="google-meet">Google Meet</option>
+                    <option value="teams">Microsoft Teams</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-blue-800">Meeting Link</label>
+                  <Input
+                    value={newEvent.meetingLink}
+                    onChange={(e) => setNewEvent(prev => ({ ...prev, meetingLink: e.target.value }))}
+                    placeholder="https://zoom.us/j/..."
+                    className="border-blue-300"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-blue-800">Difficulty Level</label>
+                    <select
+                      value={newEvent.difficulty}
+                      onChange={(e) => setNewEvent(prev => ({ ...prev, difficulty: e.target.value as any }))}
+                      className="w-full p-2 border border-blue-300 rounded-md bg-white"
+                    >
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-blue-800">Language</label>
+                    <Input
+                      value={newEvent.language}
+                      onChange={(e) => setNewEvent(prev => ({ ...prev, language: e.target.value }))}
+                      placeholder="e.g., Spanish"
+                      className="border-blue-300"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="recordingEnabled"
+                    checked={newEvent.recordingEnabled}
+                    onChange={(e) => setNewEvent(prev => ({ ...prev, recordingEnabled: e.target.checked }))}
+                    className="rounded border-blue-300"
+                  />
+                  <label htmlFor="recordingEnabled" className="text-sm text-blue-800">
+                    Enable recording (Premium/Pro only)
+                  </label>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-blue-800">Materials/Notes</label>
+                  <Textarea
+                    value={newEvent.materials}
+                    onChange={(e) => setNewEvent(prev => ({ ...prev, materials: e.target.value }))}
+                    placeholder="Share any materials or notes for participants..."
+                    rows={2}
+                    className="border-blue-300"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Freemium restrictions notice */}
+            {newEvent.type === 'live-class' && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="flex items-start space-x-2">
+                  <div className="p-1 bg-amber-100 rounded">
+                    <span className="text-amber-600 text-sm">ℹ️</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-amber-800">Live Class Access</p>
+                    <p className="text-xs text-amber-700 mt-1">
+                      Free users: 1 session/month, 30min max, large groups. 
+                                              <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            router.push('/subscription-signup?type=student&plan=PREMIUM');
+                          }}
+                          className="text-amber-600 underline ml-1 hover:text-amber-800"
+                        >
+                          Upgrade to Premium
+                        </button> for unlimited sessions and better features!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setShowCreateEvent(false)}>
                 Cancel

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CertificateService } from '@/lib/services/certificate-service';
+import { CertificateServiceSecure as CertificateService } from '@/lib/services/certificate-service-secure';
 
 export async function GET(
   request: NextRequest,

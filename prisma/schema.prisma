@@ -127,6 +127,10 @@ model user {
   achievementsPublic Boolean   @default(false)
   lastLoginAt        DateTime?
   subscriptionStatus String    @default("FREE") @db.VarChar(20)
+  
+  // Community quiz usage tracking
+  monthlyQuizUsage  Int       @default(0)
+  lastQuizReset     DateTime?
 
   // Relations
   institution Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
@@ -137,7 +141,11 @@ model user {
   communityCircles CommunityCircle[]
   circlePosts CommunityCirclePost[]
   circleEvents CommunityCircleEvent[]
+  circleEventAttendees CommunityCircleEventAttendee[]
   communityCircleMemberships CommunityCircleMembership[]
+  circlePostLikes CommunityCirclePostLike[]
+  communityQuizAttempts CommunityQuizAttempt[]
+
   
   // Connection relations
   sentConnectionRequests     ConnectionRequest[] @relation("ConnectionRequestSender")
@@ -967,6 +975,9 @@ model quiz_questions {
   media_url          String?             @db.VarChar(500)
   question_config    Json?
 
+  // Relations
+  quiz quizzes @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
+
   @@index([quiz_id], map: "idx_quiz_questions_quiz_id")
   @@map("quiz_questions")
 }
@@ -1001,6 +1012,10 @@ model quizzes {
   max_questions     Int       @default(20)
   min_questions     Int       @default(5)
   target_precision  Float     @default(0.3)
+
+  // Relations
+  quiz_questions quiz_questions[]
+  communityQuizAttempts CommunityQuizAttempt[]
 
   @@index([module_id], map: "idx_quizzes_module_id")
   @@map("quizzes")
@@ -1969,6 +1984,7 @@ model CommunityCircle {
   members CommunityCircleMembership[]
   posts CommunityCirclePost[]
   events CommunityCircleEvent[]
+  communityQuizAttempts CommunityQuizAttempt[]
   owner user? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
 
   @@index([language])
@@ -1999,17 +2015,40 @@ model CommunityCirclePost {
   circleId  String   @db.VarChar(36)
   authorId  String   @db.VarChar(36)
   content   String   @db.Text
+  parentId  String?  @db.VarChar(36) // For threaded replies
+  level     Int      @default(0) // Depth level for threading
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
   circle CommunityCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
   author user @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent CommunityCirclePost? @relation("PostReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies CommunityCirclePost[] @relation("PostReplies")
+  likes CommunityCirclePostLike[]
 
   @@index([circleId])
   @@index([authorId])
+  @@index([parentId])
   @@index([createdAt])
   @@map("community_circle_posts")
+}
+
+// Community Circle Post Likes
+model CommunityCirclePostLike {
+  id        String   @id @default(cuid())
+  postId    String   @db.VarChar(36)
+  userId    String   @db.VarChar(36)
+  createdAt DateTime @default(now())
+
+  // Relations
+  post CommunityCirclePost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("community_circle_post_likes")
 }
 
 // Community Circle Events (study sessions, workshops, etc.)
@@ -2022,7 +2061,7 @@ model CommunityCircleEvent {
   date         DateTime
   time         String   @db.VarChar(10) // HH:MM format
   duration     Int      // in minutes
-  type         String   @db.VarChar(50) // study-session, conversation, workshop, social
+  type         String   @db.VarChar(50) // study-session, conversation, workshop, social, live-class
   maxAttendees Int?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -2030,11 +2069,61 @@ model CommunityCircleEvent {
   // Relations
   circle CommunityCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
   creator user @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  attendees CommunityCircleEventAttendee[]
 
   @@index([circleId])
   @@index([createdBy])
   @@index([date])
+  @@index([type])
   @@map("community_circle_events")
+}
+
+// Community Circle Event Attendees
+model CommunityCircleEventAttendee {
+  id        String   @id @default(cuid())
+  eventId   String   @db.VarChar(36)
+  userId    String   @db.VarChar(36)
+  joinedAt  DateTime @default(now())
+  status    String   @default("REGISTERED") @db.VarChar(20) // REGISTERED, ATTENDED, NO_SHOW
+
+  // Relations
+  event CommunityCircleEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([status])
+  @@map("community_circle_event_attendees")
+}
+
+// Community Quiz Attempts
+model CommunityQuizAttempt {
+  id                String   @id @default(cuid())
+  userId            String   @db.VarChar(36)
+  quizId            String   @db.VarChar(36)
+  circleId          String?  @db.VarChar(36)
+  attemptNumber     Int      @default(1)
+  score             Int
+  percentage        Float
+  passed            Boolean
+  questionsAnswered Int
+  timeSpent         Int      // in seconds
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  status            String   @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, ABANDONED
+  
+  // Relations
+  user   user @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz   quizzes @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  circle CommunityCircle? @relation(fields: [circleId], references: [id], onDelete: SetNull)
+  
+  @@unique([userId, quizId, attemptNumber])
+  @@index([userId])
+  @@index([quizId])
+  @@index([circleId])
+  @@index([status])
+  @@map("community_quiz_attempts")
 }
 
 // Community Announcements (achievement sharing and community engagement)
