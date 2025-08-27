@@ -18,7 +18,7 @@ export async function PUT(
 
     const { id } = params;
     const body = await request.json();
-    const { name, description, price, currency, billingCycle, features, maxStudents, maxCourses, maxTeachers, isActive } = body;
+    const { name, description, price, currency, billingCycle, features, maxStudents, maxCourses, maxTeachers, maxLiveClasses, attendanceQuota, enrollmentQuota, isActive } = body;
 
     // Try to update in database first
     try {
@@ -34,6 +34,9 @@ export async function PUT(
           maxStudents,
           maxCourses,
           maxTeachers,
+          maxLiveClasses,
+          attendanceQuota,
+          enrollmentQuota,
           isActive,
           updatedAt: new Date(),
         }
@@ -55,6 +58,9 @@ export async function PUT(
         maxStudents,
         maxCourses,
         maxTeachers,
+        maxLiveClasses,
+        attendanceQuota,
+        enrollmentQuota,
         isActive,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

@@ -40,7 +40,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Video,
-  Target
+  Target,
+  Play,
+  Clock,
+  Mic,
+  Headphones
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -98,6 +102,10 @@ export default function CommunityLearningFeaturePage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+
+  // Live Conversations state
+  const [featuredConversations, setFeaturedConversations] = useState([])
+  const [loadingConversations, setLoadingConversations] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [filters, setFilters] = useState({
     language: 'all',
@@ -470,6 +478,25 @@ export default function CommunityLearningFeaturePage() {
     }
   }, [session, router])
 
+  // Fetch featured conversations on component mount
+  useEffect(() => {
+    const fetchFeaturedConversations = async () => {
+      try {
+        const response = await fetch('/api/community/featured-conversations');
+        if (response.ok) {
+          const data = await response.json();
+          setFeaturedConversations(data.featuredConversations || []);
+        }
+      } catch (error) {
+        console.error('Error fetching featured conversations:', error);
+      } finally {
+        setLoadingConversations(false);
+      }
+    };
+
+    fetchFeaturedConversations();
+  }, []);
+
   const handleLike = async (announcementId: string) => {
     try {
       const response = await fetch(`/api/community/announcements/${announcementId}/like`, {
@@ -765,20 +792,60 @@ export default function CommunityLearningFeaturePage() {
                       <p className="text-gray-600 mb-6">
                         Practice with native speakers and peers in real-time conversations
                       </p>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 text-sm text-gray-700">
-                          <Globe className="h-4 w-4 text-green-600" />
-                          <span>Native speakers</span>
+                      
+                      {loadingConversations ? (
+                        <div className="space-y-3">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                          <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-gray-700">
-                          <Video className="h-4 w-4 text-green-600" />
-                          <span>Real-time video</span>
+                      ) : featuredConversations.length > 0 ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 text-sm text-gray-700">
+                            <Clock className="h-4 w-4 text-green-600" />
+                            <span>{featuredConversations.length} sessions available</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-gray-700">
+                            <Users className="h-4 w-4 text-green-600" />
+                            <span>Join live conversations</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-gray-700">
+                            <Play className="h-4 w-4 text-green-600" />
+                            <span>Start practicing now</span>
+                          </div>
+                          <Button 
+                            onClick={() => router.push('/live-conversations')}
+                            className="w-full mt-4 bg-green-600 hover:bg-green-700"
+                            size="sm"
+                          >
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Browse Sessions
+                          </Button>
                         </div>
-                        <div className="flex items-center gap-3 text-sm text-gray-700">
-                          <Heart className="h-4 w-4 text-green-600" />
-                          <span>Cultural context</span>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 text-sm text-gray-700">
+                            <Globe className="h-4 w-4 text-green-600" />
+                            <span>Native speakers</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-gray-700">
+                            <Video className="h-4 w-4 text-green-600" />
+                            <span>Real-time video</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-sm text-gray-700">
+                            <Heart className="h-4 w-4 text-green-600" />
+                            <span>Cultural context</span>
+                          </div>
+                          <Button 
+                            onClick={() => router.push('/live-conversations')}
+                            className="w-full mt-4 bg-green-600 hover:bg-green-700"
+                            size="sm"
+                          >
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Start Conversations
+                          </Button>
                         </div>
-                      </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
@@ -1484,6 +1551,100 @@ export default function CommunityLearningFeaturePage() {
                      </Link>
                    </div>
                  </div>
+              </section>
+
+              {/* Live Conversations Section */}
+              <section id="live-conversations" className="mb-20">
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                    Live Conversations
+                  </h2>
+                  <p className="text-gray-600 text-lg">
+                    Practice languages in real-time with community members
+                  </p>
+                </div>
+
+                {loadingConversations ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map((i) => (
+                      <Card key={i} className="animate-pulse">
+                        <CardContent className="p-6">
+                          <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                          <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                          <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                          <div className="h-4 bg-gray-200 rounded"></div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : featuredConversations.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {featuredConversations.slice(0, 3).map((conversation) => (
+                      <Card key={conversation.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-green-500">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {new Date(conversation.startTime) > new Date() ? 'Starting Soon' : 'In Progress'}
+                            </Badge>
+                            <Badge variant="outline">{conversation.language}</Badge>
+                          </div>
+                          <h3 className="font-semibold text-lg mb-2">{conversation.title}</h3>
+                          <p className="text-sm text-gray-600 mb-4">{conversation.description || 'Join this conversation session'}</p>
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center space-x-2">
+                              <Users className="h-4 w-4 text-gray-500" />
+                              <span className="text-sm text-gray-600">{conversation.participantCount}/{conversation.maxParticipants} participants</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Clock className="h-4 w-4 text-gray-500" />
+                              <span className="text-sm text-gray-600">{conversation.duration} min</span>
+                            </div>
+                          </div>
+                          <Button 
+                            onClick={() => router.push(`/live-conversations/${conversation.id}`)}
+                            className="w-full bg-green-600 hover:bg-green-700"
+                            size="sm"
+                          >
+                            <Play className="h-4 w-4 mr-2" />
+                            Join Session
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Live Conversations Available</h3>
+                    <p className="text-gray-600 mb-4">Be the first to create a conversation session!</p>
+                    <Button 
+                      onClick={() => router.push('/live-conversations/create')}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create First Session
+                    </Button>
+                  </div>
+                )}
+
+                <div className="mt-8 text-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => router.push('/live-conversations/create')}
+                    className="mr-4"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create New Session
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => router.push('/live-conversations')}
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    View All Sessions
+                  </Button>
+                </div>
               </section>
 
               {/* Success Stories Section */}

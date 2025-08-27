@@ -24,6 +24,9 @@ interface SubscriptionPlan {
   maxStudents: number;
   maxCourses: number;
   maxTeachers: number;
+  maxLiveClasses?: number;
+  attendanceQuota?: number;
+  enrollmentQuota?: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -49,6 +52,9 @@ interface CreatePlanData {
   maxStudents: number;
   maxCourses: number;
   maxTeachers: number;
+  maxLiveClasses: number;
+  attendanceQuota: number;
+  enrollmentQuota: number;
 }
 
 // Available features that can be selected
@@ -56,6 +62,9 @@ const availableFeatures = [
   { key: 'maxStudents', name: 'Max Students', description: 'Maximum number of students allowed' },
   { key: 'maxCourses', name: 'Max Courses', description: 'Maximum number of courses allowed' },
   { key: 'maxTeachers', name: 'Max Teachers', description: 'Maximum number of teachers allowed' },
+  { key: 'maxLiveClasses', name: 'Max Live Classes', description: 'Maximum number of live classes per month' },
+  { key: 'attendanceQuota', name: 'Attendance Quota', description: 'Maximum attendance quota per month' },
+  { key: 'enrollmentQuota', name: 'Enrollment Quota', description: 'Maximum enrollment quota per month' },
   { key: 'basicAnalytics', name: 'Basic Analytics', description: 'Basic reporting and analytics' },
   { key: 'advancedAnalytics', name: 'Advanced Analytics', description: 'Advanced reporting and insights' },
   { key: 'emailSupport', name: 'Email Support', description: 'Email-based customer support' },
@@ -88,6 +97,9 @@ export default function SubscriptionPlansPage() {
     maxStudents: 10,
     maxCourses: 5,
     maxTeachers: 2,
+    maxLiveClasses: 4,
+    attendanceQuota: 20,
+    enrollmentQuota: 5,
   });
 
   // Load subscription plans and commission tiers
@@ -101,8 +113,8 @@ export default function SubscriptionPlansPage() {
         throw new Error('Failed to load subscription plans');
       }
 
-      const plansData: SubscriptionPlan[] = await plansResponse.json();
-      setPlans(plansData);
+      const plansData = await plansResponse.json();
+      setPlans(plansData.plans || []);
 
       // Load commission tiers
       const tiersResponse = await fetch('/api/admin/settings/commission-tiers');
@@ -110,8 +122,8 @@ export default function SubscriptionPlansPage() {
         throw new Error('Failed to load commission tiers');
       }
 
-      const tiersData: CommissionTier[] = await tiersResponse.json();
-      setCommissionTiers(tiersData);
+      const tiersData = await tiersResponse.json();
+      setCommissionTiers(Array.isArray(tiersData) ? tiersData : []);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -152,6 +164,9 @@ export default function SubscriptionPlansPage() {
         maxStudents: 10,
         maxCourses: 5,
         maxTeachers: 2,
+        maxLiveClasses: 4,
+        attendanceQuota: 20,
+        enrollmentQuota: 5,
       });
       loadData();
     } catch (err) {
@@ -238,7 +253,7 @@ export default function SubscriptionPlansPage() {
 
   // Load features from commission tier
   const loadFeaturesFromTier = (planType: string) => {
-    const tier = commissionTiers.find(t => t.planType === planType);
+    const tier = (commissionTiers || []).find(t => t.planType === planType);
     if (tier && tier.features) {
       const tierFeatures = Object.keys(tier.features).filter(key => tier.features[key] === true);
       setCreateFormData(prev => ({
@@ -373,6 +388,36 @@ export default function SubscriptionPlansPage() {
                   placeholder="2"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="maxLiveClasses">Max Live Classes per Month</Label>
+                <Input
+                  id="maxLiveClasses"
+                  type="number"
+                  value={createFormData.maxLiveClasses}
+                  onChange={(e) => setCreateFormData(prev => ({ ...prev, maxLiveClasses: parseInt(e.target.value) || 0 }))}
+                  placeholder="4"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="attendanceQuota">Attendance Quota per Month</Label>
+                <Input
+                  id="attendanceQuota"
+                  type="number"
+                  value={createFormData.attendanceQuota}
+                  onChange={(e) => setCreateFormData(prev => ({ ...prev, attendanceQuota: parseInt(e.target.value) || 0 }))}
+                  placeholder="20"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="enrollmentQuota">Enrollment Quota per Month</Label>
+                <Input
+                  id="enrollmentQuota"
+                  type="number"
+                  value={createFormData.enrollmentQuota}
+                  onChange={(e) => setCreateFormData(prev => ({ ...prev, enrollmentQuota: parseInt(e.target.value) || 0 }))}
+                  placeholder="5"
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
@@ -454,7 +499,7 @@ export default function SubscriptionPlansPage() {
 
       {/* Plans List */}
       <div className="grid gap-4">
-        {plans.length === 0 ? (
+        {(plans || []).length === 0 ? (
           <Card>
             <CardContent className="flex items-center justify-center h-32">
               <div className="text-center">
@@ -466,7 +511,7 @@ export default function SubscriptionPlansPage() {
             </CardContent>
           </Card>
         ) : (
-          plans.map((plan) => (
+          (plans || []).map((plan) => (
             <Card key={plan.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -518,6 +563,9 @@ export default function SubscriptionPlansPage() {
                     <Label className="text-sm font-medium">Limits</Label>
                     <p className="text-sm text-muted-foreground">
                       {plan.maxStudents} students • {plan.maxCourses} courses • {plan.maxTeachers} teachers
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {plan.maxLiveClasses || 0} live classes/month • {plan.attendanceQuota || 0} attendance quota • {plan.enrollmentQuota || 0} enrollments
                     </p>
                   </div>
                   <div>
@@ -594,6 +642,42 @@ export default function SubscriptionPlansPage() {
                           defaultValue={plan.maxCourses}
                           onChange={(e) => {
                             const updatedPlan = { ...plan, maxCourses: parseInt(e.target.value) || 0 };
+                            handleUpdatePlan(plan.id, updatedPlan);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`edit-max-live-classes-${plan.id}`}>Max Live Classes per Month</Label>
+                        <Input
+                          id={`edit-max-live-classes-${plan.id}`}
+                          type="number"
+                          defaultValue={plan.maxLiveClasses || 4}
+                          onChange={(e) => {
+                            const updatedPlan = { ...plan, maxLiveClasses: parseInt(e.target.value) || 0 };
+                            handleUpdatePlan(plan.id, updatedPlan);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`edit-attendance-quota-${plan.id}`}>Attendance Quota per Month</Label>
+                        <Input
+                          id={`edit-attendance-quota-${plan.id}`}
+                          type="number"
+                          defaultValue={plan.attendanceQuota || 20}
+                          onChange={(e) => {
+                            const updatedPlan = { ...plan, attendanceQuota: parseInt(e.target.value) || 0 };
+                            handleUpdatePlan(plan.id, updatedPlan);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`edit-enrollment-quota-${plan.id}`}>Enrollment Quota per Month</Label>
+                        <Input
+                          id={`edit-enrollment-quota-${plan.id}`}
+                          type="number"
+                          defaultValue={plan.enrollmentQuota || 5}
+                          onChange={(e) => {
+                            const updatedPlan = { ...plan, enrollmentQuota: parseInt(e.target.value) || 0 };
                             handleUpdatePlan(plan.id, updatedPlan);
                           }}
                         />

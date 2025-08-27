@@ -1,44 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { isBuildTime } from '@/lib/build-error-handler';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { SubscriptionManagementService } from '@/lib/subscription-management-service';
+import { LiveClassSubscriptionService } from '@/lib/live-class-subscription-service';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
-    // During build time, return fallback data immediately
-    if (isBuildTime()) {
-      return NextResponse.json([]);
-    }
-
-
     const session = await getServerSession(authOptions);
     
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const usage = await SubscriptionManagementService.getSubscriptionUsage(session.user.id);
-
-    if (!usage) {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: 'No subscription found' },
-        { status: 404 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      usage
-    });
-
+    const usage = await LiveClassSubscriptionService.getUserSubscriptionUsage(session.user.id);
+    
+    return NextResponse.json(usage);
   } catch (error) {
     console.error('Error getting subscription usage:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to get subscription usage' },
       { status: 500 }
     );
   }

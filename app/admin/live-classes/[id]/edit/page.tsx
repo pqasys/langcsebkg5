@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Instructor {
@@ -184,10 +184,21 @@ export default function EditLiveClassPage() {
   };
 
   const handleInputChange = (field: keyof LiveClass, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [field]: value
+      };
+
+      // Auto-compute end time when start time changes (60-minute duration)
+      if (field === 'startTime' && value) {
+        const startTime = new Date(value);
+        const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // Add 60 minutes
+        updated.endTime = endTime.toISOString().slice(0, 16); // Format for datetime-local input
+      }
+
+      return updated;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -388,13 +399,14 @@ export default function EditLiveClassPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="endTime">End Time *</Label>
+                <Label htmlFor="endTime">End Time (Auto-calculated)</Label>
                 <Input
                   id="endTime"
                   type="datetime-local"
                   value={formData.endTime}
-                  onChange={(e) => handleInputChange('endTime', e.target.value)}
-                  required
+                  readOnly
+                  className="bg-gray-50 cursor-not-allowed"
+                  title="End time is automatically calculated as 60 minutes after start time"
                 />
               </div>
               <div>
@@ -408,6 +420,13 @@ export default function EditLiveClassPage() {
                   max="480"
                 />
               </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 p-3 rounded-md">
+              <Clock className="h-4 w-4" />
+              <span>
+                <strong>Live class duration is fixed at 60 minutes.</strong> End time is automatically calculated when you set the start time.
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

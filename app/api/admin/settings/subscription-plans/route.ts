@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, price, currency, billingCycle, features, maxStudents, maxCourses, maxTeachers } = body;
+    const { name, description, price, currency, billingCycle, features, maxStudents, maxCourses, maxTeachers, maxLiveClasses, attendanceQuota, enrollmentQuota } = body;
 
     // Try to save to database first
     try {
@@ -134,6 +134,9 @@ export async function POST(request: NextRequest) {
           maxStudents,
           maxCourses,
           maxTeachers,
+          maxLiveClasses,
+          attendanceQuota,
+          enrollmentQuota,
           isActive: true,
         }
       });
@@ -154,6 +157,9 @@ export async function POST(request: NextRequest) {
         maxStudents,
         maxCourses,
         maxTeachers,
+        maxLiveClasses,
+        attendanceQuota,
+        enrollmentQuota,
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -182,7 +188,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, name, description, price, currency, billingCycle, features, maxStudents, maxCourses, maxTeachers, isActive } = body;
+    const { id, name, description, price, currency, billingCycle, features, maxStudents, maxCourses, maxTeachers, maxLiveClasses, attendanceQuota, enrollmentQuota, isActive } = body;
 
     // Try to update in database first
     try {
@@ -198,6 +204,9 @@ export async function PUT(request: NextRequest) {
           maxStudents,
           maxCourses,
           maxTeachers,
+          maxLiveClasses,
+          attendanceQuota,
+          enrollmentQuota,
           isActive,
           updatedAt: new Date(),
         }
@@ -219,6 +228,9 @@ export async function PUT(request: NextRequest) {
         maxStudents,
         maxCourses,
         maxTeachers,
+        maxLiveClasses,
+        attendanceQuota,
+        enrollmentQuota,
         isActive,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()

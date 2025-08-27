@@ -162,6 +162,19 @@ model user {
   certificates               Certificate[]
   userAchievements           UserAchievement[]
   languageProficiencyTestAttempts LanguageProficiencyTestAttempt[]
+  
+  // Language threshold management
+  languageThresholdsCreated  LanguageAttendanceThreshold[] @relation("LanguageThresholdCreatedBy")
+  languageThresholdsUpdated  LanguageAttendanceThreshold[] @relation("LanguageThresholdUpdatedBy")
+  
+  // Video session attendance tracking
+  videoSessionAttendances VideoSessionAttendance[]
+  
+  // A/B testing
+  abTests ABTest[]
+  
+  // Monitoring and alerts
+  alertRules AlertRule[]
 
   @@index([institutionId], map: "user_institutionId_fkey")
   @@index([profileVisibility])
@@ -665,11 +678,22 @@ model VideoSession {
   recurringPatternId String?
   sessionNumber      Int?
 
+  // Minimum attendance threshold fields for profitability
+  minAttendanceThreshold Int      @default(4) // Minimum students required for class to run
+  profitMarginThreshold  Int      @default(8) // Minimum students for platform to earn profit
+  instructorHourlyRate   Float    @default(25.0) // Instructor cost per hour
+  platformRevenuePerStudent Float @default(24.99) // Revenue per premium subscriber
+  autoCancelIfBelowThreshold Boolean @default(true) // Auto-cancel if below minimum
+  cancellationDeadline   DateTime? // Deadline for cancellation (e.g., 24h before class)
+  attendanceCheckTime    DateTime? // When to check attendance threshold
+  thresholdCheckStatus   String    @default("PENDING") @db.VarChar(20) // PENDING, PASSED, FAILED, CANCELLED
+
   // Relations
   instructor user @relation(fields: [instructorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   participants VideoSessionParticipant[]
   likes VideoSessionLike[]
+  attendances VideoSessionAttendance[]
 
   @@index([instructorId])
   @@index([courseId])
@@ -681,6 +705,8 @@ model VideoSession {
   @@index([moduleId], map: "video_sessions_moduleId_fkey")
   @@index([recurringPatternId])
   @@index([isRecurring])
+  @@index([thresholdCheckStatus])
+  @@index([attendanceCheckTime])
   @@map("video_sessions")
 }
 
@@ -697,6 +723,136 @@ model VideoSessionLike {
   @@index([sessionId])
   @@index([userId])
   @@map("video_session_likes")
+}
+
+model VideoSessionAttendance {
+  id        String    @id @default(uuid()) @db.VarChar(36)
+  userId    String    @db.VarChar(36)
+  sessionId String    @db.VarChar(36)
+  attended  Boolean   @default(false)
+  attendedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  user    user         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session VideoSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId])
+  @@index([userId])
+  @@index([sessionId])
+  @@index([attendedAt])
+  @@index([createdAt])
+  @@map("video_session_attendances")
+}
+
+model ABTest {
+  id                    String    @id @default(uuid()) @db.VarChar(36)
+  name                  String    @db.VarChar(255)
+  description           String?   @db.Text
+  language              String    @db.VarChar(50)
+  country               String?   @db.VarChar(100)
+  region                String?   @db.VarChar(100)
+  variantAThreshold     Int       @default(5)
+  variantAProfitMargin  Float     @default(20.0)
+  variantAInstructorRate Float    @default(50.0)
+  variantAPlatformRevenue Float   @default(15.0)
+  variantBThreshold     Int       @default(5)
+  variantBProfitMargin  Float     @default(20.0)
+  variantBInstructorRate Float    @default(50.0)
+  variantBPlatformRevenue Float   @default(15.0)
+  trafficSplit          Int       @default(50) // percentage to variant B
+  startDate             DateTime
+  endDate               DateTime
+  status                String    @default("DRAFT") @db.VarChar(20) // DRAFT, ACTIVE, PAUSED, COMPLETED
+  createdBy             String    @db.VarChar(36)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  createdByUser user    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  sessions     ABTestSession[]
+
+  @@index([language])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([createdBy])
+  @@map("ab_tests")
+}
+
+model ABTestSession {
+  id        String    @id @default(uuid()) @db.VarChar(36)
+  testId    String    @db.VarChar(36)
+  variant   String    @db.VarChar(1) // A or B
+  sessionId String    @db.VarChar(36)
+  attendance Int      @default(0)
+  revenue   Float     @default(0.0)
+  cost      Float     @default(0.0)
+  profit    Float     @default(0.0)
+  createdAt DateTime  @default(now())
+
+  test    ABTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@index([testId])
+  @@index([variant])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("ab_test_sessions")
+}
+
+model AlertRule {
+  id                    String    @id @default(uuid()) @db.VarChar(36)
+  name                  String    @db.VarChar(255)
+  description           String?   @db.Text
+  language              String    @db.VarChar(50)
+  country               String?   @db.VarChar(100)
+  region                String?   @db.VarChar(100)
+  metric                String    @db.VarChar(50) // CANCELLATION_RATE, PROFIT_MARGIN, etc.
+  operator              String    @db.VarChar(20) // GREATER_THAN, LESS_THAN, etc.
+  threshold             Float
+  timeWindow            Int       @default(60) // in minutes
+  severity              String    @default("MEDIUM") @db.VarChar(20) // LOW, MEDIUM, HIGH, CRITICAL
+  enabled               Boolean   @default(true)
+  notificationChannels  String    @db.Text // JSON array of channels
+  createdBy             String    @db.VarChar(36)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  createdByUser user    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  alerts       Alert[]
+
+  @@index([language])
+  @@index([enabled])
+  @@index([severity])
+  @@index([createdBy])
+  @@map("alert_rules")
+}
+
+model Alert {
+  id              String    @id @default(uuid()) @db.VarChar(36)
+  ruleId          String    @db.VarChar(36)
+  language        String    @db.VarChar(50)
+  country         String?   @db.VarChar(100)
+  region          String?   @db.VarChar(100)
+  metric          String    @db.VarChar(50)
+  currentValue    Float
+  threshold       Float
+  severity        String    @db.VarChar(20)
+  message         String    @db.Text
+  status          String    @default("ACTIVE") @db.VarChar(20) // ACTIVE, ACKNOWLEDGED, RESOLVED
+  triggeredAt     DateTime  @default(now())
+  acknowledgedAt  DateTime?
+  resolvedAt      DateTime?
+  acknowledgedBy  String?   @db.VarChar(36)
+
+  rule AlertRule  @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([ruleId])
+  @@index([language])
+  @@index([status])
+  @@index([severity])
+  @@index([triggeredAt])
+  @@map("alerts")
 }
 
 model RecurringSessionPattern {
@@ -2324,5 +2480,33 @@ model UserAchievement {
   @@index([type])
   @@index([createdAt])
   @@map("user_achievements")
+}
+
+model LanguageAttendanceThreshold {
+  id                        String   @id @default(uuid()) @db.VarChar(36)
+  language                  String   @db.VarChar(10) // Language code (e.g., "en", "es", "fr")
+  country                   String?  @db.VarChar(50) // Optional country code (e.g., "US", "UK", "CA")
+  region                    String?  @db.VarChar(50) // Optional region (e.g., "North America", "Europe")
+  minAttendanceThreshold    Int      @default(4) // Minimum students required for class to run
+  profitMarginThreshold     Int      @default(8) // Minimum students for platform to earn profit
+  instructorHourlyRate      Float    @default(25.0) // Instructor cost per hour for this language/region
+  platformRevenuePerStudent Float    @default(24.99) // Revenue per student for this language/region
+  autoCancelIfBelowThreshold Boolean @default(true) // Auto-cancel if below minimum
+  cancellationDeadlineHours Int      @default(24) // Hours before class to check
+  isActive                  Boolean  @default(true) // Whether this threshold configuration is active
+  priority                  Int      @default(0) // Priority for matching (higher = more specific)
+  notes                     String?  @db.Text // Admin notes about this configuration
+  createdBy                 String   @db.VarChar(36) // Admin who created this configuration
+  updatedBy                 String   @db.VarChar(36) // Admin who last updated this configuration
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  // Relations
+  createdByUser             user     @relation("LanguageThresholdCreatedBy", fields: [createdBy], references: [id])
+  updatedByUser             user     @relation("LanguageThresholdUpdatedBy", fields: [updatedBy], references: [id])
+
+  @@unique([language, country, region])
+  @@index([language, country, region, isActive])
+  @@index([priority])
 }
 
