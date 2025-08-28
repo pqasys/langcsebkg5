@@ -50,6 +50,8 @@ export default function MainNav() {
         return '/admin/dashboard';
       case 'INSTITUTION':
         return '/institution/dashboard';
+      case 'INSTRUCTOR':
+        return '/instructor/dashboard';
       case 'STUDENT':
         return '/student';
       default:

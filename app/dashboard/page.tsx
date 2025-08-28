@@ -20,6 +20,8 @@ export default async function DashboardPage() {
   // Redirect based on user role
   if (session.user.role === "INSTITUTION") {
     redirect("/institution/dashboard");
+  } else if (session.user.role === "INSTRUCTOR") {
+    redirect("/instructor/dashboard");
   } else if (session.user.role === "ADMIN") {
     redirect("/admin/dashboard");
   } else if (session.user.role === "STUDENT") {

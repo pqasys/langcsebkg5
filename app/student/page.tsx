@@ -44,6 +44,7 @@ import { QuizProgress } from '@/components/student/QuizProgress';
 import LearningPath from '@/app/components/student/LearningPath';
 import ProgressVisualization from '@/app/components/student/ProgressVisualization';
 import PersonalizedRecommendations from '@/app/components/student/PersonalizedRecommendations';
+import HostProgressionCard from '@/components/student/HostProgressionCard';
 
 interface CourseProgress {
   id: string;
@@ -831,6 +832,13 @@ export default function StudentDashboard() {
             </Card>
           </div>
         </TabsContent>
+
+        {/* Host Progression Section - Only show if user is a host */}
+        {session?.user?.id && (
+          <div className="mb-6 sm:mb-8">
+            <HostProgressionCard userId={session.user.id} />
+          </div>
+        )}
 
         {/* Progress Tab */}
         <TabsContent value="progress" className="space-y-6">

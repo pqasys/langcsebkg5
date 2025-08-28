@@ -80,6 +80,12 @@ const navItems = [
     description: 'Take the free language proficiency test'
   },
   {
+    title: 'Host Dashboard',
+    href: '/student/host-dashboard',
+    icon: MessageSquare,
+    description: 'Manage your hosted conversations'
+  },
+  {
     title: 'Settings',
     href: '/student/settings',
     icon: Settings,

@@ -137,6 +137,13 @@ model user {
   videoSessions VideoSession[]
   liveConversationsHosted     LiveConversation[]        @relation("LiveConversationHost")
   liveConversationsInstructed LiveConversation[]        @relation("LiveConversationInstructor")
+  liveConversationParticipants LiveConversationParticipant[]
+  instructorCommissions InstructorCommission[]
+  instructorPayouts InstructorPayout[]
+  instructorCommissionTierAssignments InstructorCommissionTierAssignment[]
+  hostCommissions HostCommission[]
+  hostPayouts HostPayout[]
+  hostCommissionTierAssignments HostCommissionTierAssignment[]
   communityAnnouncements CommunityAnnouncement[]
   communityCircles CommunityCircle[]
   circlePosts CommunityCirclePost[]
@@ -678,6 +685,11 @@ model VideoSession {
   recurringPatternId String?
   sessionNumber      Int?
 
+  // NEW: Credit-based pricing for unified model
+  creditPrice        Int      @default(30) // Credits required for this session
+  isCreditBased      Boolean  @default(false) // Whether this session uses credit pricing
+  instructorCommissionRate Float @default(70.0) // Commission rate for instructor
+
   // Minimum attendance threshold fields for profitability
   minAttendanceThreshold Int      @default(4) // Minimum students required for class to run
   profitMarginThreshold  Int      @default(8) // Minimum students for platform to earn profit
@@ -694,6 +706,7 @@ model VideoSession {
   participants VideoSessionParticipant[]
   likes VideoSessionLike[]
   attendances VideoSessionAttendance[]
+  instructorCommissions InstructorCommission[] // NEW: Commission tracking
 
   @@index([instructorId])
   @@index([courseId])
@@ -707,6 +720,7 @@ model VideoSession {
   @@index([isRecurring])
   @@index([thresholdCheckStatus])
   @@index([attendanceCheckTime])
+  @@index([isCreditBased])
   @@map("video_sessions")
 }
 
@@ -958,6 +972,11 @@ model LiveConversation {
   updatedAt           DateTime @default(now()) @updatedAt
   metadata            Json?
 
+  // NEW: Credit-based pricing for unified model
+  creditPrice        Int      @default(25) // Credits required for this conversation
+  isCreditBased      Boolean  @default(false) // Whether this conversation uses credit pricing
+  hostCommissionRate Float    @default(70.0) // Commission rate for host
+
   // Per-session subscription gating
   requiresSubscription   Boolean @default(false)
   allowedStudentTiers    Json?
@@ -968,6 +987,7 @@ model LiveConversation {
   instructor user?    @relation("LiveConversationInstructor", fields: [instructorId], references: [id])
   participants LiveConversationParticipant[]
   bookings     LiveConversationBooking[]
+  hostCommissions HostCommission[] // NEW: Commission tracking
 
   @@index([instructorId])
   @@index([hostId])
@@ -977,6 +997,7 @@ model LiveConversation {
   @@index([level])
   @@index([conversationType])
   @@index([isFree])
+  @@index([isCreditBased])
   @@map("live_conversations")
 }
 
@@ -997,6 +1018,7 @@ model LiveConversationParticipant {
 
   // Relations
   conversation LiveConversation @relation(fields: [conversationId], references: [id])
+  user         user             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([conversationId, userId])
   @@index([conversationId])
@@ -1049,7 +1071,7 @@ model LiveConversationBooking {
   @@index([conversationId])
   @@index([status])
   @@index([paymentStatus])
-  @@index([userId])
+  @@index([bookedAt])
   @@map("live_conversation_bookings")
 }
 
@@ -2508,5 +2530,207 @@ model LanguageAttendanceThreshold {
   @@unique([language, country, region])
   @@index([language, country, region, isActive])
   @@index([priority])
+}
+
+// NEW: Commission tracking models for unified revenue system
+
+model InstructorCommission {
+  id                 String   @id @default(uuid()) @db.VarChar(36)
+  instructorId       String   @db.VarChar(36)
+  sessionId          String   @db.VarChar(36)
+  sessionPrice       Float    @default(0)
+  creditPrice        Int      @default(0)
+  commissionAmount   Float    @default(0)
+  commissionRate     Float    @default(70.0)
+  status             String   @default("PENDING") @db.VarChar(20) // PENDING, PROCESSED, PAID
+  payoutId           String?  @db.VarChar(36)
+  sessionType        String   @default("LIVE_CLASS") @db.VarChar(20) // LIVE_CLASS, LIVE_CONVERSATION
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+  metadata           Json?
+
+  // Relations
+  instructor user @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  session VideoSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  payout InstructorPayout? @relation(fields: [payoutId], references: [id])
+
+  @@index([instructorId])
+  @@index([sessionId])
+  @@index([status])
+  @@index([sessionType])
+  @@index([createdAt])
+  @@map("instructor_commissions")
+}
+
+model InstructorPayout {
+  id                 String   @id @default(uuid()) @db.VarChar(36)
+  instructorId       String   @db.VarChar(36)
+  amount             Float    @default(0)
+  status             String   @default("PENDING") @db.VarChar(20) // PENDING, PROCESSING, COMPLETED, FAILED
+  stripePayoutId     String?  @db.VarChar(255)
+  scheduledDate      DateTime @default(now())
+  processedDate      DateTime?
+  payoutMethod       String   @default("STRIPE") @db.VarChar(20)
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  // Relations
+  instructor user @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  commissions InstructorCommission[]
+
+  @@index([instructorId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([processedDate])
+  @@map("instructor_payouts")
+}
+
+model HostCommission {
+  id                 String   @id @default(uuid()) @db.VarChar(36)
+  hostId             String   @db.VarChar(36)
+  conversationId     String   @db.VarChar(36)
+  sessionPrice       Float    @default(0)
+  creditPrice        Int      @default(0)
+  commissionAmount   Float    @default(0)
+  commissionRate     Float    @default(70.0)
+  status             String   @default("PENDING") @db.VarChar(20) // PENDING, PROCESSED, PAID
+  payoutId           String?  @db.VarChar(36)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+  metadata           Json?
+
+  // Relations
+  host user @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  conversation LiveConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  payout HostPayout? @relation(fields: [payoutId], references: [id])
+
+  @@index([hostId])
+  @@index([conversationId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("host_commissions")
+}
+
+model HostPayout {
+  id                 String   @id @default(uuid()) @db.VarChar(36)
+  hostId             String   @db.VarChar(36)
+  amount             Float    @default(0)
+  status             String   @default("PENDING") @db.VarChar(20) // PENDING, PROCESSING, COMPLETED, FAILED
+  stripePayoutId     String?  @db.VarChar(255)
+  scheduledDate      DateTime @default(now())
+  processedDate      DateTime?
+  payoutMethod       String   @default("STRIPE") @db.VarChar(20)
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  // Relations
+  host user @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  commissions HostCommission[]
+
+  @@index([hostId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([processedDate])
+  @@map("host_payouts")
+}
+
+model InstructorCommissionTier {
+  id                 String   @id @default(uuid()) @db.VarChar(36)
+  tierName           String   @db.VarChar(20) // BRONZE, SILVER, GOLD, PLATINUM, DIAMOND
+  displayName        String   @db.VarChar(100)
+  commissionRate     Float    @default(70.0)
+  minSessions        Int      @default(0)
+  maxSessions        Int?
+  requirements       String   @db.Text
+  benefits           Json     // Array of benefits
+  color              String   @db.VarChar(7) // Hex color code
+  effectiveDate      DateTime @default(now())
+  endDate            DateTime?
+  isActive           Boolean  @default(true)
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  // Relations
+  assignments InstructorCommissionTierAssignment[]
+
+  @@index([tierName])
+  @@index([effectiveDate])
+  @@index([endDate])
+  @@index([isActive])
+  @@map("instructor_commission_tiers")
+}
+
+model HostCommissionTier {
+  id                 String   @id @default(uuid()) @db.VarChar(36)
+  tierName           String   @db.VarChar(20) // COMMUNITY, ACTIVE, EXPERIENCED, PROFESSIONAL, MASTER
+  displayName        String   @db.VarChar(100)
+  commissionRate     Float    @default(70.0)
+  minConversations   Int      @default(0)
+  maxConversations   Int?
+  requirements       String   @db.Text
+  benefits           Json     // Array of benefits
+  color              String   @db.VarChar(7) // Hex color code
+  effectiveDate      DateTime @default(now())
+  endDate            DateTime?
+  isActive           Boolean  @default(true)
+  metadata           Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  // Relations
+  assignments HostCommissionTierAssignment[]
+
+  @@index([tierName])
+  @@index([effectiveDate])
+  @@index([endDate])
+  @@index([isActive])
+  @@map("host_commission_tiers")
+}
+
+model InstructorCommissionTierAssignment {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  instructorId String   @db.VarChar(36)
+  tierId       String   @db.VarChar(36)
+  startDate    DateTime @default(now())
+  endDate      DateTime?
+  assignedBy   String   @db.VarChar(36)
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+
+  // Relations
+  instructor user @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+  tier InstructorCommissionTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@index([instructorId])
+  @@index([tierId])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("instructor_commission_tier_assignments")
+}
+
+model HostCommissionTierAssignment {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  hostId    String   @db.VarChar(36)
+  tierId    String   @db.VarChar(36)
+  startDate DateTime @default(now())
+  endDate   DateTime?
+  assignedBy String  @db.VarChar(36)
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  // Relations
+  host user @relation(fields: [hostId], references: [id], onDelete: Cascade)
+  tier HostCommissionTier @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@index([hostId])
+  @@index([tierId])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("host_commission_tier_assignments")
 }
 
