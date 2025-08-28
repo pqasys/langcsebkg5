@@ -145,3 +145,4 @@ export default function InstructorSidebar() {
     </div>
   );
 }
+

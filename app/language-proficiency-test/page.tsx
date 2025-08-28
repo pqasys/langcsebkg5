@@ -92,7 +92,7 @@ const AVAILABLE_LANGUAGES: Language[] = [
     code: 'pt',
     name: 'Portuguese',
     flag: '🇵🇹',
-    status: 'coming-soon',
+    status: 'available',
     description: 'Proficiency Test'
   },
   {
@@ -598,7 +598,7 @@ export default function LanguageProficiencyTestPage() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Questions:</span>
-                    <Badge variant="outline">80 questions</Badge>
+                    <Badge variant="outline">160 questions</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Time Limit:</span>
@@ -625,27 +625,27 @@ export default function LanguageProficiencyTestPage() {
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">A1 - Beginner</span>
-                    <Badge variant="secondary">0-15 points</Badge>
+                    <Badge variant="secondary">0-30 points</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">A2 - Elementary</span>
-                    <Badge variant="secondary">16-30 points</Badge>
+                    <Badge variant="secondary">31-60 points</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">B1 - Intermediate</span>
-                    <Badge variant="secondary">31-45 points</Badge>
+                    <Badge variant="secondary">61-90 points</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">B2 - Upper Intermediate</span>
-                    <Badge variant="secondary">46-55 points</Badge>
+                    <Badge variant="secondary">91-110 points</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">C1 - Advanced</span>
-                    <Badge variant="secondary">56-70 points</Badge>
+                    <Badge variant="secondary">111-140 points</Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">C2 - Proficient</span>
-                    <Badge variant="secondary">71-80 points</Badge>
+                    <Badge variant="secondary">141-160 points</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -666,7 +666,7 @@ export default function LanguageProficiencyTestPage() {
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-blue-600 mb-2">
-                    {testResults.score}/80
+                    {testResults.score}/160
                   </div>
                   <div className="text-sm text-gray-600">Total Score</div>
                 </div>
@@ -678,7 +678,7 @@ export default function LanguageProficiencyTestPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-purple-600 mb-2">
-                    {Math.round((testResults.score / 80) * 100)}%
+                    {Math.round((testResults.score / 160) * 100)}%
                   </div>
                   <div className="text-sm text-gray-600">Percentage</div>
                 </div>
