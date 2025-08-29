@@ -1,7 +1,5 @@
 import { prisma } from '@/lib/prisma';
 import { FluentShipCertificateGeneratorSecure, CertificateData } from '@/lib/certificate-generator-secure';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 
 export interface AchievementCriteria {
   type: string;
@@ -97,14 +95,18 @@ export class CertificateServiceSecure {
 
     const languageName = languageNames[testAttempt.languageCode] || testAttempt.languageCode;
 
+    // Calculate total questions from answers
+    const answers = testAttempt.answers as Record<string, string>;
+    const totalQuestions = Object.keys(answers).length;
+
     // Create certificate data
     const certificateData: CertificateData = {
       userName: testAttempt.user.name || 'Student',
       language: testAttempt.languageCode,
       languageName: languageName,
-      cefrLevel: testAttempt.cefrLevel,
+      cefrLevel: testAttempt.level, // Use 'level' field from the model
       score: testAttempt.score,
-      totalQuestions: testAttempt.totalQuestions,
+      totalQuestions: totalQuestions, // Calculate from actual answers
       completionDate: testAttempt.completedAt?.toLocaleDateString() || new Date().toLocaleDateString(),
       certificateId: certificateId,
       testType: 'proficiency'
@@ -117,38 +119,21 @@ export class CertificateServiceSecure {
     const certificate = await prisma.certificate.create({
       data: {
         id: certificateId,
+        certificateId: certificateId,
         userId: testAttempt.userId,
         testAttemptId: testAttemptId,
-        languageCode: testAttempt.languageCode,
-        cefrLevel: testAttempt.cefrLevel,
+        language: testAttempt.languageCode,
+        languageName: languageName,
+        cefrLevel: testAttempt.level, // Use 'level' field from the model
         score: testAttempt.score,
-        totalQuestions: testAttempt.totalQuestions,
-        certificateData: certificateData,
-        pdfData: pdfBuffer,
-        issuedAt: new Date(),
-        expiresAt: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000), // 5 years
-        isActive: true
+        totalQuestions: totalQuestions, // Use calculated total questions
+        completionDate: testAttempt.completedAt,
+        certificateUrl: `/certificates/${certificateId}`
       }
     });
 
-    // Save PDF file to disk (optional)
-    try {
-      const uploadDir = join(process.cwd(), 'public', 'certificates');
-      await mkdir(uploadDir, { recursive: true });
-      
-      const fileName = `${certificateId}.pdf`;
-      const filePath = join(uploadDir, fileName);
-      await writeFile(filePath, pdfBuffer);
-      
-      // Update certificate with file path
-      await prisma.certificate.update({
-        where: { id: certificateId },
-        data: { filePath: `/certificates/${fileName}` }
-      });
-    } catch (error) {
-      console.error('Error saving certificate file:', error);
-      // Continue without file path - PDF is still stored in database
-    }
+    // Note: PDF file saving is disabled for browser compatibility
+    // The certificate data is stored in the database and can be generated on-demand
 
     // Check for achievements
     await this.checkAndAwardAchievements(testAttempt.userId, certificate);
@@ -159,35 +144,61 @@ export class CertificateServiceSecure {
   static async getUserCertificates(userId: string): Promise<any[]> {
     const certificates = await prisma.certificate.findMany({
       where: {
-        userId: userId,
-        isActive: true
+        userId: userId
       },
       orderBy: {
-        issuedAt: 'desc'
+        createdAt: 'desc'
       },
       select: {
         id: true,
-        languageCode: true,
+        certificateId: true,
+        language: true,
+        languageName: true,
         cefrLevel: true,
         score: true,
         totalQuestions: true,
-        issuedAt: true,
-        expiresAt: true,
-        filePath: true,
-        certificateData: true
+        completionDate: true,
+        certificateUrl: true,
+        isPublic: true,
+        sharedAt: true,
+        createdAt: true
       }
     });
 
-    return certificates.map(cert => ({
-      ...cert,
-      percentage: Math.round((cert.score / cert.totalQuestions) * 100),
-      isExpired: new Date() > cert.expiresAt
-    }));
+    // Get achievements for each certificate
+    const certificatesWithAchievements = await Promise.all(
+      certificates.map(async (cert) => {
+        const achievements = await prisma.userAchievement.findMany({
+          where: {
+            userId: userId,
+            certificateId: cert.id
+          },
+          select: {
+            id: true,
+            type: true,
+            title: true,
+            description: true,
+            icon: true,
+            color: true,
+            createdAt: true
+          }
+        });
+
+        return {
+          ...cert,
+          percentage: Math.round((cert.score / cert.totalQuestions) * 100),
+          isExpired: false, // Certificates don't expire in this schema
+          achievements: achievements
+        };
+      })
+    );
+
+    return certificatesWithAchievements;
   }
 
   static async getCertificateById(certificateId: string): Promise<any> {
     const certificate = await prisma.certificate.findUnique({
-      where: { id: certificateId },
+      where: { certificateId: certificateId },
       include: {
         user: {
           select: {
@@ -198,9 +209,8 @@ export class CertificateServiceSecure {
         testAttempt: {
           select: {
             languageCode: true,
-            cefrLevel: true,
+            level: true,
             score: true,
-            totalQuestions: true,
             completedAt: true
           }
         }
@@ -214,8 +224,8 @@ export class CertificateServiceSecure {
     return {
       ...certificate,
       percentage: Math.round((certificate.score / certificate.totalQuestions) * 100),
-      isExpired: new Date() > certificate.expiresAt,
-      isValid: certificate.isActive && new Date() <= certificate.expiresAt
+      isExpired: false, // Certificates don't expire in this schema
+      isValid: true
     };
   }
 
@@ -261,35 +271,17 @@ export class CertificateServiceSecure {
   }
 
   static async getCertificateStats(): Promise<any> {
-    const totalCertificates = await prisma.certificate.count({
-      where: { isActive: true }
-    });
-
-    const activeCertificates = await prisma.certificate.count({
-      where: {
-        isActive: true,
-        expiresAt: { gt: new Date() }
-      }
-    });
-
-    const expiredCertificates = await prisma.certificate.count({
-      where: {
-        isActive: true,
-        expiresAt: { lte: new Date() }
-      }
-    });
+    const totalCertificates = await prisma.certificate.count();
 
     const certificatesByLanguage = await prisma.certificate.groupBy({
-      by: ['languageCode'],
-      where: { isActive: true },
+      by: ['language'],
       _count: {
-        languageCode: true
+        language: true
       }
     });
 
     const certificatesByLevel = await prisma.certificate.groupBy({
       by: ['cefrLevel'],
-      where: { isActive: true },
       _count: {
         cefrLevel: true
       }
@@ -297,11 +289,11 @@ export class CertificateServiceSecure {
 
     return {
       total: totalCertificates,
-      active: activeCertificates,
-      expired: expiredCertificates,
+      active: totalCertificates, // All certificates are active in this schema
+      expired: 0, // Certificates don't expire in this schema
       byLanguage: certificatesByLanguage.map(item => ({
-        language: item.languageCode,
-        count: item._count.languageCode
+        language: item.language,
+        count: item._count.language
       })),
       byLevel: certificatesByLevel.map(item => ({
         level: item.cefrLevel,
@@ -310,18 +302,52 @@ export class CertificateServiceSecure {
     };
   }
 
+  static async getUserStats(userId: string): Promise<any> {
+    const userCertificates = await prisma.certificate.findMany({
+      where: { userId: userId }
+    });
+
+    const totalCertificates = userCertificates.length;
+    const totalAchievements = await prisma.userAchievement.count({
+      where: { userId: userId }
+    });
+
+    const averageScore = totalCertificates > 0 
+      ? Math.round(userCertificates.reduce((sum, cert) => sum + (cert.score / cert.totalQuestions * 100), 0) / totalCertificates)
+      : 0;
+
+    const languagesTested = new Set(userCertificates.map(cert => cert.language)).size;
+
+    const highestLevel = userCertificates.length > 0 
+      ? userCertificates.reduce((highest, cert) => {
+          const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+          const currentIndex = levels.indexOf(cert.cefrLevel);
+          const highestIndex = levels.indexOf(highest);
+          return currentIndex > highestIndex ? cert.cefrLevel : highest;
+        }, 'A1')
+      : 'A1';
+
+    return {
+      totalCertificates,
+      totalAchievements,
+      averageScore,
+      languagesTested,
+      highestLevel
+    };
+  }
+
   private static async checkAndAwardAchievements(userId: string, certificate: any): Promise<void> {
     // Get user's certificate history
     const userHistory = await prisma.certificate.findMany({
       where: { userId: userId },
-      orderBy: { issuedAt: 'asc' }
+      orderBy: { createdAt: 'asc' }
     });
 
     // Check each achievement criteria
     for (const criteria of this.ACHIEVEMENT_CRITERIA) {
       if (criteria.condition(certificate, userHistory)) {
         // Check if achievement already exists
-        const existingAchievement = await prisma.achievement.findFirst({
+        const existingAchievement = await prisma.userAchievement.findFirst({
           where: {
             userId: userId,
             type: criteria.type
@@ -330,7 +356,7 @@ export class CertificateServiceSecure {
 
         if (!existingAchievement) {
           // Award new achievement
-          await prisma.achievement.create({
+          await prisma.userAchievement.create({
             data: {
               userId: userId,
               type: criteria.type,
@@ -338,7 +364,6 @@ export class CertificateServiceSecure {
               description: criteria.description,
               icon: criteria.icon,
               color: criteria.color,
-              awardedAt: new Date(),
               certificateId: certificate.id
             }
           });
@@ -348,9 +373,9 @@ export class CertificateServiceSecure {
   }
 
   static async getUserAchievements(userId: string): Promise<any[]> {
-    return await prisma.achievement.findMany({
+    return await prisma.userAchievement.findMany({
       where: { userId: userId },
-      orderBy: { awardedAt: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
   }
 }

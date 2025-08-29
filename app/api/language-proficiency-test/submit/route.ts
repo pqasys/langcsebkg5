@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { CertificateServiceSecure } from '@/lib/services/certificate-service-secure';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
@@ -16,56 +17,46 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { userId, score, level, answers, timeSpent } = body;
+    const { userId, score, level, answers, timeSpent, languageCode } = body;
 
-    if (!userId || score === undefined || !level || !answers) {
+    if (!userId || score === undefined || !level || !answers || !languageCode) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Create a test attempt record
-    const testAttempt = await prisma.quizAttempt.create({
+    // Create a language proficiency test attempt record
+    const testAttempt = await prisma.languageProficiencyTestAttempt.create({
       data: {
         id: uuidv4(),
-        quiz_id: 'language-proficiency-test', // Special ID for this test
-        student_id: userId,
+        userId: userId,
+        languageCode: languageCode,
         score: score,
-        total_points: 80,
-        percentage: (score / 80) * 100,
-        status: 'COMPLETED',
-        passed: score >= 40, // Pass threshold
-        questions_answered: Object.keys(answers).length,
-        time_spent: timeSpent || 0,
-        completed_at: new Date(),
-        started_at: new Date(Date.now() - (timeSpent || 0) * 1000),
-        attempt_number: 1,
-        is_adaptive: false
+        level: level,
+        answers: answers,
+        timeSpent: timeSpent || 0,
+        completedAt: new Date()
       }
     });
 
-    // Save detailed results
-    const detailedResults = await prisma.quizResponse.createMany({
-      data: Object.entries(answers).map(([questionId, answer]) => ({
-        id: uuidv4(),
-        attemptId: testAttempt.id,
-        questionId: questionId,
-        studentId: userId,
-        answer: answer as string,
-        isCorrect: true, // We'll determine this based on the question
-        pointsEarned: 1, // Each question is worth 1 point
-        timeSpent: Math.floor(timeSpent / Object.keys(answers).length),
-        answeredAt: new Date()
-      }))
-    });
+    // Generate certificate
+    let certificate = null;
+    try {
+      certificate = await CertificateServiceSecure.createCertificate(testAttempt.id);
+    } catch (certError) {
+      console.error('Error generating certificate:', certError);
+      // Continue without certificate - the test attempt is still saved
+    }
 
     return NextResponse.json({
       success: true,
       attemptId: testAttempt.id,
+      certificateId: certificate?.id || null,
       score,
       level,
-      percentage: (score / 80) * 100
+      percentage: Math.round((score / 160) * 100), // Assuming 160 questions total
+      languageCode
     });
 
   } catch (error) {

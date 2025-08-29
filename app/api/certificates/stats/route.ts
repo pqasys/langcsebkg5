@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const stats = await CertificateService.getCertificateStats(session.user.id);
+    const stats = await CertificateService.getUserStats(session.user.id);
 
     return NextResponse.json({
       success: true,

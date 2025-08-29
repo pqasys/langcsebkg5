@@ -109,7 +109,7 @@ export class LanguageProficiencyService {
     timeSpent: number;
   }): Promise<void> {
     try {
-      await prisma.languageProficiencyTestAttempt.create({
+      const testAttempt = await prisma.languageProficiencyTestAttempt.create({
         data: {
           userId: data.userId,
           languageCode: data.languageCode,
@@ -122,6 +122,15 @@ export class LanguageProficiencyService {
 
       // Update question usage statistics
       await this.updateQuestionStats(data.answers);
+
+      // Generate certificate
+      try {
+        const { CertificateServiceSecure } = await import('@/lib/services/certificate-service-secure');
+        await CertificateServiceSecure.createCertificate(testAttempt.id);
+      } catch (certError) {
+        console.error('Error generating certificate:', certError);
+        // Continue without certificate - the test attempt is still saved
+      }
     } catch (error) {
       console.error('Error saving test attempt:', error);
     }

@@ -41,7 +41,7 @@ interface Achievement {
   description: string;
   icon: string;
   color: string;
-  earnedAt: string;
+  createdAt: string;
 }
 
 export default function CertificatesPage() {
@@ -69,11 +69,15 @@ export default function CertificatesPage() {
       const data = await response.json();
       
       if (data.success) {
-        setCertificates(data.data);
+        setCertificates(data.data || []);
+      } else {
+        console.error('Failed to fetch certificates:', data.error);
+        setCertificates([]);
       }
     } catch (error) {
       console.error('Error fetching certificates:', error);
       toast.error('Failed to load certificates');
+      setCertificates([]);
     } finally {
       setLoading(false);
     }
@@ -85,7 +89,15 @@ export default function CertificatesPage() {
       const data = await response.json();
       
       if (data.success) {
-        setStats(data.data);
+        setStats(data.data || {
+          totalCertificates: 0,
+          totalAchievements: 0,
+          averageScore: 0,
+          languagesTested: 0,
+          highestLevel: 'A1'
+        });
+      } else {
+        console.error('Failed to fetch stats:', data.error);
       }
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -256,15 +268,15 @@ export default function CertificatesPage() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {certificates.map((certificate) => (
+              {certificates && certificates.map((certificate) => (
                 <Card key={certificate.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <span className="text-2xl">{getLanguageFlag(certificate.language)}</span>
                         <div>
-                          <CardTitle className="text-lg">{certificate.languageName}</CardTitle>
-                          <p className="text-sm text-gray-600">Certificate #{certificate.certificateId}</p>
+                          <CardTitle className="text-lg">{certificate.languageName || certificate.language}</CardTitle>
+                          <p className="text-sm text-gray-600">Certificate #{certificate.certificateId || certificate.id}</p>
                         </div>
                       </div>
                       <Badge className={getLevelColor(certificate.cefrLevel)}>
@@ -277,17 +289,17 @@ export default function CertificatesPage() {
                     <div className="space-y-4">
                       <div className="text-center">
                         <div className="text-3xl font-bold text-blue-600">
-                          {certificate.score}/{certificate.totalQuestions}
+                          {certificate.score || 0}/{certificate.totalQuestions || 160}
                         </div>
                         <div className="text-sm text-gray-600">
-                          {Math.round((certificate.score / certificate.totalQuestions) * 100)}% Accuracy
+                          {Math.round(((certificate.score || 0) / (certificate.totalQuestions || 160)) * 100)}% Accuracy
                         </div>
                       </div>
                       
                       <div className="text-sm text-gray-600">
                         <div className="flex items-center space-x-2 mb-1">
                           <Calendar className="h-4 w-4" />
-                          <span>Completed: {new Date(certificate.completionDate).toLocaleDateString()}</span>
+                          <span>Completed: {certificate.completionDate ? new Date(certificate.completionDate).toLocaleDateString() : 'N/A'}</span>
                         </div>
                         {certificate.isPublic && (
                           <div className="flex items-center space-x-2 text-green-600">
@@ -297,7 +309,7 @@ export default function CertificatesPage() {
                         )}
                       </div>
                       
-                      {certificate.achievements.length > 0 && (
+                      {certificate.achievements && certificate.achievements.length > 0 && (
                         <div>
                           <h4 className="font-semibold mb-2">Achievements</h4>
                           <div className="space-y-2">
