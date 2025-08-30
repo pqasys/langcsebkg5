@@ -167,7 +167,7 @@ export async function GET() {
     console.error('Error fetching progress:');
     return NextResponse.json(
       { error: 'Failed to fetch progress' },
-      { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' }
+      { status: 500, statusText: 'Internal Server Error' }
     );
   }
 } 

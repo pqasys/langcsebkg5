@@ -4,78 +4,48 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { toast } from 'sonner';
 import { FaSpinner } from 'react-icons/fa';
 import { 
-  BookOpen,
-  GraduationCap,
+  BookOpen, 
+  Award, 
+  Clock, 
+  BarChart2, 
+  Play, 
   Calendar,
-  Clock,
-  Award,
-  Users,
-  Trophy,
   Target,
-  TrendingUp,
   Star,
-  Play,
   CheckCircle,
-  CreditCard,
-  Crown,
-  Zap,
-  Home,
-  BarChart3,
-  Activity,
-  Settings
+  TrendingUp,
+  ExternalLink,
+  ArrowRight,
+  Eye,
+  Download,
+  Printer,
+  Trophy,
+  Users,
+  BookMarked,
+  GraduationCap,
+  Activity
 } from 'lucide-react';
-import CourseAccessStatus from '@/app/components/student/CourseAccessStatus';
-import { QuizProgress } from '@/components/student/QuizProgress';
-import LearningPath from '@/app/components/student/LearningPath';
-import ProgressVisualization from '@/app/components/student/ProgressVisualization';
-import PersonalizedRecommendations from '@/app/components/student/PersonalizedRecommendations';
-import HostProgressionCard from '@/components/student/HostProgressionCard';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 
-interface CourseProgress {
+interface Course {
   id: string;
-  courseId: string;
   title: string;
+  description: string;
+  institution: string;
   progress: number;
-  status: 'IN_PROGRESS' | 'COMPLETED' | 'DROPPED' | 'ACTIVE';
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED';
   startDate: string;
-  endDate: string;
-  institution: {
-    name: string;
-  };
-}
-
-interface DashboardStats {
-  totalCourses: number;
-  completedCourses: number;
-  inProgressCourses: number;
-  averageProgress: number;
-  activeCourses: number;
-}
-
-// New interfaces for enhanced progress tracking
-interface LearningStats {
-  totalTimeSpent: number;
-  averageSessionTime: number;
-  currentStreak: number;
-  longestStreak: number;
-  totalSessions: number;
-  thisWeekSessions: number;
-  averageScore: number;
+  endDate?: string;
+  modulesCompleted: number;
+  totalModules: number;
+  imageUrl?: string;
 }
 
 interface Achievement {
@@ -85,76 +55,25 @@ interface Achievement {
   icon: string;
   unlockedAt: string;
   achievementType: string;
-}
-
-interface ModuleProgress {
-  id: string;
-  moduleId: string;
-  moduleTitle: string;
-  courseTitle: string;
-  contentCompleted: boolean;
-  exercisesCompleted: boolean;
-  quizCompleted: boolean;
-  timeSpent: number;
-  quizScore: number | null;
-  bestQuizScore: number | null;
-  learningStreak: number;
-  lastStudyDate: string;
-  retryAttempts: number;
-  achievementUnlocked: boolean;
-}
-
-// Quiz-related interfaces
-interface QuizAttempt {
-  id: string;
-  quizId: string;
-  quizTitle: string;
-  courseTitle: string;
-  moduleTitle: string;
-  startedAt: string;
-  completedAt?: string;
+  source?: string;
+  isPublic?: boolean;
+  certificateId?: string;
+  language?: string;
+  languageName?: string;
+  cefrLevel?: string;
   score?: number;
-  maxScore?: number;
-  percentage?: number;
-  timeSpent: number;
-  status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED';
-  attemptNumber: number;
-  passed: boolean;
+  totalQuestions?: number;
+  completionDate?: string;
 }
 
-interface QuizStats {
-  totalAttempts: number;
-  completedQuizzes: number;
-  averageScore: number;
-  totalTimeSpent: number;
-  currentStreak: number;
-  bestScore: number;
-  quizzesPassed: number;
-  totalQuizzes: number;
-}
-
-interface SubscriptionStatus {
-  hasActiveSubscription: boolean;
-  currentPlan?: string;
-  features: Record<string, any>;
-  subscriptionEndDate?: Date;
-  canUpgrade: boolean;
-  canDowngrade: boolean;
-  canCancel: boolean;
-  nextBillingDate?: Date;
-  billingHistory: BillingHistoryItem[];
-}
-
-interface BillingHistoryItem {
-  id: string;
-  billingDate: Date;
-  amount: number;
-  currency: string;
-  status: string;
-  paymentMethod?: string;
-  transactionId?: string;
-  invoiceNumber?: string;
-  description?: string;
+interface DashboardStats {
+  totalCourses: number;
+  completedCourses: number;
+  inProgressCourses: number;
+  averageProgress: number;
+  totalHoursSpent: number;
+  certificatesEarned: number;
+  achievementsUnlocked: number;
 }
 
 export default function StudentDashboard() {
@@ -162,30 +81,17 @@ export default function StudentDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 3;
-
-  // Session state management
-  const [courses, setCourses] = useState<CourseProgress[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalCourses: 0,
-    activeCourses: 0,
     completedCourses: 0,
     inProgressCourses: 0,
-    averageProgress: 0
+    averageProgress: 0,
+    totalHoursSpent: 0,
+    certificatesEarned: 0,
+    achievementsUnlocked: 0
   });
-
-  // New state for enhanced progress tracking
-  const [learningStats, setLearningStats] = useState<LearningStats | null>(null);
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [recentModules, setRecentModules] = useState<ModuleProgress[]>([]);
-
-  // Quiz-related state
-  const [quizStats, setQuizStats] = useState<QuizStats | null>(null);
-  const [recentQuizAttempts, setRecentQuizAttempts] = useState<QuizAttempt[]>([]);
-
-  // Subscription state
-  const [subscriptionData, setSubscriptionData] = useState<SubscriptionStatus | null>(null);
 
   // Handle session loading and authentication
   useEffect(() => {
@@ -214,218 +120,196 @@ export default function StudentDashboard() {
     try {
       setLoading(true);
       setError(null);
-      
-      console.log('StudentDashboard: Fetching dashboard data...');
-      
-      // Fetch existing dashboard data with retry logic
-      const dashboardResponse = await fetch('/api/student/dashboard', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include cookies for authentication
-      });
 
-      console.log('StudentDashboard: Dashboard API response status:', dashboardResponse.status);
-
-      if (dashboardResponse.ok) {
-        const dashboardData = await dashboardResponse.json();
-        console.log('StudentDashboard: Dashboard data received:', dashboardData);
-        
-        setCourses(dashboardData.courses || []);
-        setStats(dashboardData.stats || {
-          totalCourses: 0,
-          activeCourses: 0,
-          completedCourses: 0,
-          inProgressCourses: 0,
-          averageProgress: 0
-        });
-      } else {
-        const errorData = await dashboardResponse.json().catch(() => ({}));
-        console.error('StudentDashboard: Dashboard API error:', dashboardResponse.status, errorData);
-        
-        if (dashboardResponse.status === 401) {
-          // Unauthorized - session might be invalid
-          setError('Session expired. Please sign in again.');
-          router.replace('/auth/signin');
-          return;
-        } else if (dashboardResponse.status === 404) {
-          // Student not found
-          setError('Student profile not found. Please contact support.');
-        } else {
-          // Other server error
-          setError('Failed to load dashboard data. Please try again.');
-        }
-        
-        // Set fallback stats if API call fails
-        setStats({
-          totalCourses: 0,
-          activeCourses: 0,
-          completedCourses: 0,
-          inProgressCourses: 0,
-          averageProgress: 0
-        });
-      }
-
-      // Fetch additional data with individual error handling
-      const fetchWithFallback = async (url: string, fallbackData: any, endpointName: string) => {
-        try {
-          console.log(`StudentDashboard: Fetching ${endpointName}...`);
-          const response = await fetch(url, {
-            credentials: 'include',
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            console.log(`StudentDashboard: ${endpointName} data received:`, data);
-            return data || fallbackData;
-          } else {
-            console.warn(`StudentDashboard: ${endpointName} failed with status:`, response.status);
-            return fallbackData;
-          }
-        } catch (error) {
-          console.warn(`StudentDashboard: ${endpointName} fetch error:`, error);
-          return fallbackData;
-        }
-      };
-
-      // Fetch all additional data in parallel
-      const [statsData, achievementsData, modulesData, quizData, subscriptionData] = await Promise.all([
-        fetchWithFallback('/api/student/dashboard/stats', getFallbackData('learningStats'), 'stats'),
-        fetchWithFallback('/api/student/dashboard/achievements', [], 'achievements'),
-        fetchWithFallback('/api/student/dashboard/recent-modules', [], 'recent-modules'),
-        fetchWithFallback('/api/student/dashboard/quiz-stats', { stats: getFallbackData('quizStats'), recentAttempts: [] }, 'quiz-stats'),
-        fetchWithFallback('/api/student/subscription', { subscriptionStatus: getFallbackData('subscriptionStatus') }, 'subscription')
+      // Fetch all data in parallel
+      const [progressRes, achievementsRes, certificatesRes] = await Promise.all([
+        fetch('/api/student/progress'),
+        fetch('/api/student/dashboard/achievements'),
+        fetch('/api/certificates')
       ]);
 
-      // Set the data from the fetch results
-      setLearningStats(statsData);
-      setAchievements(achievementsData);
-      setRecentModules(modulesData);
-      setQuizStats(quizData.stats);
-      setRecentQuizAttempts(quizData.recentAttempts);
-      setSubscriptionData(subscriptionData.subscriptionStatus);
-      
-      console.log('StudentDashboard: All data loaded successfully');
-      
-    } catch (error) {
-      console.error('StudentDashboard: Error occurred:', error);
-      
-      // Retry logic for transient errors
-      if (retryCount < maxRetries) {
-        console.log(`StudentDashboard: Retrying... (${retryCount + 1}/${maxRetries})`);
-        setRetryCount(prev => prev + 1);
-        setTimeout(() => {
-          fetchDashboardData();
-        }, 1000 * (retryCount + 1)); // Exponential backoff
-        return;
+      // Handle progress data
+      if (progressRes.ok) {
+        const progressData = await progressRes.json();
+        console.log('Progress data:', progressData);
+        
+        // Transform course data
+        const transformedCourses = (progressData.courses || []).map((course: any) => ({
+          id: course.courseId,
+          title: course.title,
+          description: `Course at ${course.institution}`,
+          institution: course.institution,
+          progress: course.progress || 0,
+          status: course.status || 'NOT_STARTED',
+          startDate: course.startDate,
+          endDate: course.endDate,
+          modulesCompleted: course.modulesCompleted || 0,
+          totalModules: course.totalModules || 0
+        }));
+        
+        setCourses(transformedCourses);
+        
+        // Set stats
+        if (progressData.stats) {
+          setStats({
+            totalCourses: progressData.stats.totalCourses || 0,
+            completedCourses: progressData.stats.completedCourses || 0,
+            inProgressCourses: progressData.stats.inProgressCourses || 0,
+            averageProgress: progressData.stats.averageProgress || 0,
+            totalHoursSpent: progressData.stats.totalHoursSpent || 0,
+            certificatesEarned: progressData.stats.certificatesEarned || 0,
+            achievementsUnlocked: 0 // Will be updated below
+          });
+        }
+      } else {
+        console.error('Progress API error:', progressRes.status, progressRes.statusText);
+        toast.error('Failed to load course progress');
       }
-      
-      setError('Failed to load dashboard data. Please refresh the page or contact support if the problem persists.');
-      toast.error('Failed to load dashboard data');
-      
-      // Set fallback data on error
-      setStats({
-        totalCourses: 0,
-        activeCourses: 0,
-        completedCourses: 0,
-        inProgressCourses: 0,
-        averageProgress: 0
-      });
-      setLearningStats(getFallbackData('learningStats') as LearningStats);
-      setAchievements([]);
-      setRecentModules([]);
-      setQuizStats(getFallbackData('quizStats') as QuizStats);
-      setRecentQuizAttempts([]);
-      setSubscriptionData(getFallbackData('subscriptionStatus') as SubscriptionStatus);
+
+      // Handle achievements data
+      if (achievementsRes.ok) {
+        const achievementsData = await achievementsRes.json();
+        console.log('Achievements data:', achievementsData);
+        setAchievements(achievementsData || []);
+      } else {
+        console.error('Achievements API error:', achievementsRes.status, achievementsRes.statusText);
+        toast.error('Failed to load achievements');
+      }
+
+      // Handle certificates data
+      if (certificatesRes.ok) {
+        const certificatesResponse = await certificatesRes.json();
+        console.log('Certificates response:', certificatesResponse);
+        const certificatesData = certificatesResponse.data || certificatesResponse || [];
+        console.log('Certificates data:', certificatesData);
+        
+        const certificateAchievements = certificatesData.map((cert: any) => ({
+          id: cert.certificateId || cert.id,
+          title: `${cert.languageName || 'Language'} Proficiency Test`,
+          description: `Achieved ${cert.cefrLevel || 'Unknown'} level with ${cert.score || 0}/${cert.totalQuestions || 0} (${cert.score && cert.totalQuestions ? Math.round((cert.score / cert.totalQuestions) * 100) : 0}% accuracy)`,
+          icon: '🏆',
+          unlockedAt: cert.completionDate || cert.createdAt,
+          achievementType: 'certificate',
+          source: 'Certificate',
+          isPublic: cert.isPublic || false,
+          certificateId: cert.certificateId || cert.id,
+          language: cert.language,
+          languageName: cert.languageName,
+          cefrLevel: cert.cefrLevel,
+          score: cert.score,
+          totalQuestions: cert.totalQuestions,
+          completionDate: cert.completionDate || cert.createdAt
+        }));
+        
+        // Merge certificates with other achievements
+        const allAchievements = [...(achievements || []), ...certificateAchievements];
+        allAchievements.sort((a, b) => new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime());
+        setAchievements(allAchievements);
+        
+        // Update stats with certificate count
+        setStats(prev => ({
+          ...prev,
+          certificatesEarned: certificatesData.length,
+          achievementsUnlocked: allAchievements.length
+        }));
+      } else {
+        console.error('Certificates API error:', certificatesRes.status, certificatesRes.statusText);
+        toast.error('Failed to load certificates');
+      }
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      toast.error(`Failed to load dashboard: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError('Failed to fetch dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
-  // Helper function to get fallback data
-  const getFallbackData = (type: string): any => {
-    const fallbackData = {
-      learningStats: {
-        totalTimeSpent: 0,
-        averageSessionTime: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        totalSessions: 0,
-        thisWeekSessions: 0,
-        averageScore: 0
-      },
-      quizStats: {
-        totalAttempts: 0,
-        completedQuizzes: 0,
-        averageScore: 0,
-        totalTimeSpent: 0,
-        currentStreak: 0,
-        bestScore: 0,
-        quizzesPassed: 0,
-        totalQuizzes: 0
-      },
-      subscriptionStatus: {
-        hasActiveSubscription: false,
-        currentPlan: null,
-        features: {},
-        subscriptionEndDate: null,
-        canUpgrade: false,
-        canDowngrade: false,
-        canCancel: false,
-        nextBillingDate: null,
-        billingHistory: []
-      }
-    };
-    return fallbackData[type as keyof typeof fallbackData] || {};
-  };
-
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'COMPLETED':
+        return 'text-green-600 bg-green-50';
+      case 'IN_PROGRESS':
+        return 'text-blue-600 bg-blue-50';
+      case 'NOT_STARTED':
+        return 'text-gray-600 bg-gray-50';
+      default:
+        return 'text-gray-600 bg-gray-50';
     }
-    return `${minutes}m`;
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
-  const getSubscriptionStatusBadge = (status?: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
-      case 'TRIAL':
-        return <Badge className="bg-blue-100 text-blue-800">Trial</Badge>;
-      case 'CANCELLED':
-        return <Badge className="bg-red-100 text-red-800">Cancelled</Badge>;
-      case 'PAST_DUE':
-        return <Badge className="bg-yellow-100 text-yellow-800">Past Due</Badge>;
-      case 'SUSPENDED':
-        return <Badge className="bg-gray-100 text-gray-800">Suspended</Badge>;
-      default:
-        return <Badge className="bg-gray-100 text-gray-800">No Subscription</Badge>;
+    if (!dateString) return 'No date available';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid date';
     }
   };
 
-  const getPlanIcon = (planType?: string) => {
-    switch (planType) {
-      case 'PRO':
-        return <Crown className="h-4 w-4 text-yellow-600" />;
-      case 'PREMIUM':
-        return <Star className="h-4 w-4 text-blue-600" />;
-      case 'BASIC':
-        return <Zap className="h-4 w-4 text-green-600" />;
-      default:
-        return <CreditCard className="h-4 w-4 text-gray-600" />;
+  const getLevelColor = (level: string) => {
+    const colors: { [key: string]: string } = {
+      'A1': 'bg-gray-100 text-gray-800',
+      'A2': 'bg-blue-100 text-blue-800',
+      'B1': 'bg-green-100 text-green-800',
+      'B2': 'bg-yellow-100 text-yellow-800',
+      'C1': 'bg-orange-100 text-orange-800',
+      'C2': 'bg-purple-100 text-purple-800'
+    };
+    return colors[level] || 'bg-gray-100 text-gray-800';
+  };
+
+  const handlePrint = async (achievementId: string) => {
+    try {
+      const response = await fetch(`/certificates/${achievementId}`);
+      if (response.ok) {
+        const htmlContent = await response.text();
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+          setTimeout(() => {
+            newWindow.print();
+          }, 500);
+        }
+      }
+    } catch (error) {
+      console.error('Error printing certificate:', error);
+      toast.error('Failed to print certificate');
     }
+  };
+
+  const handleDownload = async (achievementId: string) => {
+    try {
+      const response = await fetch(`/api/certificates/${achievementId}/pdf`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `certificate-${achievementId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Error downloading certificate:', error);
+      toast.error('Failed to download certificate');
+    }
+  };
+
+  const handleView = (achievementId: string) => {
+    window.open(`/certificates/${achievementId}`, '_blank');
   };
 
   // Show loading state
@@ -446,30 +330,18 @@ export default function StudentDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="mb-4">
-            <Activity className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Dashboard Error</h2>
             <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
           </div>
-          <div className="space-y-2">
-            <Button 
-              onClick={() => {
-                setError(null);
-                setRetryCount(0);
-                fetchDashboardData();
-              }}
-              variant="primary-high"
-              size="mobile-lg"
-            >
-              Try Again
-            </Button>
-            <Button 
-              onClick={() => router.push('/auth/signin')}
-              variant="outline"
-              size="mobile-lg"
-            >
-              Sign In Again
-            </Button>
-          </div>
+          <Button 
+            onClick={() => {
+              setError(null);
+              fetchDashboardData();
+            }}
+            variant="outline"
+          >
+            Try Again
+          </Button>
         </div>
       </div>
     );
@@ -492,612 +364,155 @@ export default function StudentDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Student Dashboard</h1>
           <p className="text-muted-foreground">
             Welcome back, {session?.user?.name}
           </p>
         </div>
-        <Button onClick={fetchDashboardData} variant="outline">
+        <Button 
+          variant="outline" 
+          onClick={fetchDashboardData}
+          disabled={loading}
+        >
+          {loading ? <FaSpinner className="h-4 w-4 animate-spin mr-2" /> : <Activity className="h-4 w-4 mr-2" />}
           Refresh
         </Button>
       </div>
 
-      {/* Community CTA Bar */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                <div>
-                  <h3 className="font-semibold text-gray-900">Join the FluentShip Community</h3>
-                  <p className="text-sm text-gray-600">Connect with fellow learners, share achievements, and find study partners</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => router.push('/features/community-learning')}
-                className="border-blue-300 text-blue-700 hover:bg-blue-50"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Explore Community
-              </Button>
-              <Button 
-                size="sm"
-                onClick={() => router.push('/features/community-learning')}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Trophy className="h-4 w-4 mr-2" />
-                Share Achievement
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <Breadcrumb items={[
+        { label: 'Student', href: '/student' }
+      ]} />
 
-      {/* Subscription Status Section - Always Visible */}
-      {subscriptionData && (
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-                <CardTitle className="text-lg">Subscription Status</CardTitle>
-              </div>
-              {getSubscriptionStatusBadge(subscriptionData.currentPlan)}
-            </div>
+      {/* Stats Overview */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {subscriptionData.hasActiveSubscription ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                  {getPlanIcon(subscriptionData.currentPlan)}
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {subscriptionData.currentPlan === 'PRO' ? 'Pro Plan' : 
-                       subscriptionData.currentPlan === 'PREMIUM' ? 'Premium Plan' : 
-                       subscriptionData.currentPlan === 'BASIC' ? 'Basic Plan' : 'Current Plan'}
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      {subscriptionData.features.maxCourses === -1 ? 'Unlimited' : subscriptionData.features.maxCourses} courses
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
-                  <Calendar className="h-4 w-4 text-green-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Next Billing</p>
-                    <p className="text-xs text-gray-600">
-                      {subscriptionData.nextBillingDate ? formatDate(subscriptionData.nextBillingDate.toString()) : 'N/A'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
-                  <Star className="h-4 w-4 text-purple-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Features</p>
-                    <p className="text-xs text-gray-600">
-                      {subscriptionData.features.maxTests === -1 ? 'Unlimited' : subscriptionData.features.maxTests} tests
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg">
-                  <CheckCircle className="h-4 w-4 text-orange-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Status</p>
-                    <p className="text-xs text-gray-600">
-                      {subscriptionData.currentPlan === 'ACTIVE' ? 'Active' : subscriptionData.currentPlan}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <div className="flex items-center justify-center space-x-2 mb-4">
-                  <Star className="h-8 w-8 text-yellow-500" />
-                  <div>
-                    <h3 className="text-lg font-semibold">No Active Subscription</h3>
-                    <p className="text-sm text-gray-600">Upgrade to unlock premium learning features</p>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                  <Button 
-                    onClick={() => router.push('/subscription/trial?context=conversation')}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-gray-900"
-                  >
-                    <Zap className="h-4 w-4 mr-2" />
-                    Start Free Trial
-                  </Button>
-                  <Button 
-                    onClick={() => router.push('/student/subscription')}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Crown className="h-4 w-4 mr-2" />
-                    View Plans
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => router.push('/subscription-signup')}
-                  >
-                    <Zap className="h-4 w-4 mr-2" />
-                    Subscribe Now
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {subscriptionData.hasActiveSubscription && (
-              <div className="mt-4 flex flex-col sm:flex-row gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => router.push('/student/subscription')}
-                  className="flex-1 sm:flex-none"
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Manage Subscription
-                </Button>
-                {subscriptionData.canUpgrade && (
-                  <Button 
-                    size="sm"
-                    onClick={() => router.push('/student/subscription?action=upgrade')}
-                    className="flex-1 sm:flex-none"
-                  >
-                    <Crown className="h-4 w-4 mr-2" />
-                    Upgrade Plan
-                  </Button>
-                )}
-              </div>
-            )}
+            <div className="text-2xl font-bold">{stats.totalCourses}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.completedCourses} completed
+            </p>
           </CardContent>
         </Card>
-      )}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Average Progress</CardTitle>
+            <BarChart2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.averageProgress}%</div>
+            <Progress value={stats.averageProgress} className="mt-2" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Time Spent</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalHoursSpent}h</div>
+            <p className="text-xs text-muted-foreground">
+              Total learning hours
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Achievements</CardTitle>
+            <Award className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.achievementsUnlocked}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.certificatesEarned} certificates
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Tabbed Dashboard Content */}
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
-          <TabsTrigger value="overview" className="flex items-center space-x-2">
-            <Home className="h-4 w-4" />
-            <span className="hidden sm:inline">Overview</span>
-          </TabsTrigger>
-          <TabsTrigger value="progress" className="flex items-center space-x-2">
-            <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">Progress</span>
-          </TabsTrigger>
-          <TabsTrigger value="courses" className="flex items-center space-x-2">
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="courses" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="courses" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
-            <span className="hidden sm:inline">Courses</span>
+            My Courses
           </TabsTrigger>
-          <TabsTrigger value="activity" className="flex items-center space-x-2">
-            <Activity className="h-4 w-4" />
-            <span className="hidden sm:inline">Activity</span>
+          <TabsTrigger value="achievements" className="flex items-center gap-2">
+            <Award className="h-4 w-4" />
+            Achievements
           </TabsTrigger>
-          <TabsTrigger value="achievements" className="flex items-center space-x-2">
-            <Trophy className="h-4 w-4" />
-            <span className="hidden sm:inline">Achievements</span>
+          <TabsTrigger value="progress" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Progress
           </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          {/* Learning Path Section */}
-          {session?.user?.id && (
-            <LearningPath studentId={session.user.id} />
-          )}
-
-          {/* Progress Visualization */}
-          {session?.user?.id && (
-            <ProgressVisualization studentId={session.user.id} />
-          )}
-          
-          {/* Personalized Recommendations */}
-          {session?.user?.id && (
-            <PersonalizedRecommendations studentId={session.user.id} maxRecommendations={6} />
-          )}
-
-          {/* Enhanced Learning Stats */}
-          {learningStats && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
-              <Card className="hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Study Time</CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{formatTime(learningStats.totalTimeSpent)}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {learningStats.totalSessions} sessions completed
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Current Streak</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{learningStats.currentStreak} days</div>
-                  <p className="text-xs text-muted-foreground">
-                    Longest: {learningStats.longestStreak} days
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">This Week</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{learningStats.thisWeekSessions} sessions</div>
-                  <p className="text-xs text-muted-foreground">
-                    Avg: {formatTime(learningStats.averageSessionTime)} per session
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Average Score</CardTitle>
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{learningStats.averageScore}%</div>
-                  <p className="text-xs text-muted-foreground">
-                    Across all quizzes
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Original Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats?.totalCourses || 0}</div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Courses</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats?.activeCourses || 0}</div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completed Courses</CardTitle>
-                <GraduationCap className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats?.completedCourses || 0}</div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats?.inProgressCourses || 0}</div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Average Progress</CardTitle>
-                <Award className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stats?.averageProgress || 0}%</div>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Subscription</CardTitle>
-                <CreditCard className="h-4 w-4 text-blue-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">
-                  {subscriptionData?.hasActiveSubscription ? (
-                    <div className="flex items-center space-x-1">
-                      {getPlanIcon(subscriptionData.currentPlan)}
-                      <span className="text-sm">
-                        {subscriptionData.currentPlan === 'PRO' ? 'Pro' : 
-                         subscriptionData.currentPlan === 'PREMIUM' ? 'Premium' : 
-                         subscriptionData.currentPlan === 'BASIC' ? 'Basic' : 'Active'}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-gray-500 text-lg">None</span>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {subscriptionData?.hasActiveSubscription ? 'Active Plan' : 'No Subscription'}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* Host Progression Section - Only show if user is a host */}
-        {session?.user?.id && (
-          <div className="mb-6 sm:mb-8">
-            <HostProgressionCard userId={session.user.id} />
-          </div>
-        )}
-
-        {/* Progress Tab */}
-        <TabsContent value="progress" className="space-y-6">
-          {/* Quiz Progress Section */}
-          {quizStats && (
-            <div className="mb-6 sm:mb-8">
-              <QuizProgress 
-                recentAttempts={recentQuizAttempts}
-                stats={quizStats}
-              />
-            </div>
-          )}
-
-          {/* Continue Learning Section */}
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">Continue Learning</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {/* Quick Access to Recent Modules */}
-              {recentModules.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm">Recent Modules</h4>
-                  {recentModules.slice(0, 3).map((module) => (
-                    <div key={module.id} className="p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                         onClick={() => {
-                           router.push('/student/courses');
-                         }}>
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h5 className="font-medium text-sm">{module.moduleTitle}</h5>
-                          <p className="text-xs text-muted-foreground">{module.courseTitle}</p>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          {module.contentCompleted && <CheckCircle className="w-3 h-3 text-green-500" />}
-                          {module.exercisesCompleted && <CheckCircle className="w-3 h-3 text-blue-500" />}
-                          {module.quizCompleted && <CheckCircle className="w-3 h-3 text-purple-500" />}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-xs text-muted-foreground">
-                          {formatTime(module.timeSpent)} spent
-                        </span>
-                        <Button size="sm" variant="outline" className="h-6 text-xs">
-                          Continue
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Active Courses */}
-              <div className="space-y-3">
-                <h4 className="font-medium text-sm">Active Courses</h4>
-                {courses.filter(c => ['ACTIVE', 'IN_PROGRESS', 'ENROLLED'].includes(c.status)).slice(0, 3).map((course) => (
-                  <div key={course.id} className="p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                       onClick={() => router.push(`/student/courses/${course.courseId}`)}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h5 className="font-medium text-sm">{course.title}</h5>
-                        <p className="text-xs text-muted-foreground">{course.institution.name}</p>
-                      </div>
-                      <Badge variant="outline" className="text-xs">
-                        {course.progress}%
-                      </Badge>
-                    </div>
-                    <div className="mt-2">
-                      <Progress value={course.progress} className="h-2" />
-                    </div>
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-muted-foreground">
-                        {course.status.replace('_', ' ')}
-                      </span>
-                      <Button size="sm" variant="outline" className="h-6 text-xs">
-                        View Course
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Quick Actions */}
-              <div className="space-y-3">
-                <h4 className="font-medium text-sm">Quick Actions</h4>
-                <div className="space-y-2">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => router.push('/student/courses')}
-                  >
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Browse All Courses
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => router.push('/student/progress')}
-                  >
-                    <Target className="w-4 h-4 mr-2" />
-                    View Progress
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => router.push('/student/progress?view=achievements')}
-                  >
-                    <Award className="w-4 h-4 mr-2" />
-                    View Achievements
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => router.push('/student/subscription')}
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Manage Subscription
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* Courses Tab */}
         <TabsContent value="courses" className="space-y-6">
-          {/* Recent Enrollments */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Enrollments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {courses.slice(0, 3).map((course) => (
-                  <div key={course.id} className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{course.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {course.institution.name}
-                      </p>
-                    </div>
-                    <CourseAccessStatus enrollment={course} />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Course Progress Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Progress</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Course</TableHead>
-                    <TableHead>Institution</TableHead>
-                    <TableHead>Progress</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {courses.map((course) => (
-                    <TableRow key={course.id}>
-                      <TableCell className="font-medium">{course.title}</TableCell>
-                      <TableCell>{course.institution.name}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Progress value={course.progress} className="w-[100px]" />
-                          <span className="text-sm text-muted-foreground">
-                            {course.progress}%
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            course.status === 'COMPLETED'
-                              ? 'default'
-                              : course.status === 'IN_PROGRESS'
-                              ? 'secondary'
-                              : 'outline'
-                          }
-                        >
-                          {course.status.replace('_', ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{formatDate(course.startDate)}</TableCell>
-                      <TableCell>{formatDate(course.endDate)}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => router.push(`/student/courses/${course.courseId}`)}
-                        >
-                          View Course
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Activity Tab */}
-        <TabsContent value="activity" className="space-y-6">
-          {/* Recent Module Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Play className="w-5 h-5 mr-2" />
-                Recent Module Activity
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Enrolled Courses
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {recentModules.length === 0 ? (
+              {courses.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  <Play className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No recent module activity.</p>
-                  <p className="text-sm">Start learning to see your activity here!</p>
+                  <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No courses enrolled yet.</p>
+                  <p className="text-sm">Browse available courses to get started!</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => router.push('/courses')}
+                  >
+                    Browse Courses
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {recentModules.slice(0, 5).map((module) => (
-                    <div key={module.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  {courses.map((course) => (
+                    <div key={course.id} className="border rounded-lg p-4 flex items-center justify-between">
                       <div className="flex-1">
-                        <h4 className="font-medium">{module.moduleTitle}</h4>
-                        <p className="text-sm text-muted-foreground">{module.courseTitle}</p>
-                        <div className="flex items-center space-x-4 mt-2">
-                          <div className="flex items-center space-x-2">
-                            {module.contentCompleted && <CheckCircle className="w-4 h-4 text-green-500" />}
-                            {module.exercisesCompleted && <CheckCircle className="w-4 h-4 text-blue-500" />}
-                            {module.quizCompleted && <CheckCircle className="w-4 h-4 text-purple-500" />}
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <h3 className="font-medium">{course.title}</h3>
+                            <p className="text-sm text-muted-foreground">{course.institution}</p>
                           </div>
-                          {module.quizScore && (
-                            <Badge variant="outline">
-                              Quiz: {module.quizScore}%
-                            </Badge>
-                          )}
-                          <span className="text-sm text-muted-foreground">
-                            {formatTime(module.timeSpent)} spent
-                          </span>
+                          <Badge className={getStatusColor(course.status)}>
+                            {course.status.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Progress</span>
+                            <span>{course.progress}%</span>
+                          </div>
+                          <Progress value={course.progress} />
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Modules: </span>
+                              {course.modulesCompleted}/{course.totalModules}
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Started: </span>
+                              {formatDate(course.startDate)}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(module.lastStudyDate)}
-                        </p>
-                        {module.learningStreak > 0 && (
-                          <Badge variant="secondary" className="mt-1">
-                            {module.learningStreak} day streak
-                          </Badge>
-                        )}
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-4"
+                        title="Go to course"
+                        onClick={() => router.push(`/student/courses/${course.id}`)}
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -1106,14 +521,12 @@ export default function StudentDashboard() {
           </Card>
         </TabsContent>
 
-        {/* Achievements Tab */}
         <TabsContent value="achievements" className="space-y-6">
-          {/* Recent Achievements */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Trophy className="w-5 h-5 mr-2" />
-                Recent Achievements
+              <CardTitle className="flex items-center gap-2">
+                <Award className="h-5 w-5" />
+                Your Achievements
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1124,27 +537,165 @@ export default function StudentDashboard() {
                   <p className="text-sm">Keep learning to earn achievements!</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {achievements.slice(0, 5).map((achievement) => (
-                    <div key={achievement.id} className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                      <div className="p-2 bg-primary/10 rounded-full">
-                        <Star className="w-4 h-4 text-primary" />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {achievements.slice(0, 6).map((achievement) => (
+                    <div key={achievement.id} className="flex flex-col p-4 bg-muted/50 rounded-lg">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="p-2 bg-primary/10 rounded-full">
+                          <span className="text-lg">{achievement.icon}</span>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm">{achievement.title}</h4>
+                          <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{achievement.title}</h4>
-                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Unlocked {formatDate(achievement.unlockedAt)}
-                        </p>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>Unlocked {formatDate(achievement.unlockedAt)}</span>
+                          {achievement.cefrLevel && (
+                            <Badge className={getLevelColor(achievement.cefrLevel)}>
+                              {achievement.cefrLevel}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {achievement.score && achievement.totalQuestions && (
+                          <div className="text-center py-2 bg-blue-50 rounded">
+                            <div className="text-lg font-bold text-blue-600">
+                              {achievement.score}/{achievement.totalQuestions}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {Math.round((achievement.score / achievement.totalQuestions) * 100)}% Accuracy
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Action buttons for certificates */}
+                        {achievement.source === 'Certificate' && achievement.certificateId && (
+                          <div className="flex items-center gap-2 pt-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleView(achievement.certificateId!)}
+                              className="flex items-center gap-1 flex-1"
+                            >
+                              <Eye className="h-3 w-3" />
+                              View
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePrint(achievement.certificateId!)}
+                              className="flex items-center gap-1"
+                            >
+                              <Printer className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDownload(achievement.certificateId!)}
+                              className="flex items-center gap-1"
+                            >
+                              <Download className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
               )}
+              
+              {achievements.length > 6 && (
+                <div className="text-center pt-4">
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push('/student/progress?view=achievements')}
+                  >
+                    View All Achievements
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="progress" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Learning Progress
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">{stats.totalCourses}</div>
+                    <div className="text-sm text-blue-600">Total Courses</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">{stats.completedCourses}</div>
+                    <div className="text-sm text-green-600">Completed</div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600">{stats.inProgressCourses}</div>
+                    <div className="text-sm text-orange-600">In Progress</div>
+                  </div>
+                </div>
+                
+                <div className="text-center pt-4">
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push('/student/progress')}
+                  >
+                    View Detailed Progress
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => router.push('/courses')}
+            >
+              <BookOpen className="h-6 w-6" />
+              <span>Browse Courses</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => router.push('/student/progress')}
+            >
+              <TrendingUp className="h-6 w-6" />
+              <span>View Progress</span>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="h-auto p-4 flex flex-col items-center gap-2"
+              onClick={() => router.push('/achievements')}
+            >
+              <Award className="h-6 w-6" />
+              <span>All Achievements</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 } 

@@ -5,6 +5,9 @@ import PaymentService from '@/lib/payment-service';
 import { isBuildTime } from '@/lib/build-error-handler';
 import { SubscriptionPaymentService } from '@/lib/subscription-payment-service';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error(`STRIPE_SECRET_KEY is not set - Context: throw new Error('STRIPE_SECRET_KEY is not set');...`);
 }

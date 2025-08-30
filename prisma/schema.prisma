@@ -169,6 +169,7 @@ model user {
   certificates               Certificate[]
   userAchievements           UserAchievement[]
   languageProficiencyTestAttempts LanguageProficiencyTestAttempt[]
+  studentAchievements        StudentAchievement[]
   
   // Language threshold management
   languageThresholdsCreated  LanguageAttendanceThreshold[] @relation("LanguageThresholdCreatedBy")
@@ -1266,9 +1267,14 @@ model StudentAchievement {
   studentId   String   @db.VarChar(36)
   metadata    Json?
   achievement String   @db.VarChar(100)
+  isPublic    Boolean  @default(false)
   earnedAt    DateTime @default(now())
 
+  // Relations
+  user        user @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
   @@index([studentId])
+  @@index([isPublic])
   @@map("student_achievements")
 }
 
@@ -2422,6 +2428,7 @@ model ConnectionAchievement {
   description     String?  @db.Text
   icon            String   @db.VarChar(10)
   points          Int
+  isPublic        Boolean  @default(false)
   earnedAt        DateTime @default(now())
 
   // Relations
@@ -2429,6 +2436,7 @@ model ConnectionAchievement {
 
   @@index([userId])
   @@index([achievementType])
+  @@index([isPublic])
   @@index([earnedAt])
   @@map("connection_achievements")
 }
@@ -2463,6 +2471,7 @@ model Certificate {
   totalQuestions  Int
   completionDate  DateTime
   certificateUrl  String?  @db.Text
+  certificateData String?  @db.LongText // Base64 encoded certificate data for email distribution
   isPublic        Boolean  @default(false)
   sharedAt        DateTime?
   createdAt       DateTime @default(now())

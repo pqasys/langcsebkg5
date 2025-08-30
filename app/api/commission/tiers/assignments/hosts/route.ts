@@ -3,6 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 // Get host tier assignments
 export async function GET(request: NextRequest) {
   try {

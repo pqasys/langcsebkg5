@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 29, 2025 at 02:57 AM
--- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- Generation Time: Aug 29, 2025 at 10:20 PM
+-- Server version: 8.0.31
+-- PHP Version: 8.1.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -356,6 +356,7 @@ CREATE TABLE IF NOT EXISTS `certificates` (
   `sharedAt` datetime(3) DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL,
+  `certificateData` longtext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `certificates_certificateId_key` (`certificateId`),
   UNIQUE KEY `certificates_testAttemptId_key` (`testAttemptId`),
@@ -370,8 +371,8 @@ CREATE TABLE IF NOT EXISTS `certificates` (
 -- Dumping data for table `certificates`
 --
 
-INSERT INTO `certificates` (`id`, `certificateId`, `userId`, `testAttemptId`, `language`, `languageName`, `cefrLevel`, `score`, `totalQuestions`, `completionDate`, `certificateUrl`, `isPublic`, `sharedAt`, `createdAt`, `updatedAt`) VALUES
-('FS-MEW8NLLT-79CSNC', 'FS-MEW8NLLT-79CSNC', '140e3f04-f4f1-47f9-b001-70f50459d3cb', '6741cb35-6fa1-434a-8023-0293f5780415', 'en', 'English', 'C1', 69, 72, '2025-08-29 01:07:56.710', '/certificates/FS-MEW8NLLT-79CSNC', 0, NULL, '2025-08-29 02:53:38.538', '2025-08-29 02:53:38.538');
+INSERT INTO `certificates` (`id`, `certificateId`, `userId`, `testAttemptId`, `language`, `languageName`, `cefrLevel`, `score`, `totalQuestions`, `completionDate`, `certificateUrl`, `isPublic`, `sharedAt`, `createdAt`, `updatedAt`, `certificateData`) VALUES
+('FS-MEW8TRIN-APXKR8', 'FS-MEW8TRIN-APXKR8', '140e3f04-f4f1-47f9-b001-70f50459d3cb', '6741cb35-6fa1-434a-8023-0293f5780415', 'en', 'English', 'C1', 69, 72, '2025-08-29 01:07:56.710', '/certificates/FS-MEW8TRIN-APXKR8', 1, '2025-08-29 18:34:58.759', '2025-08-29 02:58:26.115', '2025-08-29 19:07:58.736', NULL);
 
 -- --------------------------------------------------------
 
@@ -700,10 +701,12 @@ CREATE TABLE IF NOT EXISTS `connection_achievements` (
   `icon` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `points` int NOT NULL,
   `earnedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `isPublic` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `connection_achievements_userId_idx` (`userId`),
   KEY `connection_achievements_achievementType_idx` (`achievementType`),
-  KEY `connection_achievements_earnedAt_idx` (`earnedAt`)
+  KEY `connection_achievements_earnedAt_idx` (`earnedAt`),
+  KEY `connection_achievements_isPublic_idx` (`isPublic`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1433,15 +1436,15 @@ CREATE TABLE IF NOT EXISTS `exercise_attempts` (
 
 DROP TABLE IF EXISTS `host_commissions`;
 CREATE TABLE IF NOT EXISTS `host_commissions` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `hostId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `conversationId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hostId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conversationId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `sessionPrice` double NOT NULL DEFAULT '0',
   `creditPrice` int NOT NULL DEFAULT '0',
   `commissionAmount` double NOT NULL DEFAULT '0',
   `commissionRate` double NOT NULL DEFAULT '70',
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
-  `payoutId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `payoutId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `metadata` json DEFAULT NULL,
@@ -1461,18 +1464,18 @@ CREATE TABLE IF NOT EXISTS `host_commissions` (
 
 DROP TABLE IF EXISTS `host_commission_tiers`;
 CREATE TABLE IF NOT EXISTS `host_commission_tiers` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tierName` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tierName` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `commissionRate` double NOT NULL DEFAULT '70',
   `effectiveDate` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `endDate` datetime(3) DEFAULT NULL,
-  `requirements` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `requirements` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `benefits` json NOT NULL,
-  `color` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `displayName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `displayName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `maxConversations` int DEFAULT NULL,
   `minConversations` int NOT NULL DEFAULT '0',
@@ -1502,12 +1505,12 @@ INSERT INTO `host_commission_tiers` (`id`, `tierName`, `commissionRate`, `effect
 
 DROP TABLE IF EXISTS `host_commission_tier_assignments`;
 CREATE TABLE IF NOT EXISTS `host_commission_tier_assignments` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `hostId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tierId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hostId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tierId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `startDate` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `endDate` datetime(3) DEFAULT NULL,
-  `assignedBy` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `assignedBy` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -1526,14 +1529,14 @@ CREATE TABLE IF NOT EXISTS `host_commission_tier_assignments` (
 
 DROP TABLE IF EXISTS `host_payouts`;
 CREATE TABLE IF NOT EXISTS `host_payouts` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `hostId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hostId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `amount` double NOT NULL DEFAULT '0',
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
-  `stripePayoutId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `stripePayoutId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `scheduledDate` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `processedDate` datetime(3) DEFAULT NULL,
-  `payoutMethod` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STRIPE',
+  `payoutMethod` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STRIPE',
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -1859,16 +1862,16 @@ INSERT INTO `institution_subscription_logs` (`id`, `subscriptionId`, `action`, `
 
 DROP TABLE IF EXISTS `instructor_commissions`;
 CREATE TABLE IF NOT EXISTS `instructor_commissions` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `instructorId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sessionId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `instructorId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sessionId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `sessionPrice` double NOT NULL DEFAULT '0',
   `creditPrice` int NOT NULL DEFAULT '0',
   `commissionAmount` double NOT NULL DEFAULT '0',
   `commissionRate` double NOT NULL DEFAULT '70',
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
-  `payoutId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `sessionType` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'LIVE_CLASS',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `payoutId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sessionType` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'LIVE_CLASS',
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `metadata` json DEFAULT NULL,
@@ -1889,18 +1892,18 @@ CREATE TABLE IF NOT EXISTS `instructor_commissions` (
 
 DROP TABLE IF EXISTS `instructor_commission_tiers`;
 CREATE TABLE IF NOT EXISTS `instructor_commission_tiers` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tierName` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tierName` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `commissionRate` double NOT NULL DEFAULT '70',
   `effectiveDate` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `endDate` datetime(3) DEFAULT NULL,
-  `requirements` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `requirements` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `benefits` json NOT NULL,
-  `color` varchar(7) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `displayName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `displayName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `isActive` tinyint(1) NOT NULL DEFAULT '1',
   `maxSessions` int DEFAULT NULL,
   `minSessions` int NOT NULL DEFAULT '0',
@@ -1930,12 +1933,12 @@ INSERT INTO `instructor_commission_tiers` (`id`, `tierName`, `commissionRate`, `
 
 DROP TABLE IF EXISTS `instructor_commission_tier_assignments`;
 CREATE TABLE IF NOT EXISTS `instructor_commission_tier_assignments` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `instructorId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tierId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `instructorId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tierId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `startDate` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `endDate` datetime(3) DEFAULT NULL,
-  `assignedBy` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `assignedBy` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -1954,14 +1957,14 @@ CREATE TABLE IF NOT EXISTS `instructor_commission_tier_assignments` (
 
 DROP TABLE IF EXISTS `instructor_payouts`;
 CREATE TABLE IF NOT EXISTS `instructor_payouts` (
-  `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `instructorId` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `instructorId` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `amount` double NOT NULL DEFAULT '0',
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
-  `stripePayoutId` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `stripePayoutId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `scheduledDate` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `processedDate` datetime(3) DEFAULT NULL,
-  `payoutMethod` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STRIPE',
+  `payoutMethod` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'STRIPE',
   `metadata` json DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -4616,8 +4619,10 @@ CREATE TABLE IF NOT EXISTS `student_achievements` (
   `metadata` json DEFAULT NULL,
   `achievement` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `earnedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `isPublic` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `student_achievements_studentId_idx` (`studentId`)
+  KEY `student_achievements_studentId_idx` (`studentId`),
+  KEY `student_achievements_isPublic_idx` (`isPublic`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -5212,8 +5217,8 @@ CREATE TABLE IF NOT EXISTS `user_achievements` (
 --
 
 INSERT INTO `user_achievements` (`id`, `userId`, `certificateId`, `type`, `title`, `description`, `icon`, `color`, `isPublic`, `createdAt`) VALUES
-('81615545-ddad-4902-96a4-51b527d43063', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'FS-MEW7FKHU-UK9JH1', 'first_test', 'First Steps', 'Completed your first language proficiency test', '🎯', '#10b981', 0, '2025-08-29 02:19:26.325'),
-('1e624e95-9fe5-4a22-bb9d-1f7b3f240023', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'FS-MEW7FKHU-UK9JH1', 'high_score', 'Excellence', 'Achieved a score of 90% or higher', '🏆', '#f59e0b', 0, '2025-08-29 02:19:26.332');
+('81615545-ddad-4902-96a4-51b527d43063', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'FS-MEW7FKHU-UK9JH1', 'first_test', 'First Steps', 'Completed your first language proficiency test', '🎯', '#10b981', 1, '2025-08-29 02:19:26.325'),
+('1e624e95-9fe5-4a22-bb9d-1f7b3f240023', '140e3f04-f4f1-47f9-b001-70f50459d3cb', 'FS-MEW7FKHU-UK9JH1', 'high_score', 'Excellence', 'Achieved a score of 90% or higher', '🏆', '#f59e0b', 1, '2025-08-29 02:19:26.332');
 
 -- --------------------------------------------------------
 

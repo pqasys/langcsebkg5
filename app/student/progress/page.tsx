@@ -23,7 +23,10 @@ import {
   TrendingUp,
   ExternalLink,
   ArrowRight,
-  Eye
+  Eye,
+  Download,
+  Printer,
+  Trophy
 } from 'lucide-react';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 
@@ -76,6 +79,16 @@ interface Achievement {
   icon: string;
   unlockedAt: string;
   achievementType: string;
+  source?: string;
+  isPublic?: boolean;
+  // Certificate-specific fields
+  certificateId?: string;
+  language?: string;
+  languageName?: string;
+  cefrLevel?: string;
+  score?: number;
+  totalQuestions?: number;
+  completionDate?: string;
 }
 
 export default function StudentProgressPage() {
@@ -133,14 +146,16 @@ export default function StudentProgressPage() {
       setError(null);
       
       // Fetch all data in parallel
-      const [progressRes, modulesRes, achievementsRes] = await Promise.all([
+      const [progressRes, modulesRes, achievementsRes, certificatesRes] = await Promise.all([
         fetch('/api/student/progress'),
         fetch('/api/student/dashboard/recent-modules'),
-        fetch('/api/student/dashboard/achievements')
+        fetch('/api/student/dashboard/achievements'),
+        fetch('/api/certificates')
       ]);
 
       if (progressRes.ok) {
         const data = await progressRes.json();
+        console.log('Progress data:', data);
         setCourses(data.courses || []);
         setStats(data.stats || {
           totalCourses: 0,
@@ -151,30 +166,66 @@ export default function StudentProgressPage() {
           certificatesEarned: 0
         });
       } else {
+        console.error('Progress API error:', progressRes.status, progressRes.statusText);
         toast.error('Progress API error:');
         setError('Failed to load progress data');
       }
 
       if (modulesRes.ok) {
         const modulesData = await modulesRes.json();
+        console.log('Recent modules data:', modulesData);
         setRecentModules(modulesData || []);
       } else {
+        console.error('Modules API error:', modulesRes.status, modulesRes.statusText);
         toast.error('Modules API error:');
         setRecentModules([]);
       }
 
       if (achievementsRes.ok) {
         const achievementsData = await achievementsRes.json();
+        console.log('Achievements data:', achievementsData);
         setAchievements(achievementsData || []);
       } else {
+        console.error('Achievements API error:', achievementsRes.status, achievementsRes.statusText);
         toast.error('Achievements API error:');
         setAchievements([]);
       }
+
+      // Fetch certificates and merge with achievements
+      if (certificatesRes.ok) {
+        const certificatesResponse = await certificatesRes.json();
+        console.log('Certificates response:', certificatesResponse);
+        const certificatesData = certificatesResponse.data || certificatesResponse || [];
+        console.log('Certificates data:', certificatesData);
+        const certificateAchievements = certificatesData.map((cert: any) => ({
+          id: cert.certificateId || cert.id,
+          title: `${cert.languageName || 'Language'} Proficiency Test`,
+          description: `Achieved ${cert.cefrLevel || 'Unknown'} level with ${cert.score || 0}/${cert.totalQuestions || 0} (${cert.score && cert.totalQuestions ? Math.round((cert.score / cert.totalQuestions) * 100) : 0}% accuracy)`,
+          icon: '🏆',
+          unlockedAt: cert.completionDate || cert.createdAt,
+          achievementType: 'certificate',
+          source: 'Certificate',
+          isPublic: cert.isPublic || false,
+          certificateId: cert.certificateId || cert.id,
+          language: cert.language,
+          languageName: cert.languageName,
+          cefrLevel: cert.cefrLevel,
+          score: cert.score,
+          totalQuestions: cert.totalQuestions,
+          completionDate: cert.completionDate || cert.createdAt
+        }));
+        
+        // Merge certificates with other achievements and sort by date
+        const allAchievements = [...achievements, ...certificateAchievements];
+        allAchievements.sort((a, b) => new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime());
+        setAchievements(allAchievements);
+      } else {
+        toast.error('Certificates API error:');
+      }
     } catch (error) {
       console.error('Error occurred:', error);
-      toast.error(`Failed to load progress. Please try again or contact support if the problem persists.`);
+      toast.error(`Failed to load progress: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setError('Failed to fetch progress data');
-      toast.error('Failed to fetch progress data');
     } finally {
       setLoading(false);
     }
@@ -227,6 +278,62 @@ export default function StudentProgressPage() {
 
   const navigateToModule = (courseId: string, moduleId: string) => {
     router.push(`/student/courses/${courseId}/modules/${moduleId}`);
+  };
+
+  const getLevelColor = (level: string) => {
+    const colors: { [key: string]: string } = {
+      'A1': 'bg-gray-100 text-gray-800',
+      'A2': 'bg-blue-100 text-blue-800',
+      'B1': 'bg-green-100 text-green-800',
+      'B2': 'bg-yellow-100 text-yellow-800',
+      'C1': 'bg-orange-100 text-orange-800',
+      'C2': 'bg-purple-100 text-purple-800'
+    };
+    return colors[level] || 'bg-gray-100 text-gray-800';
+  };
+
+  const handlePrint = async (achievementId: string) => {
+    try {
+      const response = await fetch(`/certificates/${achievementId}`);
+      if (response.ok) {
+        const htmlContent = await response.text();
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+          newWindow.document.write(htmlContent);
+          newWindow.document.close();
+          setTimeout(() => {
+            newWindow.print();
+          }, 500);
+        }
+      }
+    } catch (error) {
+      console.error('Error printing certificate:', error);
+      toast.error('Failed to print certificate');
+    }
+  };
+
+  const handleDownload = async (achievementId: string) => {
+    try {
+      const response = await fetch(`/api/certificates/${achievementId}/pdf`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `certificate-${achievementId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Error downloading certificate:', error);
+      toast.error('Failed to download certificate');
+    }
+  };
+
+  const handleView = (achievementId: string) => {
+    window.open(`/certificates/${achievementId}`, '_blank');
   };
 
   if (loading) {
@@ -482,16 +589,68 @@ export default function StudentProgressPage() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {achievements.map((achievement) => (
-                    <div key={achievement.id} className="flex items-center space-x-3 p-4 bg-muted/50 rounded-lg">
-                      <div className="p-2 bg-primary/10 rounded-full">
-                        <Star className="w-4 h-4 text-primary" />
+                    <div key={achievement.id} className="flex flex-col p-4 bg-muted/50 rounded-lg">
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="p-2 bg-primary/10 rounded-full">
+                          <span className="text-lg">{achievement.icon}</span>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm">{achievement.title}</h4>
+                          <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{achievement.title}</h4>
-                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Unlocked {formatDate(achievement.unlockedAt)}
-                        </p>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>Unlocked {formatDate(achievement.unlockedAt)}</span>
+                          {achievement.cefrLevel && (
+                            <Badge className={getLevelColor(achievement.cefrLevel)}>
+                              {achievement.cefrLevel}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {achievement.score && achievement.totalQuestions && (
+                          <div className="text-center py-2 bg-blue-50 rounded">
+                            <div className="text-lg font-bold text-blue-600">
+                              {achievement.score}/{achievement.totalQuestions}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              {Math.round((achievement.score / achievement.totalQuestions) * 100)}% Accuracy
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Action buttons for certificates */}
+                        {achievement.source === 'Certificate' && achievement.certificateId && (
+                          <div className="flex items-center gap-2 pt-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleView(achievement.certificateId!)}
+                              className="flex items-center gap-1 flex-1"
+                            >
+                              <Eye className="h-3 w-3" />
+                              View
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePrint(achievement.certificateId!)}
+                              className="flex items-center gap-1"
+                            >
+                              <Printer className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDownload(achievement.certificateId!)}
+                              className="flex items-center gap-1"
+                            >
+                              <Download className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

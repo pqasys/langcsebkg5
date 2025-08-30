@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PasswordInput } from "@/components/ui/password-input";
 import LanguageProficiencyManager from '@/components/student/LanguageProficiencyManager';
 import SocialLinksManager from '@/components/student/SocialLinksManager';
+import AchievementPrivacyManager from '@/components/student/AchievementPrivacyManager';
 import { LANGUAGES } from '@/lib/data/languages';
 
 interface StudentProfile {
@@ -940,6 +941,14 @@ export default function StudentSettingsPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Achievement Privacy Settings */}
+            {session?.user?.id && (
+              <AchievementPrivacyManager 
+                userId={session.user.id} 
+                disabled={saving}
+              />
+            )}
           </div>
         </TabsContent>
 

@@ -112,25 +112,33 @@ export class CertificateServiceSecure {
       testType: 'proficiency'
     };
 
-    // Generate PDF certificate
-    const pdfBuffer = await FluentShipCertificateGeneratorSecure.generateCertificate(certificateData);
+    // Generate certificate data for storage and email distribution
+    let certificateBuffer;
+    try {
+      certificateBuffer = await FluentShipCertificateGeneratorSecure.generateEmailCertificate(certificateData);
+    } catch (error) {
+      console.error('Error generating certificate:', error);
+      // Continue without certificate buffer - certificate can still be created
+      certificateBuffer = null;
+    }
 
-    // Save certificate to database
-    const certificate = await prisma.certificate.create({
-      data: {
-        id: certificateId,
-        certificateId: certificateId,
-        userId: testAttempt.userId,
-        testAttemptId: testAttemptId,
-        language: testAttempt.languageCode,
-        languageName: languageName,
-        cefrLevel: testAttempt.level, // Use 'level' field from the model
-        score: testAttempt.score,
-        totalQuestions: totalQuestions, // Use calculated total questions
-        completionDate: testAttempt.completedAt,
-        certificateUrl: `/certificates/${certificateId}`
-      }
-    });
+         // Save certificate to database
+     const certificate = await prisma.certificate.create({
+       data: {
+         id: certificateId,
+         certificateId: certificateId,
+         userId: testAttempt.userId,
+         testAttemptId: testAttemptId,
+         language: testAttempt.languageCode,
+         languageName: languageName,
+         cefrLevel: testAttempt.level, // Use 'level' field from the model
+         score: testAttempt.score,
+         totalQuestions: totalQuestions, // Use calculated total questions
+         completionDate: testAttempt.completedAt,
+         certificateUrl: `/certificates/${certificateId}`
+         // certificateData: certificateBuffer ? certificateBuffer.toString('base64') : null // Temporarily disabled
+       }
+     });
 
     // Note: PDF file saving is disabled for browser compatibility
     // The certificate data is stored in the database and can be generated on-demand
@@ -196,10 +204,10 @@ export class CertificateServiceSecure {
     return certificatesWithAchievements;
   }
 
-  static async getCertificateById(certificateId: string): Promise<any> {
+  static async getCertificateById(certificateId: string, includeData: boolean = false): Promise<any> {
     const certificate = await prisma.certificate.findUnique({
       where: { certificateId: certificateId },
-      include: {
+      include: includeData ? undefined : {
         user: {
           select: {
             name: true,
@@ -214,7 +222,39 @@ export class CertificateServiceSecure {
             completedAt: true
           }
         }
-      }
+      },
+             select: includeData ? {
+         id: true,
+         certificateId: true,
+         userId: true,
+         testAttemptId: true,
+         language: true,
+         languageName: true,
+         cefrLevel: true,
+         score: true,
+         totalQuestions: true,
+         completionDate: true,
+         certificateUrl: true,
+         // certificateData: true, // Temporarily commented out until database field is properly added
+         isPublic: true,
+         sharedAt: true,
+         createdAt: true,
+         updatedAt: true,
+         user: {
+           select: {
+             name: true,
+             email: true
+           }
+         },
+         testAttempt: {
+           select: {
+             languageCode: true,
+             level: true,
+             score: true,
+             completedAt: true
+           }
+         }
+       } : undefined
     });
 
     if (!certificate) {
@@ -377,5 +417,105 @@ export class CertificateServiceSecure {
       where: { userId: userId },
       orderBy: { createdAt: 'desc' }
     });
+  }
+
+  static async getCertificateStats(userId: string) {
+    const certificates = await this.getUserCertificates(userId);
+    
+    if (certificates.length === 0) {
+      return {
+        totalCertificates: 0,
+        totalAchievements: 0,
+        averageScore: 0,
+        languagesTested: 0,
+        highestLevel: 'A1'
+      };
+    }
+
+    const totalCertificates = certificates.length;
+    const totalAchievements = certificates.reduce((sum, cert) => sum + (cert.achievements?.length || 0), 0);
+    const averageScore = Math.round(
+      certificates.reduce((sum, cert) => sum + (cert.score / cert.totalQuestions * 100), 0) / totalCertificates
+    );
+    const languagesTested = new Set(certificates.map(cert => cert.language)).size;
+    const highestLevel = this.getHighestCEFRLevel(certificates.map(cert => cert.cefrLevel));
+
+    return {
+      totalCertificates,
+      totalAchievements,
+      averageScore,
+      languagesTested,
+      highestLevel
+    };
+  }
+
+  static async getPublicCertificates() {
+    const certificates = await prisma.certificate.findMany({
+      where: {
+        isPublic: true
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true
+          }
+        },
+        achievements: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 20 // Limit to 20 most recent public certificates
+    });
+
+    return certificates;
+  }
+
+  static async getPublicCertificateStats() {
+    const publicCertificates = await prisma.certificate.findMany({
+      where: {
+        isPublic: true
+      },
+      include: {
+        achievements: true
+      }
+    });
+
+    if (publicCertificates.length === 0) {
+      return {
+        totalCertificates: 0,
+        totalAchievements: 0,
+        averageScore: 0,
+        languagesTested: 0,
+        highestLevel: 'A1'
+      };
+    }
+
+    const totalCertificates = publicCertificates.length;
+    const totalAchievements = publicCertificates.reduce((sum, cert) => sum + (cert.achievements?.length || 0), 0);
+    const averageScore = Math.round(
+      publicCertificates.reduce((sum, cert) => sum + (cert.score / cert.totalQuestions * 100), 0) / totalCertificates
+    );
+    const languagesTested = new Set(publicCertificates.map(cert => cert.language)).size;
+    const highestLevel = this.getHighestCEFRLevel(publicCertificates.map(cert => cert.cefrLevel));
+
+    return {
+      totalCertificates,
+      totalAchievements,
+      averageScore,
+      languagesTested,
+      highestLevel
+    };
+  }
+
+  private static getHighestCEFRLevel(levels: string[]): string {
+    const levelsOrder = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    return levels.reduce((highest, current) => {
+      const currentIndex = levelsOrder.indexOf(current);
+      const highestIndex = levelsOrder.indexOf(highest);
+      return currentIndex > highestIndex ? current : highest;
+    }, 'A1');
   }
 }

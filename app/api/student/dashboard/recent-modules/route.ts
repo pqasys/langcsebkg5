@@ -94,6 +94,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(transformedModules);
   } catch (error) {
     console.error('Error fetching recent modules:');
-    return new NextResponse('Internal Server Error', { status: 500, statusText: 'Internal Server Error', statusText: 'Internal Server Error' });
+    return new NextResponse('Internal Server Error', { status: 500, statusText: 'Internal Server Error' });
   }
 } 

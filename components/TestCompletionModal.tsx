@@ -195,7 +195,7 @@ export function TestCompletionModal({
   };
 
   const handleViewCertificate = () => {
-    window.open('/certificates', '_blank');
+            window.open('/achievements', '_blank');
   };
 
   const handleShareAchievement = () => {

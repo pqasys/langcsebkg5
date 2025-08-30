@@ -34,7 +34,8 @@ import {
   DollarSign,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Trophy
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -373,6 +374,13 @@ function LiveConversationsInner() {
               >
                 <BookOpen className="w-4 h-4 mr-2" />
                 My Bookings
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/achievements')}
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                Certificates
               </Button>
               <Button
                 variant="outline"

@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { CertificateServiceSecure as CertificateService } from '@/lib/services/certificate-service-secure';
+import { FluentShipCertificateGeneratorSecure } from '@/lib/certificate-generator-secure';
+import { PDFConverter } from '@/lib/pdf-converter';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -45,6 +47,30 @@ export async function POST(request: NextRequest) {
 
     // Generate certificate
     const certificate = await CertificateService.createCertificate(testAttempt.id);
+    
+         // Generate certificate HTML for email attachment
+     let certificatePDF: Buffer | null = null;
+     try {
+       const certificateHTML = await FluentShipCertificateGeneratorSecure.generateCertificate({
+         userName: user.name || 'Student',
+         language: language,
+         languageName: languageNames[language] || language,
+         cefrLevel: results.level,
+         score: results.score,
+         totalQuestions: 80, // Standard test length
+         completionDate: new Date().toLocaleDateString(),
+         certificateId: certificate.certificateId,
+         testType: 'proficiency'
+       });
+       
+       // Convert HTML to PDF for email attachment with better error handling
+       const htmlString = certificateHTML.toString('utf-8');
+       certificatePDF = await PDFConverter.certificateToPDF(htmlString);
+       console.log('PDF generated successfully for email attachment');
+     } catch (error) {
+       console.error('Error generating certificate PDF for email:', error);
+       // Continue without PDF attachment
+     }
 
     // Get user's achievements
     const achievements = await CertificateService.getUserAchievements(userId);
@@ -152,7 +178,7 @@ export async function POST(request: NextRequest) {
             </ul>
 
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXTAUTH_URL}/certificates" class="btn">View All Certificates</a>
+                              <a href="${process.env.NEXTAUTH_URL}/achievements" class="btn">View All Achievements</a>
               <a href="${process.env.NEXTAUTH_URL}/features/community-learning" class="btn">Join Community</a>
             </div>
           </div>
@@ -168,18 +194,24 @@ export async function POST(request: NextRequest) {
     `;
 
     // Send email with certificate attachment
-    await resend.emails.send({
+    const emailData: any = {
       from: 'FluentShip <noreply@fluentship.com>',
       to: user.email,
       subject: `🎉 Your ${languageName} Language Proficiency Test Results - ${results.level} Level Achieved!`,
       html: emailHtml,
-      attachments: [
+    };
+
+    // Add certificate PDF attachment if available
+    if (certificatePDF) {
+      emailData.attachments = [
         {
           filename: `FluentShip_${languageName}_${results.level}_Certificate.pdf`,
-          path: certificate.certificateUrl
+          content: certificatePDF
         }
-      ]
-    });
+      ];
+    }
+
+    await resend.emails.send(emailData);
 
     return NextResponse.json({ 
       success: true, 

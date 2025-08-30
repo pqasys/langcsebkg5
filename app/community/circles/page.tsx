@@ -21,7 +21,8 @@ import {
   MessageCircle,
   Star,
   Crown,
-  CheckCircle
+  CheckCircle,
+  Trophy
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
@@ -234,6 +235,12 @@ export default function CommunityCirclesPage() {
                 <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
                   <Calendar className="h-4 w-4 mr-2" />
                   View Clubs
+                </Button>
+              </Link>
+              <Link href="/achievements">
+                <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <Trophy className="h-4 w-4 mr-2" />
+                  View Certificates
                 </Button>
               </Link>
             </div>

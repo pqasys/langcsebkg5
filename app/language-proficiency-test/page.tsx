@@ -694,6 +694,16 @@ export default function LanguageProficiencyTestPage() {
                   </AlertDescription>
                 </Alert>
               )}
+              
+              {/* View Certificates Link */}
+              <div className="mt-6 text-center">
+                <Link href="/achievements">
+                  <Button variant="outline" className="w-full">
+                    <Trophy className="h-4 w-4 mr-2" />
+                    View All Certificates
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         )}

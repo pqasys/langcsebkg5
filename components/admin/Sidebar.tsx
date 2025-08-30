@@ -34,7 +34,8 @@ import {
   LogOut,
   Video,
   Palette,
-  MessageCircle
+  MessageCircle,
+  Award
 } from 'lucide-react';
 // import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -331,6 +332,28 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
                       </Badge>
                     )}
                   </Link>
+
+                                     <Link
+                     href="/admin/certificates"
+                     className={cn(
+                       'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                       pathname === '/admin/certificates' ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                     )}
+                   >
+                     <Award className="h-4 w-4" />
+                     Certificates
+                   </Link>
+
+                   <Link
+                     href="/admin/achievement-privacy"
+                     className={cn(
+                       'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-gray-800',
+                       pathname === '/admin/achievement-privacy' ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
+                     )}
+                   >
+                     <Shield className="h-4 w-4" />
+                     Achievement Privacy
+                   </Link>
                 </div>
               </div>
 
@@ -440,7 +463,7 @@ export default function AdminSidebar({ institutionId }: AdminSidebarProps) {
                       isQuestionTemplatesPage ? 'bg-gray-800 text-gray-50' : 'text-gray-400 hover:text-gray-50'
                     )}
                   >
-                    <FileText className="h-4 w-4" />
+                    <Tag className="h-4 w-4" />
                     Question Templates
                   </Link>
 

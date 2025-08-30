@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react'
 import { SimpleNotifications } from '@/components/SimpleNotifications'
 import { 
   LayoutDashboard, BookOpen, Users, GraduationCap, Settings as SettingsIcon, 
-  PlusCircle, Calendar, Search as SearchIcon, Menu, X
+  PlusCircle, Calendar, Search as SearchIcon, Menu, X, Trophy, Award
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -27,6 +27,7 @@ function RoleLinks(role: string | undefined): NavItem[] {
         { href: '/student', label: 'Dashboard', icon: LayoutDashboard },
         { href: '/student/courses', label: 'My Courses', icon: BookOpen },
         { href: '/student/calendar', label: 'Study Calendar', icon: Calendar },
+        { href: '/achievements', label: 'Achievements', icon: Award },
         { href: '/community/circles', label: 'Circles', icon: Users, badgeCount: 12, badgeKey: 'circles' },
         { href: '/community/clubs', label: 'Clubs', icon: Calendar, badgeCount: 5, badgeKey: 'clubs' },
         { href: '/student/settings', label: 'Settings', icon: SettingsIcon },
@@ -57,6 +58,7 @@ function RoleLinks(role: string | undefined): NavItem[] {
       return [
         { href: '/community/circles', label: 'Circles', icon: Users, badgeCount: 18, badgeKey: 'circles' },
         { href: '/community/clubs', label: 'Clubs', icon: Calendar, badgeCount: 7, badgeKey: 'clubs' },
+        { href: '/achievements/public', label: 'Achievements', icon: Award },
       ]
   }
 }

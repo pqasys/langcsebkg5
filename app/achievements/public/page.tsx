@@ -1,0 +1,295 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { 
+  Trophy, 
+  Award,
+  Star,
+  Globe,
+  Search,
+  Filter,
+  Users,
+  Calendar,
+  CheckCircle,
+  Lock
+} from 'lucide-react';
+
+interface PublicAchievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  language?: string;
+  languageName?: string;
+  cefrLevel?: string;
+  score?: number;
+  totalQuestions?: number;
+  completionDate: string;
+  user: {
+    id: string;
+    name: string;
+    image?: string;
+  };
+}
+
+export default function PublicAchievementsPage() {
+  const [achievements, setAchievements] = useState<PublicAchievement[]>([]);
+  const [filteredAchievements, setFilteredAchievements] = useState<PublicAchievement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [languageFilter, setLanguageFilter] = useState('all');
+  const [levelFilter, setLevelFilter] = useState('all');
+
+  useEffect(() => {
+    fetchPublicAchievements();
+  }, []);
+
+  useEffect(() => {
+    filterAchievements();
+  }, [achievements, searchTerm, languageFilter, levelFilter]);
+
+  const fetchPublicAchievements = async () => {
+    try {
+      const response = await fetch('/api/achievements/public');
+      const data = await response.json();
+      
+      if (data.success) {
+        setAchievements(data.data || []);
+      } else {
+        console.error('Failed to fetch public achievements:', data.error);
+        setAchievements([]);
+      }
+    } catch (error) {
+      console.error('Error fetching public achievements:', error);
+      setAchievements([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterAchievements = () => {
+    let filtered = achievements;
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(achievement =>
+        achievement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        achievement.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        achievement.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (achievement.languageName && achievement.languageName.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    // Language filter
+    if (languageFilter && languageFilter !== 'all') {
+      filtered = filtered.filter(achievement =>
+        achievement.language === languageFilter
+      );
+    }
+
+    // Level filter
+    if (levelFilter && levelFilter !== 'all') {
+      filtered = filtered.filter(achievement =>
+        achievement.cefrLevel === levelFilter
+      );
+    }
+
+    setFilteredAchievements(filtered);
+  };
+
+  const getLanguageFlag = (language: string) => {
+    const flags: { [key: string]: string } = {
+      'en': '🇺🇸',
+      'fr': '🇫🇷',
+      'es': '🇪🇸',
+      'de': '🇩🇪',
+      'it': '🇮🇹',
+      'pt': '🇵🇹',
+      'ru': '🇷🇺',
+      'zh': '🇨🇳',
+      'ja': '🇯🇵',
+      'ko': '🇰🇷'
+    };
+    return flags[language] || '🌍';
+  };
+
+  const getLevelColor = (level: string) => {
+    const colors: { [key: string]: string } = {
+      'A1': 'bg-gray-100 text-gray-800',
+      'A2': 'bg-blue-100 text-blue-800',
+      'B1': 'bg-green-100 text-green-800',
+      'B2': 'bg-yellow-100 text-yellow-800',
+      'C1': 'bg-orange-100 text-orange-800',
+      'C2': 'bg-purple-100 text-purple-800'
+    };
+    return colors[level] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading achievements...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white">
+        <div className="container mx-auto px-6 py-16">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">
+              Community Achievements
+            </h1>
+            <p className="text-xl text-blue-100">
+              Discover and celebrate language learning achievements from our global community
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-8">
+        {/* Filters */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Filter className="h-5 w-5 mr-2" />
+              Filter Achievements
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search achievements..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <Select value={languageFilter} onValueChange={setLanguageFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Languages" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Languages</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="fr">French</SelectItem>
+                  <SelectItem value="es">Spanish</SelectItem>
+                  <SelectItem value="de">German</SelectItem>
+                  <SelectItem value="it">Italian</SelectItem>
+                  <SelectItem value="pt">Portuguese</SelectItem>
+                  <SelectItem value="ru">Russian</SelectItem>
+                  <SelectItem value="zh">Chinese</SelectItem>
+                  <SelectItem value="ja">Japanese</SelectItem>
+                  <SelectItem value="ko">Korean</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={levelFilter} onValueChange={setLevelFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Levels" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Levels</SelectItem>
+                  <SelectItem value="A1">A1 - Beginner</SelectItem>
+                  <SelectItem value="A2">A2 - Elementary</SelectItem>
+                  <SelectItem value="B1">B1 - Intermediate</SelectItem>
+                  <SelectItem value="B2">B2 - Upper Intermediate</SelectItem>
+                  <SelectItem value="C1">C1 - Advanced</SelectItem>
+                  <SelectItem value="C2">C2 - Mastery</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results Count */}
+        <div className="mb-6">
+          <p className="text-gray-600">
+            Showing {filteredAchievements.length} of {achievements.length} public achievement{achievements.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {/* Achievements Grid */}
+        {filteredAchievements.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Award className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-semibold mb-2">No achievements found</h3>
+              <p className="text-gray-600">
+                Try adjusting your filters or check back later for new achievements.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAchievements.map((achievement) => (
+              <Card key={achievement.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-2xl">{achievement.icon}</span>
+                      <div>
+                        <CardTitle className="text-lg">{achievement.title}</CardTitle>
+                        <p className="text-sm text-gray-600">{achievement.user.name}</p>
+                      </div>
+                    </div>
+                    {achievement.cefrLevel && (
+                      <Badge className={getLevelColor(achievement.cefrLevel)}>
+                        {achievement.cefrLevel}
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600">{achievement.description}</p>
+                    
+                    {achievement.score && achievement.totalQuestions && (
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {achievement.score}/{achievement.totalQuestions}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {Math.round((achievement.score / achievement.totalQuestions) * 100)}% Accuracy
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="text-sm text-gray-600">
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>Earned: {new Date(achievement.completionDate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 text-green-600">
+                      <CheckCircle className="h-4 w-4" />
+                      <span className="text-sm">Public Achievement</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
